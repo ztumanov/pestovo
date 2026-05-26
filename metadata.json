@@ -1,0 +1,6 @@
+{
+  "name": "Санаторий Пестово",
+  "description": "Современный сайт санатория «Пестово» ФТС РФ в Ялте (Гаспра) с галереей номеров, описанием лечебных программ и интерактивной формой бронирования.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
