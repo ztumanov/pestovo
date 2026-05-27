@@ -18,8 +18,8 @@ export default function AdminFloatBar() {
   const {
     isAdminMode,
     setIsAdminMode,
-    setShowAdminPanel,
-    showAdminPanel,
+    currentPage,
+    setCurrentPage,
     resetToDefault,
     setActiveSettingsTab
   } = useAdminData();
@@ -34,7 +34,7 @@ export default function AdminFloatBar() {
       if (e.ctrlKey && e.altKey && (e.key === 'a' || e.key === 'A' || e.key === 'ф' || e.key === 'Ф')) {
         e.preventDefault();
         if (isAdminMode) {
-          setShowAdminPanel(prev => !prev);
+          setCurrentPage(prev => prev === 'admin' ? 'home' : 'admin');
         } else {
           setShowLoginModal(prev => !prev);
         }
@@ -43,7 +43,7 @@ export default function AdminFloatBar() {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isAdminMode, setShowAdminPanel]);
+  }, [isAdminMode, setCurrentPage]);
 
   const handleLoginSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -51,7 +51,7 @@ export default function AdminFloatBar() {
     if (password === 'admin2026' || password === 'admin' || password === '1234') {
       setIsAdminMode(true);
       setShowLoginModal(false);
-      setShowAdminPanel(true);
+      setCurrentPage('admin');
       setPassword('');
       setLoginError('');
     } else {
@@ -63,7 +63,7 @@ export default function AdminFloatBar() {
   useEffect(() => {
     const triggerLogin = () => {
       if (isAdminMode) {
-        setShowAdminPanel(true);
+        setCurrentPage('admin');
       } else {
         setShowLoginModal(true);
       }
@@ -71,7 +71,7 @@ export default function AdminFloatBar() {
 
     window.addEventListener('trigger-admin-login', triggerLogin);
     return () => window.removeEventListener('trigger-admin-login', triggerLogin);
-  }, [isAdminMode, setShowAdminPanel]);
+  }, [isAdminMode, setCurrentPage]);
 
   return (
     <>
@@ -98,7 +98,7 @@ export default function AdminFloatBar() {
             <div className="flex flex-wrap items-center justify-center gap-2">
               <button 
                 onClick={() => {
-                  setShowAdminPanel(true);
+                  setCurrentPage('admin');
                   setActiveSettingsTab('hero');
                 }}
                 className="bg-[#c5a880] hover:bg-[#b0936b] text-[#022C22] font-semibold text-[10px] sm:text-xs px-3 py-1.5 rounded-sm uppercase tracking-wider transition-all shadow active:scale-95"

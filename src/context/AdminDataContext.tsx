@@ -92,6 +92,8 @@ interface AdminDataContextProps {
   setActiveSettingsTab: (tab: string) => void;
   showAdminPanel: boolean;
   setShowAdminPanel: (show: boolean) => void;
+  currentPage: 'home' | 'documents' | 'admin' | 'testimonials';
+  setCurrentPage: (page: 'home' | 'documents' | 'admin' | 'testimonials') => void;
 }
 
 const AdminDataContext = createContext<AdminDataContextProps | undefined>(undefined);
@@ -101,6 +103,7 @@ export function AdminDataProvider({ children }: { children: React.ReactNode }) {
   const [isAdminMode, setIsAdminMode] = useState<boolean>(false);
   const [showAdminPanel, setShowAdminPanel] = useState<boolean>(false);
   const [activeSettingsTab, setActiveSettingsTab] = useState<string>('hero');
+  const [currentPage, setCurrentPage] = useState<'home' | 'documents' | 'admin' | 'testimonials'>('home');
 
   // Load from local storage on mount
   useEffect(() => {
@@ -185,7 +188,9 @@ export function AdminDataProvider({ children }: { children: React.ReactNode }) {
       activeSettingsTab,
       setActiveSettingsTab,
       showAdminPanel,
-      setShowAdminPanel
+      setShowAdminPanel,
+      currentPage,
+      setCurrentPage
     }}>
       {children}
     </AdminDataContext.Provider>

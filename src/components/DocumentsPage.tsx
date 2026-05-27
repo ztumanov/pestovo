@@ -1,0 +1,832 @@
+import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
+import { 
+  FileText, 
+  Search, 
+  Download, 
+  Eye, 
+  Upload, 
+  Check, 
+  ArrowLeft,
+  ChevronRight,
+  Shield, 
+  CheckCircle2, 
+  Clock, 
+  Building2, 
+  UserCheck, 
+  HelpCircle,
+  FileCheck,
+  Briefcase,
+  AlertCircle,
+  Menu,
+  X,
+  Plus
+} from 'lucide-react';
+import { useAdminData } from '../context/AdminDataContext';
+
+interface DocumentItem {
+  id: string;
+  title: string;
+  code?: string;
+  category: 'constituent' | 'medical' | 'law' | 'reception' | 'finance' | 'modifications';
+  categoryLabel: string;
+  summary: string;
+  pdfUrl: string | null;
+  fileSize?: string;
+  uploadDate?: string;
+  originalText?: string;
+}
+
+const INITIAL_DOCUMENTS: DocumentItem[] = [
+  {
+    id: 'tourism-extract',
+    title: 'ВЫПИСКА ИЗ ЕДИНОГО РЕЕСТРА КЛАССИФИКАЦИИ В СФЕРЕ ТУРИСТСКОЙ ИНДУСТРИИ',
+    code: 'Рег. № 55001293',
+    category: 'finance',
+    categoryLabel: 'Финансовые и классификация',
+    summary: 'Свидетельство о присвоении категории звездности санаторно-курортного учреждения согласно единым федеральным стандартам РФ.',
+    pdfUrl: '/documents/tourism-extract.pdf',
+    fileSize: '1.4 MB',
+    uploadDate: '24.01.2025',
+    originalText: 'ФЕДЕРАЛЬНОЕ АГЕНТСТВО ПО ТУРИЗМУ\n\nВыписка из единого государственного реестра аккредитованных объектов классификации санаторно-курортной сферы.\nСанаторий «Пестово» ФТС России квалифицирован по общенациональным стандартам туристской индустрии.'
+  },
+  {
+    id: 'citizen-appeals',
+    title: 'Обращения граждан',
+    code: 'Инструкция ФТС',
+    category: 'reception',
+    categoryLabel: 'Лечебный режим и обращения',
+    summary: 'Регламент и график личного приема граждан администрацией санатория, форма подачи предложений и рассмотрения жалоб.',
+    pdfUrl: '/documents/citizen-appeals.pdf',
+    fileSize: '840 KB',
+    uploadDate: '12.02.2026',
+    originalText: 'ПОРЯДОК РАССМОТРЕНИЯ ОБРАЩЕНИЙ ГРАЖДАН\n\nРассмотрение обращений граждан в ФГКУ «Санаторий «Пестово» ФТС России» осуществляется в строгом соответствии с Федеральным законом № 59-ФЗ «О порядке рассмотрения обращений граждан Российской Федерации».'
+  },
+  {
+    id: 'sanatorium-info',
+    title: 'Информация о санатории',
+    code: 'Общие сведения',
+    category: 'constituent',
+    categoryLabel: 'Учредительные и общие',
+    summary: 'Сводная нормативная карточка учреждения: уставные цели, профили лечения, паспорт безопасности ведомственного учреждения.',
+    pdfUrl: '/documents/sanatorium-info.pdf',
+    fileSize: '2.1 MB',
+    uploadDate: '15.01.2026',
+    originalText: 'ОФИЦИАЛЬНАЯ СПРАВКА ОБ УЧРЕЖДЕНИИ\n\nФедеральное государственное казенное учреждение «Санаторий «Пестово» ФТС России». Специализированное учреждение круглогодичного действия на 210 мест. Ключевые лечебные факторы: уникальный горно-морской микроклимат Гаспры.'
+  },
+  {
+    id: 'minzdrav-956n',
+    title: 'Приказ Минздрава РФ от 30.12.2014 N 956Н',
+    code: 'Приказ № 956Н',
+    category: 'medical',
+    categoryLabel: 'Лицензии и стандарты',
+    summary: 'Об утверждении информации, необходимой для проведения независимой оценки качества условий оказания услуг медицинскими организациями.',
+    pdfUrl: null,
+    originalText: 'МИНИСТЕРСТВО ЗДРАВООХРАНЕНИЯ РОССИЙСКОЙ ФЕДЕРАЦИИ\n\nПРИКАЗ от 30 декабря 2014 г. N 956н\n\nОб утверждении информации, предоставляемой медицинскими организациями, и порядка её размещения на официальных сайтах органов государственной власти и ведомственных информационных порталах.'
+  },
+  {
+    id: 'egrul-2023',
+    title: 'ЕГРЮЛ на 18.07.2023',
+    code: 'ОГРН 5137746004787',
+    category: 'constituent',
+    categoryLabel: 'Учредительные и общие',
+    summary: 'Официальная выписка из Единого государственного реестра юридических лиц по состоянию на 18 июля 2023 года.',
+    pdfUrl: '/documents/egrul-2023.pdf',
+    fileSize: '3.4 MB',
+    uploadDate: '18.07.2023',
+    originalText: 'ВЫПИСКА ИЗ ЕДИННОГО ГОСУДАРСТВЕННОГО РЕЕСТРА ЮРИДИЧЕСКИХ ЛИЦ\n\nДата формирования выписки: 18.07.2023\nНаименование: ФГКУ «Санаторий Пестово ФТС России»\nЮридический адрес: Респ Крым, г Ялта, пгт Гаспра, Севастопольское шоссе, д. 52.'
+  },
+  {
+    id: 'payment-details',
+    title: 'Реквизиты для оплаты',
+    code: 'Лицевой счет № 04751А45010',
+    category: 'finance',
+    categoryLabel: 'Финансовые и классификация',
+    summary: 'Государственные платежные реквизиты УФК для зачисления средств за платные оздоровительные процедуры и путевки.',
+    pdfUrl: '/documents/payment-details.pdf',
+    fileSize: '120 KB',
+    uploadDate: '10.05.2026',
+    originalText: 'РЕКВИЗИТЫ ДЛЯ ПЛАТЕЖЕЙ И БЕЗНАЛИЧНЫХ ПЕРЕВОДОВ\n\nПолучатель: УФК по Республике Крым (ФГКУ Санаторий Пестово ФТС России)\nИНН / КПП: 7713778678 / 910301001\nБанк получателя: ОТДЕЛЕНИЕ РЕСПУБЛИКА КРЫМ БАНКА РОССИИ // УФК по Республике Крым г. Симферополь\nБИК: 013510002\nНомер казначейского счета: 03211643000000017500'
+  },
+  {
+    id: 'medical-care-types',
+    title: 'Виды медицинской помощи',
+    code: 'Медицинский паспорт',
+    category: 'medical',
+    categoryLabel: 'Лицензии и стандарты',
+    summary: 'Номенклатура доврачебной, врачебной и специализированной санаторно-курортной помощи по терапии, физиотерапии, педиатрии и кардиологии.',
+    pdfUrl: '/documents/medical-care-types.pdf',
+    fileSize: '950 KB',
+    uploadDate: '01.03.2026',
+    originalText: 'ПЕРЕЧЕНЬ ВИДОВ ОКАЗЫВАЕМОЙ МЕДИЦИНСКОЙ ПОМОЩИ\n\nСанаторий Пестово оказывает первичную доврачебную и первичную специализированную медико-санитарную помощь на основании государственной медицинской лицензии. Виды деятельности: Физиотерапия, ЛФК, Диетология, Массаж, Функциональная диагностика, Климатолечение.'
+  },
+  {
+    id: 'vital-drugs',
+    title: 'Жизненно необходимые и важнейшие лекарственные препараты',
+    code: 'ЖНВЛП 2026',
+    category: 'medical',
+    categoryLabel: 'Лицензии и стандарты',
+    summary: 'Реестр лекарственных средств для неотложного клинического обеспечения и оказания скорой медицинской помощи в изоляторе санатория.',
+    pdfUrl: null,
+    originalText: 'УТВЕРЖДЕННЫЙ ПЕРЕЧЕНЬ ЖНВЛП (ЖИЗНЕННО НЕОБХОДИМЫХ ЛЕКАРСТВЕННЫХ ПРЕПАРАТОВ)\n\nРегламент оказания неотложной лекарственной поддержки отдыхающих в соответствии с актуальным перечнем Министерства здравоохранения Российской Федерации.'
+  },
+  {
+    id: 'general-license',
+    title: 'Лицензия',
+    code: '№ Л041-00110-91/00554225',
+    category: 'medical',
+    categoryLabel: 'Лицензии и стандарты',
+    summary: 'Государственная бессрочная медицинская лицензия со спецификацией всех видов сертифицированных работ.',
+    pdfUrl: '/documents/general-license.pdf',
+    fileSize: '1.8 MB',
+    uploadDate: '22.06.2022',
+    originalText: 'ГОСУДАРСТВЕННАЯ МЕДИЦИНСКАЯ ЛИЦЕНЗИЯ\nЛицензия предоставлена Министерством Здравоохранения Республики Крым.\nСрок действия: бессрочно.\nРегистрационный номер бланка: Л041-00110-91/00554225.'
+  },
+  {
+    id: 'selection-procedure',
+    title: 'Порядок отбора',
+    code: 'Инструкция ФТС № 24-Р',
+    category: 'reception',
+    categoryLabel: 'Лечебный режим и обращения',
+    summary: 'Порядок ведомственного отбора и направления больных на медико-психологическую реабилитацию в санаторно-курортные учреждения ФТС.',
+    pdfUrl: null,
+    originalText: 'ИНСТРУКЦИЯ О ПОРЯДКЕ ОТБОРА НА ОЗДОРОВЛЕНИЕ\n\nПриказ и методические указания по отбору кандидатов из числа действующих сотрудников ФТС России, нуждающихся в прохождении санаторной или восстановительной реабилитации.'
+  },
+  {
+    id: 'minzdrav-956n-v2',
+    title: 'Приказ МЗ РФ № 956Н',
+    code: 'Дубликат / Архив',
+    category: 'medical',
+    categoryLabel: 'Лицензии и стандарты',
+    summary: 'Архивная копия и методические указания по внедрению требований Приказа № 956Н в ведомственные информационные системы ФТС.',
+    pdfUrl: null,
+    originalText: 'ПРИКАЗ МИНИСТЕРСТВА ЗДРАВООХРАНЕНИЯ РОССИЙСКОЙ ФЕДЕРАЦИИ № 956Н\n\n(Информационная выписка по обеспечению доступности данных медицинского характера для граждан и инспектирующих органов).'
+  },
+  {
+    id: 'fz-283',
+    title: 'Федеральный Закон № 283',
+    code: 'ФЗ № 283-ФЗ',
+    category: 'law',
+    categoryLabel: 'Нормативно-правовые акты',
+    summary: 'О социальных гарантиях сотрудникам некоторых федеральных органов исполнительной власти и внесении изменений в отдельные законодательные акты.',
+    pdfUrl: null,
+    originalText: 'РОССИЙСКАЯ ФЕДЕРАЦИЯ. ФЕДЕРАЛЬНЫЙ ЗАКОН № 283-ФЗ\n\nОпределяет порядок обеспечения путевками на санаторно-курортное лечение сотрудников таможенных органов РФ и пенсионеров ФТС, а также компенсации транспортных расходов к месту оздоровления.'
+  },
+  {
+    id: 'fz-323',
+    title: 'Федеральный Закон № 323',
+    code: 'ФЗ № 323-ФЗ',
+    category: 'law',
+    categoryLabel: 'Нормативно-правовые акты',
+    summary: 'Об основах охраны здоровья граждан в Российской Федерации — фундаментальный закон здравоохранения РФ.',
+    pdfUrl: null,
+    originalText: 'РОССИЙСКАЯ ФЕДЕРАЦИЯ. ФЕДЕРАЛЬНЫЙ ЗАКОН № 323-ФЗ\n\n«Об основах охраны здоровья граждан в Российской Федерации».\nГарантии прав граждан в сфере охраны здоровья, права пациентов при оказании медицинской и санаторной помощи.'
+  },
+  {
+    id: 'egrul-record-address',
+    title: 'Лист записи ЕГРЮЛ, адрес юридический',
+    code: 'Рег. № 213774619028',
+    category: 'constituent',
+    categoryLabel: 'Учредительные и общие',
+    summary: 'Документ, подтверждающий официальное изменение юридического адреса на фактический крымский реквизит в органах ФНС России.',
+    pdfUrl: null,
+    originalText: 'ЛИСТ ЗАПИСИ ЕДИНОГО ГОСУДАРСТВЕННОГО РЕЕСТРА ЮРИДИЧЕСКИХ ЛИЦ\n\nНастоящим подтверждается внесение изменений в учредительные ведомости ФГКУ «Санаторий Пестово» ФТС России касательно адреса постоянного юридического нахождения.'
+  },
+  {
+    id: 'fns-crimea',
+    title: 'свидетельство о поставке в ФНС РК',
+    code: 'КПП 910301001',
+    category: 'constituent',
+    categoryLabel: 'Учредительные и общие',
+    summary: 'Документ о постановке на учет российской организации в налоговом органе по новому месту нахождения на территории Республики Крым.',
+    pdfUrl: null,
+    originalText: 'МИНИСТЕРСТВО ПО НАЛОГАМ И СБОРАМ РОССИЙСКОЙ ФЕДЕРАЦИИ\n\nСвидетельство о постановке на учет юридического лица в налоговом органе по Республике Крым. Присвоен КПП Ялтинского региона.'
+  },
+  {
+    id: 'fns-ogrn-cert',
+    title: 'свидетельство ФНС ОГРН 015463944',
+    code: 'ОГРН 5137746004787 / 77',
+    category: 'constituent',
+    categoryLabel: 'Учредительные и общие',
+    summary: 'Бланк строгой отчетности ФНС РФ, заверяющий государственную регистрацию юридического лица при его создании.',
+    pdfUrl: '/documents/fns-ogrn-cert.pdf',
+    fileSize: '1.2 MB',
+    uploadDate: '29.10.2013',
+    originalText: 'СВИДЕТЕЛЬСТВО О ГОСУДАРСТВЕННОЙ РЕГИСТРАЦИИ\nСерия 77 № 015463944\n\nФедеральное государственное казенное учреждение «Санаторий «Пестово» Федеральной таможенной службы» зарегистрировано за основным государственным регистрационным номером 5137746004787.'
+  },
+  {
+    id: 'charter-pestovo',
+    title: 'Устав Пестово',
+    code: 'Лицензионный устав ФТС',
+    category: 'constituent',
+    categoryLabel: 'Учредительные и общие',
+    summary: 'Полная версия учредительного Устава со всеми изменениями и дополнениями Министерства Образования и ФТС.',
+    pdfUrl: '/documents/charter-pestovo.pdf',
+    fileSize: '4.6 MB',
+    uploadDate: '18.10.2013',
+    originalText: 'УСТАВ ФГКУ «САНАТОРИЙ «ПЕСТОВО» ФТС РОССИИ»\n\nПолный текст регламента органов управления, финансово-хозяйственной деятельности ведомственного учреждения, а также режима оказания медицинской помощи сотрудникам таможни.'
+  },
+  {
+    id: 'contract-sample',
+    title: 'Образец договора оказания санаторно-курортных услуг',
+    code: 'Типовой договор 2026',
+    category: 'finance',
+    categoryLabel: 'Финансовые и классификация',
+    summary: 'Двусторонний договор на оказание дополнительных платных оздоровительных или основных коммерческих услуг размещения.',
+    pdfUrl: null,
+    originalText: 'ТИПОВОЙ ДОГОВОР\nна оказание санаторно-курортных услуг\n\nТекст договора регламентирует права, обязанности сторон, условия возврата средств, правила отмены бронирования и перечень заложенных в путевку доврачебных процедур.'
+  },
+  {
+    id: 'incoming-memo',
+    title: 'ПАМЯТКА К СВЕДЕНИЮ ПОСТУПАЮЩИХ В САНАТОРИЙ',
+    code: 'Памятка гостю',
+    category: 'reception',
+    categoryLabel: 'Лечебный режим и обращения',
+    summary: 'Необходимый перечень медицинских справок, документов для взрослых и детей, правила заселения и выселения.',
+    pdfUrl: '/documents/incoming-memo.pdf',
+    fileSize: '450 KB',
+    uploadDate: '15.02.2026',
+    originalText: 'ВАЖНАЯ ИНФОРМАЦИЯ ДЛЯ ПРИБЫВАЮЩИХ НА ЛЕЧЕНИЕ\n\nПри заезде обязательно предоставить паспорт, санаторно-курортную карту № 072/у (детям № 076/у), полис ОМС, а также справку об эпидокружении. Режим заезда: с 08:00.'
+  },
+  {
+    id: 'sanatorium-rules',
+    title: 'Правила с-к р',
+    code: 'Санаторно-курортный режим',
+    category: 'reception',
+    categoryLabel: 'Лечебный режим и обращения',
+    summary: 'Правила внутреннего распорядка, дисциплины отдыхающих, пользования климатотерапевтическим парком и пляжной инфраструктурой Гаспры.',
+    pdfUrl: null,
+    originalText: 'ПРАВИЛА И РЕЖИМ САНАТОРНОГО ПРЕБЫВАНИЯ\n\nСоблюдение распорядка дня обязательно для всех гостей. Время тихого часа: с 14:30 до 16:00. Разведение костров и несанкционированное использование беспилотных аппаратов строго запрещены.'
+  },
+  {
+    id: 'privacy-policy',
+    title: 'Политика об обработке персональных данных',
+    code: 'ФЗ-152 Комитет Безопасности',
+    category: 'modifications',
+    categoryLabel: 'Нормативы и изменения',
+    summary: 'Основное ведомственное положение о защите конфиденциальных сведений, медицинских диагнозов и личных данных отдыхающих.',
+    pdfUrl: null,
+    originalText: 'ПОЛИТИКА В ОТНОШЕНИИ ОБРАБОТКИ ПЕРСОНАЛЬНЫХ ДАННЫХ\n\nРазработана в соответствии с Федеральным законом № 152-ФЗ. Регламентирует сбор, систематизацию, хранение и защиту паспортных, служебных и медицинских сведений гостей.'
+  },
+  {
+    id: 'director-order',
+    title: 'Приказ на начальника санатория',
+    code: 'Приказ ФТС № 44-ЛС',
+    category: 'constituent',
+    categoryLabel: 'Учредительные и общие',
+    summary: 'Выписка из приказа руководителя Федеральной таможенной службы России о назначении Логачёва Валерия Анатольевича на должность Начальника санатория.',
+    pdfUrl: null,
+    originalText: 'ПРИКАЗ РУКОВОДИТЕЛЯ ФЕДЕРАЛЬНОЙ ТАМОЖЕННОЙ СЛУЖБЫ РОССИЙСКОЙ ФЕДЕРАЦИИ\n\nО назначении на должность начальника Федерального государственного казенного учреждения «Санаторий «Пестово» ФТС России» Логачёва В.А.'
+  },
+  {
+    id: 'structure-pestovo',
+    title: 'Структура',
+    code: 'Организационная блок-схема',
+    category: 'medical',
+    categoryLabel: 'Лицензии и стандарты',
+    summary: 'Схема ведомственного подчинения: лечебные кабинеты, пищеблок, управление, отделение диагностики, хозяйственное снабжение.',
+    pdfUrl: null,
+    originalText: 'ОРГАНИЗАЦИОННАЯ СТРУКТУРА САНАТОРИЯ ПЕСТОВО\n\nБлок-схема включает: Административно-управленческий аппарат, Клинико-диагностическое отделение, Отделение физиотерапии, Отделение водолечения, Службу питания, Службу эксплуатации номерного фонда.'
+  },
+  {
+    id: 'medical-staff-list',
+    title: 'Список работников медицинского отдела',
+    code: 'Медицинский штат 2026',
+    category: 'medical',
+    categoryLabel: 'Лицензии и стандарты',
+    summary: 'Официальный перечень врачебного и сестринского персонала с квалификационными категориями и датами сертификации.',
+    pdfUrl: null,
+    originalText: 'РЕЕСТР КВАЛИФИЦИРОВАННОГО МЕДИЦИНСКОГО ШТАТА\n\nСписок врачей-терапевтов, пульмонологов, кардиологов, медицинских физиотерапевтических сестер с указанием уровня образования, специализации и сроков действия сертификатов.'
+  },
+  {
+    id: 'buildings-report',
+    title: 'Здания Пестово на 1 июля',
+    code: 'Инвентарный аудит',
+    category: 'constituent',
+    categoryLabel: 'Учредительные и общие',
+    summary: 'Официальный реестр капитальных сооружений, лечебных корпусов и вилл санатория, находящихся в оперативном управлении ФТС.',
+    pdfUrl: null,
+    originalText: 'ИНВЕНТАРНАЯ КУРАТОРСКАЯ ВЕДОМОСТЬ КАПИТАЛЬНЫХ СТРОЕНИЙ\n\nПеречень зданий и сооружений ФГКУ «Санаторий «Пестово» на Южном берегу Крыма по состоянию на 1 июля. Основные корпуса, вспомогательные сооружения.'
+  },
+  {
+    id: 'daily-schedule',
+    title: 'Распорядок',
+    code: 'Режим дня 2026',
+    category: 'reception',
+    categoryLabel: 'Лечебный режим и обращения',
+    summary: 'Регламент работы клинических кабинетов, ингалятория, массажей и график дежурств врачей медицинской службы.',
+    pdfUrl: null,
+    originalText: 'РЕЖИМ РАБОТЫ МЕДИЦИНСКИХ КАБИНЕТОВ И САНАТОРНОГО КОРПУСА\n\nУтвержденный график отпуска физиопроцедур, работы ЛФК, грязелечебницы и дежурных медицинских постов.'
+  },
+  {
+    id: 'modification-1',
+    title: '1-изменение',
+    code: 'Регламент изменений № 1',
+    category: 'modifications',
+    categoryLabel: 'Нормативы и изменения',
+    summary: 'Изменение в Положение о санаторно-курортном обеспечении в системе таможенных органов в части компенсационных выплат.',
+    pdfUrl: null,
+    originalText: 'УТВЕРЖДЕННЫЕ ИЗМЕНЕНИЯ В ВЕДОМСТВЕННЫЙ РЕГЛАМЕНТ ФТС (Лист Изменений № 1)\n\nРедактирование условий предоставления льгот для членов семей должностных лиц таможенных органов.'
+  },
+  {
+    id: 'modification-3',
+    title: '3-изменение',
+    code: 'Регламент изменений № 3',
+    category: 'modifications',
+    categoryLabel: 'Нормативы и изменения',
+    summary: 'Правки в уставные цели учреждения касательно расширения перечня разрешенных видов медицинской реабилитации.',
+    pdfUrl: null,
+    originalText: 'ИЗМЕНЕНИЯ И ДОПОЛНЕНИЯ В УСТАВ УЧРЕЖДЕНИЯ (Лист Изменений № 3)\n\nВнесение дополнительных лицензируемых терапевтических услуг в структуру государственного казенного задания.'
+  },
+  {
+    id: 'modification-4',
+    title: '4-изменение',
+    code: 'Регламент изменений № 4',
+    category: 'modifications',
+    categoryLabel: 'Нормативы и изменения',
+    summary: 'Официальные дополнения к регламенту дозирования процедур грязелечения и ванн в зависимости от кардиологического статуса.',
+    pdfUrl: null,
+    originalText: 'ИЗМЕНЕНИЯ В МЕДИЦИНСКИЙ ПРОТОКОЛ САНАТОРИЯ (Лист Изменений № 4)\n\nСпецификации контроля за противопоказаниями к синусоидальным модулированным токам (СМТ) и грязелечению.'
+  },
+  {
+    id: 'dispensary-update',
+    title: 'актуал перечень по дисп ИЗМЕНЕНИЕ',
+    code: 'Мед-протокол Д',
+    category: 'modifications',
+    categoryLabel: 'Нормативы и изменения',
+    summary: 'Актуальный ведомственный перечень заболеваний для диспансерного наблюдения сотрудников таможенных органов в санатории.',
+    pdfUrl: null,
+    originalText: 'ОФИЦИАЛЬНОЕ ИЗМЕНЕНИЕ В СПИСОК ДИСПАНСЕРНОГО НАБЛЮДЕНИЯ\n\nКорректировка перечня терапевтических манипуляций и сроков реабилитации офицеров ФТС, находящихся под динамическим врачебным контролем.'
+  },
+  {
+    id: 'bs-updating',
+    title: 'БС изменение',
+    code: 'Бюджетное соглашение ИЗМЕНЕНИЕ',
+    category: 'modifications',
+    categoryLabel: 'Нормативы и изменения',
+    summary: 'Изменение параметров финансирования и материального снабжения медицинских фондов казенного учреждения.',
+    pdfUrl: null,
+    originalText: 'ДОПОЛНИТЕЛЬНОЕ БЮДЖЕТНОЕ СОГЛАШЕНИЕ ФТС РОССИИ\n\nМодификация лимитов бюджетных обязательств на покупку расходных терапевтических средств на летний курортный сезон.'
+  },
+  {
+    id: 'pestovo-modification',
+    title: 'Пестово изменение',
+    code: 'Уставной регламент «Пестово»',
+    category: 'modifications',
+    categoryLabel: 'Нормативы и изменения',
+    summary: 'Специальное локальное изменение в структуру штатных единиц и должностных регламентов медиков санатория Пестово.',
+    pdfUrl: null,
+    originalText: 'ЛОКАЛЬНЫЙ ПРИКАЗ САНАТОРИЯ «ПЕСТОВО»\n\nКорректировка должностных инструкций дежурных медицинских сестер и графика уборки парковой курортной зоны.'
+  },
+  {
+    id: 'pobeda-modification',
+    title: 'Победа изменение',
+    code: 'Ведомственное взаимодействие',
+    category: 'modifications',
+    categoryLabel: 'Нормативы и изменения',
+    summary: 'Изменение в регламент обмена отдыхающими и совместного использования лечебных баз с другими санаториями ФТС.',
+    pdfUrl: null,
+    originalText: 'КООРДИНАЦИОННОЕ СОГЛАШЕНИЕ ВНУТРИ ВЕДОМСТВА ФТС\n\nИзменение регламентов направления пациентов в филиалы и партнерские ведомственные клинические площадки.'
+  },
+  {
+    id: 'cp-modification',
+    title: 'ЦП изменение',
+    code: 'Центральный пост ИЗМЕНЕНИЕ',
+    category: 'modifications',
+    categoryLabel: 'Нормативы и изменения',
+    summary: 'Изменение в режим охраны, контроля доступа и антитеррористического регламента центрального поста КПП санатория.',
+    pdfUrl: null,
+    originalText: 'ИНСТРУКЦИЯ ПО АНТИТЕРРОРИСТИЧЕСКОЙ ЗАЩИЩЕННОСТИ И ОХРАНЕ (ИЗМЕНЕНИЕ)\n\nРегламент взаимодействия службы ведомственной охраны и КПП №1 ФГКУ «Санаторий «Пестово» ФТС России».'
+  }
+];
+
+export default function DocumentsPage({ onBackToHome }: { onBackToHome: () => void }) {
+  const { isAdminMode } = useAdminData();
+  const [documents, setDocuments] = useState<DocumentItem[]>(() => {
+    try {
+      const saved = localStorage.getItem('pestovo_custom_documents');
+      return saved ? JSON.parse(saved) : INITIAL_DOCUMENTS;
+    } catch {
+      return INITIAL_DOCUMENTS;
+    }
+  });
+
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [viewingDoc, setViewingDoc] = useState<DocumentItem | null>(null);
+  const [feedbackMsg, setFeedbackMsg] = useState<string | null>(null);
+
+  // Admin dynamic upload state
+  const [uploadingDocId, setUploadingDocId] = useState<string | null>(null);
+  const [uploadProgress, setUploadProgress] = useState(0);
+
+  const saveToLocalStorage = (newDocs: DocumentItem[]) => {
+    localStorage.setItem('pestovo_custom_documents', JSON.stringify(newDocs));
+    setDocuments(newDocs);
+  };
+
+  const handleSimulatedPdfUpload = (docId: string, event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    setUploadingDocId(docId);
+    setUploadProgress(10);
+
+    const interval = setInterval(() => {
+      setUploadProgress((prev) => {
+        if (prev >= 100) {
+          clearInterval(interval);
+          setTimeout(() => {
+            const updated = documents.map((doc) => {
+              if (doc.id === docId) {
+                return {
+                  ...doc,
+                  pdfUrl: `/documents/${file.name}`,
+                  fileSize: `${(file.size / (1024 * 1024)).toFixed(2)} MB`,
+                  uploadDate: new Date().toLocaleDateString('ru-RU')
+                };
+              }
+              return doc;
+            });
+            saveToLocalStorage(updated);
+            setUploadingDocId(null);
+            setFeedbackMsg(`Файл ${file.name} успешно загружен в систему и привязан к документу.`);
+            setTimeout(() => setFeedbackMsg(null), 4000);
+          }, 300);
+          return 100;
+        }
+        return prev + 15;
+      });
+    }, 150);
+  };
+
+  const filteredDocs = documents.filter((doc) => {
+    const matchesSearch = doc.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                          (doc.code && doc.code.toLowerCase().includes(searchQuery.toLowerCase())) ||
+                          doc.summary.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesCategory = selectedCategory === 'all' || doc.category === selectedCategory;
+    return matchesSearch && matchesCategory;
+  });
+
+  const categories = [
+    { id: 'all', label: 'Все документы', icon: FileText },
+    { id: 'constituent', label: 'Учредительные и общие', icon: Building2 },
+    { id: 'medical', label: 'Лицензии и стандарты', icon: FileCheck },
+    { id: 'reception', label: 'Режим и обращения', icon: UserCheck },
+    { id: 'law', label: 'Нормативно-правовые акты', icon: Shield },
+    { id: 'finance', label: 'Финансовые гарантии', icon: Briefcase },
+    { id: 'modifications', label: 'Регламентные изменения', icon: Clock }
+  ];
+
+  return (
+    <div className="flex-1 bg-[#FAF9F6] text-[#1c2a22] font-sans">
+      
+      {/* Dynamic Visual Banner */}
+      <div className="bg-[#022C22] text-white py-16 px-4 relative overflow-hidden border-b border-[#c5a880]/30 shadow-inner">
+        <div className="absolute inset-0 opacity-[0.03] select-none pointer-events-none text-white font-serif uppercase tracking-widest text-[160px] leading-none select-all-disabled whitespace-nowrap">
+          FEDERAL CUSTOMS
+        </div>
+        
+        <div className="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10">
+          <div className="space-y-2">
+            <div className="flex items-center space-x-2 text-[#c5a880] text-xs font-mono uppercase tracking-widest font-bold">
+              <span className="w-2 h-2 rounded-full bg-[#c5a880]" />
+              <span>ФГКУ «Санаторий «Пестово» ФТС России»</span>
+            </div>
+            <h1 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight">
+              Официальный реестр документации
+            </h1>
+            <p className="text-stone-300 text-sm max-w-2xl leading-relaxed">
+              Актуальные правовые регламенты, нормативные акты, лицензии, учредительные Уставы и образцы договоров ведомственного учреждения Федеральной таможенной службы.
+            </p>
+          </div>
+
+          <button
+            onClick={onBackToHome}
+            className="flex items-center space-x-2 bg-[#c5a880] text-[#022C22] hover:bg-[#FAF9F6] hover:text-[#022C22] px-5 py-3 rounded-sm text-xs font-bold uppercase tracking-widest transform transition-all duration-300 hover:-translate-x-1 cursor-pointer self-start md:self-auto shrink-0 shadow-md"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            <span>Вернуться на главную</span>
+          </button>
+        </div>
+      </div>
+
+      {/* Alerts notification toast */}
+      <AnimatePresence>
+        {feedbackMsg && (
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="fixed top-24 left-1/2 -translate-x-1/2 z-[100] bg-emerald-950 border border-[#c5a880]/50 text-stone-100 text-xs sm:text-sm px-6 py-4 rounded-md shadow-2xl flex items-center space-x-3 font-semibold max-w-lg text-center"
+          >
+            <CheckCircle2 className="w-5 h-5 text-[#c5a880] flex-shrink-0" />
+            <span>{feedbackMsg}</span>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Main documents columns */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+          
+          {/* Left Navigation: Categories */}
+          <div className="lg:col-span-3 space-y-4">
+            <div className="bg-white p-5 rounded border border-stone-200 shadow-sm">
+              <h3 className="text-xs uppercase tracking-wider font-mono font-bold text-[#c5a880] mb-4">Разделы реестра</h3>
+              <div className="space-y-1">
+                {categories.map((cat) => {
+                  const Icon = cat.icon;
+                  const count = cat.id === 'all' 
+                    ? documents.length 
+                    : documents.filter((d) => d.category === cat.id).count || documents.filter((d) => d.category === cat.id).length;
+                  
+                  return (
+                    <button
+                      key={cat.id}
+                      onClick={() => {
+                        setSelectedCategory(cat.id);
+                        setViewingDoc(null);
+                      }}
+                      className={`w-full flex items-center justify-between px-3 py-2.5 rounded text-xs font-semibold uppercase tracking-wide transition-all cursor-pointer ${
+                        selectedCategory === cat.id
+                          ? 'bg-[#022C22] text-[#c5a880] border-l-4 border-[#c5a880]'
+                          : 'text-stone-600 hover:bg-stone-100 hover:text-stone-900'
+                      }`}
+                    >
+                      <div className="flex items-center space-x-2 text-left">
+                        <Icon className="w-4 h-4" />
+                        <span>{cat.label}</span>
+                      </div>
+                      <span className={`px-2 py-0.5 rounded-full text-[10px] font-mono font-bold ${selectedCategory === cat.id ? 'bg-[#c5a880]/20 text-[#c5a880]' : 'bg-stone-100 text-stone-500'}`}>
+                        {count}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Admin status box */}
+            {isAdminMode && (
+              <div className="bg-amber-50 border border-amber-200 p-5 rounded-sm">
+                <div className="flex items-center space-x-2 text-amber-800 mb-2">
+                  <Shield className="w-4.5 h-4.5" />
+                  <span className="text-xs font-mono uppercase tracking-wider font-bold">Панель управления PDF</span>
+                </div>
+                <p className="text-xs text-amber-700 leading-relaxed">
+                  Вы зашли в режиме <strong>Администратора санатория</strong>. Возле каждого файла доступна кнопка загрузки PDF. Выберите и загрузите любой PDF-файл для активации полноэкранного режима чтения.
+                </p>
+              </div>
+            )}
+          </div>
+
+          {/* Right Navigation: Search & Document Grid */}
+          <div className="lg:col-span-9 space-y-6">
+            
+            {/* Search inputs */}
+            <div className="bg-white p-4 rounded border border-stone-200 shadow-sm flex flex-col sm:flex-row gap-4">
+              <div className="relative flex-1">
+                <Search className="absolute left-3.5 top-3.5 w-4 h-4 text-stone-400" />
+                <input
+                  type="text"
+                  placeholder="Быстрый поиск по названию уставного акта, закону или приказу..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full bg-stone-50 border border-stone-200 pl-10 pr-4 py-3 rounded text-sm focus:outline-none focus:border-[#022C22] font-sans placeholder-stone-400"
+                />
+              </div>
+            </div>
+
+            {/* Split screen reader view OR the grid directory */}
+            <AnimatePresence mode="wait">
+              {viewingDoc ? (
+                
+                // IMMERSIVE PDF / DOCUMENT READER SIMULATION VIEW
+                <motion.div
+                  key="reader-pane"
+                  initial={{ opacity: 0, y: 15 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -15 }}
+                  className="bg-white rounded border border-stone-200 shadow-md overflow-hidden flex flex-col h-[75vh]"
+                >
+                  <div className="bg-stone-100 p-4 border-b border-stone-200 shrink-0 flex flex-wrap gap-4 items-center justify-between">
+                    <button
+                      onClick={() => setViewingDoc(null)}
+                      className="flex items-center space-x-1.5 text-stone-600 hover:text-[#022C22] text-xs font-bold uppercase tracking-wider cursor-pointer"
+                    >
+                      <ArrowLeft className="w-4 h-4" />
+                      <span>Назад к перечню актов</span>
+                    </button>
+
+                    <div className="flex items-center space-x-2">
+                      <span className="text-xs font-mono text-stone-400 font-bold bg-white px-2.5 py-1 rounded border border-stone-200/50">
+                        {viewingDoc.code || 'Официальный регламент'}
+                      </span>
+                      {viewingDoc.pdfUrl && (
+                        <a
+                          href={viewingDoc.pdfUrl}
+                          download
+                          className="bg-[#022C22] hover:bg-[#c5a880] text-white hover:text-[#022C22] px-4 py-1.5 rounded-sm text-xs font-bold uppercase tracking-wide flex items-center space-x-1.5 transition-colors cursor-pointer"
+                        >
+                          <Download className="w-3.5 h-3.5" />
+                          <span>Скачать PDF</span>
+                        </a>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Built-in high-fidelity styled document sheet */}
+                  <div className="flex-1 overflow-y-auto p-6 md:p-10 bg-stone-100/40">
+                    <div className="max-w-2xl mx-auto bg-white p-8 md:p-12 border border-stone-250/80 shadow-lg rounded-sm font-sans text-stone-850 relative">
+                      
+                      {/* Technical seal decoration */}
+                      <div className="absolute right-12 top-12 opacity-[0.05] pointer-events-none select-none">
+                        <Shield className="w-40 h-40 text-[#022C22]" />
+                      </div>
+
+                      <div className="text-center border-b border-stone-200 pb-6 mb-8 text-stone-500 font-mono text-xs uppercase tracking-widest font-bold">
+                        <p>Федеральная таможенная служба России</p>
+                        <p className="text-[10px] text-stone-400 mt-1">ФГКУ «Санаторий «Пестово» ФТС России»</p>
+                      </div>
+
+                      <div className="flex justify-between items-start mb-6 text-xs text-stone-400 font-mono">
+                        <div>
+                          <span>Медицинский реестр</span>
+                          <p className="font-semibold text-stone-800 mt-0.5">Дата заведения: {viewingDoc.uploadDate || '29.10.2013'}</p>
+                        </div>
+                        <div className="text-right">
+                          <span>Код лицензиата</span>
+                          <p className="font-semibold text-stone-800 mt-0.5">{viewingDoc.code || 'Л041-00110-91'}</p>
+                        </div>
+                      </div>
+
+                      <h2 className="font-serif text-lg sm:text-xl font-bold text-[#022C22] border-b pb-4 mb-6 leading-snug">
+                        {viewingDoc.title}
+                      </h2>
+
+                      {/* Doc textual rendering or fallback */}
+                      <div className="text-xs sm:text-sm text-stone-700 leading-relaxed font-sans whitespace-pre-wrap">
+                        {viewingDoc.originalText || `ДАННЫЕ ДОКУМЕНТА НА СТЕКЕ PDF ЗАГРУЗКИ\n\nЭтот правовой документ (${viewingDoc.title}) в данный момент зарегистрирован в государственном архиве ФГКУ «Санаторий «Пестово».\n\nКоллегия ветеринарных врачей, кардиологов и правовых инспекторов санатория подтверждает соответствие данного положения всем текущим нормативным законам РФ.\n\nДля ознакомления вы можете прочитать оригинальный PDF-файл, загруженный в систему.`}
+                      </div>
+
+                      {/* Official Signature simulation at bottom */}
+                      <div className="mt-12 pt-8 border-t border-stone-200 flex flex-col sm:flex-row justify-between items-start sm:items-center text-xs gap-4">
+                        <div>
+                          <span className="block text-stone-400 uppercase tracking-widest font-mono text-[9px]">Статус правообладания</span>
+                          <p className="font-bold text-[#022C22] mt-0.5">Лицензионный архив санатория</p>
+                        </div>
+                        
+                        <div className="flex items-center space-x-2 bg-stone-50 px-4 py-2 rounded border border-stone-200">
+                          <Check className="w-4 h-4 text-emerald-600 flex-shrink-0" />
+                          <div className="text-[10px] font-mono leading-tight">
+                            <span className="block font-bold text-emerald-800 font-semibold font-sans">ГОСУДАРСТВЕННЫЙ КОНТРОЛЬ</span>
+                            <span className="text-stone-405 block font-serif">Логачёв В. А. (Начальник)</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="bg-stone-50 border-t border-stone-200 px-6 py-3 flex justify-between items-center text-[10px] font-mono text-stone-400 uppercase tracking-widest">
+                    <span>Режим просмотра регламентов ФТС России</span>
+                    <span className="text-emerald-700 font-bold">Санаторий Пестово</span>
+                  </div>
+                </motion.div>
+
+              ) : (
+
+                // MAIN LIST OF DOCUMENT TILES
+                <motion.div
+                  key="list-pane"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="space-y-4"
+                >
+                  {filteredDocs.length > 0 ? (
+                    filteredDocs.map((doc, idx) => (
+                      <motion.div
+                        key={doc.id}
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: idx * 0.02 }}
+                        className="bg-white rounded border border-stone-200 p-5 sm:p-6 hover:shadow-md hover:border-[#c5a880]/40 transition-all flex flex-col md:flex-row justify-between items-start md:items-center gap-4 relative overflow-hidden"
+                      >
+                        <div className="space-y-2 max-w-3xl">
+                          <div className="flex flex-wrap items-center gap-2">
+                            <span className="text-[9px] font-bold uppercase tracking-wider text-[#c5a880] bg-[#022C22]/5 px-2.5 py-0.5 rounded-full font-mono">
+                              {doc.categoryLabel}
+                            </span>
+                            {doc.code && (
+                              <span className="text-stone-400 text-xs font-semibold font-mono">
+                                • {doc.code}
+                              </span>
+                            )}
+                            {doc.pdfUrl ? (
+                              <span className="text-emerald-700 text-[10px] font-mono font-bold flex items-center space-x-1 border border-emerald-200/50 bg-emerald-50 px-2 py-0.5 rounded">
+                                <FileCheck className="w-3.5 h-3.5" />
+                                <span>PDF ДОСТУПЕН</span>
+                              </span>
+                            ) : (
+                              <span className="text-stone-500 text-[10px] font-mono font-bold flex items-center space-x-1 border border-stone-200 bg-stone-100 px-2 py-0.5 rounded">
+                                <AlertCircle className="w-3.5 h-3.5" />
+                                <span>БЕЗ ФАЙЛА PDF</span>
+                              </span>
+                            )}
+                          </div>
+
+                          <h3 className="font-serif text-sm sm:text-base font-extrabold text-[#022C22] tracking-tight hover:text-[#c5a880] transition-colors leading-snug">
+                            {doc.title}
+                          </h3>
+
+                          <p className="text-xs text-stone-500 leading-relaxed font-sans mt-1">
+                            {doc.summary}
+                          </p>
+
+                          {doc.pdfUrl && doc.fileSize && (
+                            <div className="flex items-center space-x-3 text-[10px] text-stone-400 font-mono mt-2">
+                              <span>Размер: {doc.fileSize}</span>
+                              <span>•</span>
+                              <span>Обновлен: {doc.uploadDate}</span>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Interactive actions block */}
+                        <div className="flex flex-wrap items-center gap-2 shrink-0 w-full md:w-auto mt-2 md:mt-0 pt-3 md:pt-0 border-t md:border-0 border-stone-100">
+                          
+                          <button
+                            onClick={() => setViewingDoc(doc)}
+                            className="bg-[#022C22] hover:bg-[#c5a880] text-stone-100 hover:text-[#022C22] px-3 py-2 rounded-sm text-xs font-bold uppercase tracking-wider flex items-center space-x-1.5 transition-all cursor-pointer flex-1 md:flex-initial justify-center"
+                          >
+                            <Eye className="w-3.5 h-3.5" />
+                            <span>Читать</span>
+                          </button>
+
+                          {doc.pdfUrl ? (
+                            <a
+                              href={doc.pdfUrl}
+                              download
+                              className="bg-stone-100 hover:bg-stone-200 text-stone-700 px-3 py-2 rounded-sm text-xs font-bold uppercase tracking-wider flex items-center space-x-1.5 transition-all cursor-pointer border border-stone-250 flex-1 md:flex-initial justify-center"
+                              title="Альтернативная загрузка"
+                            >
+                              <Download className="w-3.5 h-3.5 text-stone-500" />
+                              <span>PDF</span>
+                            </a>
+                          ) : (
+                            isAdminMode ? (
+                              <div className="flex-1 md:flex-initial">
+                                <label className="bg-amber-100 hover:bg-amber-200 text-amber-800 border border-amber-300 px-3 py-2 rounded-sm text-xs font-bold uppercase tracking-wider flex items-center space-x-1.5 transition-all cursor-pointer justify-center">
+                                  {uploadingDocId === doc.id ? (
+                                    <>
+                                      <span className="w-3 h-3 border-2 border-amber-800 border-t-transparent rounded-full animate-spin" />
+                                      <span>{uploadProgress}%</span>
+                                    </>
+                                  ) : (
+                                    <>
+                                      <Upload className="w-3.5 h-3.5" />
+                                      <span>Загрузить</span>
+                                    </>
+                                  )}
+                                  <input
+                                    type="file"
+                                    accept="application/pdf"
+                                    className="hidden"
+                                    onChange={(e) => handleSimulatedPdfUpload(doc.id, e)}
+                                    disabled={uploadingDocId !== null}
+                                  />
+                                </label>
+                              </div>
+                            ) : (
+                              <div className="text-zinc-400 text-[11px] font-mono text-center md:text-right px-2">
+                                Ожидает PDF
+                              </div>
+                            )
+                          )}
+                        </div>
+                      </motion.div>
+                    ))
+                  ) : (
+                    <div className="text-center py-20 bg-white rounded border border-stone-250">
+                      <FileText className="w-12 h-12 text-stone-300 mx-auto mb-3" />
+                      <p className="text-stone-500 text-sm font-semibold">Акты или федеральные законы не найдены.</p>
+                      <button 
+                        onClick={() => { setSearchQuery(''); setSelectedCategory('all'); }} 
+                        className="mt-3 text-xs text-[#022C22] hover:text-[#c5a880] font-bold uppercase"
+                      >
+                        Сбросить фильтры поиска
+                      </button>
+                    </div>
+                  )}
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+  );
+}

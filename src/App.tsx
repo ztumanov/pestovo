@@ -62,13 +62,22 @@ import {
 import { motion, AnimatePresence } from 'motion/react';
 import { Room, MedicalProgram } from './types';
 import { useAdminData } from './context/AdminDataContext';
-import AdminPanel from './components/AdminPanel';
+import AdminPage from './components/AdminPage';
 import AdminFloatBar from './components/AdminFloatBar';
 import DocumentsModal from './components/DocumentsModal';
 import NewsModal from './components/NewsModal';
+import DocumentsPage from './components/DocumentsPage';
+import TestimonialsPage from './components/TestimonialsPage';
 
 export default function App() {
-  const { siteData, isAdminMode, setShowAdminPanel, setActiveSettingsTab, updateSection } = useAdminData();
+  const { 
+    siteData, 
+    isAdminMode, 
+    setActiveSettingsTab, 
+    updateSection,
+    currentPage,
+    setCurrentPage
+  } = useAdminData();
   const { 
     resortInfo: RESORT_INFO, 
     hero: HERO_DATA, 
@@ -949,7 +958,7 @@ export default function App() {
           <div className="flex items-center justify-between h-20">
             
             {/* Logo */}
-            <div className="flex items-center space-x-3 cursor-pointer" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
+            <div className="flex items-center space-x-3 cursor-pointer" onClick={() => { setCurrentPage('home'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}>
               {/* Gold/Emerald High-Fidelity Vector Russian FTS Emblem */}
               <div className="w-14 h-14 bg-gradient-to-br from-[#c5a880]/30 to-[#9a7d56]/10 rounded-full p-1 shadow-inner flex items-center justify-center relative overflow-visible select-none">
                 <svg className="w-12 h-12 block select-none filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.4)]" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -1051,14 +1060,17 @@ export default function App() {
                       <a
                         href="#about"
                         className="flex items-center space-x-2.5 px-4 py-2.5 text-xs hover:bg-[#034434] hover:text-[#c5a880] transition-colors"
-                        onClick={() => setIsAboutDropdownOpen(false)}
+                        onClick={() => {
+                          setIsAboutDropdownOpen(false);
+                          setCurrentPage('home');
+                        }}
                       >
                         <Building2 className="w-4 h-4 text-[#c5a880] flex-shrink-0" />
                         <span>Основная информация</span>
                       </a>
                       <button
                         onClick={() => {
-                          setActiveSubModal('documents');
+                          setCurrentPage('documents');
                           setIsAboutDropdownOpen(false);
                         }}
                         className="w-full flex items-center space-x-2.5 px-4 py-2.5 text-xs hover:bg-[#034434] hover:text-[#c5a880] transition-colors text-left cursor-pointer text-stone-100"
@@ -1091,6 +1103,7 @@ export default function App() {
                 <a
                   key={item.id}
                   href={`#${item.id}`}
+                  onClick={() => setCurrentPage('home')}
                   className={`text-sm font-medium tracking-wide transition-colors relative py-2 ${
                     activeSection === item.id ? 'text-[#c5a880]' : 'text-stone-200 hover:text-[#c5a880]'
                   }`}
@@ -1168,6 +1181,7 @@ export default function App() {
                           onClick={() => {
                             setIsMobileMenuOpen(false);
                             setIsAboutDropdownOpen(false);
+                            setCurrentPage('home');
                           }}
                           className="block py-2 text-xs font-semibold text-stone-300 hover:text-white"
                         >
@@ -1175,7 +1189,7 @@ export default function App() {
                         </a>
                         <button
                           onClick={() => {
-                            setActiveSubModal('documents');
+                            setCurrentPage('documents');
                             setIsMobileMenuOpen(false);
                             setIsAboutDropdownOpen(false);
                           }}
@@ -1208,7 +1222,10 @@ export default function App() {
                   <a
                     key={item.id}
                     href={`#${item.id}`}
-                    onClick={() => setIsMobileMenuOpen(false)}
+                    onClick={() => {
+                      setIsMobileMenuOpen(false);
+                      setCurrentPage('home');
+                    }}
                     className="block font-medium py-2 text-stone-200 border-b border-white/5 hover:text-[#c5a880]"
                   >
                     {item.label}
@@ -1249,8 +1266,25 @@ export default function App() {
         </AnimatePresence>
       </nav>
 
-      {/* HERO / WELCOME ATRIUM */}
-      <header id="hero" className="relative min-h-[90vh] flex items-center justify-center overflow-hidden bg-[#022C22]">
+      {currentPage === 'documents' ? (
+        <DocumentsPage onBackToHome={() => {
+          setCurrentPage('home');
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }} />
+      ) : currentPage === 'admin' ? (
+        <AdminPage onBackToHome={() => {
+          setCurrentPage('home');
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }} />
+      ) : currentPage === 'testimonials' ? (
+        <TestimonialsPage onBackToHome={() => {
+          setCurrentPage('home');
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }} />
+      ) : (
+        <>
+          {/* HERO / WELCOME ATRIUM */}
+          <header id="hero" className="relative min-h-[90vh] flex items-center justify-center overflow-hidden bg-[#022C22]">
         
         {/* Dynamic Background (Switchable Video/Image loops) */}
         <div className="absolute inset-0 z-0">
@@ -1495,7 +1529,7 @@ export default function App() {
               className="mb-4"
             >
               <button 
-                onClick={() => { setActiveSettingsTab('hero'); setShowAdminPanel(true); }}
+                onClick={() => { setActiveSettingsTab('hero'); setCurrentPage('admin'); }}
                 className="bg-amber-500 hover:bg-amber-600 font-bold text-stone-900 border border-amber-300 text-xs px-4 py-2 rounded-full cursor-pointer shadow-lg flex items-center gap-1.5 transition-all transform hover:scale-105"
               >
                 <Edit className="w-4 h-4" /> Редактировать первый экран
@@ -1591,7 +1625,7 @@ export default function App() {
               {isAdminMode && (
                 <div className="mb-2">
                   <button 
-                    onClick={() => { setActiveSettingsTab('general'); setShowAdminPanel(true); }}
+                    onClick={() => { setActiveSettingsTab('general'); setCurrentPage('admin'); }}
                     className="bg-amber-500 hover:bg-amber-600 text-stone-900 border border-amber-300 font-bold text-[11px] px-3.5 py-1.5 rounded-lg flex items-center gap-1.5 transition-all shadow hover:scale-105"
                   >
                     <Edit className="w-3.5 h-3.5" /> Редактировать инфо и историю
@@ -2237,7 +2271,7 @@ export default function App() {
             {isAdminMode && (
               <div className="mb-4">
                 <button 
-                  onClick={() => { setActiveSettingsTab('medical'); setShowAdminPanel(true); }}
+                  onClick={() => { setActiveSettingsTab('medical'); setCurrentPage('admin'); }}
                   className="bg-amber-500 hover:bg-amber-600 text-stone-900 border border-amber-300 font-bold text-xs px-3.5 py-1.5 rounded-lg inline-flex items-center gap-1.5 transition-all shadow hover:scale-105"
                 >
                   <Edit className="w-3.5 h-3.5" /> Управление программами лечения
@@ -2398,7 +2432,7 @@ export default function App() {
               {isAdminMode && (
                 <div className="mb-4">
                   <button 
-                    onClick={() => { setActiveSettingsTab('rooms'); setShowAdminPanel(true); }}
+                    onClick={() => { setActiveSettingsTab('rooms'); setCurrentPage('admin'); }}
                     className="bg-amber-500 hover:bg-amber-600 text-stone-900 border border-amber-300 font-bold text-xs px-3.5 py-1.5 rounded-lg flex items-center gap-1.5 transition-all shadow hover:scale-105"
                   >
                     <Edit className="w-3.5 h-3.5" /> Управление номерами
@@ -2516,7 +2550,7 @@ export default function App() {
             {isAdminMode && (
               <div className="mb-4">
                 <button 
-                  onClick={() => { setActiveSettingsTab('media'); setShowAdminPanel(true); }}
+                  onClick={() => { setActiveSettingsTab('media'); setCurrentPage('admin'); }}
                   className="bg-amber-500 hover:bg-amber-600 text-stone-900 border border-amber-300 font-bold text-xs px-3.5 py-1.5 rounded-lg inline-flex items-center gap-1.5 transition-all shadow hover:scale-105"
                 >
                   <Edit className="w-3.5 h-3.5" /> Настроить медиа-архив и фоны
@@ -2605,7 +2639,7 @@ export default function App() {
             {isAdminMode && (
               <div className="mb-4">
                 <button 
-                  onClick={() => { setActiveSettingsTab('testimonials'); setShowAdminPanel(true); }}
+                  onClick={() => { setActiveSettingsTab('testimonials'); setCurrentPage('admin'); }}
                   className="bg-amber-500 hover:bg-amber-600 text-stone-900 border border-amber-300 font-bold text-xs px-3.5 py-1.5 rounded-lg inline-flex items-center gap-1.5 transition-all shadow hover:scale-105"
                 >
                   <Edit className="w-3.5 h-3.5" /> Управление отзывами
@@ -2620,7 +2654,7 @@ export default function App() {
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {TESTIMONIALS.map((t) => (
+            {TESTIMONIALS.slice(0, 3).map((t) => (
               <div 
                 key={t.id} 
                 className="bg-emerald-950 border border-[#c5a880]/20 p-6 sm:p-8 rounded-sm relative flex flex-col justify-between shadow-xl"
@@ -2639,7 +2673,7 @@ export default function App() {
                 </div>
 
                 <div className="border-t border-white/5 pt-4 mt-auto">
-                  <h4 className="font-serif font-semibold text-sm text-white">{t.author}</h4>
+                  <h4 className="font-serif font-semibold text-sm text-white">{t.text.length > 200 ? `${t.author}` : t.author}</h4>
                   <div className="flex justify-between items-center text-[10px] text-stone-400 font-mono tracking-wider mt-1.5 uppercase">
                     <span>{t.role}</span>
                     <span>{t.date}</span>
@@ -2649,13 +2683,19 @@ export default function App() {
             ))}
           </div>
 
-          <div className="mt-12 text-center">
-            <p className="text-xs text-stone-300">
-              Вы отдыхали у нас и хотите поделиться вашим мнением?
-            </p>
+          <div className="mt-12 text-center flex flex-col sm:flex-row items-center justify-center gap-4">
+            <button 
+              onClick={() => {
+                setCurrentPage('testimonials');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }}
+              className="bg-[#c5a880] hover:bg-[#FAF9F6] text-[#022C22] font-black text-xs px-6 py-3.5 rounded-sm uppercase tracking-widest transition-all shadow-sm cursor-pointer active:scale-95"
+            >
+              Посмотреть все отзывы
+            </button>
             <a 
               href="#booking"
-              className="inline-block bg-transparent hover:bg-white/5 text-[#c5a880] border border-[#c5a880]/30 hover:border-[#c5a880] px-5 py-2.5 rounded-sm font-bold text-xs uppercase tracking-widest mt-4 transition-all"
+              className="inline-block bg-transparent hover:bg-white/5 text-[#c5a880] border border-[#c5a880]/30 hover:border-[#c5a880] px-6 py-3.5 rounded-sm font-bold text-xs uppercase tracking-widest transition-all"
             >
               Написать отзыв
             </a>
@@ -2927,7 +2967,7 @@ export default function App() {
             {isAdminMode && (
               <div className="mb-4">
                 <button 
-                  onClick={() => { setActiveSettingsTab('faq'); setShowAdminPanel(true); }}
+                  onClick={() => { setActiveSettingsTab('faq'); setCurrentPage('admin'); }}
                   className="bg-amber-500 hover:bg-amber-600 text-stone-900 border border-amber-300 font-bold text-xs px-3.5 py-1.5 rounded-lg inline-flex items-center gap-1.5 transition-all shadow hover:scale-105"
                 >
                   <Edit className="w-3.5 h-3.5" /> Редактировать FAQ вопросы
@@ -3108,6 +3148,9 @@ export default function App() {
           </div>
         </div>
       </section>
+
+        </>
+      )}
 
       {/* FOOTER */}
       <footer className="bg-[#022C22] text-white border-t border-[#c5a880]/30 py-12 z-10">
@@ -3410,7 +3453,6 @@ export default function App() {
       </AnimatePresence>
 
       {/* Embedded Admin Overlay Controllers */}
-      <AdminPanel />
       <AdminFloatBar />
 
     </div>
