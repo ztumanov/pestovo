@@ -415,6 +415,8 @@ export default function DocumentsPage({ onBackToHome }: { onBackToHome: () => vo
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [viewingDoc, setViewingDoc] = useState<DocumentItem | null>(null);
   const [feedbackMsg, setFeedbackMsg] = useState<string | null>(null);
+  const [isPassportOpen, setIsPassportOpen] = useState(true);
+  const [activePassportTab, setActivePassportTab] = useState<'general' | 'medical' | 'structure'>('general');
 
   // Admin dynamic upload state
   const [uploadingDocId, setUploadingDocId] = useState<string | null>(null);
@@ -596,6 +598,312 @@ export default function DocumentsPage({ onBackToHome }: { onBackToHome: () => vo
                   className="w-full bg-stone-50 border border-stone-200 pl-10 pr-4 py-3 rounded text-sm focus:outline-none focus:border-[#022C22] font-sans placeholder-stone-400"
                 />
               </div>
+            </div>
+
+            {/* OFFICIAL SANATORIUM PASSPORT */}
+            <div className="bg-[#022C22] text-white rounded border border-[#c5a880]/30 shadow-lg overflow-hidden transition-all duration-300">
+              <div 
+                onClick={() => setIsPassportOpen(!isPassportOpen)}
+                className="p-5 flex justify-between items-center cursor-pointer select-none bg-gradient-to-r from-[#022C22] to-[#011F18] border-b border-[#c5a880]/20"
+              >
+                <div className="flex items-center space-x-3">
+                  <div className="bg-white/10 text-[#c5a880] p-2 rounded-lg shrink-0">
+                    <Shield className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <div className="flex items-center space-x-2 flex-wrap">
+                      <span className="text-[10px] uppercase tracking-wider text-[#c5a880] font-mono font-bold bg-[#c5a880]/15 px-2 py-0.5 rounded">ГАС карточка ФТС России</span>
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                      <span className="text-[9px] font-mono text-emerald-400">АКТУАЛИЗИРОВАНО В 2026 ГОДУ</span>
+                    </div>
+                    <h2 className="font-serif text-sm sm:text-base font-bold tracking-tight text-white mt-1">
+                      Официальный паспорт и Гос. реквизиты учреждения
+                    </h2>
+                  </div>
+                </div>
+                <button className="text-[#c5a885] hover:text-white p-1 rounded-full hover:bg-white/10 transition-all font-mono text-2xs font-extrabold uppercase shrink-0">
+                  {isPassportOpen ? 'СВЕРНУТЬ [-]' : 'РАЗВЕРНУТЬ [+]'}
+                </button>
+              </div>
+
+              <AnimatePresence>
+                {isPassportOpen && (
+                  <motion.div
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: "auto", opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    transition={{ duration: 0.3 }}
+                    className="overflow-hidden bg-[#FAF9F6] text-[#1c2a22]"
+                  >
+                    {/* Tab bars inside Passport */}
+                    <div className="flex border-b border-stone-200 bg-stone-50 select-none">
+                      <button
+                        type="button"
+                        onClick={() => setActivePassportTab('general')}
+                        className={`flex-1 py-3 text-3xs sm:text-2xs uppercase tracking-widest font-black cursor-pointer border-b-2 transition-all ${
+                          activePassportTab === 'general'
+                            ? 'border-[#022C22] text-[#022C22] bg-[#FAF9F6]'
+                            : 'border-transparent text-stone-500 hover:text-stone-850 hover:bg-stone-150'
+                        }`}
+                      >
+                        Общие данные и Руководство
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setActivePassportTab('medical')}
+                        className={`flex-1 py-3 text-3xs sm:text-2xs uppercase tracking-widest font-black cursor-pointer border-b-2 transition-all ${
+                          activePassportTab === 'medical'
+                            ? 'border-[#022C22] text-[#022C22] bg-[#FAF9F6]'
+                            : 'border-transparent text-stone-500 hover:text-stone-850 hover:bg-stone-150'
+                        }`}
+                      >
+                        Специализация и Лицензия
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setActivePassportTab('structure')}
+                        className={`flex-1 py-3 text-3xs sm:text-2xs uppercase tracking-widest font-black cursor-pointer border-b-2 transition-all ${
+                          activePassportTab === 'structure'
+                            ? 'border-[#022C22] text-[#022C22] bg-[#FAF9F6]'
+                            : 'border-transparent text-stone-500 hover:text-stone-850 hover:bg-stone-150'
+                        }`}
+                      >
+                        Структура и Профиль
+                      </button>
+                    </div>
+
+                    <div className="p-6 space-y-6">
+                      {activePassportTab === 'general' && (
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                          {/* Left Column: Organization registration */}
+                          <div className="space-y-4">
+                            <h3 className="text-xs font-mono font-bold uppercase tracking-wider text-[#c5a880] border-b pb-1">Общие реквизиты</h3>
+                            <div className="space-y-2 text-xs">
+                              <div>
+                                <span className="text-stone-400 block font-mono text-[9px] uppercase">Наименование полное:</span>
+                                <span className="font-semibold text-[#022C22]">Федеральное государственное казенное учреждение «Санаторий «Пестово» ФТС России»</span>
+                              </div>
+                              <div>
+                                <span className="text-stone-400 block font-mono text-[9px] uppercase">Наименование сокращенное:</span>
+                                <span className="font-semibold text-stone-700">Санаторий «Пестово» ФТС России</span>
+                              </div>
+                              <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                  <span className="text-stone-400 block font-mono text-[9px] uppercase">ИНН:</span>
+                                  <code className="font-bold font-mono text-stone-800">7713778678</code>
+                                </div>
+                                <div>
+                                  <span className="text-stone-400 block font-mono text-[9px] uppercase">КПП:</span>
+                                  <code className="font-bold font-mono text-stone-800">910301001</code>
+                                </div>
+                              </div>
+                              <div>
+                                <span className="text-stone-400 block font-mono text-[9px] uppercase">Организационно-правовая форма (ОПФ):</span>
+                                <span className="font-medium text-stone-700">Федеральные государственные казенные учреждения</span>
+                              </div>
+                              <div>
+                                <span className="text-stone-400 block font-mono text-[9px] uppercase">Адрес юридический, фактический и почтовый:</span>
+                                <span className="font-medium text-stone-705">298660, Республика Крым, г. Ялта, пгт. Гаспра, Севастопольское шоссе, д. 52</span>
+                              </div>
+                              <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                  <span className="text-stone-400 block font-mono text-[9px] uppercase">Ведомственная подчиненность:</span>
+                                  <span className="font-semibold text-emerald-900 bg-emerald-50 px-2 py-0.5 rounded inline-block text-[11px]">Федеральная таможенная служба</span>
+                                </div>
+                                <div>
+                                  <span className="text-stone-400 block font-mono text-[9px] uppercase">Форма собственности:</span>
+                                  <span className="font-medium text-stone-700">Федеральная собственность</span>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Right Column: Key managers & Registry dates */}
+                          <div className="space-y-4">
+                            <h3 className="text-xs font-mono font-bold uppercase tracking-wider text-[#c5a880] border-b pb-1">Ответственные лица и Гос. регистрация</h3>
+                            <div className="space-y-3.5 text-xs">
+                              <div className="bg-stone-50 p-3 rounded border border-stone-200 space-y-1.5 shadow-xs">
+                                <span className="text-[#c5a880] block font-mono text-[9px] uppercase font-bold">Руководитель:</span>
+                                <div>
+                                  <p className="font-extrabold text-[#022C22] text-sm font-serif">Логачёв Валерий Анатольевич</p>
+                                  <p className="text-[10px] text-stone-500 font-mono">Начальник санатория</p>
+                                </div>
+                                <div className="grid grid-cols-2 gap-2 pt-1 border-t border-stone-200 text-[11px]">
+                                  <div>
+                                    <span className="text-stone-400 block text-[8px] uppercase font-mono">Телефон:</span>
+                                    <a href="tel:+73654239376" className="font-bold hover:underline text-emerald-850">+7(3654)23-93-76</a>
+                                  </div>
+                                  <div>
+                                    <span className="text-stone-400 block text-[8px] uppercase font-mono">Email приемной:</span>
+                                    <a href="mailto:priemnaya.pestovo@yandex.ru" className="font-semibold hover:underline text-emerald-850 truncate block">priemnaya.pestovo@yandex.ru</a>
+                                  </div>
+                                </div>
+                                <div>
+                                  <span className="text-stone-400 block text-[8px] uppercase font-mono">Факс:</span>
+                                  <span className="font-mono text-stone-600">+73654239376</span>
+                                </div>
+                              </div>
+
+                              <div className="space-y-1.5">
+                                <span className="text-stone-400 block font-mono text-[9px] uppercase">Гос. регистрация и создание:</span>
+                                <div className="text-2xs sm:text-xs text-stone-650">
+                                  <p className="text-[#022C22] font-semibold">Федеральная налоговая служба РФ</p>
+                                  <p className="text-stone-500 text-[11px]">Межрайонная инспекция ФНС №46 по г. Москве</p>
+                                  <p className="font-mono text-[11px] text-[#022C22] mt-0.5">
+                                    Серия: <span className="font-bold">77</span> | Номер: <span className="font-bold">015463944</span> | Дата: <span className="font-bold">2013-10-29</span>
+                                  </p>
+                                  <p className="text-stone-406 font-mono text-[10px]">Дата создания: 2013-10-29 (ЕГРЮЛ: 5137746004787)</p>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+
+                      {activePassportTab === 'medical' && (
+                        <div className="space-y-4">
+                          <div className="bg-stone-50 p-4 rounded border border-stone-200 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                            <div>
+                              <div className="flex items-center space-x-2">
+                                <Shield className="w-4.5 h-4.5 text-emerald-700" />
+                                <span className="font-mono font-bold text-[#022C22] text-xs">ГОСУДАРСТВЕННАЯ МЕДИЦИНСКАЯ ЛИЦЕНЗИЯ</span>
+                              </div>
+                              <h4 className="font-serif text-sm font-black text-[#022C22] mt-1">Рег. № Л041-00110-91/00554225</h4>
+                              <p className="text-[10px] text-stone-400 font-mono">Дата выдачи и начала действия: 2022-06-22 • Бессрочная</p>
+                            </div>
+                            <span className="text-emerald-800 bg-emerald-100/60 font-mono font-bold text-[10px] uppercase tracking-wider px-3 py-1 rounded inline-block border border-emerald-250">
+                              Лицензированный статус
+                            </span>
+                          </div>
+
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
+                            <div className="space-y-3">
+                              <h5 className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#c5a880] border-b pb-1">Виды лицензированной деятельности</h5>
+                              <ul className="space-y-1.5 text-xs text-stone-700">
+                                <li className="flex items-center space-x-2">
+                                  <Check className="w-4.5 h-4.5 text-emerald-600 shrink-0" />
+                                  <span>Диетология</span>
+                                </li>
+                                <li className="flex items-center space-x-2">
+                                  <Check className="w-4.5 h-4.5 text-emerald-600 shrink-0" />
+                                  <span>Лечебная физкультура (ЛФК)</span>
+                                </li>
+                                <li className="flex items-center space-x-2">
+                                  <Check className="w-4.5 h-4.5 text-emerald-600 shrink-0" />
+                                  <span>Медицинский массаж</span>
+                                </li>
+                                <li className="flex items-center space-x-2">
+                                  <Check className="w-4.5 h-4.5 text-emerald-600 shrink-0" />
+                                  <span>Организация здравоохранения и общественного здоровья</span>
+                                </li>
+                                <li className="flex items-center space-x-2">
+                                  <Check className="w-4.5 h-4.5 text-emerald-600 shrink-0" />
+                                  <span>Сестринское дело</span>
+                                </li>
+                                <li className="flex items-center space-x-2">
+                                  <Check className="w-4.5 h-4.5 text-emerald-600 shrink-0" />
+                                  <span>Терапия и восстановительное лечение</span>
+                                </li>
+                                <li className="flex items-center space-x-2">
+                                  <Check className="w-4.5 h-4.5 text-emerald-600 shrink-0" />
+                                  <span>Физиотерапия</span>
+                                </li>
+                                <li className="flex items-center space-x-2">
+                                  <Check className="w-4.5 h-4.5 text-emerald-600 shrink-0" />
+                                  <span>Функциональная диагностика</span>
+                                </li>
+                              </ul>
+                              
+                              <h5 className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#c5a880] border-b pb-1 pt-2">Методы диагностики</h5>
+                              <p className="text-xs text-stone-600 font-sans leading-relaxed">
+                                <strong>Функциональная диагностика:</strong> Спирография (спирометрия); Электрокардиография.
+                              </p>
+                              <p className="text-xs text-stone-600 font-sans leading-relaxed">
+                                <strong>Лабораторная база:</strong> Биохимические исследования; Общеклинические исследования.
+                              </p>
+                            </div>
+
+                            <div className="space-y-3">
+                              <h5 className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#c5a880] border-b pb-1">Методы лечения и бальнеотерапии</h5>
+                              <div className="p-1 max-h-[250px] overflow-y-auto space-y-2 text-xs text-stone-650 scrollbar-thin">
+                                <p className="leading-relaxed">• Методы электромагнитного лечебного воздействия на органы и ткани;</p>
+                                <p className="leading-relaxed">• Электрофорез лекарственных средств по органам и системам;</p>
+                                <p className="leading-relaxed">• Воздействие электрическим полем УВЧ (э.п. УВЧ);</p>
+                                <p className="leading-relaxed">• Воздействие магнитными полями (магнитотерапия);</p>
+                                <p className="leading-relaxed">• Воздействие синусоидальными модулярными токами (СМТ);</p>
+                                <p className="leading-relaxed">• Лечение с помощью лучевого (звукового, светового, лазерного) воздействия;</p>
+                                <p className="leading-relaxed">• Воздействие низкоинтенсивным лазерным излучением;</p>
+                                <p className="leading-relaxed">• Воздействие ультразвуком;</p>
+                                <p className="leading-relaxed">• Воздействие инфракрасным излучением;</p>
+                                <p className="leading-relaxed">• Лечебная физкультура;</p>
+                                <p className="leading-relaxed">• Лечение климатическими и природными факторами;</p>
+                                <p className="leading-relaxed">• Террентное лечение (лечение ходьбой);</p>
+                                <p className="leading-relaxed">• Подводный душ массаж;</p>
+                                <p className="leading-relaxed">• Воздействие климатом;</p>
+                                <p className="leading-relaxed">• Ванны ароматические;</p>
+                                <p className="leading-relaxed">• Медицинский массаж при различных заболеваниях;</p>
+                                <p className="leading-relaxed">• Ингаляторные введения лекарственных средств и кислорода.</p>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+
+                      {activePassportTab === 'structure' && (
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                          {/* Left column: medical profiles */}
+                          <div className="space-y-3">
+                            <h5 className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#c5a880] border-b pb-1">Профиль и Нозологическая классификация</h5>
+                            <div className="space-y-2 text-xs text-stone-750">
+                              <p className="font-semibold text-[#022C22]">Основные заболевания лечебного профиля:</p>
+                              
+                              <div className="space-y-2.5 pl-2 border-l-2 border-[#c5a880] text-stone-650">
+                                <div>
+                                  <strong className="text-stone-850">Болезни системы кровообращения:</strong>
+                                  <p className="text-[11px] leading-relaxed">Болезни, характеризующиеся повышенным кровяным давлением; Гипертензивная болезнь сердца; Гипертензивная болезнь с преимущественным поражением сердца с застойной сердечной недостаточностью.</p>
+                                </div>
+                                <div className="pt-1">
+                                  <strong className="text-stone-850">Болезни органов дыхания:</strong>
+                                  <p className="text-[11px] leading-relaxed">Хронические болезни нижних дыхательных путей; Хронический бронхит неуточненный.</p>
+                                </div>
+                                <div className="pt-1">
+                                  <strong className="text-stone-850">Болезни костно-мышечной системы:</strong>
+                                  <p className="text-[11px] leading-relaxed">Артрозы; Коксартроз [артроз тазобедренного сустава] (первичный двусторонний, другой первичный, неуточненный); Гонартроз [артроз коленного сустава] (первичный двусторонний, неуточненный); Первичный артроз других суставов; Артроз неуточненный.</p>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Right column: internal medical structure */}
+                          <div className="space-y-4">
+                            <div className="space-y-1.5">
+                              <h5 className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#c5a880] border-b pb-1">Структурные лечебные кабинеты</h5>
+                              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs pt-1 text-stone-750">
+                                <span className="bg-stone-100 p-2 rounded text-[11px] font-medium border border-stone-200">Изолятор</span>
+                                <span className="bg-stone-100 p-2 rounded text-[11px] font-medium border border-stone-200">Клинико-диагностическая лаборатория</span>
+                                <span className="bg-stone-101 p-2 rounded text-[11px] font-medium border border-stone-200">Кабинет среднего персонала</span>
+                                <span className="bg-stone-101 p-2 rounded text-[11px] font-medium border border-stone-200">Кабинет функциональной диагностики</span>
+                                <span className="bg-stone-101 p-2 rounded text-[11px] font-medium border border-stone-200">Отделение (кабинет) физиотерапии</span>
+                                <span className="bg-stone-101 p-2 rounded text-[11px] font-medium border border-stone-200">Отделение (кабинет) водолечения</span>
+                                <span className="bg-stone-101 p-2 rounded text-[11px] font-medium border border-stone-200">Зал (кабинет) ЛФК</span>
+                                <span className="bg-stone-101 p-2 rounded text-[11px] font-medium border border-stone-200">Кабинет массажа с комнатой для персонала</span>
+                              </div>
+                              <p className="text-[10px] font-mono text-stone-400 mt-1 uppercase text-right">Вспомогательные лечебные помещения</p>
+                            </div>
+
+                            <div className="space-y-1 bg-emerald-50 p-2.5 rounded border border-emerald-100 text-xs">
+                              <strong className="text-emerald-950 font-sans block text-[11px]">Круглогодичный график функционирования:</strong>
+                              <p className="text-emerald-900 leading-relaxed text-[11px]">
+                                Санаторий полностью работоспособен круглый год: Январь, Февраль, Март, Апрель, Май, Июнь, Июль, Август, Сентябрь, Октябрь, Ноябрь, Декабрь.
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
 
             {/* Split screen reader view OR the grid directory */}

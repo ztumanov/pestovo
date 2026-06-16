@@ -21,6 +21,7 @@ export interface MedicalProgram {
   procedures: string[];
   duration: string;
   icon: string;
+  image?: string;
 }
 
 export interface Testimonial {
@@ -37,3 +38,24 @@ export interface FAQItem {
   question: string;
   answer: string;
 }
+
+export interface NewsArticle {
+  id: string;
+  title: string;
+  date: string;
+  image: string;
+  content: string;
+  excerpt?: string;
+}
+
+export interface ServiceItem {
+  id: string;
+  category: 'methods' | 'diagnostics' | 'laboratory' | 'infrastructure';
+  title: string;
+  benefit: string;
+  method: string;
+  indications: string[];
+  duration?: string;
+  iconName: string;
+}
+

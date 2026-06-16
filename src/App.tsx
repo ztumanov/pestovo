@@ -56,8 +56,10 @@ import {
   Shield,
   UserCheck,
   ChevronDown,
+  ArrowUp,
   Download,
-  Newspaper
+  Newspaper,
+  Stethoscope
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Room, MedicalProgram } from './types';
@@ -65,7 +67,9 @@ import { useAdminData } from './context/AdminDataContext';
 import AdminPage from './components/AdminPage';
 import AdminFloatBar from './components/AdminFloatBar';
 import DocumentsModal from './components/DocumentsModal';
-import NewsModal from './components/NewsModal';
+import NewsPage from './components/NewsPage';
+import MedicalPage from './components/MedicalPage';
+import ServicesPage from './components/ServicesPage';
 import DocumentsPage from './components/DocumentsPage';
 import TestimonialsPage from './components/TestimonialsPage';
 
@@ -79,28 +83,68 @@ export default function App() {
     setCurrentPage
   } = useAdminData();
   const { 
-    resortInfo: RESORT_INFO, 
-    hero: HERO_DATA, 
-    rooms: ROOMS, 
-    medicalPrograms: MEDICAL_PROGRAMS, 
-    testimonials: TESTIMONIALS, 
-    faqs: FAQS, 
-    images: IMAGES, 
-    extraImages: EXTRA_IMAGES, 
-    videos: VIDEOS 
-  } = siteData;
+    resortInfo: RESORT_INFO = {}, 
+    hero: HERO_DATA = {
+      badge: 'Престижный оздоровительный комплекс ФТС России',
+      titleFirstPart: 'САНАТОРИЙ «ПЕСТОВО»',
+      titleSecondPart: 'ЮЖНЫЙ БЕРЕГ КРЫМА',
+      subtitle: 'Элитное оздоровление, легендарный парк-арборетум и дворец графини Паниной в Гаспре. Микроклимат царского курорта для вашего оздоровления.',
+      ctaText: 'Рассчитать путевку & Забронировать',
+      defaultBackgroundMode: 'video_nature',
+      stats: [
+        { value: '8 га', label: 'Реликтовый Парк' },
+        { value: '120+', label: 'Процедур' },
+        { value: '50 м', label: 'До собственного пляжа' },
+        { value: 'ФТС', label: 'Высший стандарт надежности' }
+      ],
+      slides: [
+        { id: '1', type: 'video', url: 'https://assets.mixkit.co/videos/preview/mixkit-waves-crashing-on-rocks-from-above-41851-large.mp4' },
+         { id: '2', type: 'photo', url: '/src/assets/images/pestovo_palace_1779780890544.png' },
+         { id: '3', type: 'photo', url: '/src/assets/images/pestovo_beach_1779780925661.png' }
+      ]
+    }, 
+    rooms: ROOMS = [], 
+    medicalPrograms: MEDICAL_PROGRAMS = [], 
+    testimonials: TESTIMONIALS = [], 
+    faqs: FAQS = [], 
+    images: IMAGES = {}, 
+    extraImages: EXTRA_IMAGES = {}, 
+    videos: VIDEOS = {} 
+  } = siteData || {};
 
   // Navigation states
   const [activeSection, setActiveSection] = useState('hero');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   
-  // Hero background states
-  const [heroBackground, setHeroBackground] = useState<'video_palace' | 'video_nature' | 'photo'>(
-    (HERO_DATA.defaultBackgroundMode as 'video_palace' | 'video_nature' | 'photo') || 'video_nature'
-  );
-  const [activeYoutubeId, setActiveYoutubeId] = useState<string>('JmY2D_1v-34'); // Highly embeddable alternate Gaspra Palace video
-  const [showVideoSettings, setShowVideoSettings] = useState(false);
-  const [customYtInput, setCustomYtInput] = useState('');
+  // Slideshow state for automatic background rotation
+  const rawSlides = (HERO_DATA && HERO_DATA.slides && HERO_DATA.slides.length > 0)
+    ? HERO_DATA.slides
+    : [
+        { id: '1', type: 'video', url: 'https://assets.mixkit.co/videos/preview/mixkit-waves-crashing-on-rocks-from-above-41851-large.mp4' },
+        { id: '2', type: 'photo', url: '/src/assets/images/pestovo_palace_1779780890544.png' },
+        { id: '3', type: 'photo', url: '/src/assets/images/pestovo_beach_1779780925661.png' }
+      ];
+
+  const bgMode = HERO_DATA?.defaultBackgroundMode || 'all';
+  const filteredSlides = rawSlides.filter(slide => {
+    if (bgMode === 'photo') return slide.type === 'photo';
+    if (bgMode === 'video' || bgMode === 'video_nature' || bgMode === 'video_palace') return slide.type === 'video';
+    return true;
+  });
+
+  const slides = filteredSlides.length > 0 ? filteredSlides : rawSlides;
+  const [activeSlideIndex, setActiveSlideIndex] = useState(0);
+
+  // Auto-cycling slideshow timer
+  useEffect(() => {
+    if (slides.length <= 1) return;
+    const currentSlide = slides[activeSlideIndex];
+    const duration = currentSlide?.type === 'video' ? 14000 : 7000;
+    const timer = setTimeout(() => {
+      setActiveSlideIndex(prev => (prev + 1) % slides.length);
+    }, duration);
+    return () => clearTimeout(timer);
+  }, [activeSlideIndex, slides]);
 
   // Gallery tabs
   const [galleryTab, setGalleryTab] = useState<'all' | 'rooms' | 'nature' | 'medical' | 'infrastructure'>('all');
@@ -267,6 +311,7 @@ export default function App() {
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
 
   // About dropdown and active subpages (Documents / News) states
+  const [showScrollTop, setShowScrollTop] = useState(false);
   const [isAboutDropdownOpen, setIsAboutDropdownOpen] = useState(false);
   const [activeSubModal, setActiveSubModal] = useState<'documents' | 'news' | null>(null);
 
@@ -583,6 +628,8 @@ export default function App() {
     const handleScroll = () => {
       const sections = ['hero', 'about', 'medical', 'rooms', 'gallery', 'testimonials', 'contacts'];
       const scrollPosition = window.scrollY + 200;
+      
+      setShowScrollTop(window.scrollY > 400);
 
       for (const section of sections) {
         const element = document.getElementById(section);
@@ -601,12 +648,7 @@ export default function App() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Synchronize background mode with admin panel state changes
-  useEffect(() => {
-    if (HERO_DATA.defaultBackgroundMode) {
-      setHeroBackground(HERO_DATA.defaultBackgroundMode);
-    }
-  }, [HERO_DATA.defaultBackgroundMode]);
+
 
   // Handle room details click
   const handleOpenRoomDetails = (room: Room) => {
@@ -788,7 +830,9 @@ export default function App() {
           <div className="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-2">
             <div className="flex items-center space-x-2">
               <span className="w-1.5 h-1.5 rounded-full bg-[#c5a880]"></span>
-              <span className="font-mono tracking-wider font-semibold uppercase text-stone-400">Ведомственная здравница • Санаторий «Пестово» ФТС РФ</span>
+              <span className="font-mono tracking-wider font-semibold uppercase text-stone-400 text-center sm:text-left">
+                Федеральное государственное казенное учреждение «Санаторий «Пестово» ФТС России»
+              </span>
             </div>
             <button 
               onClick={() => {
@@ -1014,15 +1058,15 @@ export default function App() {
                   <span className="font-serif font-bold text-lg md:text-xl tracking-tight text-[#FAF9F6]">САНАТОРИЙ</span>
                   <span className="font-serif font-bold text-[#c5a880] text-lg md:text-xl tracking-tight">«ПЕСТОВО»</span>
                 </div>
-                <div className="text-[10px] tracking-widest text-stone-300 font-mono uppercase font-semibold flex items-center gap-1.5 leading-none mt-1">
-                  <span className="inline-block w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
-                  ФТС России • Гаспра, Ялта
+                <div className="text-[10px] tracking-wider text-stone-300 font-mono uppercase font-semibold flex items-center gap-1.5 leading-none mt-1">
+                  <span className="inline-block w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0"></span>
+                  <span>ФГКУ ФТС России</span>
                 </div>
               </div>
             </div>
 
             {/* Desktop Nav */}
-            <div className="hidden lg:flex items-center space-x-6">
+            <div className="hidden lg:flex items-center flex-grow mx-10 xl:mx-16 justify-between">
               {/* Dropdown for About Sanatorium */}
               <div 
                 className="relative"
@@ -1080,7 +1124,8 @@ export default function App() {
                       </button>
                       <button
                         onClick={() => {
-                          setActiveSubModal('news');
+                          setCurrentPage('news');
+                          window.scrollTo({ top: 0, behavior: 'smooth' });
                           setIsAboutDropdownOpen(false);
                         }}
                         className="w-full flex items-center space-x-2.5 px-4 py-2.5 text-xs hover:bg-[#034434] hover:text-[#c5a880] transition-colors text-left cursor-pointer text-stone-100"
@@ -1088,12 +1133,24 @@ export default function App() {
                         <Newspaper className="w-4 h-4 text-[#c5a880] flex-shrink-0" />
                         <span>Новости санатория</span>
                       </button>
+                      <button
+                        onClick={() => {
+                          setCurrentPage('services');
+                          window.scrollTo({ top: 0, behavior: 'smooth' });
+                          setIsAboutDropdownOpen(false);
+                        }}
+                        className="w-full flex items-center space-x-2.5 px-4 py-2.5 text-xs hover:bg-[#034434] hover:text-[#c5a880] transition-colors text-left cursor-pointer text-stone-100"
+                      >
+                        <Compass className="w-4 h-4 text-[#c5a880] flex-shrink-0" />
+                        <span className="font-semibold text-[#c5a880]">Услуги и Сервисы</span>
+                      </button>
                     </motion.div>
                   )}
                 </AnimatePresence>
               </div>
 
               {[
+                { id: 'services', label: 'Услуги', isPage: true },
                 { id: 'medical', label: 'Лечение' },
                 { id: 'rooms', label: 'Номера' },
                 { id: 'gallery', label: 'Галерея' },
@@ -1102,14 +1159,21 @@ export default function App() {
               ].map((item) => (
                 <a
                   key={item.id}
-                  href={`#${item.id}`}
-                  onClick={() => setCurrentPage('home')}
+                  href={item.isPage ? '#' : `#${item.id}`}
+                  onClick={() => {
+                    if (item.isPage) {
+                      setCurrentPage(item.id as any);
+                      window.scrollTo({ top: 0, behavior: 'smooth' });
+                    } else {
+                      setCurrentPage('home');
+                    }
+                  }}
                   className={`text-sm font-medium tracking-wide transition-colors relative py-2 ${
-                    activeSection === item.id ? 'text-[#c5a880]' : 'text-stone-200 hover:text-[#c5a880]'
+                    (item.isPage ? currentPage === item.id : currentPage === 'home' && activeSection === item.id) ? 'text-[#c5a880]' : 'text-stone-200 hover:text-[#c5a880]'
                   }`}
                 >
                   {item.label}
-                  {activeSection === item.id && (
+                  {(item.isPage ? currentPage === item.id : currentPage === 'home' && activeSection === item.id) && (
                     <motion.div
                       layoutId="activeNavIndicator"
                       className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#c5a880]"
@@ -1121,16 +1185,10 @@ export default function App() {
             </div>
 
             {/* Action buttons Desktop */}
-            <div className="hidden lg:flex items-center space-x-4">
+            <div className="hidden lg:flex items-center">
               <a href="tel:88005503240" className="flex items-center text-sm font-medium hover:text-[#c5a880] transition-colors py-1">
                 <Phone className="w-4 h-4 mr-2 text-[#c5a880]" />
                 <span>8 (800) 550-32-40</span>
-              </a>
-              <a
-                href="#booking"
-                className="bg-[#c5a880] hover:bg-[#bca075] text-[#022C22] px-5 py-2.5 rounded-sm text-sm font-semibold uppercase tracking-wider transition-all duration-300 shadow-md hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0"
-              >
-                Забронировать
               </a>
             </div>
 
@@ -1199,7 +1257,8 @@ export default function App() {
                         </button>
                         <button
                           onClick={() => {
-                            setActiveSubModal('news');
+                            setCurrentPage('news');
+                            window.scrollTo({ top: 0, behavior: 'smooth' });
                             setIsMobileMenuOpen(false);
                             setIsAboutDropdownOpen(false);
                           }}
@@ -1207,12 +1266,24 @@ export default function App() {
                         >
                           • Новости санатория
                         </button>
+                        <button
+                          onClick={() => {
+                            setCurrentPage('services');
+                            window.scrollTo({ top: 0, behavior: 'smooth' });
+                            setIsMobileMenuOpen(false);
+                            setIsAboutDropdownOpen(false);
+                          }}
+                          className="w-full text-left block py-2 text-xs font-semibold text-[#c5a880] hover:text-white cursor-pointer font-bold"
+                        >
+                          • Услуги и Сервисы
+                        </button>
                       </motion.div>
                     )}
                   </AnimatePresence>
                 </div>
 
                 {[
+                  { id: 'services', label: 'Услуги и Сервисы', isPage: true },
                   { id: 'medical', label: 'Лечение' },
                   { id: 'rooms', label: 'Категории Номеров' },
                   { id: 'gallery', label: 'Галерея' },
@@ -1221,10 +1292,15 @@ export default function App() {
                 ].map((item) => (
                   <a
                     key={item.id}
-                    href={`#${item.id}`}
+                    href={item.isPage ? '#' : `#${item.id}`}
                     onClick={() => {
                       setIsMobileMenuOpen(false);
-                      setCurrentPage('home');
+                      if (item.isPage) {
+                        setCurrentPage(item.id as any);
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                      } else {
+                        setCurrentPage('home');
+                      }
                     }}
                     className="block font-medium py-2 text-stone-200 border-b border-white/5 hover:text-[#c5a880]"
                   >
@@ -1271,6 +1347,21 @@ export default function App() {
           setCurrentPage('home');
           window.scrollTo({ top: 0, behavior: 'smooth' });
         }} />
+      ) : currentPage === 'news' ? (
+        <NewsPage onBackToHome={() => {
+          setCurrentPage('home');
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }} />
+      ) : currentPage === 'medical' ? (
+        <MedicalPage onBackToHome={() => {
+          setCurrentPage('home');
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }} />
+      ) : currentPage === 'services' ? (
+        <ServicesPage onBackToHome={() => {
+          setCurrentPage('home');
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }} />
       ) : currentPage === 'admin' ? (
         <AdminPage onBackToHome={() => {
           setCurrentPage('home');
@@ -1287,63 +1378,42 @@ export default function App() {
           <header id="hero" className="relative min-h-[90vh] flex items-center justify-center overflow-hidden bg-[#022C22]">
         
         {/* Dynamic Background (Switchable Video/Image loops) */}
-        <div className="absolute inset-0 z-0">
+        <div className="absolute inset-0 z-0 bg-[#022C22]">
           <AnimatePresence mode="wait">
-            {heroBackground === 'video_palace' && (
+            {slides[activeSlideIndex] && (
               <motion.div 
-                key="video_palace"
-                className="absolute inset-0 w-full h-full overflow-hidden"
+                key={`slide-${activeSlideIndex}-${slides[activeSlideIndex]?.url}`}
+                className="absolute inset-0 w-full h-full overflow-hidden brightness-[1.15]"
                 initial={{ opacity: 0 }}
-                animate={{ opacity: 0.5 }}
+                animate={{ opacity: 0.65 }}
                 exit={{ opacity: 0 }}
-                transition={{ duration: 0.8 }}
+                transition={{ duration: 1.0 }}
               >
-                <iframe 
-                  className="absolute top-1/2 left-1/2 w-[180%] h-[180%] -translate-x-1/2 -translate-y-1/2 pointer-events-none scale-110 object-cover opacity-80"
-                  src={`https://www.youtube.com/embed/${activeYoutubeId}?autoplay=1&mute=1&loop=1&playlist=${activeYoutubeId}&controls=0&showinfo=0&rel=0&iv_load_policy=3&playsinline=1&enablejsapi=1`} 
-                  title="Санаторий Ясная Поляна Дворец Гаспра" 
-                  frameBorder="0" 
-                  allow="autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                  allowFullScreen
-                ></iframe>
-              </motion.div>
-            )}
-
-            {heroBackground === 'video_nature' && (
-              <motion.div 
-                key="video_nature"
-                className="absolute inset-0 w-full h-full overflow-hidden"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 0.4 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.8 }}
-              >
-                <video
-                  src={VIDEOS.coastalNatureDirect}
-                  autoPlay
-                  muted
-                  loop
-                  playsInline
-                  className="w-full h-full object-cover object-center scale-105"
-                />
-              </motion.div>
-            )}
-
-            {heroBackground === 'photo' && (
-              <motion.div 
-                key="photo"
-                className="absolute inset-0 w-full h-full overflow-hidden"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 0.45 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.8 }}
-              >
-                <img
-                  src={IMAGES.hero}
-                  alt="Санаторий Пестово ФТС России"
-                  className="w-full h-full object-cover object-center scale-105"
-                  referrerPolicy="no-referrer"
-                />
+                {slides[activeSlideIndex]?.type === 'video' ? (
+                  <video
+                    src={slides[activeSlideIndex]?.url}
+                    autoPlay
+                    muted
+                    playsInline
+                    loop
+                    preload="auto"
+                    poster="/src/assets/images/pestovo_palace_1779780890544.png"
+                    className="w-full h-full object-cover object-center scale-105"
+                    onEnded={() => {
+                      setActiveSlideIndex(prev => (prev + 1) % slides.length);
+                    }}
+                    onError={() => {
+                      console.warn("Video background failed to load, displaying poster fallback.");
+                    }}
+                  />
+                ) : (
+                  <img
+                    src={slides[activeSlideIndex]?.url}
+                    alt="Санаторий Пестово ФТС России"
+                    className="w-full h-full object-cover object-center scale-105"
+                    referrerPolicy="no-referrer"
+                  />
+                )}
               </motion.div>
             )}
           </AnimatePresence>
@@ -1351,172 +1421,6 @@ export default function App() {
           {/* Elegant geometric gradients imitating sunlight through pines */}
           <div className="absolute inset-0 bg-gradient-to-t from-[#022C22] via-[#022C22]/60 to-transparent z-1"></div>
           <div className="absolute inset-l-0 inset-r-0 bottom-0 h-48 bg-gradient-to-t from-[#FAF9F6] to-transparent z-2"></div>
-        </div>
-
-        {/* Floating Background Ambient Controls */}
-        <div className="absolute bottom-6 right-6 z-20 flex flex-col items-end space-y-2">
-          {showVideoSettings && (
-            <motion.div 
-              initial={{ opacity: 0, scale: 0.95, y: 10 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: 10 }}
-              className="bg-emerald-950/95 backdrop-blur-md border border-[#c5a880]/40 p-4 rounded-xl text-white shadow-2xl max-w-xs sm:max-w-sm"
-            >
-              <div className="flex items-center justify-between border-b border-[#c5a880]/20 pb-2 mb-3">
-                <span className="font-serif font-bold text-[#c5a880] text-sm tracking-wide">Настройки атмосферы</span>
-                <button 
-                  onClick={() => setShowVideoSettings(false)}
-                  className="text-stone-400 hover:text-white transition-colors"
-                >
-                  <X className="w-4 h-4" />
-                </button>
-              </div>
-              
-              <div className="space-y-3">
-                {/* Mode Selectors */}
-                <div>
-                  <label className="block text-[10px] uppercase tracking-wider text-stone-400 font-mono mb-1.5">Тип заставки</label>
-                  <div className="grid grid-cols-3 gap-1 bg-black/35 p-1 rounded-lg">
-                    <button 
-                      onClick={() => setHeroBackground('video_nature')}
-                      className={`py-1 text-[10px] rounded-md transition-all font-semibold uppercase tracking-wider ${heroBackground === 'video_nature' ? 'bg-[#c5a880] text-[#022C22]' : 'text-stone-300 hover:text-white'}`}
-                    >
-                      Природа
-                    </button>
-                    <button 
-                      onClick={() => setHeroBackground('video_palace')}
-                      className={`py-1 text-[10px] rounded-md transition-all font-semibold uppercase tracking-wider ${heroBackground === 'video_palace' ? 'bg-[#c5a880] text-[#022C22]' : 'text-stone-300 hover:text-white'}`}
-                    >
-                      Дворец
-                    </button>
-                    <button 
-                      onClick={() => setHeroBackground('photo')}
-                      className={`py-1 text-[10px] rounded-md transition-all font-semibold uppercase tracking-wider ${heroBackground === 'photo' ? 'bg-[#c5a880] text-[#022C22]' : 'text-stone-300 hover:text-white'}`}
-                    >
-                      Фото
-                    </button>
-                  </div>
-                </div>
-
-                {/* If Palace is active, show YouTube ID selection */}
-                {heroBackground === 'video_palace' && (
-                  <motion.div 
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: 'auto' }}
-                    className="space-y-2 border-t border-[#c5a880]/15 pt-2"
-                  >
-                    <label className="block text-[10px] uppercase tracking-wider text-stone-400 font-mono">Вариант видео-тура (YouTube)</label>
-                    <div className="space-y-1">
-                      <button 
-                        onClick={() => setActiveYoutubeId('JmY2D_1v-34')}
-                        className={`w-full text-left px-2 py-1.5 text-[11px] rounded transition-all flex items-center justify-between ${activeYoutubeId === 'JmY2D_1v-34' ? 'bg-[#c5a880]/20 text-[#c5a880] border border-[#c5a880]/30' : 'hover:bg-white/5 text-stone-300'}`}
-                      >
-                        <span>🎬 Дворец Голицына (Гаспра)</span>
-                        {activeYoutubeId === 'JmY2D_1v-34' && <span className="text-[9px] font-mono font-bold bg-[#c5a880] text-[#022C22] px-1 rounded">АКТИВНО</span>}
-                      </button>
-                      <button 
-                        onClick={() => setActiveYoutubeId('34n1m7SgUXM')}
-                        className={`w-full text-left px-2 py-1.5 text-[11px] rounded transition-all flex items-center justify-between ${activeYoutubeId === '34n1m7SgUXM' ? 'bg-[#c5a880]/20 text-[#c5a880] border border-[#c5a880]/30' : 'hover:bg-white/5 text-stone-300'}`}
-                      >
-                        <span>🏰 Ласточкино гнездо Ялта</span>
-                        {activeYoutubeId === '34n1m7SgUXM' && <span className="text-[9px] font-mono font-bold bg-[#c5a880] text-[#022C22] px-1 rounded">АКТИВНО</span>}
-                      </button>
-                      <button 
-                        onClick={() => setActiveYoutubeId('7gYF0vN_Gxk')}
-                        className={`w-full text-left px-2 py-1.5 text-[11px] rounded transition-all flex items-center justify-between ${activeYoutubeId === '7gYF0vN_Gxk' ? 'bg-[#c5a880]/20 text-[#c5a880] border border-[#c5a880]/30' : 'hover:bg-white/5 text-stone-300'}`}
-                      >
-                        <span>🌲 Величественный ЮБК (Полет)</span>
-                        {activeYoutubeId === '7gYF0vN_Gxk' && <span className="text-[9px] font-mono font-bold bg-[#c5a880] text-[#022C22] px-1 rounded">АКТИВНО</span>}
-                      </button>
-                    </div>
-
-                    {/* Manual ID Input */}
-                    <div className="space-y-1 mt-2">
-                      <div className="flex items-center justify-between">
-                        <label className="text-[9px] uppercase tracking-wider text-stone-400 font-mono">Свой YouTube ID или ссылка:</label>
-                      </div>
-                      <div className="flex items-center space-x-1.5">
-                        <input 
-                          type="text" 
-                          placeholder="ID или ссылка на видео"
-                          value={customYtInput}
-                          onChange={(e) => setCustomYtInput(e.target.value)}
-                          className="bg-black/35 border border-[#c5a880]/30 rounded px-2 py-1 text-xs text-white placeholder-stone-500 focus:outline-none focus:border-[#c5a880] w-full font-mono text-[11px]"
-                        />
-                        <button 
-                          onClick={() => {
-                            if (customYtInput.trim()) {
-                              let id = customYtInput.trim();
-                              if (id.includes('v=')) {
-                                id = id.split('v=')[1]?.split('&')[0] || id;
-                              } else if (id.includes('youtu.be/')) {
-                                id = id.split('youtu.be/')[1]?.split('?')[0] || id;
-                              } else if (id.includes('embed/')) {
-                                id = id.split('embed/')[1]?.split('?')[0] || id;
-                              }
-                              setActiveYoutubeId(id);
-                              setCustomYtInput('');
-                            }
-                          }}
-                          className="bg-[#c5a880] text-[#022C22] font-semibold text-xs rounded px-2.5 py-1 transition-all hover:bg-[#b0936b] active:scale-95 whitespace-nowrap"
-                        >
-                          ОК
-                        </button>
-                      </div>
-                    </div>
-                  </motion.div>
-                )}
-
-                {/* Helpful Warning */}
-                <div className="text-[10px] text-stone-300 bg-white/5 p-2 rounded leading-relaxed border border-white/5">
-                  ⚠️ <strong className="text-[#c5a880]">Инфо:</strong> Поддерживаются любые открытые YouTube ролики. Если выбранный ролик заблокирован из-за ограничений встраивания, переключитесь на нативную <span className="text-[#c5a880] underline cursor-pointer" onClick={() => { setHeroBackground('video_nature'); setShowVideoSettings(false); }}>«Природу»</span> — это прямое HD-видео.
-                </div>
-              </div>
-            </motion.div>
-          )}
-
-          {/* Simple Button Bar Trigger */}
-          <div className="flex items-center space-x-1 sm:space-x-2 bg-emerald-950/80 backdrop-blur-md border border-[#c5a880]/30 p-1.5 rounded-full text-xs text-white shadow-2xl">
-            <span className="hidden lg:inline text-[#c5a880]/80 font-mono text-[9px] uppercase tracking-wider px-2">Фон:</span>
-            <button 
-              onClick={() => {
-                setHeroBackground('video_nature');
-                setShowVideoSettings(false);
-              }}
-              className={`px-3 py-1.5 rounded-full transition-all duration-300 font-mono text-[10px] sm:text-[11px] font-semibold uppercase tracking-wider flex items-center gap-1.5 ${heroBackground === 'video_nature' && !showVideoSettings ? 'bg-[#c5a880] text-[#022C22] shadow' : 'text-stone-300 hover:text-white hover:bg-white/10'}`}
-              title="Красивый прямой HD-видео-тур: море, сосны и горы Крыма"
-            >
-              <Waves className="w-3 h-3" /> <span className="hidden sm:inline">Природа</span>
-            </button>
-            <button 
-              onClick={() => {
-                setHeroBackground('video_palace');
-                setShowVideoSettings(true);
-              }}
-              className={`px-3 py-1.5 rounded-full transition-all duration-300 font-mono text-[10px] sm:text-[11px] font-semibold uppercase tracking-wider flex items-center gap-1.5 ${heroBackground === 'video_palace' ? 'bg-[#c5a880] text-[#022C22] shadow' : 'text-stone-300 hover:text-white hover:bg-white/10'}`}
-              title="Видеообзор дворца Голицына в Гаспре"
-            >
-              <Video className="w-3 h-3" /> <span className="hidden sm:inline">Дворец</span>
-            </button>
-            <button 
-              onClick={() => {
-                setHeroBackground('photo');
-                setShowVideoSettings(false);
-              }}
-              className={`px-3 py-1.5 rounded-full transition-all duration-300 font-mono text-[10px] sm:text-[11px] font-semibold uppercase tracking-wider flex items-center gap-1.5 ${heroBackground === 'photo' && !showVideoSettings ? 'bg-[#c5a880] text-[#022C22] shadow' : 'text-stone-300 hover:text-white hover:bg-white/10'}`}
-              title="Художественное обработанное фото дворца (100% стабильно)"
-            >
-              <Image className="w-3 h-3" /> <span className="hidden sm:inline">Фото</span>
-            </button>
-            
-            <button 
-              onClick={() => setShowVideoSettings(!showVideoSettings)}
-              className={`p-1.5 rounded-full transition-all ${showVideoSettings ? 'bg-white/10 text-white animate-pulse' : 'text-[#c5a880] hover:bg-white/5'}`}
-              title="Открыть настройки фона"
-            >
-              <Sparkles className="w-3.5 h-3.5" />
-            </button>
-          </div>
         </div>
 
         {/* Hero Content */}
@@ -1587,29 +1491,24 @@ export default function App() {
           </motion.div>
 
           {/* Quick Stats Grid */}
-          <motion.div 
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.8, delay: 0.6 }}
-            className="mt-20 w-full max-w-5xl grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 bg-[#022C22]/80 backdrop-blur-md p-6 sm:p-8 rounded-sm border border-[#c5a880]/20 shadow-2xl"
-          >
-            <div className="text-center border-r border-white/10 last:border-0 pe-2">
-              <span className="block font-serif text-3xl sm:text-4xl font-semibold text-[#c5a880]">8 га</span>
-              <span className="block text-stone-300 text-[11px] tracking-wider uppercase font-mono mt-2 leading-none">Реликтовый Парк</span>
-            </div>
-            <div className="text-center lg:border-r border-white/10 pe-2">
-              <span className="block font-serif text-3xl sm:text-4xl font-semibold text-[#c5a880]">120+</span>
-              <span className="block text-stone-300 text-[11px] tracking-wider uppercase font-mono mt-2 leading-none">Процедур</span>
-            </div>
-            <div className="text-center border-r border-white/10 last:border-0 pe-2">
-              <span className="block font-serif text-3xl sm:text-4xl font-semibold text-[#c5a880]">50 м</span>
-              <span className="block text-stone-300 text-[11px] tracking-wider uppercase font-mono mt-2 leading-none">До собственного пляжа</span>
-            </div>
-            <div className="text-center last:border-0 pe-2">
-              <span className="block font-serif text-3xl sm:text-4xl font-semibold text-[#c5a880]">ФТС</span>
-              <span className="block text-stone-300 text-[11px] tracking-wider uppercase font-mono mt-2 leading-none">Высший стандарт надежности</span>
-            </div>
-          </motion.div>
+          {HERO_DATA.stats && HERO_DATA.stats.length > 0 && (
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.8, delay: 0.6 }}
+              className="mt-20 w-full max-w-5xl grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 bg-[#022C22]/80 backdrop-blur-md p-6 sm:p-8 rounded-sm border border-[#c5a880]/20 shadow-2xl"
+            >
+              {HERO_DATA.stats.map((stat, idx) => (
+                <div 
+                  key={idx} 
+                  className="text-center border-r border-white/10 last:border-r-0 pe-2"
+                >
+                  <span className="block font-serif text-3xl sm:text-4xl font-semibold text-[#c5a880]">{stat.value}</span>
+                  <span className="block text-stone-300 text-[11px] tracking-wider uppercase font-mono mt-2 leading-none">{stat.label}</span>
+                </div>
+              ))}
+            </motion.div>
+          )}
 
         </div>
       </header>
@@ -1705,52 +1604,97 @@ export default function App() {
                     <div className="space-y-4">
                       
                       {/* Big Weather Panel */}
-                      <div className="bg-emerald-950/50 p-4 rounded-sm border border-emerald-900/40 flex items-center justify-between">
-                        <div className="flex items-center space-x-3.5">
-                          <div className="bg-emerald-950/60 p-2.5 rounded border border-[#c5a880]/20">
-                            {getWeatherIcon(realWeather.weatherCode, "w-11 h-11")}
-                          </div>
-                          <div>
-                            <span className="text-[9px] text-stone-400 uppercase tracking-widest font-mono block">Сейчас на курорте</span>
-                            <div className="text-3xl font-serif font-extrabold text-[#FAF9F6] leading-none mt-1">
-                              {realWeather.temp}°C
+                      <div className="bg-emerald-950/50 p-4 rounded-sm border border-emerald-900/40 min-h-[110px] flex items-center justify-between relative overflow-hidden">
+                        <AnimatePresence mode="wait">
+                          <motion.div
+                            key={climateTime}
+                            initial={{ opacity: 0, y: 8 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -8 }}
+                            transition={{ duration: 0.25, ease: "easeInOut" }}
+                            className="flex items-center justify-between w-full"
+                          >
+                            <div className="flex items-center space-x-3.5">
+                              <div className="bg-emerald-950/60 p-2.5 rounded border border-[#c5a880]/20">
+                                {getWeatherIcon(climateTime === 'day' ? 0 : climateTime === 'morning' ? 1 : 2, "w-11 h-11")}
+                              </div>
+                              <div>
+                                <span className="text-[9px] text-[#c5a880] uppercase tracking-widest font-mono block">
+                                  {climateTime === 'morning' ? 'Утро на курорте' : climateTime === 'day' ? 'День на курорте' : 'Вечер на курорте'}
+                                </span>
+                                <div className="text-3xl font-serif font-extrabold text-[#FAF9F6] leading-none mt-1">
+                                  {climateDetails[climateTime].temp}
+                                </div>
+                                <span className="text-xs text-stone-300 font-sans font-semibold block mt-1.5">
+                                  {climateTime === 'morning' ? 'Ясно, свежий ветерок' : climateTime === 'day' ? 'Преимущественно ясно' : 'Малооблачно, штиль'}
+                                </span>
+                              </div>
                             </div>
-                            <span className="text-xs text-[#c5a880] font-sans font-semibold block mt-1.5">
-                              {getWeatherName(realWeather.weatherCode)}
-                            </span>
-                          </div>
-                        </div>
-                        <div className="text-right space-y-0.5">
-                          <span className="text-[9px] text-[#c5a880] uppercase tracking-wider font-mono block">Крымский климат</span>
-                          <div className="text-xs font-medium text-white">
-                            Ощущается как: <span className="text-white font-mono font-bold text-sm">{realWeather.feelsLike}°C</span>
-                          </div>
-                          <p className="text-[10px] text-emerald-300">Целебный воздух</p>
-                        </div>
+                            <div className="text-right space-y-0.5 max-w-[150px] hidden sm:block">
+                              <span className="text-[9px] text-[#c5a880] uppercase tracking-wider font-mono block mb-1">Показание климата</span>
+                              <div className="text-[10px] sm:text-xs font-serif italic text-stone-200 leading-tight">
+                                "{climateDetails[climateTime].recommendation}"
+                              </div>
+                            </div>
+                          </motion.div>
+                        </AnimatePresence>
                       </div>
 
                       {/* Extended Live Parameters (Sleek 3-Column Layout with Black Sea Temperature) */}
                       <div className="grid grid-cols-3 gap-2">
-                        <div className="bg-emerald-950/30 p-2.5 rounded-sm border border-emerald-900/35 flex flex-col justify-between">
+                        <div className="bg-emerald-950/30 p-2.5 rounded-sm border border-emerald-900/35 flex flex-col justify-between overflow-hidden">
                           <span className="text-[8px] uppercase tracking-wider font-mono text-stone-400 block mb-1">Ветер в Гаспре</span>
-                          <div className="flex items-center space-x-1">
-                            <Wind className="w-4 h-4 text-[#c5a880] shrink-0" />
-                            <span className="text-xs font-extrabold text-[#FAF9F6] font-mono">{realWeather.windSpeed} м/с</span>
-                          </div>
+                          <AnimatePresence mode="wait">
+                            <motion.div
+                              key={climateTime}
+                              initial={{ opacity: 0, y: 4 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              exit={{ opacity: 0, y: -4 }}
+                              transition={{ duration: 0.2 }}
+                              className="flex items-center space-x-1"
+                            >
+                              <Wind className="w-4 h-4 text-[#c5a880] shrink-0" />
+                              <span className="text-xs font-extrabold text-[#FAF9F6] font-mono">
+                                {climateTime === 'morning' ? '3.2' : climateTime === 'day' ? '4.5' : '1.8'} м/с
+                              </span>
+                            </motion.div>
+                          </AnimatePresence>
                         </div>
-                        <div className="bg-emerald-950/30 p-2.5 rounded-sm border border-emerald-900/35 flex flex-col justify-between">
+                        <div className="bg-emerald-950/30 p-2.5 rounded-sm border border-emerald-900/35 flex flex-col justify-between overflow-hidden">
                           <span className="text-[8px] uppercase tracking-wider font-mono text-stone-400 block mb-1">Влажность</span>
-                          <div className="flex items-center space-x-1">
-                            <Droplet className="w-4 h-4 text-[#c5a880] shrink-0" />
-                            <span className="text-xs font-extrabold text-[#FAF9F6] font-mono">{realWeather.humidity}%</span>
-                          </div>
+                          <AnimatePresence mode="wait">
+                            <motion.div
+                              key={climateTime}
+                              initial={{ opacity: 0, y: 4 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              exit={{ opacity: 0, y: -4 }}
+                              transition={{ duration: 0.2 }}
+                              className="flex items-center space-x-1"
+                            >
+                              <Droplet className="w-4 h-4 text-[#c5a880] shrink-0" />
+                              <span className="text-xs font-extrabold text-[#FAF9F6] font-mono">
+                                {climateDetails[climateTime].humidity}
+                              </span>
+                            </motion.div>
+                          </AnimatePresence>
                         </div>
-                        <div className="bg-emerald-920/10 hover:bg-[#023a2d]/40 transition-colors p-2.5 rounded-sm border border-[#c5a880]/20 flex flex-col justify-between">
+                        <div className="bg-emerald-920/10 hover:bg-[#023a2d]/40 transition bg-emerald-950/20 p-2.5 rounded-sm border border-[#c5a880]/20 flex flex-col justify-between overflow-hidden">
                           <span className="text-[8px] uppercase tracking-wider font-mono text-emerald-300 block mb-1">Черное море t°</span>
-                          <div className="flex items-center space-x-1">
-                            <Waves className="w-4 h-4 text-[#c5a880] shrink-0" />
-                            <span className="text-xs font-extrabold text-white font-mono">{getSeaTemperature(realWeather.temp)}°C</span>
-                          </div>
+                          <AnimatePresence mode="wait">
+                            <motion.div
+                              key={climateTime}
+                              initial={{ opacity: 0, y: 4 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              exit={{ opacity: 0, y: -4 }}
+                              transition={{ duration: 0.2 }}
+                              className="flex items-center space-x-1"
+                            >
+                              <Waves className="w-4 h-4 text-[#c5a880] shrink-0" />
+                              <span className="text-xs font-extrabold text-white font-mono">
+                                {climateDetails[climateTime].seaTemp}
+                              </span>
+                            </motion.div>
+                          </AnimatePresence>
                         </div>
                       </div>
 
@@ -2264,10 +2208,10 @@ export default function App() {
       </section>
 
       {/* DETAILED INTERACTIVE MEDICAL PROGRAMS */}
-      <section id="medical" className="py-24 bg-[#022C22] text-white">
+      <section id="medical" className="py-20 bg-[#022C22] text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           
-          <div className="text-center max-w-3xl mx-auto mb-16">
+          <div className="text-center max-w-3xl mx-auto mb-12">
             {isAdminMode && (
               <div className="mb-4">
                 <button 
@@ -2284,142 +2228,57 @@ export default function App() {
             </h2>
             <div className="h-1 w-20 bg-[#c5a880] mx-auto mt-6"></div>
             <p className="text-stone-300 text-sm sm:text-base leading-relaxed mt-4">
-              Санаторий «Пестово» имеет высшую медицинскую категорию и специализируется на лечении широкого спектра заболеваний с использованием природных лечебных факторов.
+              Санаторий «Пестово» имеет высшую медицинскую категорию и предлагает комплексные программы оздоровления с использованием современного оборудования и целительных природных факторов.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-            
-            {/* Sidebar with program items list */}
-            <div className="lg:col-span-5 space-y-3">
-              {MEDICAL_PROGRAMS.map((prog) => (
-                <button
-                  key={prog.id}
-                  onClick={() => setActiveMedProgram(prog.id)}
-                  className={`w-full text-left p-5 transition-all text-sm rounded-sm border duration-300 flex items-center justify-between group ${
-                    activeMedProgram === prog.id 
-                      ? 'bg-[#c5a880] border-[#c5a880] text-[#022C22] shadow-xl translate-x-1 font-medium' 
-                      : 'bg-emerald-950/40 border-emerald-900 text-stone-200 hover:bg-emerald-950/80 hover:border-emerald-800'
-                  }`}
-                >
-                  <div className="flex items-center space-x-4">
-                    <div className={`p-2 rounded-sm ${activeMedProgram === prog.id ? 'bg-[#022C22] text-[#c5a880]' : 'bg-emerald-900/30'}`}>
-                      {getMedicalIcon(prog.icon)}
-                    </div>
-                    <div>
-                      <h4 className={`text-base font-semibold ${activeMedProgram === prog.id ? 'text-[#022C22]' : 'text-[#FAF9F6]'}`}>
-                        {prog.title}
-                      </h4>
-                      <p className={`text-xs mt-1 line-clamp-1 ${activeMedProgram === prog.id ? 'text-[#022C22]/80' : 'text-stone-400'}`}>
-                        {prog.shortDesc}
-                      </p>
-                    </div>
+          {/* Compact 4-column grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {MEDICAL_PROGRAMS.map((prog) => (
+              <div 
+                key={prog.id}
+                onClick={() => {
+                  setCurrentPage('medical');
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }}
+                className="bg-emerald-950/45 border border-emerald-900/60 p-6 rounded-xl hover:border-[#c5a880]/50 transition-all duration-300 hover:-translate-y-1 hover:scale-[1.02] hover:shadow-2xl hover:shadow-[#c5a880]/10 block cursor-pointer group flex flex-col justify-between h-full hover:bg-emerald-950"
+              >
+                <div>
+                  <div className="w-10 h-10 rounded-lg bg-emerald-900/40 flex items-center justify-center mb-4 text-[#c5a880] border border-emerald-800/20 group-hover:bg-[#c5a880] group-hover:text-[#022C22] transition-colors duration-300">
+                    {getMedicalIcon(prog.icon)}
                   </div>
-                  <ChevronRight className={`w-5 h-5 transition-transform duration-300 ${
-                    activeMedProgram === prog.id ? 'text-[#022C22] rotate-90' : 'text-stone-500 group-hover:translate-x-1'
-                  }`} />
-                </button>
-              ))}
-
-              <div className="bg-emerald-950 p-6 rounded-sm border border-[#c5a880]/20 mt-8 space-y-4">
-                <div className="flex items-start space-x-3">
-                  <Award className="w-5 h-5 text-[#c5a880] shrink-0 mt-0.5" />
-                  <div>
-                    <h5 className="font-serif text-sm font-semibold tracking-wide text-white">Ведомственная санаторно-курортная карта</h5>
-                    <p className="text-xs text-stone-300 mt-1">Оформляется врачом по месту жительства или у нас на месте (за 1 день в лечебном корпусе).</p>
-                  </div>
+                  <h3 className="font-serif font-bold text-lg text-white mb-2 leading-tight group-hover:text-[#c5a880] transition-colors">
+                    {prog.title}
+                  </h3>
+                  <span className="inline-block font-mono text-[10px] uppercase text-[#c5a880] tracking-wider mb-3">
+                    Срок: {prog.duration}
+                  </span>
+                  <p className="text-stone-300 text-xs leading-relaxed line-clamp-3">
+                    {prog.shortDesc}
+                  </p>
+                </div>
+                
+                <div className="mt-6 flex items-center space-x-1.5 text-xs text-[#c5a880] font-bold uppercase tracking-wider border-b border-transparent group-hover:border-[#c5a880] w-max pb-0.5 transition-all">
+                  <span>Подробнее</span>
+                  <ChevronRight className="w-3.5 h-3.5" />
                 </div>
               </div>
-            </div>
-
-            {/* Displaying details of the active program */}
-            <div className="lg:col-span-7">
-              <AnimatePresence mode="wait">
-                {MEDICAL_PROGRAMS.filter(p => p.id === activeMedProgram).map((prog) => (
-                  <motion.div
-                    key={prog.id}
-                    initial={{ opacity: 0, x: 20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: -20 }}
-                    transition={{ duration: 0.4 }}
-                    className="bg-emerald-950 border border-[#c5a880]/20 rounded-sm p-6 sm:p-8 space-y-6 shadow-2xl relative"
-                  >
-                    
-                    {/* Corner Image of medical spa */}
-                    <div className="relative h-64 sm:h-80 rounded-sm overflow-hidden mb-6 border border-[#c5a880]/15">
-                      <img
-                        src={IMAGES.medical}
-                        alt={prog.title}
-                        className="w-full h-full object-cover object-center"
-                        referrerPolicy="no-referrer"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-emerald-950 via-emerald-950/20 to-transparent"></div>
-                      <div className="absolute bottom-4 left-4 right-4 flex justify-between items-end">
-                        <span className="bg-[#c5a880] text-[#022C22] font-mono text-xs uppercase px-3 py-1.5 font-bold rounded-sm shadow-md">
-                          Курс лечения: {prog.duration}
-                        </span>
-                      </div>
-                    </div>
-
-                    <h3 className="font-serif text-2xl sm:text-3xl font-medium text-white tracking-tight flex items-center">
-                      <Sparkles className="w-6 h-6 mr-3 text-[#c5a880] shrink-0" />
-                      Программа «{prog.title}»
-                    </h3>
-
-                    <p className="text-stone-200 text-sm sm:text-base leading-relaxed">
-                      {prog.fullDesc}
-                    </p>
-
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 pt-4 border-t border-[#c5a880]/20">
-                      <div>
-                        <h4 className="text-stone-300 font-serif text-sm uppercase tracking-wider font-semibold mb-3 border-b border-white/5 pb-1 flex items-center">
-                          <Check className="w-4 h-4 text-[#c5a880] mr-2" />
-                          Показания к программе:
-                        </h4>
-                        <ul className="space-y-2">
-                          {prog.indications.map((ind, i) => (
-                            <li key={i} className="text-xs text-stone-200 flex items-start">
-                              <span className="inline-block w-1.5 h-1.5 rounded-full bg-[#c5a880] mt-1.5 mr-2 shrink-0"></span>
-                              {ind}
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                      <div>
-                        <h4 className="text-stone-300 font-serif text-sm uppercase tracking-wider font-semibold mb-3 border-b border-white/5 pb-1 flex items-center">
-                          <Check className="w-4 h-4 text-[#c5a880] mr-2" />
-                          Входящие процедуры:
-                        </h4>
-                        <ul className="space-y-2">
-                          {prog.procedures.map((proc, i) => (
-                            <li key={i} className="text-xs text-stone-200 flex items-start">
-                              <span className="inline-block w-1 h-3 bg-[#c5a880] mr-2 rounded-full shrink-0 mt-0.5"></span>
-                              {proc}
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    </div>
-
-                    <div className="bg-[#022C22] p-4 rounded-sm border border-[#c5a880]/15 flex flex-col sm:flex-row items-center justify-between gap-4">
-                      <div className="text-xs text-stone-300">
-                        <span className="font-bold text-[#c5a880] block mb-1">Дополнительно:</span>
-                        Лечащий врач может корректировать перечень процедур с учетом противопоказаний.
-                      </div>
-                      <a
-                        href="#contacts"
-                        className="bg-transparent hover:bg-[#c5a880] text-[#c5a880] hover:text-[#022C22] border border-[#c5a880] px-4 py-2 text-xs font-bold uppercase tracking-wider rounded-sm transition-all duration-300 whitespace-nowrap"
-                      >
-                        Записаться по телефону
-                      </a>
-                    </div>
-
-                  </motion.div>
-                ))}
-              </AnimatePresence>
-            </div>
-
+            ))}
           </div>
+
+          <div className="flex justify-center mt-12">
+            <button 
+              onClick={() => {
+                setCurrentPage('medical');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }}
+              className="bg-[#c5a880] text-[#022C22] hover:bg-white hover:text-[#022C22] border border-[#c5a880] px-8 py-3.5 text-xs font-bold uppercase tracking-widest rounded-lg transition-all duration-300 shadow-xl hover:scale-105 inline-flex items-center gap-2 cursor-pointer"
+            >
+              <Stethoscope className="w-4 h-4" />
+              <span>Все программы и процедуры в деталях</span>
+            </button>
+          </div>
+
         </div>
       </section>
 
@@ -2452,7 +2311,7 @@ export default function App() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto justify-center">
             {ROOMS.map((room) => (
               <div 
                 key={room.id}
@@ -2461,7 +2320,7 @@ export default function App() {
                 {/* Image Section */}
                 <div className="relative overflow-hidden h-56 shrink-0 border-b border-stone-100">
                   <img
-                    src={room.image}
+                    src={room.image || undefined}
                     alt={room.name}
                     className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                     referrerPolicy="no-referrer"
@@ -2501,8 +2360,12 @@ export default function App() {
                   <div>
                     <div className="flex items-baseline justify-between mb-4">
                       <span className="text-[10px] tracking-wider font-mono text-stone-400 uppercase">Стоимость сутки</span>
-                      <div className="text-lg font-bold text-[#022C22]">
-                        от <span className="text-xl font-serif font-bold text-[#c5a880]">{room.price.toLocaleString('ru-RU')} ₽</span>
+                      <div className="text-[#022C22]">
+                        {(!room.price || room.price <= 0) ? (
+                          <span className="text-xs font-semibold text-[#c5a880] uppercase tracking-wide">Уточняйте у менеджера!</span>
+                        ) : (
+                          <>от <span className="text-xl font-serif font-bold text-[#c5a880]">{room.price.toLocaleString('ru-RU')} ₽</span></>
+                        )}
                       </div>
                     </div>
 
@@ -2607,7 +2470,7 @@ export default function App() {
                   className="relative group h-64 overflow-hidden rounded-sm border border-stone-200 shadow-sm cursor-zoom-in"
                 >
                   <img
-                    src={item.src}
+                    src={item.src || undefined}
                     alt={item.title}
                     className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                     referrerPolicy="no-referrer"
@@ -3046,8 +2909,8 @@ export default function App() {
                   <div>
                     <span className="text-[10px] uppercase tracking-wider text-stone-400 font-mono">Телефоны отдела бронирования:</span>
                     <p className="text-sm font-semibold text-[#022C22] mt-0.5 flex flex-col sm:flex-row sm:space-x-4">
-                      <a href="tel:88005503240" className="hover:text-[#c5a880]">{RESORT_INFO.phone} (Бесплатно по РФ)</a>
-                      <a href="tel:+73654278000" className="hover:text-[#c5a880]">{RESORT_INFO.phoneDirect} (Ресепшн)</a>
+                      <a href={`tel:${RESORT_INFO.phone}`} className="hover:text-[#c5a880]">Тел: {RESORT_INFO.phone}</a>
+                      {RESORT_INFO.fax && <a href={`tel:${RESORT_INFO.fax}`} className="hover:text-[#c5a880]">Факс: {RESORT_INFO.fax}</a>}
                     </p>
                   </div>
                 </div>
@@ -3086,61 +2949,61 @@ export default function App() {
 
             </div>
 
-            {/* Simulated Vector / Luxury Styled Interactive Map */}
-            <div className="lg:col-span-7 h-96 lg:h-auto min-h-[400px] bg-[#022C22] text-white rounded-sm border border-[#c5a880]/20 flex flex-col justify-between overflow-hidden relative p-8 shadow-2xl">
+            {/* Real Interactive Yandex Map */}
+            <div className="lg:col-span-7 min-h-[450px] bg-[#022C22] text-white rounded-sm border border-[#c5a880]/20 flex flex-col justify-between overflow-hidden relative shadow-2xl">
               
-              <div className="absolute inset-0 z-0">
-                {/* Unsplash abstract landscape or coastline detail */}
-                <img
-                  src={IMAGES.nature}
-                  alt="Карта Гаспры"
-                  className="w-full h-full object-cover opacity-20 scale-105"
-                  referrerPolicy="no-referrer"
-                />
-                <div className="absolute inset-0 bg-gradient-to-br from-[#022C22] via-[#022C22]/90 to-[#022C22]/40"></div>
+              <div className="w-full h-[280px] sm:h-[320px] lg:h-[350px] relative z-10 border-b border-[#c5a880]/20 bg-emerald-950/40">
+                <iframe 
+                  src={`https://yandex.ru/map-widget/v1/?text=${encodeURIComponent("298660, Республика Крым, г. Ялта, пгт. Гаспра, Севастопольское шоссе, д. 52")}&z=16`}
+                  width="100%" 
+                  height="100%" 
+                  className="w-full h-full"
+                  frameBorder="0" 
+                  allowFullScreen
+                  title="Yandex Map"
+                ></iframe>
               </div>
 
-              <div className="relative z-10">
-                <span className="text-[10px] tracking-widest font-mono text-emerald-400 uppercase">Гео-модуль «Пестово»</span>
-                <h3 className="font-serif text-xl font-medium tracking-wide mt-1.5">Размещение на Черноморском побережье</h3>
-              </div>
-
-              {/* Graphical illustration of Gaspra roads & Swallow's Nest */}
-              <div className="relative z-10 bg-emerald-950/80 backdrop-blur-md p-6 rounded-sm border border-emerald-800/60 my-auto text-xs space-y-4">
-                <div className="flex items-center space-x-3">
-                  <div className="w-3 h-3 rounded-full bg-[#c5a880] animate-ping shrink-0"></div>
-                  <strong className="text-white text-sm">Санаторий «Пестово» ФТС РФ находится здесь:</strong>
-                </div>
-                
-                <p className="text-stone-300 leading-relaxed">
-                  Поселок городского типа Гаспра (Севастопольское шоссе, 5), прямо посреди парковой зоны, граничащей с государственным санаторием «Днепр» и знаменитым памятником дворцово-паркового зодчества «Харакс».
-                </p>
-
-                <div className="grid grid-cols-2 gap-4 border-t border-white/5 pt-3 text-[11px] text-stone-400">
+              <div className="p-6 space-y-4 bg-gradient-to-b from-[#022C22] to-[#011B15] relative z-10">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                   <div>
-                    <span className="block font-bold text-[#c5a880] uppercase tracking-wide">Рядом с нами:</span>
-                    Дворец «Харакс» — 600 м <br/>
-                    Ласточкино Гнездо — 1.8 км
+                    <span className="text-[10px] tracking-widest font-mono text-emerald-400 uppercase font-bold">Гео-модуль «Пестово»</span>
+                    <h3 className="font-serif text-lg font-semibold tracking-wide mt-0.5">Размещение на Черноморском побережье</h3>
+                    <p className="text-stone-300 text-xs mt-1.5 leading-relaxed">
+                      Крым, г. Ялта, пгт. Гаспра, Севастопольское шоссе, д. 52. Расположен посреди реликтовой парковой зоны Харакс.
+                    </p>
                   </div>
-                  <div>
-                    <span className="block font-bold text-[#c5a880] uppercase tracking-wide">До центра Ялты:</span>
-                    Расстояние — 11 км <br/>
-                    На машине — 15 минут
+                  
+                  <div className="shrink-0 flex flex-col items-start sm:items-end gap-1">
+                    <span className="text-[10px] text-stone-400 font-mono uppercase">Координаты GPS</span>
+                    <span className="text-xs font-mono font-bold text-[#c5a880]">44.4308° N, 34.1256° E</span>
                   </div>
                 </div>
-              </div>
 
-              <div className="relative z-10 flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-white/10 pt-4 mt-4">
-                <span className="text-[11px] text-stone-300">Координаты GPS: <strong>44.4308° N, 34.1256° E</strong></span>
-                <a 
-                  href="https://yandex.ru/maps/?text=Республика Крым, Ялта, пгт. Гаспра, Севастопольское шоссе, д. 5"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="bg-[#c5a880] hover:bg-[#bca075] text-[#022C22] px-4 py-2 rounded-sm text-xs font-bold uppercase tracking-widest transition-colors flex items-center space-x-1.5 text-center shrink-0 w-full sm:w-auto justify-center"
-                >
-                  <Compass className="w-3.5 h-3.5" />
-                  <span>Открыть на Яндекс.Картах</span>
-                </a>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 border-t border-white/5 pt-3.5 text-xs text-stone-300">
+                  <div>
+                    <strong className="text-xs font-bold text-[#c5a880] uppercase tracking-wide block mb-1">Рядом с нами:</strong>
+                    • Дворец «Харакс» — 600 м <br/>
+                    • Ласточкино Гнездо — 1.8 км
+                  </div>
+                  <div className="flex flex-col justify-between items-stretch">
+                    <div>
+                      <strong className="text-xs font-bold text-[#c5a880] uppercase tracking-wide block mb-1">До центра Ялты:</strong>
+                      • Расстояние — 11 км • 15 минут езды
+                    </div>
+                    <div className="pt-2 sm:pt-0 self-end w-full">
+                      <a 
+                        href={`https://yandex.ru/maps/?text=${encodeURIComponent("298660, Республика Крым, г. Ялта, пгт. Гаспра, Севастопольское шоссе, д. 52")}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="bg-[#c5a880] hover:bg-[#bca075] text-[#022C22] px-4 py-1.5 rounded-sm text-[11px] font-bold uppercase tracking-wider transition-colors flex items-center space-x-1.5 justify-center w-full"
+                      >
+                        <Compass className="w-3.5 h-3.5" />
+                        <span>Открыть на Яндекс.Картах</span>
+                      </a>
+                    </div>
+                  </div>
+                </div>
               </div>
 
             </div>
@@ -3199,10 +3062,10 @@ export default function App() {
             <div>
               <h4 className="font-serif text-sm font-semibold text-white tracking-wider uppercase mb-4 border-b border-white/5 pb-1 select-none text-stone-200">Бронирование</h4>
               <ul className="space-y-2 text-xs text-stone-300">
-                <li>Бесплатный звонок: <a href="tel:88005503240" className="hover:underline">{RESORT_INFO.phone}</a></li>
-                <li>Администратор: <a href="tel:+73654278000" className="hover:underline">{RESORT_INFO.phoneDirect}</a></li>
-                <li>Отдел продаж: <a href={`mailto:${RESORT_INFO.email}`} className="hover:underline">{RESORT_INFO.email}</a></li>
-                <li>Адрес: г. Ялта, пгт. Гаспра, Севастопольское шоссе, д. 5</li>
+                <li>Телефон: <a href={`tel:${RESORT_INFO.phone}`} className="hover:underline">{RESORT_INFO.phone}</a></li>
+                {RESORT_INFO.fax && <li>Факс: <a href={`tel:${RESORT_INFO.fax}`} className="hover:underline">{RESORT_INFO.fax}</a></li>}
+                <li>Приемная: <a href={`mailto:${RESORT_INFO.email}`} className="hover:underline">{RESORT_INFO.email}</a></li>
+                <li>Адрес: {RESORT_INFO.address}</li>
               </ul>
             </div>
 
@@ -3254,7 +3117,7 @@ export default function App() {
               {/* Header Visual */}
               <div className="relative h-64 shrink-0 border-b border-stone-100">
                 <img
-                  src={roomModal.image}
+                  src={roomModal.image || undefined}
                   alt={roomModal.name}
                   className="w-full h-full object-cover"
                   referrerPolicy="no-referrer"
@@ -3325,7 +3188,11 @@ export default function App() {
               <div className="p-4 bg-stone-50 border-t border-stone-100 flex items-center justify-between">
                 <div>
                   <span className="text-[10px] tracking-wider text-stone-400 uppercase font-mono block">Цена за сутки</span>
-                  <span className="text-lg font-bold text-[#022C22]">от <span className="text-xl font-serif font-bold text-[#c5a880]">{roomModal.price.toLocaleString('ru')} ₽</span></span>
+                  {(!roomModal.price || roomModal.price <= 0) ? (
+                    <span className="text-sm font-bold text-[#c5a880] uppercase tracking-wide">Уточняйте у менеджера!</span>
+                  ) : (
+                    <span className="text-lg font-bold text-[#022C22]">от <span className="text-xl font-serif font-bold text-[#c5a880]">{roomModal.price.toLocaleString('ru')} ₽</span></span>
+                  )}
                 </div>
                 <div className="flex space-x-2">
                   <button
@@ -3397,8 +3264,8 @@ export default function App() {
                 <AnimatePresence mode="wait">
                   <motion.img
                     key={lightboxIndex}
-                    src={filteredGallery[lightboxIndex].src}
-                    alt={filteredGallery[lightboxIndex].title}
+                    src={filteredGallery[lightboxIndex]?.src || undefined}
+                    alt={filteredGallery[lightboxIndex]?.title || ''}
                     initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0, scale: 0.95 }}
@@ -3454,6 +3321,27 @@ export default function App() {
 
       {/* Embedded Admin Overlay Controllers */}
       <AdminFloatBar />
+
+      {/* Scroll to Top Button */}
+      <AnimatePresence>
+        {showScrollTop && (
+          <motion.button
+            initial={{ opacity: 0, y: 20, scale: 0.9 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 20, scale: 0.9 }}
+            transition={{ duration: 0.4, ease: "easeInOut" }}
+            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+            className={`fixed bottom-6 right-6 z-[60] p-3 rounded-full shadow-xl border cursor-pointer flex items-center justify-center transition-all ${
+              isAccessMode 
+                ? 'bg-black text-white hover:bg-gray-800 border-white'
+                : 'bg-[#022C22] text-[#c5a880] border-[#c5a880]/30 hover:border-[#c5a880] focus:ring-2 focus:ring-[#c5a880]/50'
+            }`}
+            title="Наверх"
+          >
+            <ArrowUp className="w-5 h-5" />
+          </motion.button>
+        )}
+      </AnimatePresence>
 
     </div>
   );

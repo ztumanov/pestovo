@@ -24,10 +24,58 @@ import {
   ArrowLeft,
   Database,
   CheckCircle,
-  FileText
+  FileText,
+  Newspaper
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Room, MedicalProgram, Testimonial, FAQItem } from '../types';
+import { Room, MedicalProgram, Testimonial, FAQItem, NewsArticle, ServiceItem } from '../types';
+
+/**
+ * Utility to downscale and compress images client-side before storing them in localStorage
+ */
+function compressImage(file: File, maxDim: number, quality: number, callback: (base64: string) => void) {
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const originalResult = e.target?.result;
+    if (originalResult && typeof originalResult === 'string') {
+      // If it's not actually an image mimetype (failsafe), just return raw reader result
+      if (!file.type.startsWith('image/')) {
+        callback(originalResult);
+        return;
+      }
+      const img = new Image();
+      img.src = originalResult;
+      img.onload = () => {
+        let width = img.width;
+        let height = img.height;
+        if (width > maxDim || height > maxDim) {
+          if (width > height) {
+            height = Math.round((height * maxDim) / width);
+            width = maxDim;
+          } else {
+            width = Math.round((width * maxDim) / height);
+            height = maxDim;
+          }
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+          ctx.drawImage(img, 0, 0, width, height);
+          const optimized = canvas.toDataURL('image/jpeg', quality);
+          callback(optimized);
+        } else {
+          callback(originalResult);
+        }
+      };
+      img.onerror = () => {
+        callback(originalResult);
+      };
+    }
+  };
+  reader.readAsDataURL(file);
+}
 
 export default function AdminPage({ onBackToHome }: { onBackToHome: () => void }) {
   const {
@@ -55,23 +103,33 @@ export default function AdminPage({ onBackToHome }: { onBackToHome: () => void }
   const [medPrograms, setMedPrograms] = useState<MedicalProgram[]>([...siteData.medicalPrograms]);
   const [testimonials, setTestimonials] = useState<Testimonial[]>([...siteData.testimonials]);
   const [faqs, setFaqs] = useState<FAQItem[]>([...siteData.faqs]);
+  const [news, setNews] = useState<NewsArticle[]>([...(siteData.news || [])]);
+  const [services, setServices] = useState<ServiceItem[]>([...(siteData.services || [])]);
 
   // Selected sub-items being edited in forms
   const [editingRoomId, setEditingRoomId] = useState<string | null>(null);
   const [editingMedId, setEditingMedId] = useState<string | null>(null);
   const [editingTestId, setEditingTestId] = useState<string | null>(null);
   const [editingFaqId, setEditingFaqId] = useState<string | null>(null);
+  const [editingNewsId, setEditingNewsId] = useState<string | null>(null);
+  const [editingServiceId, setEditingServiceId] = useState<string | null>(null);
 
   // States for adding new items
   const [showAddRoom, setShowAddRoom] = useState(false);
   const [showAddMed, setShowAddMed] = useState(false);
   const [showAddTest, setShowAddTest] = useState(false);
   const [showAddFaq, setShowAddFaq] = useState(false);
+  const [showAddNews, setShowAddNews] = useState(false);
+  const [showAddService, setShowAddService] = useState(false);
 
   // State to show save indicator
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [dragActive, setDragActive] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
+  const [videoDragActive, setVideoDragActive] = useState(false);
+  const [videoUploadError, setVideoUploadError] = useState<string | null>(null);
+  const [slidesDragActive, setSlidesDragActive] = useState(false);
+  const [slidesUploadError, setSlidesUploadError] = useState<string | null>(null);
 
   // Custom confirmation modal state
   const [confirmModal, setConfirmModal] = useState<{
@@ -113,6 +171,8 @@ export default function AdminPage({ onBackToHome }: { onBackToHome: () => void }
     setMedPrograms([...siteData.medicalPrograms]);
     setTestimonials([...siteData.testimonials]);
     setFaqs([...siteData.faqs]);
+    setNews([...(siteData.news || [])]);
+    setServices([...(siteData.services || [])]);
   }, [siteData]);
 
   if (!isAdminMode) {
@@ -145,6 +205,7 @@ export default function AdminPage({ onBackToHome }: { onBackToHome: () => void }
   const handleSaveHero = () => {
     updateSection('hero', localHero);
     updateSection('images', localImages);
+    updateSection('videos', localVideos);
     triggerSuccess();
   };
 
@@ -308,26 +369,161 @@ export default function AdminPage({ onBackToHome }: { onBackToHome: () => void }
     triggerSuccess();
   };
 
+  // NEWS HANDLERS
+  const handleUpdateNews = (newsId: string, updatedNews: NewsArticle) => {
+    const nextNews = news.map(n => n.id === newsId ? updatedNews : n);
+    setNews(nextNews);
+    updateSection('news', nextNews);
+    setEditingNewsId(null);
+    triggerSuccess();
+  };
+
+  const handleDeleteNews = (newsId: string) => {
+    setConfirmModal({
+      isOpen: true,
+      title: 'Удалить новость?',
+      message: 'Вы уверены, что хотите удалить эту новость?',
+      confirmText: 'Да, удалить',
+      confirmClass: 'bg-red-600 hover:bg-red-750 text-white',
+      onConfirm: () => {
+        const nextNews = news.filter(n => n.id !== newsId);
+        setNews(nextNews);
+        updateSection('news', nextNews);
+        triggerSuccess();
+      }
+    });
+  };
+
+  const handleAddNews = (newArticle: Omit<NewsArticle, 'id'>) => {
+    const created: NewsArticle = {
+      ...newArticle,
+      id: `news-${Date.now()}`
+    };
+    const nextNews = [created, ...news];
+    setNews(nextNews);
+    updateSection('news', nextNews);
+    setShowAddNews(false);
+    triggerSuccess();
+  };
+
+  // SERVICES HANDLERS
+  const handleUpdateService = (serviceId: string, updatedService: ServiceItem) => {
+    const nextServices = services.map(s => s.id === serviceId ? updatedService : s);
+    setServices(nextServices);
+    updateSection('services', nextServices);
+    setEditingServiceId(null);
+    triggerSuccess();
+  };
+
+  const handleDeleteService = (serviceId: string) => {
+    setConfirmModal({
+      isOpen: true,
+      title: 'Удалить услугу?',
+      message: 'Вы уверены, что хотите окончательно удалить эту услугу из каталога?',
+      confirmText: 'Да, удалить',
+      confirmClass: 'bg-red-600 hover:bg-red-750 text-white',
+      onConfirm: () => {
+        const nextServices = services.filter(s => s.id !== serviceId);
+        setServices(nextServices);
+        updateSection('services', nextServices);
+        triggerSuccess();
+      }
+    });
+  };
+
+  const handleAddService = (newService: Omit<ServiceItem, 'id'>) => {
+    const created: ServiceItem = {
+      ...newService,
+      id: `service-${Date.now()}`
+    };
+    const nextServices = [...services, created];
+    setServices(nextServices);
+    updateSection('services', nextServices);
+    setShowAddService(false);
+    triggerSuccess();
+  };
+
   const handleFile = (file: File) => {
     if (!file.type.startsWith('image/')) {
       setUploadError('Пожалуйста, выберите файл изображения (png, jpg, jpeg, webp).');
       return;
     }
-    if (file.size > 2.5 * 1024 * 1024) {
-      setUploadError('Файл слишком большой. Рекомендуется изображение ужать до 2.5 МБ для бесперебойного сохранения в браузере.');
+
+    setUploadError(null);
+    compressImage(file, 1200, 0.8, (base64) => {
+      setLocalImages(prev => ({ ...prev, hero: base64 }));
+      setLocalHero(prev => ({ ...prev, defaultBackgroundMode: 'photo' }));
+    });
+  };
+
+  const handleVideoFile = (file: File) => {
+    // Both .mov and .mp4 are supported
+    const isVideo = file.type.startsWith('video/') || file.name.endsWith('.mov') || file.name.endsWith('.MOV') || file.name.endsWith('.mp4') || file.name.endsWith('.MP4');
+    if (!isVideo) {
+      setVideoUploadError('Пожалуйста, выберите файл видео (.mp4 или .mov).');
+      return;
+    }
+    if (file.size > 15 * 1024 * 1024) {
+      setVideoUploadError('Файл слишком большой. Для бесперебойной интеграции в браузере рекомендуется использовать сжатые ролики до 15 МБ.');
       return;
     }
 
-    setUploadError(null);
+    setVideoUploadError(null);
     const reader = new FileReader();
     reader.onload = (e) => {
       if (e.target?.result && typeof e.target.result === 'string') {
         const resultStr = e.target.result;
-        setLocalImages(prev => ({ ...prev, hero: resultStr }));
-        setLocalHero(prev => ({ ...prev, defaultBackgroundMode: 'photo' }));
+        setLocalVideos(prev => ({ ...prev, coastalNatureDirect: resultStr }));
+        setLocalHero(prev => ({ ...prev, defaultBackgroundMode: 'video_nature' }));
       }
     };
     reader.readAsDataURL(file);
+  };
+
+  const handleSlidesUpload = (file: File) => {
+    const isVideo = file.type.startsWith('video/') || file.name.toLowerCase().endsWith('.mov') || file.name.toLowerCase().endsWith('.mp4');
+    const isImage = file.type.startsWith('image/');
+
+    if (!isVideo && !isImage) {
+      setSlidesUploadError('Пожалуйста, выберите корректное изображение или видеофайл (.MOV, .MP4, .JPG, .PNG, .WEBP).');
+      return;
+    }
+
+    const maxSize = isVideo ? 20 * 1024 * 1024 : 10 * 1024 * 1024;
+    const maxSizeMB = isVideo ? '20 МБ' : '10 МБ';
+
+    if (file.size > maxSize) {
+      setSlidesUploadError(`Файл слишком большой. Для фоновых слайдов лимит размера составляет ${maxSizeMB}.`);
+      return;
+    }
+
+    setSlidesUploadError(null);
+
+    const onMediaLoaded = (base64Data: string) => {
+      const currentSlides = (localHero as any).slides || [];
+      const newSlide = {
+        id: `slide-${Date.now()}`,
+        type: isVideo ? 'video' : 'photo',
+        url: base64Data
+      };
+      setLocalHero({
+        ...localHero,
+        slides: [...currentSlides, newSlide]
+      });
+      triggerSuccess();
+    };
+
+    if (isImage) {
+      compressImage(file, 1200, 0.8, onMediaLoaded);
+    } else {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        if (e.target?.result && typeof e.target.result === 'string') {
+          onMediaLoaded(e.target.result);
+        }
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   const tabs = [
@@ -335,8 +531,10 @@ export default function AdminPage({ onBackToHome }: { onBackToHome: () => void }
     { id: 'general', name: 'Контакты & Инфо', icon: Phone },
     { id: 'rooms', name: 'Каталог Номеров', icon: Building, badge: rooms.length },
     { id: 'medical', name: 'Программы Лечения', icon: HeartHandshake, badge: medPrograms.length },
+    { id: 'services', name: 'Каталог Услуг', icon: Sparkles, badge: services.length },
     { id: 'testimonials', name: 'Отзывы Гостей', icon: MessageSquare, badge: testimonials.length },
     { id: 'faq', name: 'Вопросы & Ответы', icon: HelpCircle, badge: faqs.length },
+    { id: 'news', name: 'Новости', icon: Newspaper, badge: news.length },
     { id: 'media', name: 'Медиа & Ссылки', icon: Folder },
   ];
 
@@ -378,10 +576,12 @@ export default function AdminPage({ onBackToHome }: { onBackToHome: () => void }
                   setEditingMedId(null);
                   setEditingTestId(null);
                   setEditingFaqId(null);
+                  setEditingServiceId(null);
                   setShowAddRoom(false);
                   setShowAddMed(false);
                   setShowAddTest(false);
                   setShowAddFaq(false);
+                  setShowAddService(false);
                 }}
                 className={`w-full text-left py-3 px-4 text-xs font-semibold rounded-xl transition-all flex items-center justify-between border uppercase tracking-wider cursor-pointer ${
                   active 
@@ -592,226 +792,252 @@ export default function AdminPage({ onBackToHome }: { onBackToHome: () => void }
                   />
                 </div>
 
-                {/* BACKGROUND IMAGE CONFIGURATION SECTION */}
+                {/* HERO STATS CONFIGURATION SECTION */}
                 <div className="border-t border-stone-100 pt-6 mt-6 space-y-4">
                   <h4 className="font-bold font-serif text-[#022C22] text-sm uppercase tracking-wider flex items-center gap-2">
-                    <ImageIcon className="w-5 h-5 text-[#c5a880]" />
-                    Фоновое оформление главного экрана
+                    <Sparkles className="w-5 h-5 text-[#c5a880]" />
+                    Показатели / Статистика (Блок из 4-х колонок)
                   </h4>
                   <p className="text-xs text-stone-500 leading-relaxed">
-                    Настройте стиль приветственной заставки. Вы можете выбрать живое видео или установить <strong>собственное фоновое изображение (фото)</strong>.
+                    Настройте 4 ключевых показателя, которые отображаются на главном экране в виде горизонтальной плашки под кнопками.
                   </p>
 
-                  <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-                    
-                    {/* Mode Choice & Fields */}
-                    <div className="lg:col-span-7 space-y-4">
-                      
-                      <div className="space-y-2 bg-[#FAF9F6] p-4 rounded-xl border border-stone-200">
-                        <label className="block text-xs font-bold uppercase tracking-wider text-[#022C22]">Режим заставки по умолчанию</label>
-                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 mt-2">
-                          <button
-                            type="button"
-                            onClick={() => setLocalHero({ ...localHero, defaultBackgroundMode: 'video_nature' })}
-                            className={`p-3 text-xs rounded-xl border transition-all flex flex-col items-center justify-center gap-1.5 cursor-pointer ${
-                              localHero.defaultBackgroundMode === 'video_nature'
-                                ? 'bg-[#022C22] text-[#FAF9F6] border-stone-800 font-bold shadow'
-                                : 'bg-white hover:bg-[#FAF9F6] text-stone-700 border-stone-200'
-                            }`}
-                          >
-                            <VideoIcon className="w-4 h-4 text-[#c5a880]" />
-                            <span>Природа (MP4)</span>
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => setLocalHero({ ...localHero, defaultBackgroundMode: 'video_palace' })}
-                            className={`p-3 text-xs rounded-xl border transition-all flex flex-col items-center justify-center gap-1.5 cursor-pointer ${
-                              localHero.defaultBackgroundMode === 'video_palace'
-                                ? 'bg-[#022C22] text-[#FAF9F6] border-stone-800 font-bold shadow'
-                                : 'bg-white hover:bg-[#FAF9F6] text-stone-700 border-stone-200'
-                            }`}
-                          >
-                            <VideoIcon className="w-4 h-4 text-[#c5a880] animate-pulse" />
-                            <span>Дворец (YouTube)</span>
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => setLocalHero({ ...localHero, defaultBackgroundMode: 'photo' })}
-                            className={`p-3 text-xs rounded-xl border transition-all flex flex-col items-center justify-center gap-1.5 cursor-pointer ${
-                              localHero.defaultBackgroundMode === 'photo'
-                                ? 'bg-[#022C22] text-[#FAF9F6] border-stone-800 font-bold shadow'
-                                : 'bg-white hover:bg-[#FAF9F6] text-stone-700 border-stone-200'
-                            }`}
-                          >
-                            <ImageIcon className="w-4 h-4 text-[#c5a880]" />
-                            <span>Фото-подложка</span>
-                          </button>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    {(localHero.stats || [
+                      { value: '8 га', label: 'Реликтовый Парк' },
+                      { value: '120+', label: 'Процедур' },
+                      { value: '50 м', label: 'До собственного пляжа' },
+                      { value: 'ФТС', label: 'Высший стандарт надежности' }
+                    ]).map((stat, idx) => (
+                      <div key={idx} className="bg-[#FAF9F6] border border-stone-200 p-4 rounded-xl space-y-2 shadow-sm">
+                        <span className="block text-[10px] font-black uppercase text-[#022C22]/60 tracking-wider">Колонка {idx + 1}</span>
+                        <div>
+                          <label className="block text-[9px] font-bold uppercase tracking-wider text-stone-400 mb-0.5">Значение</label>
+                          <input 
+                            type="text"
+                            value={stat.value}
+                            onChange={e => {
+                              const defaultStats = [
+                                { value: '8 га', label: 'Реликтовый Парк' },
+                                { value: '120+', label: 'Процедур' },
+                                { value: '50 м', label: 'До собственного пляжа' },
+                                { value: 'ФТС', label: 'Высший стандарт надежности' }
+                              ];
+                              const statsArray = localHero.stats && localHero.stats.length > 0 ? localHero.stats : defaultStats;
+                              const newStats = [...statsArray];
+                              if (newStats[idx]) {
+                                newStats[idx] = { ...newStats[idx], value: e.target.value };
+                                setLocalHero({ ...localHero, stats: newStats });
+                              }
+                            }}
+                            placeholder="Значение"
+                            className="w-full bg-white border border-stone-300 rounded-lg px-2.5 py-1.5 text-xs font-bold font-mono text-stone-800 focus:outline-none focus:border-[#c5a880]"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-[9px] font-bold uppercase tracking-wider text-stone-400 mb-0.5">Подпись</label>
+                          <input 
+                            type="text"
+                            value={stat.label}
+                            onChange={e => {
+                              const defaultStats = [
+                                { value: '8 га', label: 'Реликтовый Парк' },
+                                { value: '120+', label: 'Процедур' },
+                                { value: '50 м', label: 'До собственного пляжа' },
+                                { value: 'ФТС', label: 'Высший стандарт надежности' }
+                              ];
+                              const statsArray = localHero.stats && localHero.stats.length > 0 ? localHero.stats : defaultStats;
+                              const newStats = [...statsArray];
+                              if (newStats[idx]) {
+                                newStats[idx] = { ...newStats[idx], label: e.target.value };
+                                setLocalHero({ ...localHero, stats: newStats });
+                              }
+                            }}
+                            placeholder="Подпись"
+                            className="w-full bg-white border border-stone-300 rounded-lg px-2.5 py-1.5 text-xs text-stone-700 font-medium focus:outline-none focus:border-[#c5a880]"
+                          />
                         </div>
                       </div>
+                    ))}
+                  </div>
+                </div>
 
+                {/* BACKGROUND IMAGE/VIDEO SLIDES CONFIGURATION SECTION */}
+                <div className="border-t border-stone-100 pt-6 mt-6 space-y-4">
+                  <h4 className="font-bold font-serif text-[#022C22] text-sm uppercase tracking-wider flex items-center gap-2">
+                    <Sparkles className="w-5 h-5 text-[#c5a880]" />
+                    Фоновое оформление главного экрана (Слайд-шоу)
+                  </h4>
+                  <p className="text-xs text-stone-500 leading-relaxed">
+                    Настройте автоматическое слайд-шоу для фона главной страницы. Вы можете загружать как <strong>фотографии</strong> (JPG, PNG, WEBP), так и <strong>короткие видеоролики</strong> (в формате .MOV или .MP4). Они будут сменять друг друга с мягким эффектом затухания.
+                  </p>
+
+                  {/* Background Display Mode Switcher */}
+                  <div className="bg-[#FAF9F6] p-5 rounded-2xl border border-stone-200/80 space-y-3">
+                    <label className="block text-xs font-bold text-[#022C22] uppercase tracking-wider flex items-center gap-1.5">
+                      <Sparkles className="w-4 h-4 text-[#c5a880]" />
+                      Режим отображения медиафайлов на первом экране
+                    </label>
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                      <button
+                        type="button"
+                        onClick={() => setLocalHero(prev => ({ ...prev, defaultBackgroundMode: 'all' }))}
+                        className={`py-2 px-4 rounded-xl text-xs font-bold transition-all border text-center flex items-center justify-center gap-1.5 cursor-pointer ${
+                          (!localHero.defaultBackgroundMode || localHero.defaultBackgroundMode === 'all')
+                            ? 'bg-[#022C22] border-transparent text-[#FAF9F6] shadow-sm'
+                            : 'bg-white border-stone-200 text-stone-600 hover:text-[#022C22] hover:bg-stone-50'
+                        }`}
+                      >
+                        Все слайды (Фото + Видео)
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setLocalHero(prev => ({ ...prev, defaultBackgroundMode: 'photo' }))}
+                        className={`py-2 px-4 rounded-xl text-xs font-bold transition-all border text-center flex items-center justify-center gap-1.5 cursor-pointer ${
+                          localHero.defaultBackgroundMode === 'photo'
+                            ? 'bg-[#022C22] border-transparent text-[#FAF9F6] shadow-sm'
+                            : 'bg-white border-stone-200 text-stone-600 hover:text-[#022C22] hover:bg-stone-50'
+                        }`}
+                      >
+                        Только фотографии
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setLocalHero(prev => ({ ...prev, defaultBackgroundMode: 'video' }))}
+                        className={`py-2 px-4 rounded-xl text-xs font-bold transition-all border text-center flex items-center justify-center gap-1.5 cursor-pointer ${
+                          (localHero.defaultBackgroundMode === 'video' || localHero.defaultBackgroundMode === 'video_nature' || localHero.defaultBackgroundMode === 'video_palace')
+                            ? 'bg-[#022C22] border-transparent text-[#FAF9F6] shadow-sm'
+                            : 'bg-white border-stone-200 text-stone-600 hover:text-[#022C22] hover:bg-stone-50'
+                        }`}
+                      >
+                        Только видеоролики
+                      </button>
+                    </div>
+                    <p className="text-[11px] text-stone-400 italic">
+                      💡 При переключении сайт мгновенно подстроится: в ротации главного экрана будут прокручиваться только выбранные типы файлов.
+                    </p>
+                  </div>
+
+                  <div className="space-y-6">
+                    {/* Current Slides Grid */}
+                    <div>
+                      <span className="block text-xs font-bold text-stone-500 uppercase tracking-wider mb-2">Активные слайды в ротации:</span>
+                      
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        {((localHero as any).slides || []).map((slide: any, index: number) => (
+                          <div key={slide.id || index} className="relative border border-stone-200 rounded-xl bg-stone-50 overflow-hidden shadow-sm group">
+                            <div className="aspect-video w-full relative bg-stone-100 flex items-center justify-center">
+                              {slide.type === 'video' ? (
+                                <video 
+                                  src={slide.url}
+                                  className="w-full h-full object-cover"
+                                  controls={false}
+                                  muted
+                                  playsInline
+                                />
+                              ) : (
+                                <img 
+                                  src={slide.url} 
+                                  alt={`Slide ${index + 1}`}
+                                  className="w-full h-full object-cover"
+                                  referrerPolicy="no-referrer"
+                                />
+                              )}
+
+                              <div className="absolute top-2 left-2 bg-black/60 text-white font-mono text-[10px] px-2 py-0.5 rounded-full font-bold">
+                                #{index + 1}
+                              </div>
+
+                              <div className="absolute top-2 right-2 bg-[#FAF9F6] border border-stone-200 text-[#022C22] font-mono text-[9px] uppercase px-2 py-0.5 rounded-full font-semibold">
+                                {slide.type === 'video' ? 'Видео' : 'Фото'}
+                              </div>
+                            </div>
+
+                            <div className="p-3 bg-white border-t border-stone-100 flex items-center justify-between">
+                              <span className="text-[10px] text-stone-400 font-mono truncate max-w-[150px]" title={slide.url}>
+                                {slide.url.startsWith('data:') ? 'Пользовательский файл' : 'Встроенный файл'}
+                              </span>
+                              
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  const currentSlides = (localHero as any).slides || [];
+                                  if (currentSlides.length <= 1) {
+                                    alert('Нельзя удалить последний слайд. Должен оставаться как минимум один фоновый элемент!');
+                                    return;
+                                  }
+                                  const nextSlides = currentSlides.filter((s: any) => s.id !== slide.id);
+                                  setLocalHero({
+                                    ...localHero,
+                                    slides: nextSlides
+                                  });
+                                }}
+                                className="text-[10px] text-red-600 hover:text-red-700 bg-red-50 hover:bg-red-100 py-1 px-2.5 rounded-lg transition-all font-semibold flex items-center gap-1 cursor-pointer"
+                              >
+                                <Trash2 className="w-3.5 h-3.5" />
+                                Удалить
+                              </button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Drag and Drop Slide Uploader */}
+                    <div className="bg-[#FAF9F6] p-5 rounded-2xl border border-stone-200/80 space-y-4">
                       <div>
-                        <label className="block text-xs font-bold text-stone-500 mb-1.5 flex items-center justify-between">
-                          <span>Адрес (URL) фонового изображения</span>
-                          <span className="text-[9px] font-mono text-emerald-800 bg-emerald-50 px-1.5 rounded font-semibold uppercase">Активен</span>
+                        <label className="block text-xs font-bold text-[#022C22] flex items-center justify-between">
+                          <span className="flex items-center gap-1.5 font-serif text-[#022C22]">
+                            <Plus className="w-4 h-4 text-[#c5a880]" /> Загрузить новый слайд (Фото или .MOV/.MP4 Видео)
+                          </span>
                         </label>
-                        <input 
-                          type="text" 
-                          value={localImages.hero} 
-                          onChange={e => {
-                            setLocalImages({ ...localImages, hero: e.target.value });
-                            setLocalHero({ ...localHero, defaultBackgroundMode: 'photo' });
-                          }}
-                          placeholder="https://images.unsplash.com/... или base64 код"
-                          className="w-full border border-stone-300 rounded-xl px-4 py-2.5 text-xs font-mono focus:outline-none focus:border-[#c5a880]/80"
-                        />
+                        <p className="text-[11px] text-stone-500 leading-relaxed mt-1">
+                          Загрузите медиафайл. Система автоматически определит тип (фото или видео) и добавит его в автоматическое слайд-шоу. Видео воспроизводится в тихом режиме без звука.
+                        </p>
                       </div>
 
-                      {/* File upload drag-and-drop info */}
                       <div 
-                        className={`border-2 border-dashed rounded-xl p-4 text-center cursor-pointer transition-all ${
-                          dragActive 
-                            ? 'border-[#c5a880] bg-[#c5a880]/10 scale-[0.99]' 
-                            : 'border-stone-300 hover:border-[#c5a880] hover:bg-stone-50'
+                        className={`border-2 border-dashed rounded-xl p-6 text-center cursor-pointer transition-all ${
+                          slidesDragActive 
+                            ? 'border-[#c5a880] bg-[#c5a880]/15 scale-[0.99]' 
+                            : 'border-stone-300 hover:border-[#c5a880] hover:bg-stone-50 bg-white'
                         }`}
                         onDragOver={(e) => {
                           e.preventDefault();
-                          setDragActive(true);
+                          setSlidesDragActive(true);
                         }}
-                        onDragLeave={() => setDragActive(false)}
+                        onDragLeave={() => setSlidesDragActive(false)}
                         onDrop={(e) => {
                           e.preventDefault();
-                          setDragActive(false);
+                          setSlidesDragActive(false);
                           if (e.dataTransfer.files?.[0]) {
-                            handleFile(e.dataTransfer.files[0]);
+                            handleSlidesUpload(e.dataTransfer.files[0]);
                           }
                         }}
                         onClick={() => {
-                          document.getElementById('welcome-bg-file-upload-page')?.click();
+                          document.getElementById('slides-bg-file-upload-page')?.click();
                         }}
                       >
                         <input 
                           type="file" 
-                          id="welcome-bg-file-upload-page" 
-                          accept="image/*" 
+                          id="slides-bg-file-upload-page" 
+                          accept="image/*,video/mp4,video/quicktime,video/mov,video/x-m4v" 
                           className="hidden" 
                           onChange={(e) => {
                             if (e.target.files?.[0]) {
-                              handleFile(e.target.files[0]);
+                              handleSlidesUpload(e.target.files[0]);
                             }
                           }}
                         />
-                        <ImageIcon className="w-6 h-6 mx-auto text-stone-400 mb-1" />
-                        <span className="text-[11px] block text-stone-500 font-semibold">Перетащите сюда фото или кликните</span>
-                        <span className="text-[9px] text-stone-400 block mt-0.5">Форматы: JPG, PNG, WEBP (до 2.5 МБ)</span>
-                      </div>
-                      {uploadError && (
-                        <p className="text-[10px] text-red-500 mt-1 font-medium">{uploadError}</p>
-                      )}
-
-                      <div>
-                        <label className="block text-xs font-bold text-stone-500 mb-1.5">Предустановленные фотографии:</label>
-                        <div className="grid grid-cols-2 gap-2">
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setLocalImages({ ...localImages, hero: '/src/assets/images/pestovo_palace_1779780890544.png' });
-                              setLocalHero({ ...localHero, defaultBackgroundMode: 'photo' });
-                            }}
-                            className={`px-3 py-2 text-[10px] rounded-lg text-left truncate transition-all border cursor-pointer ${
-                              localImages.hero === '/src/assets/images/pestovo_palace_1779780890544.png'
-                                ? 'bg-amber-100/60 border-amber-500/40 text-amber-950 font-bold'
-                                : 'bg-stone-100 hover:bg-stone-200 border-stone-200 text-stone-700'
-                            }`}
-                          >
-                            🏰 Дворец Паниной
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setLocalImages({ ...localImages, hero: '/src/assets/images/pestovo_beach_1779780925661.png' });
-                              setLocalHero({ ...localHero, defaultBackgroundMode: 'photo' });
-                            }}
-                            className={`px-3 py-2 text-[10px] rounded-lg text-left truncate transition-all border cursor-pointer ${
-                              localImages.hero === '/src/assets/images/pestovo_beach_1779780925661.png'
-                                ? 'bg-amber-100/60 border-amber-500/40 text-amber-950 font-bold'
-                                : 'bg-stone-100 hover:bg-stone-200 border-stone-200 text-stone-700'
-                            }`}
-                          >
-                            🌊 Берег моря в Гаспре
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setLocalImages({ ...localImages, hero: '/src/assets/images/pestovo_block_1779780908700.png' });
-                              setLocalHero({ ...localHero, defaultBackgroundMode: 'photo' });
-                            }}
-                            className={`px-3 py-2 text-[10px] rounded-lg text-left truncate transition-all border cursor-pointer ${
-                              localImages.hero === '/src/assets/images/pestovo_block_1779780908700.png'
-                                ? 'bg-amber-100/60 border-amber-500/40 text-amber-950 font-bold'
-                                : 'bg-stone-100 hover:bg-stone-200 border-stone-200 text-stone-700'
-                            }`}
-                          >
-                            🏥 Главный Корпус
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setLocalImages({ ...localImages, hero: '/src/assets/images/pestovo_nature_1779777690866.png' });
-                              setLocalHero({ ...localHero, defaultBackgroundMode: 'photo' });
-                            }}
-                            className={`px-3 py-2 text-[10px] rounded-lg text-left truncate transition-all border cursor-pointer ${
-                              localImages.hero === '/src/assets/images/pestovo_nature_1779777690866.png'
-                                ? 'bg-amber-100/60 border-amber-500/40 text-amber-950 font-bold'
-                                : 'bg-stone-100 hover:bg-stone-200 border-stone-200 text-stone-700'
-                            }`}
-                          >
-                            🌲 Кедровый Парк
-                          </button>
-                        </div>
+                        <Sparkles className="w-8 h-8 mx-auto text-stone-400 mb-2" />
+                        <span className="text-xs block text-stone-600 font-bold">Выберите файл или перетащите его сюда</span>
+                        <span className="text-[10px] text-stone-400 block mt-1">Поддерживаемые форматы: JPG, PNG, WEBP, MP4, MOV (рекомендуется до 15 МБ)</span>
                       </div>
 
-                    </div>
-
-                    {/* Preview window */}
-                    <div className="lg:col-span-5 flex flex-col justify-between border border-stone-200 bg-[#FAF9F6] p-4 rounded-xl">
-                      <div className="space-y-3">
-                        <span className="text-xs font-bold uppercase tracking-wider text-stone-500 block">Живой предпросмотр:</span>
-                        {localImages.hero ? (
-                          <div className="relative aspect-video rounded-xl border border-stone-200 overflow-hidden bg-stone-200 shadow-inner">
-                            <img 
-                              src={localImages.hero} 
-                              alt="Welcome slide preview" 
-                              className="w-full h-full object-cover" 
-                              referrerPolicy="no-referrer"
-                            />
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/25 to-transparent flex flex-col justify-end p-4">
-                              <span className="text-[9px] font-mono tracking-widest text-[#c5a880] uppercase">Макет Приветственного Экрана</span>
-                              <h5 className="font-serif font-bold text-white text-sm line-clamp-1">{localHero.titleFirstPart || 'САНАТОРИЙ ПЕСТОВО'}</h5>
-                            </div>
-                          </div>
-                        ) : (
-                          <div className="aspect-video bg-white border border-stone-200 rounded-xl flex flex-col items-center justify-center p-4">
-                            <ImageIcon className="w-8 h-8 text-stone-300 mb-1" />
-                            <span className="text-xs text-stone-400">Фото не установлено</span>
-                          </div>
-                        )}
-                        <span className="text-[11px] text-stone-400 block leading-relaxed">
-                          * Предпросмотр показывает, как выбранное фото будет смотреться под основным логотипом. При сохранении, сайт автоматически перейдет в режим фото-обоев.
-                        </span>
-                      </div>
-
-                      {localImages.hero && (
-                        <button
-                          type="button"
-                          onClick={() => setLocalImages({ ...localImages, hero: '' })}
-                          className="text-[10px] border border-stone-300 text-stone-600 hover:text-red-600 hover:border-red-200 bg-white py-1.5 px-3 rounded-lg transition-all flex items-center justify-center gap-1 self-end mt-3 cursor-pointer"
-                        >
-                          <Trash2 className="w-3" />
-                          Стереть фото
-                        </button>
+                      {slidesUploadError && (
+                        <p className="text-xs text-red-600 font-bold tracking-wide mt-1">{slidesUploadError}</p>
                       )}
                     </div>
-
                   </div>
                 </div>
 
@@ -1145,6 +1371,131 @@ export default function AdminPage({ onBackToHome }: { onBackToHome: () => void }
             </div>
           )}
 
+          {/* TAB: SERVICES */}
+          {activeSettingsTab === 'services' && (
+            <div className="space-y-6">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-stone-200 pb-3">
+                <div>
+                  <h3 className="font-serif font-black text-xl text-[#022C22]">Каталог медицинских и оздоровительных услуг</h3>
+                  <p className="text-xs text-stone-400 mt-1">Добавление, изменение категорий, показаний, методов проведения и пользы услуг.</p>
+                </div>
+                {!showAddService && !editingServiceId && (
+                  <button 
+                    onClick={() => setShowAddService(true)}
+                    className="bg-emerald-800 hover:bg-emerald-700 text-white font-bold text-xs px-4 py-3 rounded-xl flex items-center gap-1.5 uppercase tracking-wider transition-all shadow cursor-pointer"
+                  >
+                    <Plus className="w-4 h-4" /> Добавить услугу
+                  </button>
+                )}
+              </div>
+
+              {/* LIST SERVICES */}
+              {!showAddService && !editingServiceId && (
+                <div className="space-y-4">
+                  {services.length === 0 ? (
+                    <div className="bg-white rounded-2xl border border-dashed border-stone-300 p-8 text-center text-stone-500 font-sans">
+                      Список услуг пуст. Создайте первую услугу с помощью кнопки выше.
+                    </div>
+                  ) : (
+                    services.map((service) => {
+                      let categoryName = '';
+                      switch (service.category) {
+                        case 'methods': categoryName = 'Методы лечения'; break;
+                        case 'diagnostics': categoryName = 'Функциональная диагностика'; break;
+                        case 'laboratory': categoryName = 'Лабораторная база'; break;
+                        case 'infrastructure': categoryName = 'Инфраструктура и сервис'; break;
+                        default: categoryName = service.category;
+                      }
+
+                      return (
+                        <div 
+                          key={service.id}
+                          className="bg-white rounded-2xl border border-stone-200 p-5 flex flex-col md:flex-row md:items-start justify-between gap-5 shadow-sm hover:shadow-md transition-shadow"
+                        >
+                          <div className="flex-1 space-y-2">
+                            <div className="flex flex-wrap items-center gap-2">
+                              <h4 className="font-serif font-black text-[#022C22] text-base md:text-lg flex items-center gap-2">
+                                <span className="text-emerald-700 text-base">✨</span> {service.title}
+                              </h4>
+                              <span className="bg-amber-50 text-amber-800 text-[9px] uppercase font-mono tracking-wider font-bold px-2 py-0.5 border border-amber-200 rounded">
+                                {categoryName}
+                              </span>
+                              {service.duration && (
+                                <span className="text-[10px] text-stone-500 font-mono">
+                                  ⏱️ {service.duration}
+                                </span>
+                              )}
+                            </div>
+                            
+                            <div className="text-xs text-stone-600 space-y-1">
+                              <p className="leading-relaxed"><strong>Польза:</strong> {service.benefit}</p>
+                              <p className="leading-relaxed"><strong>Методика:</strong> {service.method}</p>
+                              {service.indications && service.indications.length > 0 && (
+                                <p className="leading-relaxed">
+                                  <strong>Показания:</strong> {service.indications.join(', ')}
+                                </p>
+                              )}
+                            </div>
+                          </div>
+                          
+                          <div className="flex items-center space-x-2 self-end md:self-center flex-shrink-0 mt-2 md:mt-0">
+                            <button 
+                              onClick={() => setEditingServiceId(service.id)}
+                              className="border border-[#022C22] hover:bg-[#022C22] text-[#022C22] hover:text-white font-bold text-xs px-4 py-2 rounded-xl transition-all cursor-pointer"
+                            >
+                              Редактировать
+                            </button>
+                            <button 
+                              onClick={() => handleDeleteService(service.id)}
+                              className="border border-red-200 bg-red-50 hover:bg-red-100 text-red-700 p-2.5 rounded-xl transition-all cursor-pointer"
+                              title="Удалить услугу"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </div>
+                        </div>
+                      );
+                    })
+                  )}
+                </div>
+              )}
+
+              {/* ADD SERVICE FORM */}
+              {showAddService && (
+                <ServiceForm 
+                  initialData={{
+                    category: 'methods',
+                    title: '',
+                    benefit: '',
+                    method: '',
+                    duration: '20 мин',
+                    iconName: 'Sparkles',
+                    indications: []
+                  }}
+                  onCancel={() => setShowAddService(false)}
+                  onSave={handleAddService}
+                />
+              )}
+
+              {/* EDIT SERVICE FORM */}
+              {editingServiceId && (() => {
+                const service = services.find(s => s.id === editingServiceId);
+                return service ? (
+                  <div className="bg-stone-50 rounded-2xl border border-[#c5a880]/40 p-6 md:p-8 space-y-4 shadow-sm">
+                    <h4 className="font-serif font-black text-md text-[#022C22] flex items-center gap-1.5 uppercase tracking-wide">
+                      ⚙️ Редактирование услуги: <span className="text-[#b0936b]">{service.title}</span>
+                    </h4>
+                    <ServiceForm 
+                      initialData={service}
+                      onCancel={() => setEditingServiceId(null)}
+                      onSave={(data) => handleUpdateService(service.id, { ...data, id: service.id })}
+                    />
+                  </div>
+                ) : null;
+              })()}
+            </div>
+          )}
+
           {/* TAB 5: TESTIMONIALS */}
           {activeSettingsTab === 'testimonials' && (
             <div className="space-y-6">
@@ -1314,7 +1665,106 @@ export default function AdminPage({ onBackToHome }: { onBackToHome: () => void }
             </div>
           )}
 
-          {/* TAB 7: MEDIA & LINKS */}
+          {/* TAB 7: NEWS */}
+          {activeSettingsTab === 'news' && (
+            <div className="space-y-6">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-stone-200 pb-3">
+                <div>
+                  <h3 className="font-serif font-black text-xl text-[#022C22]">Новости и события</h3>
+                  <p className="text-xs text-stone-400 mt-1">Публикация новостей, акций и важных событий санатория.</p>
+                </div>
+                {!showAddNews && (
+                  <button 
+                    onClick={() => setShowAddNews(true)}
+                    className="bg-[#022C22] text-[#FAF9F6] border border-stone-900 px-4 py-2 rounded-lg text-xs font-bold font-mono tracking-wider hover:bg-[#c5a880] hover:text-[#022C22] hover:border-transparent transition-all flex items-center space-x-2 shrink-0 shadow-sm"
+                  >
+                    <Plus className="w-3.5 h-3.5" />
+                    <span>Добавить новость</span>
+                  </button>
+                )}
+              </div>
+
+              {/* NEWS LIST */}
+              {!showAddNews && (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {news.length === 0 && (
+                    <div className="col-span-full py-8 text-center bg-white rounded-xl border border-dashed border-stone-300 text-stone-500 font-serif">
+                      Новостей пока нет
+                    </div>
+                  )}
+                  {news.map(n => (
+                    <div key={n.id} className="bg-white rounded-xl p-0 overflow-hidden shadow-sm border border-stone-200 flex flex-col relative group">
+                      {editingNewsId === n.id ? (
+                        <div className="p-1 border-b-4 border-amber-500">
+                          <h4 className="font-bold text-xs uppercase tracking-wider text-amber-700 bg-amber-50 px-3 py-2 mb-2 rounded-md flex items-center gap-2">
+                            <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
+                            ⚙️ Редактирование новости:
+                          </h4>
+                          <NewsForm 
+                            initialData={n}
+                            onCancel={() => setEditingNewsId(null)}
+                            onSave={(data) => handleUpdateNews(n.id, { ...data, id: n.id })}
+                          />
+                        </div>
+                      ) : (
+                        <div className="flex flex-col h-full">
+                          <div className="h-40 bg-stone-100 relative">
+                            <img src={n.image} alt={n.title} className="w-full h-full object-cover" />
+                            <div className="absolute top-2 left-2 bg-black/60 text-white px-2 py-0.5 rounded text-[10px] font-mono backdrop-blur-sm">
+                              {n.date}
+                            </div>
+                          </div>
+                          <div className="p-4 flex flex-col flex-grow">
+                            <h4 className="font-serif font-bold text-[#022C22] text-sm mb-1 leading-snug line-clamp-2">{n.title}</h4>
+                            <p className="text-xs text-stone-500 leading-relaxed line-clamp-3 mb-4">{n.excerpt || n.content}</p>
+                            <div className="mt-auto flex justify-end gap-2 pt-2 border-t border-stone-100">
+                              <button 
+                                onClick={() => setEditingNewsId(n.id)}
+                                className="p-1.5 text-stone-400 hover:text-[#022C22] hover:bg-stone-100 rounded transition-colors bg-white outline outline-1 outline-stone-200"
+                                title="Редактировать"
+                              >
+                                <Settings className="w-4 h-4" />
+                              </button>
+                              <button 
+                                onClick={() => handleDeleteNews(n.id)}
+                                className="p-1.5 text-stone-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors bg-white outline outline-1 outline-stone-200"
+                                title="Удалить"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* ADD NEWS FORM */}
+              {showAddNews && (
+                <div className="bg-white rounded-xl shadow-lg border border-stone-200 p-2 border-l-4 border-l-[#022C22]">
+                  <h4 className="font-bold text-xs uppercase tracking-wider text-[#022C22] bg-[#022C22]/5 px-4 py-3 mb-2 rounded-md flex items-center gap-2">
+                    <Plus className="w-4 h-4 text-[#022C22]" />
+                    Создание новой записи
+                  </h4>
+                  <NewsForm 
+                    initialData={{
+                      title: '',
+                      date: new Date().toLocaleDateString('ru-RU'),
+                      image: '',
+                      excerpt: '',
+                      content: ''
+                    }}
+                    onCancel={() => setShowAddNews(false)}
+                    onSave={handleAddNews}
+                  />
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* TAB 8: MEDIA & LINKS */}
           {activeSettingsTab === 'media' && (
             <div className="space-y-6">
               <div className="border-b border-stone-200 pb-3">
@@ -1461,7 +1911,7 @@ export default function AdminPage({ onBackToHome }: { onBackToHome: () => void }
                             className="w-full border border-stone-300 rounded-lg px-2 py-1 text-[11px] focus:outline-none focus:border-[#c5a880]/80 mb-1 font-mono text-xs"
                           />
                           <img 
-                            src={localExtraImages[imageKey]} 
+                            src={localExtraImages[imageKey] || undefined} 
                             alt={imageKey} 
                             className="w-full h-20 object-cover rounded-lg border border-stone-200 shadow-inner" 
                             referrerPolicy="no-referrer" 
@@ -1556,6 +2006,19 @@ function RoomForm({ initialData, onCancel, onSave }: RoomFormProps) {
   const [price, setPrice] = useState(initialData.price);
   const [description, setDescription] = useState(initialData.description);
   const [image, setImage] = useState(initialData.image);
+  const [dragActive, setDragActive] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
+
+  const handleRoomImageFile = (file: File) => {
+    if (!file.type.startsWith('image/')) {
+      setUploadError('Пожалуйста, выберите файл изображения (png, jpg, jpeg, webp).');
+      return;
+    }
+    setUploadError(null);
+    compressImage(file, 1000, 0.75, (base64) => {
+      setImage(base64);
+    });
+  };
   
   const [newAmenity, setNewAmenity] = useState('');
   const [amenities, setAmenities] = useState<string[]>([...initialData.amenities]);
@@ -1622,9 +2085,138 @@ function RoomForm({ initialData, onCancel, onSave }: RoomFormProps) {
           <label className="block text-xs font-bold text-stone-500 mb-1">Стоимость за сутки (руб.)</label>
           <input type="number" value={price} onChange={e => setPrice(Number(e.target.value))} className="w-full border border-stone-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#c5a880]" />
         </div>
-        <div>
-          <label className="block text-xs font-bold text-stone-500 mb-1">Ссылка на фото номера</label>
-          <input type="text" value={image} onChange={e => setImage(e.target.value)} className="w-full border border-stone-300 rounded-xl px-4 py-2.5 text-xs font-mono focus:outline-none focus:border-[#c5a880]" />
+      </div>
+
+      <div className="border-t border-stone-100 pt-5 space-y-4">
+        <label className="block text-xs font-black uppercase tracking-wider text-[#022C22]">Фотография номера</label>
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-5">
+          {/* Controls column */}
+          <div className="md:col-span-7 space-y-3">
+            <div>
+              <span className="block text-[11px] font-bold text-stone-500 mb-1">Ссылка на картинку (URL)</span>
+              <input 
+                type="text" 
+                value={image} 
+                onChange={e => setImage(e.target.value)} 
+                className="w-full border border-stone-300 rounded-xl px-4 py-2 text-xs font-mono focus:outline-none focus:border-[#c5a880]" 
+                placeholder="https://images.unsplash.com/... или base64"
+              />
+            </div>
+
+            {/* Drag & Drop */}
+            <div 
+              className={`border-2 border-dashed rounded-xl p-3.5 text-center cursor-pointer transition-all ${
+                dragActive 
+                  ? 'border-[#c5a880] bg-[#c5a880]/10' 
+                  : 'border-stone-300 hover:border-[#c5a880] hover:bg-stone-50'
+              }`}
+              onDragOver={(e) => {
+                e.preventDefault();
+                setDragActive(true);
+              }}
+              onDragLeave={() => setDragActive(false)}
+              onDrop={(e) => {
+                e.preventDefault();
+                setDragActive(false);
+                if (e.dataTransfer.files?.[0]) {
+                  handleRoomImageFile(e.dataTransfer.files[0]);
+                }
+              }}
+              onClick={() => {
+                document.getElementById(`room-file-upload-${initialData.id || 'new'}`)?.click();
+              }}
+            >
+              <input 
+                type="file" 
+                id={`room-file-upload-${initialData.id || 'new'}`} 
+                accept="image/*" 
+                className="hidden" 
+                onChange={(e) => {
+                  if (e.target.files?.[0]) {
+                    handleRoomImageFile(e.target.files[0]);
+                  }
+                }}
+              />
+              <span className="text-[11px] font-semibold text-stone-600 block">Загрузить файл с компьютера</span>
+              <span className="text-[9px] text-stone-400 block mt-0.5">Перетащите картинку сюда или нажмите</span>
+            </div>
+            {uploadError && (
+              <p className="text-[10px] text-red-500 font-medium">{uploadError}</p>
+            )}
+
+            {/* Presets */}
+            <div className="space-y-1">
+              <span className="block text-[10px] font-bold text-stone-400 uppercase tracking-wider">Готовые пресеты Пестово:</span>
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  type="button"
+                  onClick={() => setImage('/src/assets/images/pestovo_block_1779780908700.png')}
+                  className={`px-2 py-1.5 text-[10px] rounded-lg text-left truncate transition-all border cursor-pointer ${
+                    image === '/src/assets/images/pestovo_block_1779780908700.png'
+                      ? 'bg-amber-100 border-amber-400 font-bold text-amber-955'
+                      : 'bg-stone-100 hover:bg-stone-200 border-stone-200 text-stone-700'
+                  }`}
+                >
+                  🏥 Стандарт Эконом
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setImage('/src/assets/images/pestovo_suite_1779777660563.png')}
+                  className={`px-2 py-1.5 text-[10px] rounded-lg text-left truncate transition-all border cursor-pointer ${
+                    image === '/src/assets/images/pestovo_suite_1779777660563.png'
+                      ? 'bg-amber-100 border-amber-400 font-bold text-amber-955'
+                      : 'bg-stone-100 hover:bg-stone-200 border-stone-200 text-stone-700'
+                  }`}
+                >
+                  🛋️ Вилла Полулюкс
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setImage('https://images.unsplash.com/photo-1590490360182-c33d57733427?auto=format&fit=crop&w=800&q=80')}
+                  className={`px-2 py-1.5 text-[10px] rounded-lg text-left truncate transition-all border cursor-pointer ${
+                    image === 'https://images.unsplash.com/photo-1590490360182-c33d57733427?auto=format&fit=crop&w=800&q=80'
+                      ? 'bg-amber-100 border-amber-400 font-bold text-amber-955'
+                      : 'bg-stone-100 hover:bg-stone-200 border-stone-200 text-stone-700'
+                  }`}
+                >
+                  🛏️ Семейный Люкс
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setImage('https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=1200&q=80')}
+                  className={`px-2 py-1.5 text-[10px] rounded-lg text-left truncate transition-all border cursor-pointer ${
+                    image === 'https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=1200&q=80'
+                      ? 'bg-amber-100 border-amber-400 font-bold text-amber-955'
+                      : 'bg-stone-100 hover:bg-stone-200 border-stone-200 text-stone-700'
+                  }`}
+                >
+                  👑 Президент Люкс
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Preview column */}
+          <div className="md:col-span-5 flex flex-col justify-center bg-stone-50 border border-stone-200 p-3.5 rounded-xl">
+            <span className="text-[10px] font-bold text-stone-400 block uppercase mb-1.5 text-center">Вид карточки номера</span>
+            {image ? (
+              <div className="relative aspect-video rounded-lg overflow-hidden border border-stone-200 bg-stone-200 shadow-sm">
+                <img 
+                  src={image} 
+                  alt="Room prew" 
+                  className="w-full h-full object-cover" 
+                  referrerPolicy="no-referrer"
+                />
+                <span className="absolute bottom-2 left-2 bg-[#022C22] text-[#FAF9F6] text-[9px] font-mono uppercase px-1.5 py-0.5 rounded font-bold">
+                  {price || 0} ₽
+                </span>
+              </div>
+            ) : (
+              <div className="aspect-video bg-white border border-stone-200 rounded-lg flex flex-col items-center justify-center p-3 text-center">
+                <span className="text-2xs text-stone-400">Изображение не загружено</span>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
@@ -1688,6 +2280,20 @@ function MedicalForm({ initialData, onCancel, onSave }: MedicalFormProps) {
   const [fullDesc, setFullDesc] = useState(initialData.fullDesc);
   const [duration, setDuration] = useState(initialData.duration);
   const [icon, setIcon] = useState(initialData.icon);
+  const [image, setImage] = useState(initialData.image || '');
+  const [dragActive, setDragActive] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
+
+  const handleMedImageFile = (file: File) => {
+    if (!file.type.startsWith('image/')) {
+      setUploadError('Пожалуйста, выберите файл изображения (png, jpg, jpeg, webp).');
+      return;
+    }
+    setUploadError(null);
+    compressImage(file, 1000, 0.75, (base64) => {
+      setImage(base64);
+    });
+  };
 
   const [newIndication, setNewIndication] = useState('');
   const [indications, setIndications] = useState<string[]>([...initialData.indications]);
@@ -1708,7 +2314,8 @@ function MedicalForm({ initialData, onCancel, onSave }: MedicalFormProps) {
       indications,
       procedures,
       duration,
-      icon
+      icon,
+      image
     });
   };
 
@@ -1756,6 +2363,144 @@ function MedicalForm({ initialData, onCancel, onSave }: MedicalFormProps) {
       <div>
         <label className="block text-xs font-bold text-stone-500 mb-1">Подробное клиническое описание программы</label>
         <textarea rows={4} value={fullDesc} onChange={e => setFullDesc(e.target.value)} className="w-full border border-stone-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#c5a880] leading-relaxed" />
+      </div>
+
+      <div className="border-t border-stone-100 pt-5 space-y-4">
+        <label className="block text-xs font-black uppercase tracking-wider text-[#022C22]">Фотография программы лечения</label>
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-5">
+          {/* Controls column */}
+          <div className="md:col-span-7 space-y-3">
+            <div>
+              <span className="block text-[11px] font-bold text-stone-500 mb-1">Ссылка на фото (URL)</span>
+              <input 
+                type="text" 
+                value={image} 
+                onChange={e => setImage(e.target.value)} 
+                className="w-full border border-stone-300 rounded-xl px-4 py-2 text-xs font-mono focus:outline-none focus:border-[#c5a880]" 
+                placeholder="https://images.unsplash.com/... или base64 (по умолчанию кабинет физиотерапии)"
+              />
+            </div>
+
+            {/* Drag & Drop */}
+            <div 
+              className={`border-2 border-dashed rounded-xl p-3.5 text-center cursor-pointer transition-all ${
+                dragActive 
+                  ? 'border-[#c5a880] bg-[#c5a880]/10' 
+                  : 'border-stone-300 hover:border-[#c5a880] hover:bg-stone-50'
+              }`}
+              onDragOver={(e) => {
+                e.preventDefault();
+                setDragActive(true);
+              }}
+              onDragLeave={() => setDragActive(false)}
+              onDrop={(e) => {
+                e.preventDefault();
+                setDragActive(false);
+                if (e.dataTransfer.files?.[0]) {
+                  handleMedImageFile(e.dataTransfer.files[0]);
+                }
+              }}
+              onClick={() => {
+                document.getElementById(`med-file-upload-${initialData.id || 'new'}`)?.click();
+              }}
+            >
+              <input 
+                type="file" 
+                id={`med-file-upload-${initialData.id || 'new'}`} 
+                accept="image/*" 
+                className="hidden" 
+                onChange={(e) => {
+                  if (e.target.files?.[0]) {
+                    handleMedImageFile(e.target.files[0]);
+                  }
+                }}
+              />
+              <span className="text-[11px] font-semibold text-stone-600 block">Загрузить файл с компьютера</span>
+              <span className="text-[9px] text-stone-400 block mt-0.5">Перетащите картинку сюда или нажмите</span>
+            </div>
+            {uploadError && (
+              <p className="text-[10px] text-red-500 font-medium">{uploadError}</p>
+            )}
+
+            {/* Presets */}
+            <div className="space-y-1">
+              <span className="block text-[10px] font-bold text-stone-400 uppercase tracking-wider">Медицинские пресеты:</span>
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  type="button"
+                  onClick={() => setImage('/src/assets/images/pestovo_medical_1779777676990.png')}
+                  className={`px-2 py-1.5 text-[10px] rounded-lg text-left truncate transition-all border cursor-pointer ${
+                    image === '/src/assets/images/pestovo_medical_1779777676990.png'
+                      ? 'bg-amber-100 border-amber-400 font-bold text-amber-955'
+                      : 'bg-stone-100 hover:bg-stone-200 border-stone-200 text-stone-700'
+                  }`}
+                >
+                  🩺 Бальнеотерапия
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setImage('/src/assets/images/pestovo_beach_1779780925661.png')}
+                  className={`px-2 py-1.5 text-[10px] rounded-lg text-left truncate transition-all border cursor-pointer ${
+                    image === '/src/assets/images/pestovo_beach_1779780925661.png'
+                      ? 'bg-amber-100 border-amber-400 font-bold text-amber-955'
+                      : 'bg-stone-100 hover:bg-stone-200 border-stone-200 text-stone-700'
+                  }`}
+                >
+                  🌲 Климатолечение / Пляж
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setImage('https://images.unsplash.com/photo-1576013551627-0cc20b96c2a7?auto=format&fit=crop&w=800&q=80')}
+                  className={`px-2 py-1.5 text-[10px] rounded-lg text-left truncate transition-all border cursor-pointer ${
+                    image === 'https://images.unsplash.com/photo-1576013551627-0cc20b96c2a7?auto=format&fit=crop&w=800&q=80'
+                      ? 'bg-amber-100 border-amber-400 font-bold text-amber-955'
+                      : 'bg-stone-100 hover:bg-stone-200 border-stone-200 text-stone-700'
+                  }`}
+                >
+                  🏊‍♂️ Лечебный Бассейн
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setImage('https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&w=800&q=80')}
+                  className={`px-2 py-1.5 text-[10px] rounded-lg text-left truncate transition-all border cursor-pointer ${
+                    image === 'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&w=800&q=80'
+                      ? 'bg-amber-100 border-amber-400 font-bold text-amber-955'
+                      : 'bg-stone-100 hover:bg-stone-200 border-stone-200 text-stone-700'
+                  }`}
+                >
+                  🏥 Медицинский Центр
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Preview column */}
+          <div className="md:col-span-5 flex flex-col justify-center bg-stone-50 border border-stone-200 p-3.5 rounded-xl">
+            <span className="text-[10px] font-bold text-stone-400 block uppercase mb-1.5 text-center">Вид карточки программы</span>
+            {image ? (
+              <div className="relative aspect-video rounded-lg overflow-hidden border border-stone-200 bg-stone-200 shadow-sm">
+                <img 
+                  src={image} 
+                  alt="Medical program prew" 
+                  className="w-full h-full object-cover" 
+                  referrerPolicy="no-referrer"
+                />
+              </div>
+            ) : (
+              <div className="relative aspect-video rounded-lg overflow-hidden border border-stone-200 bg-stone-200 shadow-sm">
+                <img 
+                  src="/src/assets/images/pestovo_medical_1779777676990.png" 
+                  alt="Default medical program prew" 
+                  className="w-full h-full object-cover brightness-90" 
+                  referrerPolicy="no-referrer"
+                />
+                <div className="absolute inset-0 bg-black/30 flex items-center justify-center p-3 text-center">
+                  <span className="text-white text-[11px] font-bold drop-shadow-md">Будет использован стандартный кабинет физиотерапии</span>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
       </div>
 
       {/* Indications and Procedures */}
@@ -1910,6 +2655,171 @@ function FaqForm({ initialData, onCancel, onSave }: FaqFormProps) {
         </button>
         <button type="submit" className="bg-[#022C22] text-[#FAF9F6] hover:bg-[#c5a880] hover:text-[#022C22] font-semibold text-xs py-2.5 px-6 rounded-xl transition-all">
           Сохранить вопрос
+        </button>
+      </div>
+    </form>
+  );
+}
+
+interface NewsFormProps {
+  initialData: Omit<NewsArticle, 'id'> & { id?: string };
+  onCancel: () => void;
+  onSave: (data: Omit<NewsArticle, 'id'>) => void;
+}
+
+function NewsForm({ initialData, onCancel, onSave }: NewsFormProps) {
+  const [title, setTitle] = useState(initialData.title);
+  const [date, setDate] = useState(initialData.date);
+  const [image, setImage] = useState(initialData.image);
+  const [excerpt, setExcerpt] = useState(initialData.excerpt || '');
+  const [content, setContent] = useState(initialData.content);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!title || !date || !image || !content) {
+      alert("Пожалуйста, заполните основные поля (заголовок, дата, картинка, текст).");
+      return;
+    }
+    onSave({ title, date, image, excerpt, content });
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="p-4 sm:p-6 space-y-4">
+      <div>
+        <label className="block text-[10px] font-bold uppercase tracking-wider text-stone-400 mb-1">Заголовок новости</label>
+        <input required type="text" value={title} onChange={e => setTitle(e.target.value)} className="w-full bg-stone-50 border border-stone-200 rounded-xl px-4 py-2 font-serif text-[#022C22] focus:outline-none focus:border-[#c5a880]" placeholder="Например: Открытие нового корпуса" />
+      </div>
+      <div>
+        <label className="block text-[10px] font-bold uppercase tracking-wider text-stone-400 mb-1">Дата публикации</label>
+        <input required type="text" value={date} onChange={e => setDate(e.target.value)} className="w-full bg-stone-50 border border-stone-200 rounded-xl px-4 py-2 text-sm text-[#022C22] focus:outline-none focus:border-[#c5a880]" placeholder="Например: 10.05.2026" />
+      </div>
+      <div>
+        <label className="block text-[10px] font-bold uppercase tracking-wider text-stone-400 mb-1">Ссылка на картинку</label>
+        <input required type="text" value={image} onChange={e => setImage(e.target.value)} className="w-full bg-stone-50 border border-stone-200 rounded-xl px-4 py-2 font-mono text-xs text-[#022C22] focus:outline-none focus:border-[#c5a880]" placeholder="https://..." />
+      </div>
+      <div>
+        <label className="block text-[10px] font-bold uppercase tracking-wider text-stone-400 mb-1">Краткий анонс (опционально)</label>
+        <textarea rows={2} value={excerpt} onChange={e => setExcerpt(e.target.value)} className="w-full bg-stone-50 border border-stone-200 rounded-xl px-4 py-3 text-sm text-stone-700 focus:outline-none focus:border-[#c5a880]" placeholder="Текст для предпросмотра на карточке" />
+      </div>
+      <div>
+        <label className="block text-[10px] font-bold uppercase tracking-wider text-stone-400 mb-1">Полный текст новости</label>
+        <textarea required rows={6} value={content} onChange={e => setContent(e.target.value)} className="w-full bg-stone-50 border border-stone-200 rounded-xl px-4 py-3 text-sm text-stone-700 focus:outline-none focus:border-[#c5a880] leading-relaxed" placeholder="Текст новости..." />
+      </div>
+
+      <div className="flex justify-end gap-2 border-t border-stone-100 pt-4">
+        <button type="button" onClick={onCancel} className="bg-stone-100 hover:bg-stone-200 text-stone-700 font-bold text-xs py-2.5 px-5 rounded-xl transition-all">
+          Отмена
+        </button>
+        <button type="submit" className="bg-[#022C22] text-[#FAF9F6] hover:bg-[#c5a880] hover:text-[#022C22] font-semibold text-xs py-2.5 px-6 rounded-xl transition-all">
+          Сохранить новость
+        </button>
+      </div>
+    </form>
+  );
+}
+
+// 6. SERVICE FORM
+interface ServiceFormProps {
+  initialData: Omit<ServiceItem, 'id'> & { id?: string };
+  onCancel: () => void;
+  onSave: (data: Omit<ServiceItem, 'id'>) => void;
+}
+
+function ServiceForm({ initialData, onCancel, onSave }: ServiceFormProps) {
+  const [category, setCategory] = useState<ServiceItem['category']>(initialData.category || 'methods');
+  const [title, setTitle] = useState(initialData.title || '');
+  const [benefit, setBenefit] = useState(initialData.benefit || '');
+  const [method, setMethod] = useState(initialData.method || '');
+  const [duration, setDuration] = useState(initialData.duration || '');
+  const [iconName, setIconName] = useState(initialData.iconName || 'Sparkles');
+  const [indications, setIndications] = useState<string[]>(initialData.indications || []);
+  const [newIndication, setNewIndication] = useState('');
+
+  const handleAddIndication = () => {
+    if (newIndication.trim()) {
+      setIndications([...indications, newIndication.trim()]);
+      setNewIndication('');
+    }
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!title.trim() || !benefit.trim() || !method.trim()) {
+      alert('Пожалуйста, заполните основные поля: Название, Польза и Метод!');
+      return;
+    }
+    onSave({ category, title, benefit, method, duration, iconName, indications });
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="bg-white p-6 rounded-2xl border border-stone-200 space-y-5 shadow-sm">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+        <div>
+          <label className="block text-xs font-bold text-stone-500 mb-1">Категория услуги</label>
+          <select value={category} onChange={e => setCategory(e.target.value as any)} className="w-full border border-stone-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#c5a880] bg-white">
+            <option value="methods">Методы лечения</option>
+            <option value="diagnostics">Функциональная диагностика</option>
+            <option value="laboratory">Лабораторная база</option>
+            <option value="infrastructure">Инфраструктура и сервис</option>
+          </select>
+        </div>
+        <div>
+          <label className="block text-xs font-bold text-stone-500 mb-1">Иконка</label>
+          <select value={iconName} onChange={e => setIconName(e.target.value)} className="w-full border border-stone-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#c5a880] bg-white">
+            <option value="Activity">Волна / Пульс (Activity)</option>
+            <option value="Heart">Сердце (Heart)</option>
+            <option value="Flame">Огонь (Flame)</option>
+            <option value="Waves">Волны воды (Waves)</option>
+            <option value="Wind">Ветер / Кислород (Wind)</option>
+            <option value="Compass">Компас / Терренкур (Compass)</option>
+            <option value="Droplet">Капля (Droplet)</option>
+            <option value="Stethoscope">Стетоскоп (Stethoscope)</option>
+            <option value="Sparkles">Искры / Сервис (Sparkles)</option>
+          </select>
+        </div>
+        <div className="md:col-span-2">
+          <label className="block text-xs font-bold text-stone-500 mb-1">Название услуги</label>
+          <input type="text" value={title} onChange={e => setTitle(e.target.value)} className="w-full border border-stone-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#c5a880]" placeholder="Например: Аэроионотерапия" />
+        </div>
+        <div>
+          <label className="block text-xs font-bold text-stone-500 mb-1">Польза / Эффект</label>
+          <textarea rows={3} value={benefit} onChange={e => setBenefit(e.target.value)} className="w-full border border-stone-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#c5a880]" placeholder="Какую пользу приносит процедура отдыхающему..." />
+        </div>
+        <div>
+          <label className="block text-xs font-bold text-stone-500 mb-1">Методология / Описание</label>
+          <textarea rows={3} value={method} onChange={e => setMethod(e.target.value)} className="w-full border border-stone-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#c5a880]" placeholder="Как именно проводится лечебное мероприятие..." />
+        </div>
+        <div>
+          <label className="block text-xs font-bold text-stone-500 mb-1">Продолжительность (например: 15–20 мин)</label>
+          <input type="text" value={duration} onChange={e => setDuration(e.target.value)} className="w-full border border-stone-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#c5a880]" placeholder="например: 15–20 мин" />
+        </div>
+      </div>
+
+      <div>
+        <label className="block text-xs font-bold text-stone-500 mb-1.5">Показания к применению (список причин)</label>
+        <div className="bg-[#FAF9F6] p-4 rounded-2xl border border-stone-200 space-y-3">
+          <div className="flex flex-wrap gap-1.5">
+            {indications.map((ind, idx) => (
+              <div key={idx} className="flex justify-between items-center text-xs text-stone-700 bg-white border border-stone-200 p-2 rounded-lg pr-1.5 shadow-sm">
+                <span className="truncate">{ind}</span>
+                <button type="button" onClick={() => setIndications(indications.filter((_, i) => i !== idx))} className="text-red-500 font-bold px-1.5 hover:text-red-700">×</button>
+              </div>
+            ))}
+            {indications.length === 0 && <span className="text-[11px] text-stone-400 p-1 block">Добавьте показания ниже</span>}
+          </div>
+          <div className="flex gap-2">
+            <input type="text" placeholder="Новое показание..." value={newIndication} onChange={e => setNewIndication(e.target.value)} className="border border-stone-300 rounded-xl px-3 py-1.5 text-xs flex-1 focus:outline-none focus:border-[#c5a880]" />
+            <button type="button" onClick={handleAddIndication} className="bg-[#022C22] hover:bg-emerald-800 text-white text-xs px-3 py-1.5 rounded-xl font-bold">Добавить</button>
+          </div>
+        </div>
+      </div>
+
+      <div className="flex justify-end gap-2 border-t border-stone-100 pt-4">
+        <button type="button" onClick={onCancel} className="bg-stone-100 hover:bg-stone-200 text-stone-700 font-bold text-xs py-2.5 px-5 rounded-xl transition-all">
+          Отмена
+        </button>
+        <button type="submit" className="bg-[#022C22] text-[#FAF9F6] hover:bg-[#c5a880] hover:text-[#022C22] font-semibold text-xs py-2.5 px-6 rounded-xl transition-all">
+          Сохранить услугу
         </button>
       </div>
     </form>
