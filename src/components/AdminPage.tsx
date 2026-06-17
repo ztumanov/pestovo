@@ -2005,7 +2005,12 @@ function RoomForm({ initialData, onCancel, onSave }: RoomFormProps) {
   const [view, setView] = useState(initialData.view);
   const [price, setPrice] = useState(initialData.price);
   const [description, setDescription] = useState(initialData.description);
-  const [image, setImage] = useState(initialData.image);
+  const [images, setImages] = useState<string[]>(() => {
+    if (initialData.images && initialData.images.length > 0) {
+      return [...initialData.images];
+    }
+    return initialData.image ? [initialData.image] : [];
+  });
   const [dragActive, setDragActive] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
 
@@ -2016,7 +2021,16 @@ function RoomForm({ initialData, onCancel, onSave }: RoomFormProps) {
     }
     setUploadError(null);
     compressImage(file, 1000, 0.75, (base64) => {
-      setImage(base64);
+      setImages(prev => {
+        if (prev.includes(base64)) return prev;
+        return [...prev, base64];
+      });
+    });
+  };
+
+  const handleRoomMultipleFiles = (files: FileList) => {
+    Array.from(files).forEach(file => {
+      handleRoomImageFile(file);
     });
   };
   
@@ -2039,7 +2053,8 @@ function RoomForm({ initialData, onCancel, onSave }: RoomFormProps) {
       price: Number(price),
       description,
       amenities,
-      image
+      image: images[0] || '',
+      images: images
     });
   };
 
@@ -2088,24 +2103,95 @@ function RoomForm({ initialData, onCancel, onSave }: RoomFormProps) {
       </div>
 
       <div className="border-t border-stone-100 pt-5 space-y-4">
-        <label className="block text-xs font-black uppercase tracking-wider text-[#022C22]">Фотография номера</label>
+        <label className="block text-xs font-black uppercase tracking-wider text-[#022C22]">Фотографии номера (можно загрузить несколько)</label>
+
+        {images.length > 0 && (
+          <div className="bg-stone-50 border border-stone-100 p-4 rounded-xl space-y-2">
+            <span className="block text-[10px] font-bold text-stone-500 uppercase tracking-wide">Загруженные фотографии:</span>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
+              {images.map((imgSrc, idx) => (
+                <div key={idx} className="relative aspect-video rounded-lg overflow-hidden border border-stone-200 group bg-white shadow-xs">
+                  <img 
+                    src={imgSrc} 
+                    alt={`Room photo ${idx + 1}`} 
+                    className="w-full h-full object-cover animate-fade-in" 
+                    referrerPolicy="no-referrer"
+                  />
+                  
+                  {idx === 0 && (
+                    <span className="absolute top-1 right-1 bg-emerald-600 text-white text-[8px] font-bold uppercase px-1.5 py-0.5 rounded shadow">
+                      Главное
+                    </span>
+                  )}
+                  
+                  <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-1.5 gap-1">
+                    {idx > 0 && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setImages(prev => {
+                            const updated = [...prev];
+                            const [moved] = updated.splice(idx, 1);
+                            return [moved, ...updated];
+                          });
+                        }}
+                        className="w-full bg-white hover:bg-[#c5a880] hover:text-white text-[8px] font-bold text-stone-800 py-1 rounded transition-colors cursor-pointer"
+                      >
+                        Сделать главным
+                      </button>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setImages(prev => prev.filter((_, i) => i !== idx));
+                      }}
+                      className="w-full bg-red-600 hover:bg-red-700 text-[8px] font-bold text-white py-1 rounded transition-colors cursor-pointer"
+                    >
+                      Удалить
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <p className="text-[9px] text-stone-400">Наведите курсор на фото, чтобы выбрать его главным или удалить.</p>
+          </div>
+        )}
+
         <div className="grid grid-cols-1 md:grid-cols-12 gap-5">
           {/* Controls column */}
           <div className="md:col-span-7 space-y-3">
             <div>
-              <span className="block text-[11px] font-bold text-stone-500 mb-1">Ссылка на картинку (URL)</span>
-              <input 
-                type="text" 
-                value={image} 
-                onChange={e => setImage(e.target.value)} 
-                className="w-full border border-stone-300 rounded-xl px-4 py-2 text-xs font-mono focus:outline-none focus:border-[#c5a880]" 
-                placeholder="https://images.unsplash.com/... или base64"
-              />
+              <span className="block text-[11px] font-bold text-stone-500 mb-1">Добавить фото по интернет-ссылке (URL)</span>
+              <div className="flex gap-2">
+                <input 
+                  type="text" 
+                  id="room-url-input"
+                  placeholder="https://images.unsplash.com/... или base64"
+                  className="w-full border border-stone-300 rounded-xl px-4 py-2 text-xs font-mono focus:outline-none focus:border-[#c5a880]" 
+                />
+                <button
+                  type="button"
+                  onClick={() => {
+                    const input = document.getElementById('room-url-input') as HTMLInputElement;
+                    if (input && input.value.trim()) {
+                      const url = input.value.trim();
+                      setImages(prev => {
+                        if (prev.includes(url)) return prev;
+                        return [...prev, url];
+                      });
+                      input.value = '';
+                    }
+                  }}
+                  className="bg-[#022C22] text-white text-xs font-bold px-4 rounded-xl hover:bg-[#c5a880] hover:text-stone-900 transition-colors cursor-pointer"
+                >
+                  Добавить
+                </button>
+              </div>
             </div>
 
             {/* Drag & Drop */}
             <div 
-              className={`border-2 border-dashed rounded-xl p-3.5 text-center cursor-pointer transition-all ${
+              className={`border-2 border-dashed rounded-xl p-4 text-center cursor-pointer transition-all ${
                 dragActive 
                   ? 'border-[#c5a880] bg-[#c5a880]/10' 
                   : 'border-stone-300 hover:border-[#c5a880] hover:bg-stone-50'
@@ -2118,8 +2204,8 @@ function RoomForm({ initialData, onCancel, onSave }: RoomFormProps) {
               onDrop={(e) => {
                 e.preventDefault();
                 setDragActive(false);
-                if (e.dataTransfer.files?.[0]) {
-                  handleRoomImageFile(e.dataTransfer.files[0]);
+                if (e.dataTransfer.files) {
+                  handleRoomMultipleFiles(e.dataTransfer.files);
                 }
               }}
               onClick={() => {
@@ -2130,15 +2216,16 @@ function RoomForm({ initialData, onCancel, onSave }: RoomFormProps) {
                 type="file" 
                 id={`room-file-upload-${initialData.id || 'new'}`} 
                 accept="image/*" 
+                multiple
                 className="hidden" 
                 onChange={(e) => {
-                  if (e.target.files?.[0]) {
-                    handleRoomImageFile(e.target.files[0]);
+                  if (e.target.files) {
+                    handleRoomMultipleFiles(e.target.files);
                   }
                 }}
               />
-              <span className="text-[11px] font-semibold text-stone-600 block">Загрузить файл с компьютера</span>
-              <span className="text-[9px] text-stone-400 block mt-0.5">Перетащите картинку сюда или нажмите</span>
+              <span className="text-[11px] font-semibold text-stone-600 block">Загрузить файлы с компьютера</span>
+              <span className="text-[9px] text-stone-400 block mt-0.5">Перетащите одну или несколько картинок сюда или нажмите</span>
             </div>
             {uploadError && (
               <p className="text-[10px] text-red-500 font-medium">{uploadError}</p>
@@ -2146,49 +2233,45 @@ function RoomForm({ initialData, onCancel, onSave }: RoomFormProps) {
 
             {/* Presets */}
             <div className="space-y-1">
-              <span className="block text-[10px] font-bold text-stone-400 uppercase tracking-wider">Готовые пресеты Пестово:</span>
+              <span className="block text-[10px] font-bold text-stone-400 uppercase tracking-wider">Пресеты Пестово (кликните, чтобы добавить):</span>
               <div className="grid grid-cols-2 gap-2">
                 <button
                   type="button"
-                  onClick={() => setImage('/src/assets/images/pestovo_block_1779780908700.png')}
-                  className={`px-2 py-1.5 text-[10px] rounded-lg text-left truncate transition-all border cursor-pointer ${
-                    image === '/src/assets/images/pestovo_block_1779780908700.png'
-                      ? 'bg-amber-100 border-amber-400 font-bold text-amber-955'
-                      : 'bg-stone-100 hover:bg-stone-200 border-stone-200 text-stone-700'
-                  }`}
+                  onClick={() => {
+                    const preset = '/src/assets/images/pestovo_block_1779780908700.png';
+                    setImages(prev => prev.includes(preset) ? prev : [...prev, preset]);
+                  }}
+                  className="px-2 py-1.5 bg-stone-100 hover:bg-stone-200 border border-stone-200 rounded-lg text-left text-[10px] truncate cursor-pointer text-stone-700"
                 >
                   🏥 Стандарт Эконом
                 </button>
                 <button
                   type="button"
-                  onClick={() => setImage('/src/assets/images/pestovo_suite_1779777660563.png')}
-                  className={`px-2 py-1.5 text-[10px] rounded-lg text-left truncate transition-all border cursor-pointer ${
-                    image === '/src/assets/images/pestovo_suite_1779777660563.png'
-                      ? 'bg-amber-100 border-amber-400 font-bold text-amber-955'
-                      : 'bg-stone-100 hover:bg-stone-200 border-stone-200 text-stone-700'
-                  }`}
+                  onClick={() => {
+                    const preset = '/src/assets/images/pestovo_suite_1779777660563.png';
+                    setImages(prev => prev.includes(preset) ? prev : [...prev, preset]);
+                  }}
+                  className="px-2 py-1.5 bg-stone-100 hover:bg-stone-200 border border-stone-200 rounded-lg text-left text-[10px] truncate cursor-pointer text-stone-700"
                 >
                   🛋️ Вилла Полулюкс
                 </button>
                 <button
                   type="button"
-                  onClick={() => setImage('https://images.unsplash.com/photo-1590490360182-c33d57733427?auto=format&fit=crop&w=800&q=80')}
-                  className={`px-2 py-1.5 text-[10px] rounded-lg text-left truncate transition-all border cursor-pointer ${
-                    image === 'https://images.unsplash.com/photo-1590490360182-c33d57733427?auto=format&fit=crop&w=800&q=80'
-                      ? 'bg-amber-100 border-amber-400 font-bold text-amber-955'
-                      : 'bg-stone-100 hover:bg-stone-200 border-stone-200 text-stone-700'
-                  }`}
+                  onClick={() => {
+                    const preset = 'https://images.unsplash.com/photo-1590490360182-c33d57733427?auto=format&fit=crop&w=800&q=80';
+                    setImages(prev => prev.includes(preset) ? prev : [...prev, preset]);
+                  }}
+                  className="px-2 py-1.5 bg-stone-100 hover:bg-stone-200 border border-stone-200 rounded-lg text-left text-[10px] truncate cursor-pointer text-stone-700"
                 >
                   🛏️ Семейный Люкс
                 </button>
                 <button
                   type="button"
-                  onClick={() => setImage('https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=1200&q=80')}
-                  className={`px-2 py-1.5 text-[10px] rounded-lg text-left truncate transition-all border cursor-pointer ${
-                    image === 'https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=1200&q=80'
-                      ? 'bg-amber-100 border-amber-400 font-bold text-amber-955'
-                      : 'bg-stone-100 hover:bg-stone-200 border-stone-200 text-stone-700'
-                  }`}
+                  onClick={() => {
+                    const preset = 'https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=1200&q=80';
+                    setImages(prev => prev.includes(preset) ? prev : [...prev, preset]);
+                  }}
+                  className="px-2 py-1.5 bg-stone-100 hover:bg-stone-200 border border-stone-200 rounded-lg text-left text-[10px] truncate cursor-pointer text-stone-700"
                 >
                   👑 Президент Люкс
                 </button>
@@ -2198,11 +2281,11 @@ function RoomForm({ initialData, onCancel, onSave }: RoomFormProps) {
 
           {/* Preview column */}
           <div className="md:col-span-5 flex flex-col justify-center bg-stone-50 border border-stone-200 p-3.5 rounded-xl">
-            <span className="text-[10px] font-bold text-stone-400 block uppercase mb-1.5 text-center">Вид карточки номера</span>
-            {image ? (
+            <span className="text-[10px] font-bold text-stone-400 block uppercase mb-1.5 text-center">Вид карточки номера (главное фото)</span>
+            {images.length > 0 ? (
               <div className="relative aspect-video rounded-lg overflow-hidden border border-stone-200 bg-stone-200 shadow-sm">
                 <img 
-                  src={image} 
+                  src={images[0]} 
                   alt="Room prew" 
                   className="w-full h-full object-cover" 
                   referrerPolicy="no-referrer"
@@ -2213,7 +2296,7 @@ function RoomForm({ initialData, onCancel, onSave }: RoomFormProps) {
               </div>
             ) : (
               <div className="aspect-video bg-white border border-stone-200 rounded-lg flex flex-col items-center justify-center p-3 text-center">
-                <span className="text-2xs text-stone-400">Изображение не загружено</span>
+                <span className="text-2xs text-stone-400 animate-pulse">Изображения не загружены</span>
               </div>
             )}
           </div>

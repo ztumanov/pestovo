@@ -306,6 +306,11 @@ export default function App() {
 
   // Room details modal
   const [roomModal, setRoomModal] = useState<Room | null>(null);
+  const [activeRoomImageIndex, setActiveRoomImageIndex] = useState(0);
+
+  useEffect(() => {
+    setActiveRoomImageIndex(0);
+  }, [roomModal?.id]);
 
   // Lightbox index for full screen gallery images
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
@@ -3115,25 +3120,77 @@ export default function App() {
             >
               
               {/* Header Visual */}
-              <div className="relative h-64 shrink-0 border-b border-stone-100">
-                <img
-                  src={roomModal.image || undefined}
-                  alt={roomModal.name}
-                  className="w-full h-full object-cover"
-                  referrerPolicy="no-referrer"
-                />
-                <button
-                  onClick={() => setRoomModal(null)}
-                  className="absolute top-4 right-4 bg-black/50 hover:bg-black text-white p-2 rounded-full backdrop-blur-md transition-colors"
-                >
-                  <X className="w-5 h-5" />
-                </button>
-                <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/80 to-transparent"></div>
-                <div className="absolute bottom-4 left-4 text-white">
-                  <span className="text-[10px] tracking-widest font-mono text-[#c5a880] uppercase font-bold">{roomModal.category}</span>
-                  <h3 className="font-serif text-2xl font-semibold mt-1 tracking-tight">{roomModal.name}</h3>
-                </div>
-              </div>
+              {(() => {
+                const roomImages = roomModal.images && roomModal.images.length > 0 ? roomModal.images : [roomModal.image];
+                return (
+                  <div className="relative h-64 shrink-0 border-b border-stone-100 group">
+                    <AnimatePresence mode="wait">
+                      <motion.img
+                        key={roomImages[activeRoomImageIndex] || 'default'}
+                        src={roomImages[activeRoomImageIndex] || roomModal.image}
+                        alt={roomModal.name}
+                        className="w-full h-full object-cover"
+                        referrerPolicy="no-referrer"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 0.2 }}
+                      />
+                    </AnimatePresence>
+                    <button
+                      onClick={() => setRoomModal(null)}
+                      className="absolute top-4 right-4 bg-black/50 hover:bg-black text-white p-2 rounded-full backdrop-blur-md transition-colors z-20 cursor-pointer"
+                    >
+                      <X className="w-5 h-5" />
+                    </button>
+                    
+                    {roomImages.length > 1 && (
+                      <>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setActiveRoomImageIndex(prev => (prev - 1 + roomImages.length) % roomImages.length);
+                          }}
+                          className="absolute left-3 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/75 text-white p-2 rounded-full backdrop-blur-sm transition-all shadow-md z-10 cursor-pointer flex items-center justify-center"
+                        >
+                          <ChevronLeft className="w-5 h-5" />
+                        </button>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setActiveRoomImageIndex(prev => (prev + 1) % roomImages.length);
+                          }}
+                          className="absolute right-3 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/75 text-white p-2 rounded-full backdrop-blur-sm transition-all shadow-md z-10 cursor-pointer flex items-center justify-center"
+                        >
+                          <ChevronRight className="w-5 h-5" />
+                        </button>
+
+                        {/* Pagination indicator dots */}
+                        <div className="absolute bottom-16 left-1/2 -translate-x-1/2 flex items-center gap-1.5 z-10 bg-black/35 px-2.5 py-1 rounded-full backdrop-blur-sm">
+                          {roomImages.map((_, i) => (
+                            <button
+                              key={i}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setActiveRoomImageIndex(i);
+                              }}
+                              className={`w-2 h-2 rounded-full transition-all duration-300 cursor-pointer ${
+                                i === activeRoomImageIndex ? 'bg-[#c5a880] scale-125' : 'bg-white/60 hover:bg-white'
+                              }`}
+                            />
+                          ))}
+                        </div>
+                      </>
+                    )}
+
+                    <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/80 to-transparent"></div>
+                    <div className="absolute bottom-4 left-4 text-white z-10">
+                      <span className="text-[10px] tracking-widest font-mono text-[#c5a880] uppercase font-bold">{roomModal.category}</span>
+                      <h3 className="font-serif text-2xl font-semibold mt-1 tracking-tight">{roomModal.name}</h3>
+                    </div>
+                  </div>
+                );
+              })()}
 
               {/* Scrollable contents inside modal */}
               <div className="p-6 overflow-y-auto space-y-6">
