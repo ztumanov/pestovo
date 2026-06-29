@@ -234,7 +234,13 @@ export function AdminDataProvider({ children }: { children: React.ReactNode }) {
             parsed.hero.badge = 'Оздоровительный комплекс ФТС России';
             morphed = true;
           }
-          if (!parsed.hero.titleFirstPart) { parsed.hero.titleFirstPart = defaultHero.titleFirstPart; morphed = true; }
+          if (!parsed.hero.titleFirstPart) { 
+            parsed.hero.titleFirstPart = defaultHero.titleFirstPart; 
+            morphed = true; 
+          } else if (parsed.hero.titleFirstPart === 'САНАТОРИЙ «ПЕСТОВО»' || parsed.hero.titleFirstPart.includes('ПЕСТОВО')) {
+            parsed.hero.titleFirstPart = 'САНАТОРИЙ «ЯСНАЯ ПОЛЯНА»';
+            morphed = true;
+          }
           if (!parsed.hero.titleSecondPart) { parsed.hero.titleSecondPart = defaultHero.titleSecondPart; morphed = true; }
           if (!parsed.hero.subtitle) { 
             parsed.hero.subtitle = defaultHero.subtitle; 

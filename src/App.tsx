@@ -86,7 +86,7 @@ export default function App() {
     resortInfo: RESORT_INFO = {}, 
     hero: HERO_DATA = {
       badge: 'Оздоровительный комплекс ФТС России',
-      titleFirstPart: 'САНАТОРИЙ «ПЕСТОВО»',
+      titleFirstPart: 'САНАТОРИЙ «ЯСНАЯ ПОЛЯНА»',
       titleSecondPart: 'ЮЖНЫЙ БЕРЕГ КРЫМА',
       subtitle: 'Современный центр оздоровления, эффективного лечения и комплексной реабилитации для должностных лиц таможенных органов и членов их семей.',
       ctaText: 'Рассчитать путевку & Забронировать',
@@ -1008,7 +1008,7 @@ export default function App() {
           <div className="flex items-center justify-between h-20">
             
             {/* Logo */}
-            <div className="flex items-center space-x-3 cursor-pointer" onClick={() => { setCurrentPage('home'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}>
+            <div className="flex items-center space-x-4 cursor-pointer" onClick={() => { setCurrentPage('home'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}>
               {/* Gold/Emerald High-Fidelity Vector Russian FTS Emblem */}
               <div className="w-14 h-14 bg-gradient-to-br from-[#c5a880]/30 to-[#9a7d56]/10 rounded-full p-1 shadow-inner flex items-center justify-center relative overflow-visible select-none">
                 <svg className="w-12 h-12 block select-none filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.4)]" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -1059,14 +1059,10 @@ export default function App() {
                   </g>
                 </svg>
               </div>
-              <div>
-                <div className="flex items-center space-x-1">
+              <div className="flex flex-col items-start justify-center pl-1">
+                <div className="flex items-center space-x-1.5">
                   <span className="font-serif font-bold text-lg md:text-xl tracking-tight text-[#FAF9F6]">САНАТОРИЙ</span>
-                  <span className="font-serif font-bold text-[#c5a880] text-lg md:text-xl tracking-tight">«ПЕСТОВО»</span>
-                </div>
-                <div className="text-[10px] tracking-wider text-stone-300 font-mono uppercase font-semibold flex items-center gap-1.5 leading-none mt-1">
-                  <span className="inline-block w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0"></span>
-                  <span>ФГКУ ФТС России</span>
+                  <span className="font-serif font-bold text-[#c5a880] text-lg md:text-xl tracking-tight">«ЯСНАЯ ПОЛЯНА»</span>
                 </div>
               </div>
             </div>
@@ -1473,10 +1469,31 @@ export default function App() {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.15 }}
-            className="font-serif text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tighter leading-tight max-w-5xl"
+            className="font-serif leading-none max-w-5xl text-center"
           >
-            {HERO_DATA.titleFirstPart} <br/>
-            <span className="italic text-[#c5a880] font-normal font-serif">{HERO_DATA.titleSecondPart}</span>
+            {(() => {
+              const text = HERO_DATA.titleFirstPart || 'САНАТОРИЙ «ЯСНАЯ ПОЛЯНА»';
+              if (text.toUpperCase().includes('САНАТОРИЙ') && (text.toUpperCase().includes('ЯСНАЯ ПОЛЯНА') || text.toUpperCase().includes('«ЯСНАЯ ПОЛЯНА»'))) {
+                return (
+                  <>
+                    <span className="block text-stone-300 font-sans font-medium text-xl sm:text-2xl md:text-3xl lg:text-4xl tracking-[0.2em] uppercase opacity-90 mb-2 sm:mb-3">
+                      САНАТОРИЙ
+                    </span>
+                    <span className="block text-white font-serif font-black tracking-tight text-5xl sm:text-6xl md:text-7xl lg:text-8xl drop-shadow-md leading-tight">
+                      «ЯСНАЯ ПОЛЯНА»
+                    </span>
+                  </>
+                );
+              }
+              return (
+                <span className="block text-white font-serif font-black tracking-tight text-4xl sm:text-5xl md:text-6xl lg:text-7xl">
+                  {text}
+                </span>
+              );
+            })()}
+            <span className="italic text-[#c5a880] font-normal font-serif text-xl sm:text-2xl md:text-3xl lg:text-4xl block mt-4 sm:mt-5 tracking-wide">
+              {HERO_DATA.titleSecondPart}
+            </span>
           </motion.h1>
 
           <motion.p
