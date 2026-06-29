@@ -61,7 +61,7 @@ import {
   Newspaper,
   Stethoscope
 } from 'lucide-react';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion, AnimatePresence, useScroll, useTransform, useSpring } from 'motion/react';
 import { Room, MedicalProgram } from './types';
 import { useAdminData } from './context/AdminDataContext';
 import AdminPage from './components/AdminPage';
@@ -85,10 +85,10 @@ export default function App() {
   const { 
     resortInfo: RESORT_INFO = {}, 
     hero: HERO_DATA = {
-      badge: 'Престижный оздоровительный комплекс ФТС России',
+      badge: 'Оздоровительный комплекс ФТС России',
       titleFirstPart: 'САНАТОРИЙ «ПЕСТОВО»',
       titleSecondPart: 'ЮЖНЫЙ БЕРЕГ КРЫМА',
-      subtitle: 'Элитное оздоровление, легендарный парк-арборетум и дворец графини Паниной в Гаспре. Микроклимат царского курорта для вашего оздоровления.',
+      subtitle: 'Современный центр оздоровления, эффективного лечения и комплексной реабилитации для должностных лиц таможенных органов и членов их семей.',
       ctaText: 'Рассчитать путевку & Забронировать',
       defaultBackgroundMode: 'video_nature',
       stats: [
@@ -115,6 +115,17 @@ export default function App() {
   // Navigation states
   const [activeSection, setActiveSection] = useState('hero');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  // Scroll parallax values for Hero block with smooth physics spring
+  const { scrollY } = useScroll();
+  const smoothScrollY = useSpring(scrollY, {
+    stiffness: 85,
+    damping: 24,
+    mass: 0.2
+  });
+  const yBg = useTransform(smoothScrollY, [0, 800], [0, 180]);
+  const yHeroText = useTransform(smoothScrollY, [0, 800], [0, -90]);
+  const opacityHeroText = useTransform(smoothScrollY, [0, 800], [1, 0]);
   
   // Slideshow state for automatic background rotation
   const rawSlides = (HERO_DATA && HERO_DATA.slides && HERO_DATA.slides.length > 0)
@@ -787,17 +798,7 @@ export default function App() {
   };
 
   // Combine generated images + fallback Unsplash pictures for the big filterable gallery
-  const ALL_GALLERY_ITEMS = [
-    { src: IMAGES.hero, category: 'nature', title: 'Вид на главный корпус и парк-арборетум' },
-    { src: IMAGES.suite, category: 'rooms', title: 'Интерьер Полулюкс Комфорт с панорамой моря' },
-    { src: IMAGES.medical, category: 'medical', title: 'Кабинет аппаратной бальнеологии и физиотерапии' },
-    { src: IMAGES.nature, category: 'nature', title: 'Исторический терренкур к Черному морю в Гаспре' },
-    { src: EXTRA_IMAGES.standardRoom, category: 'rooms', title: 'Номер Стандарт Улучшенный' },
-    { src: EXTRA_IMAGES.deluxeRoom, category: 'rooms', title: 'Элегантный Двухкомнатный Люкс' },
-    { src: EXTRA_IMAGES.pool, category: 'infrastructure', title: 'Подогреваемый плавательный бассейн' },
-    { src: EXTRA_IMAGES.dining, category: 'infrastructure', title: 'Ресторан «Пестово» - трехразовый шведский стол' },
-    { src: EXTRA_IMAGES.fitness, category: 'infrastructure', title: 'Тренажерный зал в спортивно-оздоровительном корпусе' }
-  ];
+  const ALL_GALLERY_ITEMS = siteData.gallery || [];
 
   const filteredGallery = galleryTab === 'all' 
     ? ALL_GALLERY_ITEMS 
@@ -836,7 +837,7 @@ export default function App() {
             <div className="flex items-center space-x-2">
               <span className="w-1.5 h-1.5 rounded-full bg-[#c5a880]"></span>
               <span className="font-mono tracking-wider font-semibold uppercase text-stone-400 text-center sm:text-left">
-                Федеральное государственное казенное учреждение «Санаторий «Пестово» ФТС России»
+                Федеральное государственное казенное учреждение «Санаторий «Ясная Поляна» ФТС России»
               </span>
             </div>
             <button 
@@ -1347,43 +1348,52 @@ export default function App() {
         </AnimatePresence>
       </nav>
 
-      {currentPage === 'documents' ? (
-        <DocumentsPage onBackToHome={() => {
-          setCurrentPage('home');
-          window.scrollTo({ top: 0, behavior: 'smooth' });
-        }} />
-      ) : currentPage === 'news' ? (
-        <NewsPage onBackToHome={() => {
-          setCurrentPage('home');
-          window.scrollTo({ top: 0, behavior: 'smooth' });
-        }} />
-      ) : currentPage === 'medical' ? (
-        <MedicalPage onBackToHome={() => {
-          setCurrentPage('home');
-          window.scrollTo({ top: 0, behavior: 'smooth' });
-        }} />
-      ) : currentPage === 'services' ? (
-        <ServicesPage onBackToHome={() => {
-          setCurrentPage('home');
-          window.scrollTo({ top: 0, behavior: 'smooth' });
-        }} />
-      ) : currentPage === 'admin' ? (
-        <AdminPage onBackToHome={() => {
-          setCurrentPage('home');
-          window.scrollTo({ top: 0, behavior: 'smooth' });
-        }} />
-      ) : currentPage === 'testimonials' ? (
-        <TestimonialsPage onBackToHome={() => {
-          setCurrentPage('home');
-          window.scrollTo({ top: 0, behavior: 'smooth' });
-        }} />
-      ) : (
-        <>
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={currentPage}
+          initial={{ opacity: 0, y: 15 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -15 }}
+          transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+          className="flex-grow w-full flex flex-col"
+        >
+          {currentPage === 'documents' ? (
+            <DocumentsPage onBackToHome={() => {
+              setCurrentPage('home');
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }} />
+          ) : currentPage === 'news' ? (
+            <NewsPage onBackToHome={() => {
+              setCurrentPage('home');
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }} />
+          ) : currentPage === 'medical' ? (
+            <MedicalPage onBackToHome={() => {
+              setCurrentPage('home');
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }} />
+          ) : currentPage === 'services' ? (
+            <ServicesPage onBackToHome={() => {
+              setCurrentPage('home');
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }} />
+          ) : currentPage === 'admin' ? (
+            <AdminPage onBackToHome={() => {
+              setCurrentPage('home');
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }} />
+          ) : currentPage === 'testimonials' ? (
+            <TestimonialsPage onBackToHome={() => {
+              setCurrentPage('home');
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }} />
+          ) : (
+            <>
           {/* HERO / WELCOME ATRIUM */}
           <header id="hero" className="relative min-h-[90vh] flex items-center justify-center overflow-hidden bg-[#022C22]">
         
         {/* Dynamic Background (Switchable Video/Image loops) */}
-        <div className="absolute inset-0 z-0 bg-[#022C22]">
+        <motion.div className="absolute inset-0 z-0 bg-[#022C22]" style={{ y: yBg }}>
           <AnimatePresence mode="wait">
             {slides[activeSlideIndex] && (
               <motion.div 
@@ -1414,7 +1424,7 @@ export default function App() {
                 ) : (
                   <img
                     src={slides[activeSlideIndex]?.url}
-                    alt="Санаторий Пестово ФТС России"
+                    alt="Санаторий Ясная Поляна ФТС России"
                     className="w-full h-full object-cover object-center scale-105"
                     referrerPolicy="no-referrer"
                   />
@@ -1426,10 +1436,13 @@ export default function App() {
           {/* Elegant geometric gradients imitating sunlight through pines */}
           <div className="absolute inset-0 bg-gradient-to-t from-[#022C22] via-[#022C22]/60 to-transparent z-1"></div>
           <div className="absolute inset-l-0 inset-r-0 bottom-0 h-48 bg-gradient-to-t from-[#FAF9F6] to-transparent z-2"></div>
-        </div>
+        </motion.div>
 
         {/* Hero Content */}
-        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 text-center text-white flex flex-col items-center">
+        <motion.div 
+          className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 text-center text-white flex flex-col items-center"
+          style={{ y: yHeroText, opacity: opacityHeroText }}
+        >
           
           {isAdminMode && (
             <motion.div
@@ -1482,14 +1495,8 @@ export default function App() {
             className="mt-10 flex flex-col sm:flex-row items-center gap-4"
           >
             <a
-              href="#booking"
-              className="w-full sm:w-auto bg-[#c5a880] hover:bg-[#bca075] text-[#022C22] px-8 py-4 rounded-sm font-bold text-sm uppercase tracking-widest text-center transition-all duration-300 shadow-xl hover:-translate-y-0.5"
-            >
-              {HERO_DATA.ctaText}
-            </a>
-            <a
               href="#about"
-              className="w-full sm:w-auto border border-white/40 hover:border-white hover:bg-white/10 text-white px-8 py-4 rounded-sm font-semibold text-sm uppercase tracking-widest text-center transition-all duration-300"
+              className="w-full sm:w-auto bg-[#c5a880] hover:bg-[#bca075] text-[#022C22] px-8 py-4 rounded-sm font-bold text-sm uppercase tracking-widest text-center transition-all duration-300 shadow-xl hover:-translate-y-0.5"
             >
               Узнать о санатории
             </a>
@@ -1515,12 +1522,18 @@ export default function App() {
             </motion.div>
           )}
 
-        </div>
+        </motion.div>
       </header>
 
       {/* ABOUT & MICROCLIMATE INTERACTIVE EXPERIENCE */}
       <section id="about" className="py-24 bg-[#FAF9F6]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <motion.div
+          initial={{ opacity: 0, y: 45 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-100px" }}
+          transition={{ duration: 0.85, ease: [0.16, 1, 0.3, 1] }}
+          className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"
+        >
           
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
             
@@ -1807,7 +1820,7 @@ export default function App() {
                   Общие данные и медицинская специализация санатория
                 </h3>
                 <p className="text-stone-500 text-sm mt-3 leading-relaxed">
-                  Федеральное государственное казенное учреждение «Санаторий «Пестово» ФТС России». Полная ведомственная и нормативная информация с официального реестра учреждения.
+                  Федеральное государственное казенное учреждение «Санаторий «Ясная Поляна» ФТС России». Полная ведомственная и нормативная информация с официального реестра учреждения.
                 </p>
               </div>
               
@@ -1866,13 +1879,13 @@ export default function App() {
                       <div>
                         <span className="block text-xs uppercase tracking-widest font-mono text-stone-400">Полное наименование организации</span>
                         <p className="font-serif text-base sm:text-lg text-[#022C22] font-semibold mt-1 leading-snug">
-                          Федеральное государственное казенное учреждение «Санаторий «Пестово» ФТС России»
+                          Федеральное государственное казенное учреждение «Санаторий «Ясная Поляна» ФТС России»
                         </p>
                       </div>
 
                       <div>
                         <span className="block text-xs uppercase tracking-widest font-mono text-stone-400">Сокращенное наименование</span>
-                        <p className="font-semibold text-stone-800 mt-1">Санаторий «Пестово» ФТС России</p>
+                        <p className="font-semibold text-stone-800 mt-1">Санаторий «Ясная Поляна» ФТС России</p>
                       </div>
 
                       <div className="grid grid-cols-2 gap-4 pt-2">
@@ -1939,38 +1952,45 @@ export default function App() {
                     className="space-y-6 text-sm text-stone-700 font-sans"
                   >
                     {/* License Details Header */}
-                    <div className="bg-emerald-950/[0.03] p-4 rounded-sm border border-[#c5a880]/20 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                    <div className="bg-emerald-950/[0.03] p-5 rounded-xl border border-[#c5a880]/30 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                       <div>
-                        <span className="text-[10px] tracking-widest font-mono text-[#c5a880] uppercase font-bold">Государственная медицинская лицензия</span>
-                        <h4 className="font-serif text-lg font-bold text-[#022C22] mt-0.5">Лицензия № Л041-00110-91/00554225</h4>
+                        <div className="flex items-center space-x-2 text-[#c5a880] text-[10px] font-mono uppercase tracking-widest font-bold">
+                          <Award className="w-3.5 h-3.5" />
+                          <span>Государственный Медицинский Стандарт</span>
+                        </div>
+                        <h4 className="font-serif text-xl font-extrabold text-[#022C22] mt-1">Лицензия № Л041-00110-91/00554225</h4>
+                        <p className="text-stone-500 text-xs mt-1">
+                          Выдана лицензирующим органом на осуществление высокотехнологичного санаторно-курортного лечения.
+                        </p>
                       </div>
-                      <div className="font-mono text-xs bg-[#022C22] text-white px-3 py-1 rounded">
-                        Выдана: 2022-06-22 (Бессрочно)
+                      <div className="flex flex-col text-right font-mono text-xs text-[#022C22] bg-white border border-stone-200 shadow-sm p-3 rounded-lg md:self-center shrink-0">
+                        <div><span className="text-stone-400">Дата выдачи:</span> <strong>2022-06-22</strong></div>
+                        <div className="border-t border-stone-100 mt-1 pt-1"><span className="text-stone-400">Срок действия:</span> <strong className="text-emerald-700">Бессрочно</strong></div>
                       </div>
                     </div>
 
                     <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 pt-2">
                       {/* Left: Specializations */}
-                      <div className="lg:col-span-6 space-y-5">
+                      <div className="lg:col-span-6 space-y-6">
                         <div className="space-y-3">
-                          <h5 className="font-serif text-base font-bold text-[#022C22] border-b pb-1.5 flex items-center space-x-1.5">
-                            <Check className="w-4 h-4 text-[#c5a880]" />
-                            <span>Разрешенные виды медицинской деятельности:</span>
+                          <h5 className="font-serif text-base font-bold text-[#022C22] border-b border-stone-200 pb-2 flex items-center space-x-2">
+                            <Stethoscope className="w-4 h-4 text-[#c5a880]" />
+                            <span>Разрешенная профессиональная специализация:</span>
                           </h5>
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-stone-700">
                             {[
-                              'диетология',
-                              'лечебная физкультура',
-                              'медицинский массаж',
-                              'организация здравоохранения и общественного здоровья',
-                              'сестринское дело',
-                              'терапия',
-                              'физиотерапия',
-                              'функциональная диагностика'
+                              { name: 'диетология', desc: 'Терапевтическое и лечебное питание' },
+                              { name: 'лечебная физкультура', desc: 'Индивидуальные программы ЛФК' },
+                              { name: 'медицинский массаж', desc: 'Профессиональный ручной массаж' },
+                              { name: 'организация здравоохранения', desc: 'Высшие ведомственные стандарты ФТС' },
+                              { name: 'сестринское дело', desc: 'Круглосуточный квалифицированный уход' },
+                              { name: 'терапия', desc: 'Индивидуальное ведение лечащим врачом' },
+                              { name: 'физиотерапия', desc: 'Полный комплекс аппаратного лечения' },
+                              { name: 'функциональная диагностика', desc: 'ЭКГ и спирометрия на месте' }
                             ].map((item, id) => (
-                              <div key={id} className="flex items-center space-x-2">
-                                <span className="w-1.5 h-1.5 rounded-full bg-[#c5a880]" />
-                                <span className="font-medium text-[13px]">{item}</span>
+                              <div key={id} className="bg-stone-50 hover:bg-stone-100/50 border border-stone-200/60 p-2.5 rounded-lg transition-all">
+                                <span className="font-bold text-[13px] text-[#022C22] block capitalize">{item.name}</span>
+                                <span className="text-[11px] text-stone-500 block">{item.desc}</span>
                               </div>
                             ))}
                           </div>
@@ -1978,49 +1998,58 @@ export default function App() {
 
                         {/* Diagnostics & Labs */}
                         <div className="pt-2 space-y-3">
-                          <h5 className="font-serif text-base font-bold text-[#022C22] border-b pb-1.5 flex items-center space-x-1.5">
+                          <h5 className="font-serif text-base font-bold text-[#022C22] border-b border-stone-200 pb-2 flex items-center space-x-2">
                             <Activity className="w-4 h-4 text-[#c5a880]" />
-                            <span>Методы диагностики и лаборатория:</span>
+                            <span>Медицинская диагностика и клиническая лаборатория:</span>
                           </h5>
-                          <div className="space-y-3">
-                            <div>
-                              <strong className="text-stone-850 text-xs uppercase tracking-wider font-mono">Лабораторная база:</strong>
-                              <p className="text-stone-600 mt-0.5 text-xs">Биохимические исследования; Общеклинические исследования.</p>
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div className="bg-emerald-50/40 p-4 rounded-xl border border-emerald-100">
+                              <h6 className="font-serif text-xs font-bold text-[#022C22] uppercase tracking-wider font-mono">Лабораторная база</h6>
+                              <p className="text-stone-600 mt-1 text-xs leading-relaxed">
+                                • Биохимические исследования крови и мочи<br />
+                                • Общеклинические исследования на высокоточном оборудовании
+                              </p>
                             </div>
-                            <div>
-                              <strong className="text-stone-850 text-xs uppercase tracking-wider font-mono">Функциональная диагностика:</strong>
-                              <p className="text-stone-600 mt-0.5 text-xs">Методы: Спирография (спирометрия); Электрокардиография.</p>
+                            <div className="bg-amber-50/40 p-4 rounded-xl border border-amber-100">
+                              <h6 className="font-serif text-xs font-bold text-[#022C22] uppercase tracking-wider font-mono">Функциональная диагностика</h6>
+                              <p className="text-stone-600 mt-1 text-xs leading-relaxed">
+                                • Спирография (диагностика функции дыхания)<br />
+                                • Электрокардиография (ЭКГ-исследования сердца)
+                              </p>
                             </div>
                           </div>
                         </div>
                       </div>
 
                       {/* Right: Pathologies & Basic Illness Profiles */}
-                      <div className="lg:col-span-6 bg-stone-50 p-5 rounded border border-stone-200/95 space-y-4">
-                        <h5 className="font-serif text-base font-bold text-[#022C22] flex items-center space-x-2 border-b pb-2">
+                      <div className="lg:col-span-6 bg-[#022C22]/[0.02] p-6 rounded-xl border border-stone-200 shadow-sm space-y-4">
+                        <h5 className="font-serif text-lg font-bold text-[#022C22] flex items-center space-x-2 border-b border-stone-200 pb-2 select-none">
                           <Shield className="w-5 h-5 text-[#c5a880]" />
-                          <span>Медицинский профиль (Показания к лечению)</span>
+                          <span>Медицинские показания (Лечебные профили)</span>
                         </h5>
                         
-                        <div className="space-y-3.5 divide-y divide-stone-200/50 text-xs text-stone-700">
-                          <div className="pt-0 pb-1.5">
-                            <strong className="block text-stone-850 font-semibold text-sm text-[#022C22] mb-1">Болезни системы кровообращения:</strong>
+                        <div className="space-y-4 divide-y divide-stone-200/50 text-xs text-stone-700">
+                          <div className="pt-0 pb-2">
+                            <span className="inline-block bg-red-50 text-red-800 text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-full mb-1">Рекомендовано</span>
+                            <strong className="block text-stone-850 font-bold text-sm text-[#022C22] mb-1">Болезни системы кровообращения:</strong>
                             <p className="leading-relaxed text-stone-600">
                               Болезни, характеризующиеся повышенным кровяным давлением; Гипертензивная болезнь сердца [гипертоническая болезнь с преимущественным поражением сердца]; Гипертензивная [гипертоническая] болезнь с преимущественным поражением сердца с застойной сердечной недостаточностью.
                             </p>
                           </div>
 
-                          <div className="pt-2">
-                            <strong className="block text-stone-850 font-semibold text-sm text-[#022C22] mb-1">Болезни organs дыхания:</strong>
+                          <div className="pt-3 pb-2">
+                            <span className="inline-block bg-sky-50 text-sky-800 text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-full mb-1">Рекомендовано</span>
+                            <strong className="block text-stone-850 font-bold text-sm text-[#022C22] mb-1">Болезни органов дыхания:</strong>
                             <p className="leading-relaxed text-stone-600">
-                              Хронические болезни нижних дыхательных путей; Хронический бронхит неуточненный.
+                              Хронические болезни нижних дыхательных путей; Хронический бронхит неуточненный; Оздоровление после респираторных вирусных заболеваний.
                             </p>
                           </div>
 
-                          <div className="pt-2">
-                            <strong className="block text-stone-850 font-semibold text-sm text-[#022C22] mb-1">Болезни костно-мышечной системы и соединительной ткани:</strong>
+                          <div className="pt-3">
+                            <span className="inline-block bg-amber-50 text-amber-800 text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-full mb-1">Рекомендовано</span>
+                            <strong className="block text-stone-850 font-bold text-sm text-[#022C22] mb-1">Болезни костно-мышечной системы и суставов:</strong>
                             <p className="leading-relaxed text-stone-600">
-                              Артрозы; Коксартроз [артроз тазобедренного сустава] (первичный коксартроз двусторонний, другой первичный коксартроз, коксартроз неуточненный); Гонартроз [артроз коленного сустава] (первичный гонартроз двусторонний, другой первичный гонартроз, гонартроз неуточненный); Другие артрозы; Первичный артроз других суставов; Артроз неуточненный.
+                              Артрозы; Коксартроз [артроз тазобедренного сустава] (первичный, двусторонний); Гонартроз [артроз коленного сустава] (первичный коленного сустава, двусторонний); Другие виды артрозов; Артроз неуточненный.
                             </p>
                           </div>
                         </div>
@@ -2039,62 +2068,110 @@ export default function App() {
                     className="grid grid-cols-1 lg:grid-cols-12 gap-8 text-sm text-stone-700 font-sans"
                   >
                     {/* Treatment list */}
-                    <div className="lg:col-span-7 space-y-4">
-                      <h4 className="font-serif text-lg font-bold text-[#022C22] border-b pb-2">Применяемые методы лечения и реабилитации:</h4>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2 text-xs leading-relaxed">
+                    <div className="lg:col-span-8 space-y-6">
+                      <div>
+                        <h4 className="font-serif text-xl font-bold text-[#022C22] flex items-center">
+                          <Stethoscope className="w-5 h-5 text-[#c5a880] mr-2" />
+                          Применяемые высокотехнологичные методы лечения
+                        </h4>
+                        <p className="text-xs text-stone-500 mt-1">
+                          Комплексный перечень терапевтических процедур, проводимых квалифицированными специалистами на современном лицензированном оборудовании.
+                        </p>
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         {[
-                          'Методы электромагнитного лечебного воздействия на органы и ткани',
-                          'Электрофорез лекарственных средств по органам и системам',
-                          'Воздействие электрическим полем УВЧ (э.п. УВЧ)',
-                          'Воздействие магнитными полями (магнитотерапия)',
-                          'Воздействие синусоидальными модулярными токами (СМТ)',
-                          'Лечение с помощью лучевого (звукового, светового, ультрафиолетового, лазерного) воздействия',
-                          'Воздействие низкоинтенсивным лазерным излучение',
-                          'Воздействие ультразвуком',
-                          'Воздействие инфракрасным излучением',
-                          'Лечебная физкультура',
-                          'Лечение климатическими и природными факторами',
-                          'Террентное лечение (лечение ходьбой)',
-                          'Подводный душ массаж',
-                          'Воздействие климатом',
-                          'Ванны ароматические',
-                          'Массаж',
-                          'Массаж при различных заболеваниях',
-                          'Ингаляторные введения лекарственных средств и кислорода'
-                        ].map((m, idx) => (
-                          <div key={idx} className="flex items-start space-x-2">
-                            <span className="w-1.5 h-1.5 rounded-full bg-[#c5a880] mt-1.5 flex-shrink-0"></span>
-                            <span className="text-stone-600">{m}</span>
+                          {
+                            category: 'Аппаратная электро- и магнитотерапия',
+                            items: [
+                              { name: 'Электромагнитное воздействие', desc: 'Воздействие электромагнитным лечебным полем на органы и ткани.' },
+                              { name: 'Электрофорез лекарственных средств', desc: 'Чрескожное введение медицинских препаратов с помощью токов по органам и системам.' },
+                              { name: 'УВЧ-терапия (э.п. УВЧ)', desc: 'Воздействие электрическим полем ультравысокой частоты для снятия воспалений.' },
+                              { name: 'Магнитотерапия', desc: 'Регенерация и улучшение трофики тканей благодаря импульсным магнитным полям.' },
+                              { name: 'СМТ-терапия', desc: 'Амплипульстерапия синусоидальными модулированными токами для стимуляции.' }
+                            ]
+                          },
+                          {
+                            category: 'Светолечение & Стимуляция',
+                            items: [
+                              { name: 'Лучевое лечение', desc: 'Различные методики светового, ультрафиолетового, звукового и лазерного воздействия.' },
+                              { name: 'Лазеротерапия', desc: 'Воздействие низкоинтенсивным лазерным излучением для активации обмена веществ.' },
+                              { name: 'Ультразвуковая терапия', desc: 'Микрозональное массажное действие на ткани с помощью звуковых колебаний.' },
+                              { name: 'Инфракрасное (ИК) излучение', desc: 'Глубокий тепловой прогрев суставов и мышечной системы человека.' }
+                            ]
+                          },
+                          {
+                            category: 'Бальнеология & Массаж',
+                            items: [
+                              { name: 'Подводный душ-массаж', desc: 'Интенсивный массаж струей воды под давлением в гидромассажной ванне.' },
+                              { name: 'Аромаванны лечебные', desc: 'Расслабляющие ванны с хвойными, солевыми и ароматными эссенциями.' },
+                              { name: 'Медицинский и сегментарный массаж', desc: 'Прогрессивное ручное разминание мышц при различных заболеваниях.' },
+                              { name: 'Лечебная физкультура (ЛФК)', desc: 'Дозированные физические упражнения в залах кинезотерапии под наблюдением врача.' }
+                            ]
+                          },
+                          {
+                            category: 'Климатотерапия & Оксигенация',
+                            items: [
+                              { name: 'Климатотерапия', desc: 'Лечение климатическими и целебными природными факторами ЮБК.' },
+                              { name: 'Воздействие климатом', desc: 'Аэротерапия, гелиотерапия и прогулки в парковой реликтовой зоне.' },
+                              { name: 'Терренкур (лечебная ходьба)', desc: 'Дозированное террентное лечение по специально проложенным маршрутам.' },
+                              { name: 'Ингаляционная терапия', desc: 'Ингаляторное введение противовоспалительных лекарств и растворов.' },
+                              { name: 'Кислородная терапия', desc: 'Введение чистого медицинского кислорода для компенсации гипоксии.' }
+                            ]
+                          }
+                        ].map((cat, groupIdx) => (
+                          <div key={groupIdx} className="bg-stone-50 border border-stone-200/85 p-4 rounded-xl space-y-3 hover:shadow-md transition-all duration-300">
+                            <div className="flex items-center space-x-2 border-b border-stone-200/60 pb-2">
+                              <span className={`w-2 h-2 rounded-full ${
+                                groupIdx === 0 ? 'bg-emerald-600' :
+                                groupIdx === 1 ? 'bg-amber-500' :
+                                groupIdx === 2 ? 'bg-blue-500' : 'bg-teal-600'
+                              }`} />
+                              <h5 className="font-serif text-xs font-bold text-[#022C22] tracking-wide uppercase">{cat.category}</h5>
+                            </div>
+                            <div className="space-y-3">
+                              {cat.items.map((item, itemIdx) => (
+                                <div key={itemIdx} className="group/item">
+                                  <div className="flex items-start space-x-1.5">
+                                    <Check className="w-3.5 h-3.5 text-[#c5a880] mt-0.5 shrink-0" />
+                                    <div>
+                                      <span className="text-[12px] font-bold text-stone-850 block leading-tight text-[#022C22]">{item.name}</span>
+                                      <span className="text-[10px] text-stone-500 block leading-normal mt-0.5">{item.desc}</span>
+                                    </div>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
                           </div>
                         ))}
                       </div>
                     </div>
 
                     {/* Structure / Chambers */}
-                    <div className="lg:col-span-5 bg-[#022C22]/[0.02] p-5 rounded border border-stone-250/50 space-y-4">
-                      <h4 className="font-serif text-base font-bold text-[#022C22] border-b pb-2 flex items-center space-x-2">
+                    <div className="lg:col-span-4 bg-[#022C22]/[0.02] p-5 rounded-xl border border-stone-200/85 space-y-4">
+                      <h4 className="font-serif text-base font-bold text-[#022C22] border-b border-stone-200 pb-2 flex items-center space-x-2">
                         <Building2 className="w-4 h-4 text-[#c5a880]" />
                         <span>Структура медицинских кабинетов</span>
                       </h4>
                       <p className="text-xs text-stone-500 leading-relaxed">
-                        Внутренние лечебно-диагностические отделения Санатория:
+                        Внутреннее устройство лечебно-диагностического подразделения Санатория:
                       </p>
                       
                       <div className="space-y-1.5 text-xs font-semibold text-stone-700">
                         {[
-                          'изолятор',
-                          'клинико-диагностическая лаборатория',
-                          'кабинет среднего персонала',
-                          'отделение (кабинет) функциональной диагностики',
-                          'отделение (кабинет) физиотерапии',
-                          'отделение (кабинет) водолечения',
-                          'зал (кабинет) ЛФК',
-                          'кабинет массажа с комнатой для персонала',
-                          'вспомогательные помещения'
+                          'Кабинет функциональной диагностики',
+                          'Отделение аппаратной физиотерапии',
+                          'Отделение водолечения (бальнеотерапия)',
+                          'Специализированный зал ЛФК',
+                          'Кабинеты медицинского массажа',
+                          'Ингаляторий и кислородный пункт',
+                          'Изолятор и процедурные кабинеты',
+                          'Клинико-диагностическая лаборатория',
+                          'Комната дежурного медицинского персонала'
                         ].map((cab, idx) => (
-                          <div key={idx} className="flex items-center space-x-2 bg-white p-2 border border-stone-200/80 rounded shadow-sm hover:border-[#c5a880]/30 transition-all">
+                          <div key={idx} className="flex items-center space-x-2 bg-white p-2 border border-stone-200/80 rounded-lg shadow-sm hover:border-[#c5a880]/30 transition-all">
                             <Check className="w-3.5 h-3.5 text-[#022C22] flex-shrink-0" />
-                            <span className="font-sans text-stone-750 font-medium capitalize-first">{cab}</span>
+                            <span className="font-sans text-stone-750 font-medium">{cab}</span>
                           </div>
                         ))}
                       </div>
@@ -2140,7 +2217,7 @@ export default function App() {
                           </p>
                           <p className="flex justify-between">
                             <span className="text-stone-500">Email:</span>
-                            <a href="mailto:priemnaya.pestovo@yandex.ru" className="font-mono font-bold text-[#022C22] hover:text-[#c5a880] hover:underline">priemnaya.pestovo@yandex.ru</a>
+                            <a href="mailto:priemnaya.yasnayapolyana@yandex.ru" className="font-mono font-bold text-[#022C22] hover:text-[#c5a880] hover:underline">priemnaya.yasnayapolyana@yandex.ru</a>
                           </p>
                         </div>
                       </div>
@@ -2209,12 +2286,18 @@ export default function App() {
             </div>
           </div>
 
-        </div>
+        </motion.div>
       </section>
 
       {/* DETAILED INTERACTIVE MEDICAL PROGRAMS */}
       <section id="medical" className="py-20 bg-[#022C22] text-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <motion.div
+          initial={{ opacity: 0, y: 45 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-100px" }}
+          transition={{ duration: 0.85, ease: [0.16, 1, 0.3, 1] }}
+          className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"
+        >
           
           <div className="text-center max-w-3xl mx-auto mb-12">
             {isAdminMode && (
@@ -2233,15 +2316,19 @@ export default function App() {
             </h2>
             <div className="h-1 w-20 bg-[#c5a880] mx-auto mt-6"></div>
             <p className="text-stone-300 text-sm sm:text-base leading-relaxed mt-4">
-              Санаторий «Пестово» имеет высшую медицинскую категорию и предлагает комплексные программы оздоровления с использованием современного оборудования и целительных природных факторов.
+              Санаторий «Ясная Поляна» имеет высшую медицинскую категорию и предлагает комплексные программы оздоровления с использованием современного оборудования и целительных природных факторов.
             </p>
           </div>
 
           {/* Compact 4-column grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {MEDICAL_PROGRAMS.map((prog) => (
-              <div 
+            {MEDICAL_PROGRAMS.map((prog, index) => (
+              <motion.div 
                 key={prog.id}
+                initial={{ opacity: 0, y: 35 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-50px" }}
+                transition={{ duration: 0.65, delay: index * 0.1, ease: [0.16, 1, 0.3, 1] }}
                 onClick={() => {
                   setCurrentPage('medical');
                   window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -2267,7 +2354,7 @@ export default function App() {
                   <span>Подробнее</span>
                   <ChevronRight className="w-3.5 h-3.5" />
                 </div>
-              </div>
+              </motion.div>
             ))}
           </div>
 
@@ -2284,12 +2371,18 @@ export default function App() {
             </button>
           </div>
 
-        </div>
+        </motion.div>
       </section>
 
       {/* EXQUISITE ROOMS GALLERY */}
       <section id="rooms" className="py-24 bg-[#FAF9F6]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <motion.div
+          initial={{ opacity: 0, y: 45 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-100px" }}
+          transition={{ duration: 0.85, ease: [0.16, 1, 0.3, 1] }}
+          className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"
+        >
           
           <div className="flex flex-col md:flex-row md:items-end justify-between mb-16">
             <div>
@@ -2317,9 +2410,13 @@ export default function App() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto justify-center">
-            {ROOMS.map((room) => (
-              <div 
+            {ROOMS.map((room, index) => (
+              <motion.div 
                 key={room.id}
+                initial={{ opacity: 0, y: 40 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-50px" }}
+                transition={{ duration: 0.7, delay: index * 0.15, ease: [0.16, 1, 0.3, 1] }}
                 className="bg-white rounded-sm border border-stone-200/60 overflow-hidden hover:shadow-xl transition-all duration-300 flex flex-col group justify-between"
               >
                 {/* Image Section */}
@@ -2391,7 +2488,7 @@ export default function App() {
                   </div>
                 </div>
 
-              </div>
+              </motion.div>
             ))}
           </div>
 
@@ -2407,12 +2504,18 @@ export default function App() {
             </a>
           </div>
 
-        </div>
+        </motion.div>
       </section>
 
       {/* FILTERABLE MEDIA PHOTO GALLERY */}
       <section id="gallery" className="py-24 bg-[#FAF9F6] border-t border-stone-200/40">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <motion.div
+          initial={{ opacity: 0, y: 45 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-100px" }}
+          transition={{ duration: 0.85, ease: [0.16, 1, 0.3, 1] }}
+          className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"
+        >
           
           <div className="text-center max-w-2xl mx-auto mb-12">
             {isAdminMode && (
@@ -2438,10 +2541,7 @@ export default function App() {
           <div className="flex flex-wrap justify-center gap-1.5 mb-10 pb-2 border-b border-stone-200">
             {[
               { id: 'all', label: 'Все фото' },
-              { id: 'rooms', label: 'Номера' },
-              { id: 'nature', label: 'Парк-Арборетум' },
-              { id: 'medical', label: 'Лечебный корпус' },
-              { id: 'infrastructure', label: 'Инфраструктура' },
+              ...(siteData.galleryCategories || []).map(cat => ({ id: cat.id, label: cat.name }))
             ].map((tab) => (
               <button
                 key={tab.id}
@@ -2487,7 +2587,9 @@ export default function App() {
                   </div>
 
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-5">
-                    <span className="text-[10px] tracking-wider text-[#c5a880] uppercase font-mono">{item.category}</span>
+                    <span className="text-[10px] tracking-wider text-[#c5a880] uppercase font-mono">
+                      {siteData.galleryCategories?.find(c => c.id === item.category)?.name || item.category}
+                    </span>
                     <h4 className="text-white font-serif text-lg font-medium leading-snug mt-1">{item.title}</h4>
                     <p className="text-stone-300 text-[10px] sm:text-xs mt-1 opacity-75">Посмотреть в полный экран</p>
                   </div>
@@ -2496,12 +2598,18 @@ export default function App() {
             </AnimatePresence>
           </motion.div>
 
-        </div>
+        </motion.div>
       </section>
 
       {/* REAL REVIEWS & TRUST */}
       <section id="testimonials" className="py-24 bg-[#022C22] text-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <motion.div
+          initial={{ opacity: 0, y: 45 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-100px" }}
+          transition={{ duration: 0.85, ease: [0.16, 1, 0.3, 1] }}
+          className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"
+        >
           
           <div className="text-center max-w-3xl mx-auto mb-16">
             {isAdminMode && (
@@ -2569,12 +2677,18 @@ export default function App() {
             </a>
           </div>
 
-        </div>
+        </motion.div>
       </section>
 
       {/* COMPREHENSIVE INTERACTIVE REVIEW FORM */}
       <section id="booking" className="py-24 bg-[#FAF9F6]">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6">
+        <motion.div
+          initial={{ opacity: 0, y: 45 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-100px" }}
+          transition={{ duration: 0.85, ease: [0.16, 1, 0.3, 1] }}
+          className="max-w-4xl mx-auto px-4 sm:px-6"
+        >
           <div className="bg-white rounded-sm border border-stone-200/80 shadow-2xl overflow-hidden">
             
             {/* Header / Intro banner for the callback form */}
@@ -2587,7 +2701,7 @@ export default function App() {
                 Поделитесь своими впечатлениями
               </h2>
               <p className="relative z-10 text-stone-300 text-xs mt-3 leading-relaxed max-w-2xl mx-auto">
-                Ваше честное мнение помогает нам улучшать медицинские программы, сервис, развивать парк-арборетум и делать проживание в санатории ФТС России «Пестово» совершенным.
+                Ваше честное мнение помогает нам улучшать медицинские программы, сервис, развивать парк-арборетум и делать проживание в санатории ФТС России «Ясная Поляна» совершенным.
               </p>
             </div>
 
@@ -2824,12 +2938,18 @@ export default function App() {
             </div>
 
           </div>
-        </div>
+        </motion.div>
       </section>
 
       {/* DETAILED FAQ SEGMENT */}
       <section className="py-20 bg-white border-t border-b border-stone-200/60">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6">
+        <motion.div
+          initial={{ opacity: 0, y: 45 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-100px" }}
+          transition={{ duration: 0.85, ease: [0.16, 1, 0.3, 1] }}
+          className="max-w-4xl mx-auto px-4 sm:px-6"
+        >
           
           <div className="text-center mb-12">
             {isAdminMode && (
@@ -2867,12 +2987,18 @@ export default function App() {
             ))}
           </div>
 
-        </div>
+        </motion.div>
       </section>
 
       {/* CONTACTS, DIRECTIONS & EMBEDDED DYNAMIC MAP INFO */}
       <section id="contacts" className="py-24 bg-[#FAF9F6]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <motion.div
+          initial={{ opacity: 0, y: 45 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-100px" }}
+          transition={{ duration: 0.85, ease: [0.16, 1, 0.3, 1] }}
+          className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"
+        >
           
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-stretch">
             
@@ -2972,7 +3098,7 @@ export default function App() {
               <div className="p-6 space-y-4 bg-gradient-to-b from-[#022C22] to-[#011B15] relative z-10">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                   <div>
-                    <span className="text-[10px] tracking-widest font-mono text-emerald-400 uppercase font-bold">Гео-модуль «Пестово»</span>
+                    <span className="text-[10px] tracking-widest font-mono text-emerald-400 uppercase font-bold">Гео-модуль «Ясная Поляна»</span>
                     <h3 className="font-serif text-lg font-semibold tracking-wide mt-0.5">Размещение на Черноморском побережье</h3>
                     <p className="text-stone-300 text-xs mt-1.5 leading-relaxed">
                       Крым, г. Ялта, пгт. Гаспра, Севастопольское шоссе, д. 52. Расположен посреди реликтовой парковой зоны Харакс.
@@ -3014,11 +3140,13 @@ export default function App() {
             </div>
 
           </div>
-        </div>
+        </motion.div>
       </section>
 
-        </>
-      )}
+            </>
+          )}
+        </motion.div>
+      </AnimatePresence>
 
       {/* FOOTER */}
       <footer className="bg-[#022C22] text-white border-t border-[#c5a880]/30 py-12 z-10">
@@ -3028,7 +3156,7 @@ export default function App() {
             {/* Branding column */}
             <div className="space-y-4">
               <div className="flex items-center space-x-2">
-                <span className="font-serif font-semibold text-lg text-white">Санаторий «Пестово»</span>
+                <span className="font-serif font-semibold text-lg text-white">Санаторий «Ясная Поляна»</span>
                 <span className="text-[#c5a880] text-lg font-serif italic">ФТС РФ</span>
               </div>
               <p className="text-xs text-stone-300 leading-relaxed">
@@ -3078,7 +3206,7 @@ export default function App() {
 
           <div className="border-t border-white/5 pt-8 text-center md:flex md:items-center md:justify-between text-xs text-stone-400">
             <p>
-              &copy; {new Date().getFullYear()} Санаторий «Пестово» ФТС России. Официальное представительство. Все права защищены.
+              &copy; {new Date().getFullYear()} Санаторий «Ясная Поляна» ФТС России. Официальное представительство. Все права защищены.
             </p>
             <div className="flex space-x-4 mt-4 md:mt-0 justify-center items-center">
               <button type="button" className="hover:text-white">Политика обработки данных</button>
@@ -3286,7 +3414,7 @@ export default function App() {
             <div className="relative z-10 w-full flex items-center justify-between text-white max-w-7xl mx-auto py-2">
               <div className="space-y-0.5 max-w-[80%]">
                 <span className="text-[10px] tracking-widest font-mono text-[#c5a880] uppercase font-bold">
-                  Санаторий «Пестово» • {filteredGallery[lightboxIndex].category}
+                  Санаторий «Ясная Поляна» • {filteredGallery[lightboxIndex].category}
                 </span>
                 <h3 className="font-serif text-sm sm:text-lg font-medium text-stone-100 truncate">
                   {filteredGallery[lightboxIndex].title}

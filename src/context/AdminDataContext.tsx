@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { Room, MedicalProgram, Testimonial, FAQItem, NewsArticle, ServiceItem } from '../types';
+import { Room, MedicalProgram, Testimonial, FAQItem, NewsArticle, ServiceItem, GalleryItem, GalleryCategory } from '../types';
 import { 
   ROOMS, 
   MEDICAL_PROGRAMS, 
@@ -82,15 +82,17 @@ export interface SiteData {
     coastalNatureDirect: string;
   };
   services: ServiceItem[];
+  gallery: GalleryItem[];
+  galleryCategories: GalleryCategory[];
 }
 
 const DEFAULT_SITE_DATA: SiteData = {
   resortInfo: { ...RESORT_INFO },
   hero: {
-    badge: 'Престижный оздоровительный комплекс ФТС России',
-    titleFirstPart: 'САНАТОРИЙ «ПЕСТОВО»',
+    badge: 'Оздоровительный комплекс ФТС России',
+    titleFirstPart: 'САНАТОРИЙ «ЯСНАЯ ПОЛЯНА»',
     titleSecondPart: 'ЮЖНЫЙ БЕРЕГ КРЫМА',
-    subtitle: 'Элитное оздоровление, легендарный парк-арборетум и дворец графини Паниной в Гаспре. Микроклимат царского курорта для вашего оздоровления.',
+    subtitle: 'Современный центр оздоровления, эффективного лечения и комплексной реабилитации для должностных лиц таможенных органов и членов их семей.',
     ctaText: 'Рассчитать путевку & Забронировать',
     defaultBackgroundMode: 'video_nature',
     stats: [
@@ -122,7 +124,24 @@ const DEFAULT_SITE_DATA: SiteData = {
   images: { ...IMAGES },
   extraImages: { ...EXTRA_IMAGES },
   videos: { ...VIDEOS },
-  services: [...DEFAULT_SERVICES]
+  services: [...DEFAULT_SERVICES],
+  gallery: [
+    { id: 'gal-1', src: IMAGES.hero, category: 'nature', title: 'Вид на главный корпус и парк-арборетум' },
+    { id: 'gal-2', src: IMAGES.suite, category: 'rooms', title: 'Интерьер Полулюкс Комфорт с панорамой моря' },
+    { id: 'gal-3', src: IMAGES.medical, category: 'medical', title: 'Кабинет аппаратной бальнеологии и физиотерапии' },
+    { id: 'gal-4', src: IMAGES.nature, category: 'nature', title: 'Исторический терренкур к Черному морю в Гаспре' },
+    { id: 'gal-5', src: EXTRA_IMAGES.standardRoom, category: 'rooms', title: 'Номер Стандарт Улучшенный' },
+    { id: 'gal-6', src: EXTRA_IMAGES.deluxeRoom, category: 'rooms', title: 'Элегантный Двухкомнатный Люкс' },
+    { id: 'gal-7', src: EXTRA_IMAGES.pool, category: 'infrastructure', title: 'Подогреваемый плавательный бассейн' },
+    { id: 'gal-8', src: EXTRA_IMAGES.dining, category: 'infrastructure', title: 'Ресторан «Ясная Поляна» - трехразовый шведский стол' },
+    { id: 'gal-9', src: EXTRA_IMAGES.fitness, category: 'infrastructure', title: 'Тренажерный зал в спортивно-оздоровительном корпусе' }
+  ],
+  galleryCategories: [
+    { id: 'rooms', name: 'Номера' },
+    { id: 'nature', name: 'Парк-Арборетум' },
+    { id: 'medical', name: 'Лечебный корпус' },
+    { id: 'infrastructure', name: 'Инфраструктура' }
+  ]
 };
 
 const LOCAL_STORAGE_KEY = 'pestovo_resort_editable_data';
@@ -208,10 +227,25 @@ export function AdminDataProvider({ children }: { children: React.ReactNode }) {
         } else {
           // Guard against missing properties inside hero
           const defaultHero = DEFAULT_SITE_DATA.hero;
-          if (!parsed.hero.badge) { parsed.hero.badge = defaultHero.badge; morphed = true; }
+          if (!parsed.hero.badge) { 
+            parsed.hero.badge = defaultHero.badge; 
+            morphed = true; 
+          } else if (parsed.hero.badge === 'Престижный оздоровительный комплекс ФТС России') {
+            parsed.hero.badge = 'Оздоровительный комплекс ФТС России';
+            morphed = true;
+          }
           if (!parsed.hero.titleFirstPart) { parsed.hero.titleFirstPart = defaultHero.titleFirstPart; morphed = true; }
           if (!parsed.hero.titleSecondPart) { parsed.hero.titleSecondPart = defaultHero.titleSecondPart; morphed = true; }
-          if (!parsed.hero.subtitle) { parsed.hero.subtitle = defaultHero.subtitle; morphed = true; }
+          if (!parsed.hero.subtitle) { 
+            parsed.hero.subtitle = defaultHero.subtitle; 
+            morphed = true; 
+          } else if (
+            parsed.hero.subtitle === 'Элитное оздоровление, легендарный парк-арборетум и дворец графини Паниной в Гаспре. Микроклимат царского курорта для вашего оздоровления.' ||
+            parsed.hero.subtitle === 'Предоставляет оздоровления, лечения и реабилитации должностных лиц таможенных органов и членов их семей.'
+          ) {
+            parsed.hero.subtitle = defaultHero.subtitle;
+            morphed = true;
+          }
           if (!parsed.hero.ctaText) { parsed.hero.ctaText = defaultHero.ctaText; morphed = true; }
           if (!parsed.hero.defaultBackgroundMode) { parsed.hero.defaultBackgroundMode = defaultHero.defaultBackgroundMode; morphed = true; }
           
@@ -255,6 +289,18 @@ export function AdminDataProvider({ children }: { children: React.ReactNode }) {
         // Backfill missing services
         if (!parsed.services || !Array.isArray(parsed.services)) {
           parsed.services = [...DEFAULT_SERVICES];
+          morphed = true;
+        }
+
+        // Backfill missing gallery
+        if (!parsed.gallery || !Array.isArray(parsed.gallery)) {
+          parsed.gallery = JSON.parse(JSON.stringify(DEFAULT_SITE_DATA.gallery));
+          morphed = true;
+        }
+
+        // Backfill missing galleryCategories
+        if (!parsed.galleryCategories || !Array.isArray(parsed.galleryCategories)) {
+          parsed.galleryCategories = JSON.parse(JSON.stringify(DEFAULT_SITE_DATA.galleryCategories));
           morphed = true;
         }
 

@@ -41,7 +41,7 @@ export default function TestimonialsPage({ onBackToHome }: { onBackToHome: () =>
             Истории наших гостей
           </h1>
           <p className="text-stone-300 text-sm sm:text-base mt-4 leading-relaxed max-w-3xl">
-            Искренние отзывы, слова благодарности, напутствия и очерки от отдыхающих, ветеранов и сотрудников Федеральной таможенной службы России о пребывании в санатории «Пестово» в Гаспре.
+            Искренние отзывы, слова благодарности, напутствия и очерки от отдыхающих, ветеранов и сотрудников Федеральной таможенной службы России о пребывании в санатории «Ясная Поляна» в Гаспре.
           </p>
         </div>
       </div>
@@ -223,7 +223,7 @@ export default function TestimonialsPage({ onBackToHome }: { onBackToHome: () =>
       {/* FOOTER BAR */}
       <footer className="bg-stone-100 border-t border-stone-200 py-6 text-center">
         <p className="text-[10px] text-stone-400 font-mono tracking-wide uppercase">
-          Санаторий ФТС России «Пестово» • Гаспра 2026
+          Санаторий ФТС России «Ясная Поляна» • Гаспра 2026
         </p>
       </footer>
 

@@ -25,10 +25,12 @@ import {
   Database,
   CheckCircle,
   FileText,
-  Newspaper
+  Newspaper,
+  Check,
+  Edit2
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Room, MedicalProgram, Testimonial, FAQItem, NewsArticle, ServiceItem } from '../types';
+import { Room, MedicalProgram, Testimonial, FAQItem, NewsArticle, ServiceItem, GalleryItem, GalleryCategory } from '../types';
 
 /**
  * Utility to downscale and compress images client-side before storing them in localStorage
@@ -105,6 +107,8 @@ export default function AdminPage({ onBackToHome }: { onBackToHome: () => void }
   const [faqs, setFaqs] = useState<FAQItem[]>([...siteData.faqs]);
   const [news, setNews] = useState<NewsArticle[]>([...(siteData.news || [])]);
   const [services, setServices] = useState<ServiceItem[]>([...(siteData.services || [])]);
+  const [galleryItems, setGalleryItems] = useState<GalleryItem[]>([...(siteData.gallery || [])]);
+  const [galleryCats, setGalleryCats] = useState<GalleryCategory[]>([...(siteData.galleryCategories || [])]);
 
   // Selected sub-items being edited in forms
   const [editingRoomId, setEditingRoomId] = useState<string | null>(null);
@@ -130,6 +134,20 @@ export default function AdminPage({ onBackToHome }: { onBackToHome: () => void }
   const [videoUploadError, setVideoUploadError] = useState<string | null>(null);
   const [slidesDragActive, setSlidesDragActive] = useState(false);
   const [slidesUploadError, setSlidesUploadError] = useState<string | null>(null);
+
+  // Gallery Item states
+  const [newItemTitle, setNewItemTitle] = useState('');
+  const [newItemCategory, setNewItemCategory] = useState<string>('');
+  const [newItemSrc, setNewItemSrc] = useState('');
+  const [newImageError, setNewImageError] = useState<string | null>(null);
+  const [newDragActive, setNewDragActive] = useState(false);
+
+  // Gallery Category form states
+  const [newCatId, setNewCatId] = useState('');
+  const [newCatName, setNewCatName] = useState('');
+  const [editingCatId, setEditingCatId] = useState<string | null>(null);
+  const [editingCatValue, setEditingCatValue] = useState('');
+  const [catError, setCatError] = useState<string | null>(null);
 
   // Custom confirmation modal state
   const [confirmModal, setConfirmModal] = useState<{
@@ -173,6 +191,8 @@ export default function AdminPage({ onBackToHome }: { onBackToHome: () => void }
     setFaqs([...siteData.faqs]);
     setNews([...(siteData.news || [])]);
     setServices([...(siteData.services || [])]);
+    setGalleryItems([...(siteData.gallery || [])]);
+    setGalleryCats([...(siteData.galleryCategories || [])]);
   }, [siteData]);
 
   if (!isAdminMode) {
@@ -184,7 +204,7 @@ export default function AdminPage({ onBackToHome }: { onBackToHome: () => void }
           </div>
           <h2 className="font-serif font-bold text-2xl text-[#FAF9F6]">Доступ ограничен</h2>
           <p className="text-sm text-stone-300 leading-relaxed">
-            Для управления содержимым санатория «Пестово» необходимо войти с правами администратора.
+            Для управления содержимым санатория «Ясная Поляна» необходимо войти с правами администратора.
           </p>
           <button 
             onClick={onBackToHome}
@@ -369,6 +389,97 @@ export default function AdminPage({ onBackToHome }: { onBackToHome: () => void }
     triggerSuccess();
   };
 
+  // GALLERY HANDLERS
+  const handleUpdateGalleryItem = (itemId: string, updatedItem: GalleryItem) => {
+    const nextGallery = galleryItems.map(g => g.id === itemId ? updatedItem : g);
+    setGalleryItems(nextGallery);
+    updateSection('gallery', nextGallery);
+    triggerSuccess();
+  };
+
+  const handleDeleteGalleryItem = (itemId: string) => {
+    setConfirmModal({
+      isOpen: true,
+      title: 'Удалить фотографию из галереи?',
+      message: 'Вы уверены, что хотите навсегда удалить эту фотографию из галереи внизу главной страницы?',
+      confirmText: 'Да, удалить',
+      confirmClass: 'bg-red-600 hover:bg-red-750 text-white',
+      onConfirm: () => {
+        const nextGallery = galleryItems.filter(g => g.id !== itemId);
+        setGalleryItems(nextGallery);
+        updateSection('gallery', nextGallery);
+        triggerSuccess();
+      }
+    });
+  };
+
+  const handleAddGalleryItem = (newItem: Omit<GalleryItem, 'id'>) => {
+    const created: GalleryItem = {
+      ...newItem,
+      id: `gal-${Date.now()}`
+    };
+    const nextGallery = [...galleryItems, created];
+    setGalleryItems(nextGallery);
+    updateSection('gallery', nextGallery);
+    triggerSuccess();
+  };
+
+  // GALLERY CATEGORIES HANDLERS
+  const handleAddCategory = () => {
+    if (!newCatId.trim() || !newCatName.trim()) {
+      setCatError('Заполните латинский ID и русское название категории');
+      return;
+    }
+    const cleanId = newCatId.trim().toLowerCase().replace(/[^a-z0-9_-]/g, '');
+    if (!cleanId) {
+      setCatError('ID категории должен содержать латинские буквы или цифры');
+      return;
+    }
+    if (galleryCats.some(c => c.id === cleanId)) {
+      setCatError('Категория с таким ID уже существует');
+      return;
+    }
+    const created = { id: cleanId, name: newCatName.trim() };
+    const nextCats = [...galleryCats, created];
+    setGalleryCats(nextCats);
+    updateSection('galleryCategories', nextCats);
+    setNewCatId('');
+    setNewCatName('');
+    setCatError(null);
+    triggerSuccess();
+  };
+
+  const handleUpdateCategory = (catId: string, newName: string) => {
+    if (!newName.trim()) return;
+    const nextCats = galleryCats.map(c => c.id === catId ? { ...c, name: newName.trim() } : c);
+    setGalleryCats(nextCats);
+    updateSection('galleryCategories', nextCats);
+    setEditingCatId(null);
+    triggerSuccess();
+  };
+
+  const handleDeleteCategory = (catId: string) => {
+    setConfirmModal({
+      isOpen: true,
+      title: 'Удалить категорию?',
+      message: 'Вы уверены, что хотите удалить эту категорию? Все фотографии, привязанные к ней, останутся в галерее, но их категория сбросится.',
+      confirmText: 'Да, удалить',
+      confirmClass: 'bg-red-600 hover:bg-red-750 text-white',
+      onConfirm: () => {
+        const nextCats = galleryCats.filter(c => c.id !== catId);
+        setGalleryCats(nextCats);
+        updateSection('galleryCategories', nextCats);
+        
+        // Update gallery item category if it was deleted
+        const nextGallery = galleryItems.map(g => g.category === catId ? { ...g, category: nextCats[0]?.id || '' } : g);
+        setGalleryItems(nextGallery);
+        updateSection('gallery', nextGallery);
+
+        triggerSuccess();
+      }
+    });
+  };
+
   // NEWS HANDLERS
   const handleUpdateNews = (newsId: string, updatedNews: NewsArticle) => {
     const nextNews = news.map(n => n.id === newsId ? updatedNews : n);
@@ -535,7 +646,7 @@ export default function AdminPage({ onBackToHome }: { onBackToHome: () => void }
     { id: 'testimonials', name: 'Отзывы Гостей', icon: MessageSquare, badge: testimonials.length },
     { id: 'faq', name: 'Вопросы & Ответы', icon: HelpCircle, badge: faqs.length },
     { id: 'news', name: 'Новости', icon: Newspaper, badge: news.length },
-    { id: 'media', name: 'Медиа & Ссылки', icon: Folder },
+    { id: 'media', name: 'Медиа & Ссылки', icon: Folder, badge: galleryItems.length },
   ];
 
   return (
@@ -1932,6 +2043,383 @@ export default function AdminPage({ onBackToHome }: { onBackToHome: () => void }
                   </button>
                 </div>
               </div>
+
+              {/* GALLERY MANAGER CARD */}
+              <div className="space-y-6 bg-white p-6 md:p-8 rounded-2xl border border-stone-200 shadow-sm mt-6">
+                <div className="border-b border-stone-100 pb-3 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+                  <div>
+                    <h4 className="font-bold font-serif text-[#022C22] text-sm uppercase tracking-wider flex items-center gap-2">
+                      <ImageIcon className="w-4 h-4 text-[#c5a880]" />
+                      Управление нижней фотогалереей
+                    </h4>
+                    <p className="text-[11px] text-stone-400 mt-0.5">Добавляйте, загружайте и редактируйте фотографии на главной странице внизу.</p>
+                  </div>
+                  <span className="text-xs bg-[#FAF9F6] border border-stone-200 text-[#022C22] font-mono px-3 py-1 rounded-full font-bold">
+                    Всего кадров: {galleryItems.length}
+                  </span>
+                </div>
+
+                {/* ADD NEW PHOTO BLOCK */}
+                <div className="bg-[#FAF9F6] p-5 rounded-2xl border border-stone-200/60 shadow-inner space-y-4">
+                  <h5 className="font-bold text-xs text-[#022C22] uppercase tracking-wider flex items-center gap-1.5">
+                    <Plus className="w-3.5 h-3.5" /> Добавить новую фотографию в галерею
+                  </h5>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-3">
+                      <div>
+                        <label className="block text-[11px] font-bold text-stone-500 mb-1">Название кадра (описание):</label>
+                        <input 
+                          type="text" 
+                          placeholder="Например: Роскошный вид на море с террасы"
+                          value={newItemTitle}
+                          onChange={e => setNewItemTitle(e.target.value)}
+                          className="w-full border border-stone-300 rounded-lg px-3.5 py-2 text-xs focus:ring-1 focus:ring-[#c5a880] focus:outline-none"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-[11px] font-bold text-stone-500 mb-1">Категория (вкладка на главной):</label>
+                        <select 
+                          value={newItemCategory || (galleryCats[0]?.id || '')}
+                          onChange={e => setNewItemCategory(e.target.value)}
+                          className="w-full border border-stone-300 rounded-lg px-3.5 py-2 text-xs bg-white focus:ring-1 focus:ring-[#c5a880] focus:outline-none cursor-pointer"
+                        >
+                          {galleryCats.map(cat => (
+                            <option key={cat.id} value={cat.id}>{cat.name} ({cat.id})</option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
+
+                    {/* Drag-and-drop & Upload file field */}
+                    <div className="space-y-2">
+                      <label className="block text-[11px] font-bold text-stone-500">Загрузить файл изображения:</label>
+                      
+                      <div 
+                        onDragEnter={(e) => { e.preventDefault(); setNewDragActive(true); }}
+                        onDragLeave={(e) => { e.preventDefault(); setNewDragActive(false); }}
+                        onDragOver={(e) => e.preventDefault()}
+                        onDrop={(e) => {
+                          e.preventDefault();
+                          setNewDragActive(false);
+                          if (e.dataTransfer.files?.[0]) {
+                            const file = e.dataTransfer.files[0];
+                            if (!file.type.startsWith('image/')) {
+                              setNewImageError('Только файлы изображений!');
+                              return;
+                            }
+                            compressImage(file, 1000, 0.75, (b64) => {
+                              setNewItemSrc(b64);
+                              setNewImageError(null);
+                            });
+                          }
+                        }}
+                        onClick={() => document.getElementById('gallery-new-file-input')?.click()}
+                        className={`border-2 border-dashed rounded-xl p-4 text-center cursor-pointer transition-all flex flex-col justify-center items-center h-28 relative ${
+                          newDragActive 
+                            ? 'border-[#c5a880] bg-white' 
+                            : newItemSrc 
+                              ? 'border-emerald-200 bg-emerald-50/20' 
+                              : 'border-stone-200 hover:border-[#c5a880]/60 bg-white hover:bg-[#FAF9F6]'
+                        }`}
+                      >
+                        <input 
+                          type="file" 
+                          id="gallery-new-file-input"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={(e) => {
+                            if (e.target.files?.[0]) {
+                              const file = e.target.files[0];
+                              compressImage(file, 1000, 0.75, (b64) => {
+                                newItemSrc ? null : null; // side effect
+                                setNewItemSrc(b64);
+                                setNewImageError(null);
+                              });
+                            }
+                          }}
+                        />
+                        {newItemSrc ? (
+                          <div className="flex items-center gap-3 w-full h-full justify-center">
+                            <img src={newItemSrc} alt="preview" className="w-16 h-16 object-cover rounded-lg border border-stone-200" referrerPolicy="no-referrer" />
+                            <div className="text-left">
+                              <span className="text-[10px] text-emerald-600 font-bold block">✓ Фотография готова к загрузке</span>
+                              <span className="text-[9px] text-stone-400 block max-w-[150px] truncate font-mono">Размер оптимизирован</span>
+                            </div>
+                          </div>
+                        ) : (
+                          <>
+                            <ImageIcon className="w-6 h-6 text-stone-400 mb-1" />
+                            <span className="text-[11px] font-bold text-stone-600">Нажмите для выбора или перетащите фото</span>
+                            <span className="text-[9px] text-stone-400 uppercase tracking-wider block mt-0.5">JPG, PNG, WEBP</span>
+                          </>
+                        )}
+                      </div>
+                      
+                      {newImageError && (
+                        <p className="text-[10px] text-red-600 font-bold mt-1">{newImageError}</p>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="flex justify-end pt-2">
+                    <button 
+                      onClick={() => {
+                        if (!newItemSrc) {
+                          setNewImageError('Пожалуйста, выберите или перетащите изображение');
+                          return;
+                        }
+                        if (!newItemTitle.trim()) {
+                          setNewImageError('Пожалуйста, укажите название или описание фотографии');
+                          return;
+                        }
+                        handleAddGalleryItem({
+                          title: newItemTitle,
+                          category: newItemCategory || (galleryCats[0]?.id || 'nature'),
+                          src: newItemSrc
+                        });
+                        setNewItemTitle('');
+                        setNewItemSrc('');
+                        setNewImageError(null);
+                      }}
+                      disabled={!newItemSrc || !newItemTitle.trim()}
+                      className="bg-[#022C22] hover:bg-[#c5a880] text-[#FAF9F6] hover:text-[#022C22] disabled:opacity-50 disabled:bg-stone-200 disabled:text-stone-400 font-bold text-xs py-2 px-5 rounded-lg transition-all flex items-center gap-1.5 cursor-pointer"
+                    >
+                      <Plus className="w-4 h-4" /> Добавить в галерею
+                    </button>
+                  </div>
+                </div>
+
+                {/* CATEGORIES / SECTIONS MANAGER */}
+                <div className="bg-[#FAF9F6] p-5 rounded-2xl border border-stone-200/60 shadow-inner space-y-4 my-6">
+                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 border-b border-stone-200/50 pb-2">
+                    <h5 className="font-bold text-xs text-[#022C22] uppercase tracking-wider flex items-center gap-1.5">
+                      <Folder className="w-3.5 h-3.5 text-[#c5a880]" /> Редактирование разделов (вкладок) галереи
+                    </h5>
+                    <span className="text-[10px] bg-stone-200 border border-stone-300 text-stone-600 font-mono px-2 py-0.5 rounded-full font-bold">
+                      Вкладок: {galleryCats.length}
+                    </span>
+                  </div>
+
+                  {/* Add category form */}
+                  <div className="bg-white p-4 rounded-xl border border-stone-200 shadow-sm space-y-3">
+                    <span className="text-[10px] font-bold text-stone-400 uppercase tracking-widest block">Создать новый раздел</span>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                      <div>
+                        <label className="block text-[10px] font-bold text-stone-500 mb-0.5">ID (латиница/код):</label>
+                        <input 
+                          type="text" 
+                          placeholder="Например: beach"
+                          value={newCatId}
+                          onChange={e => setNewCatId(e.target.value.toLowerCase().replace(/[^a-z0-9_-]/g, ''))}
+                          className="w-full border border-stone-300 rounded-lg px-3 py-1.5 text-xs focus:ring-1 focus:ring-[#c5a880] focus:outline-none font-mono"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-[10px] font-bold text-stone-500 mb-0.5">Название (показано на сайте):</label>
+                        <input 
+                          type="text" 
+                          placeholder="Например: Собственный пляж"
+                          value={newCatName}
+                          onChange={e => setNewCatName(e.target.value)}
+                          className="w-full border border-stone-300 rounded-lg px-3 py-1.5 text-xs focus:ring-1 focus:ring-[#c5a880] focus:outline-none"
+                        />
+                      </div>
+                      <div className="flex items-end">
+                        <button 
+                          onClick={handleAddCategory}
+                          className="w-full bg-[#022C22] hover:bg-[#c5a880] text-[#FAF9F6] hover:text-[#022C22] font-semibold text-xs py-2 px-4 rounded-lg transition-all flex items-center justify-center gap-1.5 cursor-pointer h-[34px]"
+                        >
+                          <Plus className="w-3.5 h-3.5" /> Создать раздел
+                        </button>
+                      </div>
+                    </div>
+                    {catError && (
+                      <p className="text-[10px] text-red-600 font-bold mt-1">{catError}</p>
+                    )}
+                  </div>
+
+                  {/* Categories list wrapper */}
+                  <div className="space-y-2">
+                    <span className="text-[10px] font-bold text-stone-400 uppercase tracking-widest block">Существующие разделы</span>
+                    
+                    {galleryCats.length === 0 ? (
+                      <p className="text-xs text-stone-400 italic">Нет разделов. Пожалуйста, создайте хотя бы один.</p>
+                    ) : (
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        {galleryCats.map((cat) => (
+                          <div 
+                            key={cat.id} 
+                            className="bg-white border border-stone-200/80 rounded-xl p-3 flex items-center justify-between shadow-sm"
+                          >
+                            {editingCatId === cat.id ? (
+                              <div className="flex items-center gap-2 w-full">
+                                <input 
+                                  type="text" 
+                                  value={editingCatValue}
+                                  onChange={e => setEditingCatValue(e.target.value)}
+                                  className="flex-1 border border-stone-300 rounded px-2 py-1 text-xs focus:ring-1 focus:ring-[#c5a880] focus:outline-none"
+                                />
+                                <button 
+                                  onClick={() => handleUpdateCategory(cat.id, editingCatValue)}
+                                  className="p-1 text-emerald-600 hover:text-emerald-750 bg-emerald-50 rounded cursor-pointer flex items-center justify-center"
+                                  title="Сохранить"
+                                >
+                                  <Check className="w-3.5 h-3.5" />
+                                </button>
+                                <button 
+                                  onClick={() => setEditingCatId(null)}
+                                  className="p-1 text-stone-400 hover:text-stone-600 bg-stone-50 rounded cursor-pointer flex items-center justify-center"
+                                  title="Отмена"
+                                >
+                                  <X className="w-3.5 h-3.5" />
+                                </button>
+                              </div>
+                            ) : (
+                              <>
+                                <div className="flex items-center space-x-2">
+                                  <span className="text-[10px] font-mono font-bold bg-stone-100 text-stone-500 px-2 py-0.5 rounded border border-stone-200">
+                                    {cat.id}
+                                  </span>
+                                  <span className="text-xs font-semibold text-stone-700 font-serif">
+                                    {cat.name}
+                                  </span>
+                                </div>
+                                <div className="flex items-center space-x-1.5">
+                                  <button 
+                                    onClick={() => {
+                                      setEditingCatId(cat.id);
+                                      setEditingCatValue(cat.name);
+                                    }}
+                                    className="p-1 px-2 border border-stone-200 text-stone-500 hover:bg-stone-50 hover:text-[#022C22] rounded-lg text-[10px] font-bold flex items-center gap-0.5 cursor-pointer"
+                                    title="Переименовать"
+                                  >
+                                    <Edit2 className="w-2.5 h-2.5" /> Изменить
+                                  </button>
+                                  <button 
+                                    onClick={() => handleDeleteCategory(cat.id)}
+                                    className="p-1 text-red-500 hover:bg-red-50 hover:text-red-700 rounded-lg cursor-pointer flex items-center justify-center"
+                                    title="Удалить раздел"
+                                  >
+                                    <Trash2 className="w-3.5 h-3.5" />
+                                  </button>
+                                </div>
+                              </>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* CURRENT GALLERY LIST IN GRID & EDITABLE */}
+                <div className="space-y-4">
+                  <h5 className="font-bold text-xs text-[#022C22] uppercase tracking-wider">Текущие фотографии в галерее ({galleryItems.length})</h5>
+
+                  {galleryItems.length === 0 ? (
+                    <div className="p-8 text-center border border-dashed border-stone-200 rounded-xl bg-[#FAF9F6]">
+                      <ImageIcon className="w-8 h-8 text-stone-300 mx-auto mb-2" />
+                      <p className="text-xs text-stone-400 font-medium">Нет загруженных фотографий в галерее</p>
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                      {galleryItems.map((item, index) => (
+                        <div key={item.id || index} className="bg-white border border-stone-200/80 rounded-xl overflow-hidden shadow-sm hover:border-slate-350 transition-all flex flex-col group relative">
+                          
+                          {/* Image preview & delete tag */}
+                          <div className="h-32 bg-stone-100 relative overflow-hidden">
+                            <img 
+                              src={item.src} 
+                              alt={item.title} 
+                              className="w-full h-full object-cover group-hover:scale-105 transition-all duration-300" 
+                              referrerPolicy="no-referrer"
+                            />
+                            <div className="absolute top-2 right-2 flex gap-1 items-center z-10">
+                              <button 
+                                onClick={() => handleDeleteGalleryItem(item.id)}
+                                className="p-1.5 bg-red-50 hover:bg-red-150 border border-red-250 text-red-600 rounded-lg shadow-sm hover:scale-110 active:scale-95 transition-all cursor-pointer"
+                                title="Удалить снимок"
+                              >
+                                <Trash2 className="w-3.5 h-3.5" />
+                              </button>
+                            </div>
+                            <div className="absolute bottom-2 left-2 z-10">
+                              <span className="text-[9px] font-bold tracking-widest text-[#FAF9F6] bg-stone-900/75 border border-stone-600/30 px-2 py-0.5 rounded uppercase">
+                                {galleryCats.find(c => c.id === item.category)?.name || item.category}
+                              </span>
+                            </div>
+                          </div>
+
+                          {/* Editable title & category */}
+                          <div className="p-3.5 space-y-2 flex-1 flex flex-col justify-between">
+                            <div className="space-y-2">
+                              <div>
+                                <label className="block text-[9px] font-bold text-stone-400 uppercase tracking-wider">Название / Описание:</label>
+                                <input 
+                                  type="text" 
+                                  value={item.title}
+                                  onChange={(e) => {
+                                    const nextItems = [...galleryItems];
+                                    nextItems[index] = { ...item, title: e.target.value };
+                                    setGalleryItems(nextItems);
+                                  }}
+                                  className="w-full border-b border-stone-200 focus:border-[#c5a880] text-[11px] font-sans pb-0.5 focus:outline-none focus:ring-0 mt-0.5 text-stone-700"
+                                />
+                              </div>
+
+                              <div>
+                                <label className="block text-[9px] font-bold text-stone-400 uppercase tracking-wider">Категория:</label>
+                                <select 
+                                  value={item.category}
+                                  onChange={(e) => {
+                                    const nextItems = [...galleryItems];
+                                    nextItems[index] = { ...item, category: e.target.value };
+                                    setGalleryItems(nextItems);
+                                    handleUpdateGalleryItem(item.id, { ...item, category: e.target.value });
+                                  }}
+                                  className="w-full text-[10px] font-semibold text-stone-600 bg-transparent border-0 focus:ring-0 cursor-pointer p-0 mt-0.5"
+                                >
+                                  {galleryCats.map(cat => (
+                                    <option key={cat.id} value={cat.id}>{cat.name} ({cat.id})</option>
+                                  ))}
+                                </select>
+                              </div>
+                            </div>
+
+                            {/* Mini action to save edit changes inside item */}
+                            <div className="pt-2 flex justify-between items-center border-t border-stone-100 mt-2">
+                              <span className="text-[9px] text-stone-400 font-mono">#{index + 1}</span>
+                              <button 
+                                onClick={() => handleUpdateGalleryItem(item.id, item)}
+                                className="text-[9px] font-bold uppercase tracking-wider text-[#022C22] hover:text-[#c5a880] flex items-center gap-0.5 cursor-pointer bg-stone-100 hover:bg-[#022C22]/5 px-2 py-0.5 rounded transition-all"
+                              >
+                                <Save className="w-2.5 h-2.5" /> Сохранить
+                              </button>
+                            </div>
+                          </div>
+
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* SAVE BUTTON FOR BATCH GALLERY CHANGES */}
+                <div className="pt-5 flex justify-end border-t border-stone-100 gap-3">
+                  <button 
+                    onClick={() => {
+                      updateSection('gallery', galleryItems);
+                      triggerSuccess();
+                    }}
+                    className="bg-gradient-to-r from-emerald-800 to-[#022C22] text-[#FAF9F6] hover:bg-[#c5a880] hover:text-[#022C22] font-semibold text-xs py-3 px-8 rounded-xl transition-all uppercase tracking-wider flex items-center gap-2 border border-transparent shadow cursor-pointer active:scale-95"
+                  >
+                    <Save className="w-4 h-4" />
+                    Сохранить всю фотогалерею ({galleryItems.length} картинок)
+                  </button>
+                </div>
+              </div>
             </div>
           )}
 
@@ -2233,7 +2721,7 @@ function RoomForm({ initialData, onCancel, onSave }: RoomFormProps) {
 
             {/* Presets */}
             <div className="space-y-1">
-              <span className="block text-[10px] font-bold text-stone-400 uppercase tracking-wider">Пресеты Пестово (кликните, чтобы добавить):</span>
+              <span className="block text-[10px] font-bold text-stone-400 uppercase tracking-wider">Пресеты Ясной Поляны (кликните, чтобы добавить):</span>
               <div className="grid grid-cols-2 gap-2">
                 <button
                   type="button"

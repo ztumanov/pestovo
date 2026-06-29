@@ -60,3 +60,16 @@ export interface ServiceItem {
   iconName: string;
 }
 
+export interface GalleryItem {
+  id: string;
+  src: string;
+  category: string;
+  title: string;
+}
+
+export interface GalleryCategory {
+  id: string;
+  name: string;
+}
+
+

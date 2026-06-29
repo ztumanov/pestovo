@@ -299,6 +299,80 @@ export default function MedicalPage({ onBackToHome }: { onBackToHome: () => void
           </div>
 
         </div>
+
+        {/* NEW SECTION: LICENSES & CLINICAL BASE */}
+        <div className="mt-16 bg-white rounded-2xl border border-stone-200 shadow-xl overflow-hidden">
+          <div className="bg-[#022C22] text-white p-6 sm:p-8 border-b border-[#c5a880]/20 flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+              <div className="flex items-center space-x-2 text-[#c5a880] text-xs font-mono uppercase tracking-widest font-bold mb-1">
+                <Award className="w-4 h-4 text-[#c5a880]" />
+                <span>Государственные стандарты лечения</span>
+              </div>
+              <h3 className="font-serif text-xl sm:text-2xl font-bold tracking-tight">Лицензированные виды деятельности и медицинская специализация</h3>
+            </div>
+            <div className="bg-white/10 px-4 py-2 rounded-lg backdrop-blur-md border border-white/15 text-stone-300 font-mono text-[10px] sm:text-xs">
+              Лицензия № <span className="text-white font-bold">Л041-00110-91/00554225</span>
+            </div>
+          </div>
+
+          <div className="p-6 sm:p-8 grid grid-cols-1 md:grid-cols-2 gap-8">
+            {/* Left Column: License Card */}
+            <div className="bg-stone-50 border border-stone-200/60 rounded-xl p-6 relative overflow-hidden flex flex-col justify-between">
+              <div className="absolute top-0 right-0 w-24 h-24 bg-[#c5a880]/5 rounded-bl-full pointer-events-none" />
+              <div>
+                <h4 className="font-serif text-sm font-bold text-[#022C22] mb-4 uppercase tracking-wider text-[#c5a880] flex items-center">
+                  <FileText className="w-4 h-4 mr-2 text-[#c5a880]" />
+                  Сведения о лицензии
+                </h4>
+                <div className="space-y-3.5 text-xs">
+                  <div className="flex justify-between border-b border-stone-200/50 pb-2.5">
+                    <span className="text-stone-500">Регистрационный номер:</span>
+                    <span className="font-mono font-bold text-[#022C22]">Л041-00110-91/00554225</span>
+                  </div>
+                  <div className="flex justify-between border-b border-stone-200/50 pb-2.5">
+                    <span className="text-stone-500">Дата выдачи:</span>
+                    <span className="font-bold text-[#022C22]">22 июня 2022 г.</span>
+                  </div>
+                  <div className="flex justify-between pb-1">
+                    <span className="text-stone-500">Дата начала действия:</span>
+                    <span className="font-bold text-[#022C22]">22 июня 2022 г.</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Right Column: Specializations (Вид деятельности) */}
+            <div className="space-y-4">
+              <h4 className="font-serif text-sm font-bold text-[#022C22] uppercase tracking-wider flex items-center">
+                <Stethoscope className="w-4 h-4 mr-2 text-[#c5a880]" />
+                Медицинская специализация (по лицензии)
+              </h4>
+              <div className="flex flex-wrap gap-2 pt-1">
+                {[
+                  'диетология',
+                  'лечебная физкультура',
+                  'медицинский массаж',
+                  'организация здравоохранения',
+                  'сестринское дело',
+                  'терапия',
+                  'физиотерапия',
+                  'функциональная диагностика'
+                ].map((activity, idx) => (
+                  <span 
+                    key={idx} 
+                    className="bg-[#022C22]/5 border border-[#022C22]/10 text-[#022C22] text-xs font-semibold px-3 py-1.5 rounded-lg capitalize hover:bg-[#022C22]/10 transition-colors"
+                  >
+                    {activity}
+                  </span>
+                ))}
+              </div>
+              <p className="text-xs text-stone-500 leading-normal pt-1 text-justify">
+                Санаторий «Ясная Поляна» гарантирует полное соответствие оказываемых услуг терапевтическим регламентам Министерства здравоохранения РФ под строгим внутренним контролем качества.
+              </p>
+            </div>
+          </div>
+        </div>
+
       </div>
 
     </div>
