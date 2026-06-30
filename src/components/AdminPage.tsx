@@ -647,6 +647,7 @@ export default function AdminPage({ onBackToHome }: { onBackToHome: () => void }
     { id: 'faq', name: 'Вопросы & Ответы', icon: HelpCircle, badge: faqs.length },
     { id: 'news', name: 'Новости', icon: Newspaper, badge: news.length },
     { id: 'media', name: 'Медиа & Ссылки', icon: Folder, badge: galleryItems.length },
+    { id: 'publish', name: 'Сохранить на хостинг', icon: Database },
   ];
 
   return (
@@ -2419,6 +2420,198 @@ export default function AdminPage({ onBackToHome }: { onBackToHome: () => void }
                     Сохранить всю фотогалерею ({galleryItems.length} картинок)
                   </button>
                 </div>
+              </div>
+            </div>
+          )}
+
+          {activeSettingsTab === 'publish' && (
+            <div className="space-y-6">
+              <div className="border-b border-stone-200 pb-3">
+                <h3 className="font-serif font-black text-xl text-[#022C22]">Публикация изменений на хостинг</h3>
+                <p className="text-xs text-stone-400 mt-1 font-medium">Как сохранить ваши правки навсегда для всех посетителей вашего сайта.</p>
+              </div>
+
+              {/* Informational banner about local storage */}
+              <div className="bg-amber-50 border border-amber-200 p-5 rounded-2xl flex flex-col md:flex-row gap-4 items-start md:items-center">
+                <div className="p-3 bg-amber-100 rounded-xl text-amber-800">
+                  <Database className="w-6 h-6" />
+                </div>
+                <div>
+                  <h4 className="font-bold text-amber-900 text-sm">Почему правки видны только на одном устройстве?</h4>
+                  <p className="text-xs text-amber-800 leading-relaxed mt-1">
+                    Этот сайт — это современное и очень быстрое клиентское приложение. Когда вы редактируете тексты или добавляете картинки, они сохраняются 
+                    исключительно в <strong>памяти вашего текущего браузера (localStorage)</strong>. Другие пользователи на своих смартфонах, компьютерах 
+                    или в режиме инкогнито эти изменения не увидят, так как у них в браузере своя пустая память.
+                  </p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                
+                {/* Export & Import Actions */}
+                <div className="lg:col-span-1 bg-white p-6 rounded-2xl border border-stone-200 shadow-sm flex flex-col justify-between space-y-6">
+                  <div>
+                    <h4 className="font-bold font-serif text-[#022C22] text-sm uppercase tracking-wider border-b border-stone-100 pb-2 mb-4">
+                      Инструменты управления
+                    </h4>
+                    <p className="text-xs text-stone-500 leading-relaxed mb-6">
+                      Используйте эти кнопки для скачивания файла настроек или переноса данных на другие устройства.
+                    </p>
+
+                    <div className="space-y-4">
+                      {/* Download JSON Button */}
+                      <button
+                        onClick={() => {
+                          const jsonString = `data:text/json;charset=utf-8,${encodeURIComponent(
+                            JSON.stringify(siteData, null, 2)
+                          )}`;
+                          const downloadAnchor = document.createElement('a');
+                          downloadAnchor.setAttribute('href', jsonString);
+                          downloadAnchor.setAttribute('download', 'site-data.json');
+                          document.body.appendChild(downloadAnchor);
+                          downloadAnchor.click();
+                          downloadAnchor.remove();
+                          triggerSuccess();
+                        }}
+                        className="w-full bg-[#022C22] hover:bg-[#c5a880] text-[#FAF9F6] hover:text-[#022C22] font-semibold text-xs py-3.5 px-4 rounded-xl transition-all uppercase tracking-wider flex items-center justify-center gap-2 border border-transparent shadow cursor-pointer"
+                      >
+                        <Save className="w-4 h-4" />
+                        Скачать site-data.json
+                      </button>
+
+                      {/* Import JSON file input and label */}
+                      <div className="pt-2">
+                        <label className="block text-[10px] font-bold text-stone-400 uppercase tracking-wider mb-2 text-center">
+                          Резервная копия / Перенос данных
+                        </label>
+                        <label className="w-full bg-stone-100 hover:bg-stone-200 text-stone-700 font-semibold text-xs py-3 px-4 rounded-xl transition-all uppercase tracking-wider flex items-center justify-center gap-2 border border-stone-300 border-dashed cursor-pointer text-center">
+                          <ImageIcon className="w-4 h-4 text-stone-500" />
+                          <span>Загрузить из JSON</span>
+                          <input
+                            type="file"
+                            accept=".json"
+                            onChange={(e) => {
+                              const fileReader = new FileReader();
+                              const file = e.target.files?.[0];
+                              if (!file) return;
+                              fileReader.onload = (event) => {
+                                try {
+                                  const parsed = JSON.parse(event.target?.result as string);
+                                  if (parsed && typeof parsed === 'object') {
+                                    updateSiteData(parsed);
+                                    alert('Конфигурация успешно импортирована! Страница будет обновлена.');
+                                    window.location.reload();
+                                  } else {
+                                    alert('Неверный формат файла!');
+                                  }
+                                } catch (err) {
+                                  alert('Ошибка при чтении файла конфигурации!');
+                                }
+                              };
+                              fileReader.readAsText(file);
+                            }}
+                            className="hidden"
+                          />
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="bg-stone-50 p-4 rounded-xl border border-stone-100">
+                    <span className="text-[10px] font-mono text-stone-400 block text-center uppercase tracking-wider">
+                      Конфигурация содержит:
+                    </span>
+                    <div className="grid grid-cols-2 gap-2 mt-2 text-center">
+                      <div className="bg-white p-2 rounded border border-stone-100 text-xs">
+                        <strong className="text-emerald-700 block text-sm">{siteData.rooms?.length || 0}</strong>
+                        <span className="text-[10px] text-stone-400">Номера</span>
+                      </div>
+                      <div className="bg-white p-2 rounded border border-stone-100 text-xs">
+                        <strong className="text-emerald-700 block text-sm">{siteData.services?.length || 0}</strong>
+                        <span className="text-[10px] text-stone-400">Услуги</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Step-by-Step Hosting Publication Guide */}
+                <div className="lg:col-span-2 bg-white p-6 md:p-8 rounded-2xl border border-stone-200 shadow-sm space-y-5">
+                  <h4 className="font-bold font-serif text-[#022C22] text-sm uppercase tracking-wider border-b border-stone-100 pb-2 flex items-center gap-2">
+                    <CheckCircle className="w-5 h-5 text-[#c5a880]" />
+                    Инструкция по публикации на хостинг за 1 минуту
+                  </h4>
+                  
+                  <p className="text-xs text-stone-600 leading-relaxed">
+                    Мы настроили ваш сайт так, что он умеет <strong>автоматически считывать настройки из файла на вашем хостинге</strong>. 
+                    Вам больше не нужно разбираться в коде или заново компилировать (собирать) проект. Всё очень просто:
+                  </p>
+
+                  <div className="space-y-4 pt-2">
+                    <div className="flex gap-4 items-start">
+                      <div className="flex-shrink-0 w-6 h-6 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold flex items-center justify-center font-mono">
+                        1
+                      </div>
+                      <div className="space-y-1">
+                        <h5 className="font-bold text-slate-800 text-xs">Скачайте актуальный файл настроек</h5>
+                        <p className="text-xs text-stone-500 leading-relaxed">
+                          Сделайте все нужные правки на этом компьютере (добавьте фотографии, измените контакты или новости). После этого 
+                          нажмите слева кнопку <strong className="text-[#022C22]">«Скачать site-data.json»</strong>.
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex gap-4 items-start border-t border-stone-100 pt-3">
+                      <div className="flex-shrink-0 w-6 h-6 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold flex items-center justify-center font-mono">
+                        2
+                      </div>
+                      <div className="space-y-1">
+                        <h5 className="font-bold text-slate-800 text-xs">Зайдите в вашу панель управления хостингом</h5>
+                        <p className="text-xs text-stone-500 leading-relaxed">
+                          Откройте файловый менеджер в вашей панели хостинга (<strong>ISPmanager</strong>, cPanel, Beget и т.д.) или 
+                          подключитесь к вашему серверу через FTP-клиент (например, FileZilla).
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex gap-4 items-start border-t border-stone-100 pt-3">
+                      <div className="flex-shrink-0 w-6 h-6 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold flex items-center justify-center font-mono">
+                        3
+                      </div>
+                      <div className="space-y-1">
+                        <h5 className="font-bold text-slate-800 text-xs">Перейдите в корневую папку сайта</h5>
+                        <p className="text-xs text-stone-500 leading-relaxed">
+                          Найдите директорию, куда загружен ваш сайт. Обычно она называется <strong>public_html</strong>, <strong>www/ваше_имя_сайта</strong> или 
+                          просто содержит файл <strong>index.html</strong>.
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex gap-4 items-start border-t border-stone-100 pt-3">
+                      <div className="flex-shrink-0 w-6 h-6 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold flex items-center justify-center font-mono">
+                        4
+                      </div>
+                      <div className="space-y-1">
+                        <h5 className="font-bold text-slate-800 text-xs">Загрузите site-data.json на хостинг</h5>
+                        <p className="text-xs text-stone-500 leading-relaxed">
+                          Загрузите скачанный файл <code className="bg-stone-100 px-1.5 py-0.5 rounded text-xs font-mono">site-data.json</code> прямо в эту папку (рядом с файлом index.html). 
+                          Если там уже был старый файл, просто перезапишите его.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="bg-emerald-50 border border-emerald-200 p-4 rounded-xl mt-4">
+                    <span className="text-xs font-bold text-emerald-900 block flex items-center gap-1.5">
+                      <Check className="w-4 h-4 text-emerald-600" />
+                      Поздравляем, изменения опубликованы!
+                    </span>
+                    <p className="text-[11px] text-emerald-800 leading-relaxed mt-1">
+                      Теперь при входе на сайт с любого мобильного телефона, другого компьютера или в приватном режиме (инкогнито), 
+                      сайт автоматически применит все ваши новые картинки и тексты из этого файла!
+                    </p>
+                  </div>
+                </div>
+
               </div>
             </div>
           )}

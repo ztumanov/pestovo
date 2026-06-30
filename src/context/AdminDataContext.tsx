@@ -171,155 +171,179 @@ export function AdminDataProvider({ children }: { children: React.ReactNode }) {
   const [activeSettingsTab, setActiveSettingsTab] = useState<string>('hero');
   const [currentPage, setCurrentPage] = useState<'home' | 'documents' | 'news' | 'medical' | 'services' | 'admin' | 'testimonials'>('home');
 
-  // Load from local storage on mount
+  // Load from static file on hosting AND local storage on mount
   useEffect(() => {
-    const savedData = localStorage.getItem(LOCAL_STORAGE_KEY);
-    if (savedData) {
+    async function initializeData() {
+      let baseData = { ...DEFAULT_SITE_DATA };
+      
+      // 1. Try to load published data from the hosting root folder (site-data.json)
       try {
-        const parsed = JSON.parse(savedData);
-        
-        // Gentle migration: if the client is still pointing to old defaults, auto-update them to the uploaded images
-        let morphed = false;
-        if (parsed.images) {
-          if (parsed.images.hero === '/src/assets/images/pestovo_hero_processed_1779778734060.png') {
-            parsed.images.hero = '/src/assets/images/pestovo_palace_1779780890544.png';
-            morphed = true;
-          }
-          if (parsed.images.nature === '/src/assets/images/pestovo_nature_1779777690866.png') {
-            parsed.images.nature = '/src/assets/images/pestovo_beach_1779780925661.png';
-            morphed = true;
+        const response = await fetch('/site-data.json', { cache: 'no-store' });
+        if (response.ok) {
+          const published = await response.json();
+          if (published && typeof published === 'object') {
+            baseData = { ...baseData, ...published };
+            console.log('Successfully loaded published site-data.json from hosting root');
           }
         }
-        if (parsed.extraImages) {
-          if (parsed.extraImages.standardRoom === 'https://images.unsplash.com/photo-1618773928121-c32242e63f39?auto=format&fit=crop&w=800&q=80') {
-            parsed.extraImages.standardRoom = '/src/assets/images/pestovo_block_1779780908700.png';
-            morphed = true;
-          }
-        }
+      } catch (err) {
+        console.log('No published site-data.json found on hosting root, falling back to bundled defaults.', err);
+      }
 
-        // Force-merge fresh official organizational details
-        if (parsed.resortInfo) {
-          parsed.resortInfo = {
-            ...parsed.resortInfo,
-            ...RESORT_INFO
-          };
-          morphed = true;
-        }
-
-        // Force-merge fresh ROOMS if legacy room IDs or incorrect count is found
-        if (parsed.rooms) {
-          const hasLegacyRooms = parsed.rooms.some((r: any) => 
-            r.id === 'standard-improved' || 
-            r.id === 'junior-suite' || 
-            r.id === 'suite-luxury' || 
-            r.id === 'apartment-fts'
-          );
-          if (hasLegacyRooms || parsed.rooms.length !== 2) {
-            parsed.rooms = [...ROOMS];
-            morphed = true;
-          }
-        }
-
-        // Backfill and safeguard missing hero or hero properties
-        if (!parsed.hero) {
-          parsed.hero = JSON.parse(JSON.stringify(DEFAULT_SITE_DATA.hero));
-          morphed = true;
-        } else {
-          // Guard against missing properties inside hero
-          const defaultHero = DEFAULT_SITE_DATA.hero;
-          if (!parsed.hero.badge) { 
-            parsed.hero.badge = defaultHero.badge; 
-            morphed = true; 
-          } else if (parsed.hero.badge === 'Престижный оздоровительный комплекс ФТС России') {
-            parsed.hero.badge = 'Оздоровительный комплекс ФТС России';
-            morphed = true;
-          }
-          if (!parsed.hero.titleFirstPart) { 
-            parsed.hero.titleFirstPart = defaultHero.titleFirstPart; 
-            morphed = true; 
-          } else if (parsed.hero.titleFirstPart === 'САНАТОРИЙ «ПЕСТОВО»' || parsed.hero.titleFirstPart.includes('ПЕСТОВО')) {
-            parsed.hero.titleFirstPart = 'САНАТОРИЙ «ЯСНАЯ ПОЛЯНА»';
-            morphed = true;
-          }
-          if (!parsed.hero.titleSecondPart) { parsed.hero.titleSecondPart = defaultHero.titleSecondPart; morphed = true; }
-          if (!parsed.hero.subtitle) { 
-            parsed.hero.subtitle = defaultHero.subtitle; 
-            morphed = true; 
-          } else if (
-            parsed.hero.subtitle === 'Элитное оздоровление, легендарный парк-арборетум и дворец графини Паниной в Гаспре. Микроклимат царского курорта для вашего оздоровления.' ||
-            parsed.hero.subtitle === 'Предоставляет оздоровления, лечения и реабилитации должностных лиц таможенных органов и членов их семей.'
-          ) {
-            parsed.hero.subtitle = defaultHero.subtitle;
-            morphed = true;
-          }
-          if (!parsed.hero.ctaText) { parsed.hero.ctaText = defaultHero.ctaText; morphed = true; }
-          if (!parsed.hero.defaultBackgroundMode) { parsed.hero.defaultBackgroundMode = defaultHero.defaultBackgroundMode; morphed = true; }
+      // 2. Check if this browser has an active local draft in localStorage
+      const savedData = localStorage.getItem(LOCAL_STORAGE_KEY);
+      if (savedData) {
+        try {
+          const parsed = JSON.parse(savedData);
           
-          if (!parsed.hero.stats || !Array.isArray(parsed.hero.stats) || parsed.hero.stats.length === 0) {
-            parsed.hero.stats = JSON.parse(JSON.stringify(defaultHero.stats));
+          // Gentle migration: if the client is still pointing to old defaults, auto-update them to the uploaded images
+          let morphed = false;
+          if (parsed.images) {
+            if (parsed.images.hero === '/src/assets/images/pestovo_hero_processed_1779778734060.png') {
+              parsed.images.hero = '/src/assets/images/pestovo_palace_1779780890544.png';
+              morphed = true;
+            }
+            if (parsed.images.nature === '/src/assets/images/pestovo_nature_1779777690866.png') {
+              parsed.images.nature = '/src/assets/images/pestovo_beach_1779780925661.png';
+              morphed = true;
+            }
+          }
+          if (parsed.extraImages) {
+            if (parsed.extraImages.standardRoom === 'https://images.unsplash.com/photo-1618773928121-c32242e63f39?auto=format&fit=crop&w=800&q=80') {
+              parsed.extraImages.standardRoom = '/src/assets/images/pestovo_block_1779780908700.png';
+              morphed = true;
+            }
+          }
+
+          // Force-merge fresh official organizational details
+          if (parsed.resortInfo) {
+            parsed.resortInfo = {
+              ...parsed.resortInfo,
+              ...RESORT_INFO
+            };
             morphed = true;
           }
-          if (!parsed.hero.slides || !Array.isArray(parsed.hero.slides) || parsed.hero.slides.length === 0) {
-            parsed.hero.slides = JSON.parse(JSON.stringify(defaultHero.slides));
+
+          // Force-merge fresh ROOMS if legacy room IDs or incorrect count is found
+          if (parsed.rooms) {
+            const hasLegacyRooms = parsed.rooms.some((r: any) => 
+              r.id === 'standard-improved' || 
+              r.id === 'junior-suite' || 
+              r.id === 'suite-luxury' || 
+              r.id === 'apartment-fts'
+            );
+            if (hasLegacyRooms || parsed.rooms.length !== 2) {
+              parsed.rooms = [...ROOMS];
+              morphed = true;
+            }
+          }
+
+          // Backfill and safeguard missing hero or hero properties
+          if (!parsed.hero) {
+            parsed.hero = JSON.parse(JSON.stringify(baseData.hero));
             morphed = true;
           } else {
-            // Migrating old Vimeo URLs to ultra-stable Mixkit URLs in loaded state
-            parsed.hero.slides = parsed.hero.slides.map((slide: any) => {
-              if (slide.url && slide.url.includes('vimeo.com')) {
-                morphed = true;
-                return {
-                  ...slide,
-                  url: 'https://assets.mixkit.co/videos/preview/mixkit-waves-crashing-on-rocks-from-above-41851-large.mp4'
-                };
-              }
-              return slide;
-            });
-          }
-        }
-
-        // Backfill missing news
-        if (!parsed.news || !Array.isArray(parsed.news)) {
-          parsed.news = [
-            {
-              id: 'news-1',
-              title: 'Открытие обновленного корпуса',
-              date: '10.05.2026',
-              image: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&q=80',
-              excerpt: 'После проведения капитального ремонта открыт спальный корпус...',
-              content: 'После проведения капитального ремонта открыт спальный корпус. Новые номера оборудованы всем необходимым для комфортного отдыха. Ждем вас!'
+            // Guard against missing properties inside hero
+            const defaultHero = baseData.hero;
+            if (!parsed.hero.badge) { 
+              parsed.hero.badge = defaultHero.badge; 
+              morphed = true; 
+            } else if (parsed.hero.badge === 'Престижный оздоровительный комплекс ФТС России') {
+              parsed.hero.badge = 'Оздоровительный комплекс ФТС России';
+              morphed = true;
             }
-          ];
-          morphed = true;
-        }
+            if (!parsed.hero.titleFirstPart) { 
+              parsed.hero.titleFirstPart = defaultHero.titleFirstPart; 
+              morphed = true; 
+            } else if (parsed.hero.titleFirstPart === 'САНАТОРИЙ «ПЕСТОВО»' || parsed.hero.titleFirstPart.includes('ПЕСТОВО')) {
+              parsed.hero.titleFirstPart = 'САНАТОРИЙ «ЯСНАЯ ПОЛЯНА»';
+              morphed = true;
+            }
+            if (!parsed.hero.titleSecondPart) { parsed.hero.titleSecondPart = defaultHero.titleSecondPart; morphed = true; }
+            if (!parsed.hero.subtitle) { 
+              parsed.hero.subtitle = defaultHero.subtitle; 
+              morphed = true; 
+            } else if (
+              parsed.hero.subtitle === 'Элитное оздоровление, легендарный парк-арборетум и дворец графини Паниной в Гаспре. Микроклимат царского курорта для вашего оздоровления.' ||
+              parsed.hero.subtitle === 'Предоставляет оздоровления, лечения и реабилитации должностных лиц таможенных органов и членов их семей.'
+            ) {
+              parsed.hero.subtitle = defaultHero.subtitle;
+              morphed = true;
+            }
+            if (!parsed.hero.ctaText) { parsed.hero.ctaText = defaultHero.ctaText; morphed = true; }
+            if (!parsed.hero.defaultBackgroundMode) { parsed.hero.defaultBackgroundMode = defaultHero.defaultBackgroundMode; morphed = true; }
+            
+            if (!parsed.hero.stats || !Array.isArray(parsed.hero.stats) || parsed.hero.stats.length === 0) {
+              parsed.hero.stats = JSON.parse(JSON.stringify(defaultHero.stats));
+              morphed = true;
+            }
+            if (!parsed.hero.slides || !Array.isArray(parsed.hero.slides) || parsed.hero.slides.length === 0) {
+              parsed.hero.slides = JSON.parse(JSON.stringify(defaultHero.slides));
+              morphed = true;
+            } else {
+              // Migrating old Vimeo URLs to ultra-stable Mixkit URLs in loaded state
+              parsed.hero.slides = parsed.hero.slides.map((slide: any) => {
+                if (slide.url && slide.url.includes('vimeo.com')) {
+                  morphed = true;
+                  return {
+                    ...slide,
+                    url: 'https://assets.mixkit.co/videos/preview/mixkit-waves-crashing-on-rocks-from-above-41851-large.mp4'
+                  };
+                }
+                return slide;
+              });
+            }
+          }
 
-        // Backfill missing services
-        if (!parsed.services || !Array.isArray(parsed.services)) {
-          parsed.services = [...DEFAULT_SERVICES];
-          morphed = true;
-        }
+          // Backfill missing news
+          if (!parsed.news || !Array.isArray(parsed.news)) {
+            parsed.news = [
+              {
+                id: 'news-1',
+                title: 'Открытие обновленного корпуса',
+                date: '10.05.2026',
+                image: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&q=80',
+                excerpt: 'После проведения капитального ремонта открыт спальный корпус...',
+                content: 'После проведения капитального ремонта открыт спальный корпус. Новые номера оборудованы всем необходимым для комфортного отдыха. Ждем вас!'
+              }
+            ];
+            morphed = true;
+          }
 
-        // Backfill missing gallery
-        if (!parsed.gallery || !Array.isArray(parsed.gallery)) {
-          parsed.gallery = JSON.parse(JSON.stringify(DEFAULT_SITE_DATA.gallery));
-          morphed = true;
-        }
+          // Backfill missing services
+          if (!parsed.services || !Array.isArray(parsed.services)) {
+            parsed.services = [...baseData.services];
+            morphed = true;
+          }
 
-        // Backfill missing galleryCategories
-        if (!parsed.galleryCategories || !Array.isArray(parsed.galleryCategories)) {
-          parsed.galleryCategories = JSON.parse(JSON.stringify(DEFAULT_SITE_DATA.galleryCategories));
-          morphed = true;
-        }
+          // Backfill missing gallery
+          if (!parsed.gallery || !Array.isArray(parsed.gallery)) {
+            parsed.gallery = JSON.parse(JSON.stringify(baseData.gallery));
+            morphed = true;
+          }
 
-        if (morphed) {
-          localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(parsed));
-        }
+          // Backfill missing galleryCategories
+          if (!parsed.galleryCategories || !Array.isArray(parsed.galleryCategories)) {
+            parsed.galleryCategories = JSON.parse(JSON.stringify(baseData.galleryCategories));
+            morphed = true;
+          }
 
-        setSiteData(parsed);
-      } catch (e) {
-        console.error('Error parsing stored site data:', e);
-        setSiteData(DEFAULT_SITE_DATA);
+          if (morphed) {
+            localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(parsed));
+          }
+
+          setSiteData(parsed);
+        } catch (e) {
+          console.error('Error parsing stored site data, falling back to hosting base data:', e);
+          setSiteData(baseData);
+        }
+      } else {
+        // No local draft, use the base loaded from hosting
+        setSiteData(baseData);
       }
     }
+
+    initializeData();
 
     const savedAdminMode = localStorage.getItem(ADMIN_MODE_KEY);
     if (savedAdminMode === 'true') {
