@@ -202,34 +202,115 @@ export default function App() {
         // Gaspra, Crimea coordinates
         const lat = 44.4361;
         const lon = 34.1139;
-        const res = await fetch(
-          `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,wind_speed_10m&daily=weather_code,temperature_2m_max,temperature_2m_min&timezone=Europe/Moscow`
-        );
-        if (!res.ok) throw new Error('Не удалось получить данные');
-        const data = await res.json();
         
-        if (active && data && data.current && data.daily) {
-          const forecastData = [];
-          for (let i = 0; i < 3; i++) {
-            if (data.daily.time[i]) {
-              forecastData.push({
-                date: data.daily.time[i],
-                tempMax: Math.round(data.daily.temperature_2m_max[i]),
-                tempMin: Math.round(data.daily.temperature_2m_min[i]),
-                weatherCode: data.daily.weather_code[i]
-              });
-            }
+        let data: any = null;
+        let isFallback = false;
+
+        const fetchWithTimeout = async (url: string, ms = 4000) => {
+          const controller = new AbortController();
+          const id = setTimeout(() => controller.abort(), ms);
+          try {
+            const response = await fetch(url, { signal: controller.signal });
+            clearTimeout(id);
+            return response;
+          } catch (e) {
+            clearTimeout(id);
+            throw e;
           }
-          
-          setRealWeather({
-            temp: Math.round(data.current.temperature_2m),
-            feelsLike: Math.round(data.current.apparent_temperature),
-            humidity: data.current.relative_humidity_2m,
-            windSpeed: Number(data.current.wind_speed_10m.toFixed(1)),
-            weatherCode: data.current.weather_code,
-            forecast: forecastData
-          });
-          setWeatherError(null);
+        };
+
+        try {
+          const res = await fetchWithTimeout(
+            `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,wind_speed_10m&daily=weather_code,temperature_2m_max,temperature_2m_min&timezone=Europe/Moscow`,
+            4000
+          );
+          if (res.ok) {
+            data = await res.json();
+          } else {
+            throw new Error('Primary weather API returned non-OK response');
+          }
+        } catch (primaryErr) {
+          console.warn('Primary weather API failed or timed out. Falling back to wttr.in...', primaryErr);
+          isFallback = true;
+          try {
+            const res = await fetchWithTimeout(
+              `https://wttr.in/44.4361,34.1139?format=j1`,
+              5000
+            );
+            if (!res.ok) throw new Error('Fallback weather API returned non-OK response');
+            data = await res.json();
+          } catch (fallbackErr) {
+            console.error('Fallback weather API also failed:', fallbackErr);
+            throw new Error('Both weather APIs failed');
+          }
+        }
+        
+        if (active && data) {
+          if (!isFallback && data.current && data.daily) {
+            const forecastData = [];
+            for (let i = 0; i < 3; i++) {
+              if (data.daily.time[i]) {
+                forecastData.push({
+                  date: data.daily.time[i],
+                  tempMax: Math.round(data.daily.temperature_2m_max[i]),
+                  tempMin: Math.round(data.daily.temperature_2m_min[i]),
+                  weatherCode: data.daily.weather_code[i]
+                });
+              }
+            }
+            
+            setRealWeather({
+              temp: Math.round(data.current.temperature_2m),
+              feelsLike: Math.round(data.current.apparent_temperature),
+              humidity: data.current.relative_humidity_2m,
+              windSpeed: Number(data.current.wind_speed_10m.toFixed(1)),
+              weatherCode: data.current.weather_code,
+              forecast: forecastData
+            });
+            setWeatherError(null);
+          } else if (isFallback && data.current_condition && data.weather) {
+            const current = data.current_condition[0];
+            
+            const mapWwoToWmo = (wwoCode: string | number): number => {
+              const code = Number(wwoCode);
+              if (code === 113) return 0; // Sunny
+              if ([116].includes(code)) return 1; // Partly Cloudy
+              if ([119, 122].includes(code)) return 3; // Cloudy/Overcast
+              if ([143, 248, 260].includes(code)) return 45; // Fog
+              if ([263, 266, 293, 296, 299, 302, 305, 308, 353, 356, 359].includes(code)) return 61; // Rain
+              if ([179, 227, 230, 323, 326, 329, 332, 335, 338, 368, 371, 395].includes(code)) return 71; // Snow
+              if ([200, 386, 389, 392].includes(code)) return 95; // Thunderstorm
+              return 2; // Default Cloudy
+            };
+
+            const forecastData = [];
+            for (let i = 0; i < 3; i++) {
+              const day = data.weather[i];
+              if (day) {
+                const dayCode = mapWwoToWmo(day.hourly?.[4]?.weatherCode || day.hourly?.[0]?.weatherCode || 113);
+                forecastData.push({
+                  date: day.date,
+                  tempMax: Math.round(Number(day.maxtempC)),
+                  tempMin: Math.round(Number(day.mintempC)),
+                  weatherCode: dayCode
+                });
+              }
+            }
+
+            const currentCode = mapWwoToWmo(current.weatherCode || 113);
+            const windKmph = Number(current.windspeedKmph) || 0;
+            const windMs = Number((windKmph / 3.6).toFixed(1));
+
+            setRealWeather({
+              temp: Math.round(Number(current.temp_C)),
+              feelsLike: Math.round(Number(current.FeelsLikeC || current.temp_C)),
+              humidity: Number(current.humidity) || 60,
+              windSpeed: windMs,
+              weatherCode: currentCode,
+              forecast: forecastData
+            });
+            setWeatherError(null);
+          }
         }
       } catch (err: any) {
         if (active) {
