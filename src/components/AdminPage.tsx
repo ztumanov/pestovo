@@ -27,10 +27,14 @@ import {
   FileText,
   Newspaper,
   Check,
-  Edit2
+  Edit2,
+  Users,
+  Shield,
+  Key,
+  UserCheck
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Room, MedicalProgram, Testimonial, FAQItem, NewsArticle, ServiceItem, GalleryItem, GalleryCategory } from '../types';
+import { Room, MedicalProgram, Testimonial, FAQItem, NewsArticle, ServiceItem, GalleryItem, GalleryCategory, AdminUser } from '../types';
 
 /**
  * Utility to downscale and compress images client-side before storing them in localStorage
@@ -109,6 +113,7 @@ export default function AdminPage({ onBackToHome }: { onBackToHome: () => void }
   const [services, setServices] = useState<ServiceItem[]>([...(siteData.services || [])]);
   const [galleryItems, setGalleryItems] = useState<GalleryItem[]>([...(siteData.gallery || [])]);
   const [galleryCats, setGalleryCats] = useState<GalleryCategory[]>([...(siteData.galleryCategories || [])]);
+  const [usersList, setUsersList] = useState<AdminUser[]>([...(siteData.users || [])]);
 
   // Selected sub-items being edited in forms
   const [editingRoomId, setEditingRoomId] = useState<string | null>(null);
@@ -117,6 +122,7 @@ export default function AdminPage({ onBackToHome }: { onBackToHome: () => void }
   const [editingFaqId, setEditingFaqId] = useState<string | null>(null);
   const [editingNewsId, setEditingNewsId] = useState<string | null>(null);
   const [editingServiceId, setEditingServiceId] = useState<string | null>(null);
+  const [editingUserId, setEditingUserId] = useState<string | null>(null);
 
   // States for adding new items
   const [showAddRoom, setShowAddRoom] = useState(false);
@@ -125,6 +131,14 @@ export default function AdminPage({ onBackToHome }: { onBackToHome: () => void }
   const [showAddFaq, setShowAddFaq] = useState(false);
   const [showAddNews, setShowAddNews] = useState(false);
   const [showAddService, setShowAddService] = useState(false);
+  const [showAddUser, setShowAddUser] = useState(false);
+
+  // User form state
+  const [userForm, setUserForm] = useState<Omit<AdminUser, 'id'>>({
+    username: '',
+    password: '',
+    role: 'Редактор'
+  });
 
   // State to show save indicator
   const [saveSuccess, setSaveSuccess] = useState(false);
@@ -480,6 +494,68 @@ export default function AdminPage({ onBackToHome }: { onBackToHome: () => void }
     });
   };
 
+  // USERS HANDLERS
+  const handleAddUser = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!userForm.username.trim() || !userForm.password?.trim()) {
+      alert('Заполните логин и пароль пользователя');
+      return;
+    }
+    
+    const nextUsername = userForm.username.trim();
+    // Check if user already exists
+    if (usersList.some(u => u.username.toLowerCase() === nextUsername.toLowerCase())) {
+      alert('Пользователь с таким логином уже существует в системе');
+      return;
+    }
+
+    const created: AdminUser = {
+      id: `user-${Date.now()}`,
+      username: nextUsername,
+      password: userForm.password,
+      role: userForm.role || 'Редактор'
+    };
+
+    const nextUsers = [...usersList, created];
+    setUsersList(nextUsers);
+    updateSection('users', nextUsers);
+    setShowAddUser(false);
+    setUserForm({ username: '', password: '', role: 'Редактор' });
+    triggerSuccess();
+  };
+
+  const handleUpdateUser = (userId: string, updatedUser: AdminUser) => {
+    const nextUsers = usersList.map(u => u.id === userId ? updatedUser : u);
+    setUsersList(nextUsers);
+    updateSection('users', nextUsers);
+    setEditingUserId(null);
+    triggerSuccess();
+  };
+
+  const handleDeleteUser = (userId: string) => {
+    const userToDelete = usersList.find(u => u.id === userId);
+    if (!userToDelete) return;
+
+    if (userToDelete.username === 'admin') {
+      alert('Вы не можете удалить главного системного пользователя admin для предотвращения блокировки панели!');
+      return;
+    }
+
+    setConfirmModal({
+      isOpen: true,
+      title: 'Удалить пользователя?',
+      message: `Вы действительно хотите навсегда аннулировать учетную запись сотрудника «${userToDelete.username}»? Он потеряет доступ к панели управления.`,
+      confirmText: 'Да, удалить',
+      confirmClass: 'bg-red-600 hover:bg-red-750 text-white',
+      onConfirm: () => {
+        const nextUsers = usersList.filter(u => u.id !== userId);
+        setUsersList(nextUsers);
+        updateSection('users', nextUsers);
+        triggerSuccess();
+      }
+    });
+  };
+
   // NEWS HANDLERS
   const handleUpdateNews = (newsId: string, updatedNews: NewsArticle) => {
     const nextNews = news.map(n => n.id === newsId ? updatedNews : n);
@@ -647,6 +723,7 @@ export default function AdminPage({ onBackToHome }: { onBackToHome: () => void }
     { id: 'faq', name: 'Вопросы & Ответы', icon: HelpCircle, badge: faqs.length },
     { id: 'news', name: 'Новости', icon: Newspaper, badge: news.length },
     { id: 'media', name: 'Медиа & Ссылки', icon: Folder, badge: galleryItems.length },
+    { id: 'users', name: 'Пользователи', icon: Users, badge: usersList.length },
     { id: 'publish', name: 'Сохранить на хостинг', icon: Database },
   ];
 
@@ -689,11 +766,13 @@ export default function AdminPage({ onBackToHome }: { onBackToHome: () => void }
                   setEditingTestId(null);
                   setEditingFaqId(null);
                   setEditingServiceId(null);
+                  setEditingUserId(null);
                   setShowAddRoom(false);
                   setShowAddMed(false);
                   setShowAddTest(false);
                   setShowAddFaq(false);
                   setShowAddService(false);
+                  setShowAddUser(false);
                 }}
                 className={`w-full text-left py-3 px-4 text-xs font-semibold rounded-xl transition-all flex items-center justify-between border uppercase tracking-wider cursor-pointer ${
                   active 
@@ -2420,6 +2499,268 @@ export default function AdminPage({ onBackToHome }: { onBackToHome: () => void }
                     Сохранить всю фотогалерею ({galleryItems.length} картинок)
                   </button>
                 </div>
+              </div>
+            </div>
+          )}
+
+          {activeSettingsTab === 'users' && (
+            <div className="space-y-6">
+              <div className="border-b border-stone-200 pb-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div>
+                  <h3 className="font-serif font-black text-xl text-[#022C22]">Управление пользователями системы</h3>
+                  <p className="text-xs text-stone-400 mt-1 font-medium">Добавление, редактирование и удаление аккаунтов сотрудников с доступом к редактору сайта.</p>
+                </div>
+                {!showAddUser && (
+                  <button
+                    onClick={() => {
+                      setShowAddUser(true);
+                      setEditingUserId(null);
+                      setUserForm({ username: '', password: '', role: 'Редактор' });
+                    }}
+                    className="bg-[#022C22] hover:bg-[#034D3C] text-white font-semibold text-xs px-4 py-2.5 rounded-xl uppercase tracking-wider transition-all flex items-center gap-1.5 shadow self-start cursor-pointer"
+                  >
+                    <Plus className="w-4 h-4 text-[#c5a880]" /> Добавить сотрудника
+                  </button>
+                )}
+              </div>
+
+              {/* ADD USER FORM */}
+              <AnimatePresence>
+                {showAddUser && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                    exit={{ opacity: 0, height: 0 }}
+                    className="overflow-hidden"
+                  >
+                    <form onSubmit={handleAddUser} className="bg-white p-6 rounded-2xl border border-stone-200 shadow-sm space-y-4 max-w-2xl">
+                      <div className="flex items-center justify-between border-b border-stone-100 pb-3">
+                        <h4 className="font-serif font-bold text-sm text-[#022C22] uppercase tracking-wider flex items-center gap-2">
+                          <Plus className="w-4 h-4 text-[#c5a880]" /> Создать учетную запись сотрудника
+                        </h4>
+                        <button
+                          type="button"
+                          onClick={() => setShowAddUser(false)}
+                          className="text-stone-400 hover:text-stone-600 cursor-pointer"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        {/* Username */}
+                        <div className="space-y-1">
+                          <label className="block text-[10px] font-bold text-stone-400 uppercase tracking-wider">Логин для входа</label>
+                          <input
+                            type="text"
+                            required
+                            placeholder="Например, director"
+                            value={userForm.username}
+                            onChange={(e) => setUserForm({ ...userForm, username: e.target.value })}
+                            className="w-full bg-stone-50 border border-stone-200 rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-[#c5a880] focus:bg-white"
+                          />
+                        </div>
+
+                        {/* Password */}
+                        <div className="space-y-1">
+                          <label className="block text-[10px] font-bold text-stone-400 uppercase tracking-wider">Пароль</label>
+                          <input
+                            type="text"
+                            required
+                            placeholder="Минимум 4 символа"
+                            value={userForm.password}
+                            onChange={(e) => setUserForm({ ...userForm, password: e.target.value })}
+                            className="w-full bg-stone-50 border border-stone-200 rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-[#c5a880] focus:bg-white font-mono"
+                          />
+                        </div>
+
+                        {/* Role */}
+                        <div className="space-y-1">
+                          <label className="block text-[10px] font-bold text-stone-400 uppercase tracking-wider">Должность / Роль</label>
+                          <select
+                            value={userForm.role}
+                            onChange={(e) => setUserForm({ ...userForm, role: e.target.value })}
+                            className="w-full bg-stone-50 border border-stone-200 rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-[#c5a880] focus:bg-white cursor-pointer"
+                          >
+                            <option value="Редактор">Редактор</option>
+                            <option value="Администратор">Администратор</option>
+                            <option value="и.о. Начальника санатория">и.о. Начальника санатория</option>
+                            <option value="Начальник отдела">Начальник отдела</option>
+                            <option value="Сотрудник ФТС">Сотрудник ФТС</option>
+                          </select>
+                        </div>
+                      </div>
+
+                      <div className="pt-2 flex justify-end gap-2">
+                        <button
+                          type="button"
+                          onClick={() => setShowAddUser(false)}
+                          className="px-4 py-2 text-xs font-semibold text-stone-500 hover:text-stone-700 bg-stone-100 rounded-lg cursor-pointer"
+                        >
+                          Отмена
+                        </button>
+                        <button
+                          type="submit"
+                          className="px-5 py-2 text-xs font-semibold text-[#022C22] bg-[#c5a880] hover:bg-[#b59770] rounded-lg cursor-pointer uppercase tracking-wider"
+                        >
+                          Сохранить пользователя
+                        </button>
+                      </div>
+                    </form>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
+              {/* USERS CARD GRID */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {usersList.map((usr) => {
+                  const isEditing = editingUserId === usr.id;
+                  return (
+                    <motion.div
+                      key={usr.id}
+                      layout
+                      className="bg-white rounded-2xl border border-stone-200 p-6 shadow-sm flex flex-col justify-between space-y-4 hover:border-[#c5a880]/40 transition-all relative overflow-hidden"
+                    >
+                      {/* Role decorative badge in corner */}
+                      <div className="absolute top-0 right-0 h-2 w-full bg-[#022C22]/10"></div>
+                      
+                      {isEditing ? (
+                        <div className="space-y-3 pt-2">
+                          <h4 className="font-mono text-[9px] uppercase tracking-wider text-[#c5a880] font-bold">Редактирование сотрудника</h4>
+                          
+                          {/* Edit Login */}
+                          <div className="space-y-1">
+                            <label className="block text-[8px] font-bold text-stone-400 uppercase">Логин</label>
+                            <input
+                              type="text"
+                              required
+                              value={usr.username}
+                              onChange={(e) => {
+                                const updated = { ...usr, username: e.target.value };
+                                setUsersList(usersList.map(u => u.id === usr.id ? updated : u));
+                              }}
+                              className="w-full bg-stone-50 border border-stone-200 rounded-lg px-2 py-1.5 text-xs font-bold"
+                            />
+                          </div>
+
+                          {/* Edit Password */}
+                          <div className="space-y-1">
+                            <label className="block text-[8px] font-bold text-stone-400 uppercase">Пароль</label>
+                            <input
+                              type="text"
+                              required
+                              value={usr.password || ''}
+                              onChange={(e) => {
+                                const updated = { ...usr, password: e.target.value };
+                                setUsersList(usersList.map(u => u.id === usr.id ? updated : u));
+                              }}
+                              className="w-full bg-stone-50 border border-stone-200 rounded-lg px-2 py-1.5 text-xs font-mono"
+                            />
+                          </div>
+
+                          {/* Edit Role */}
+                          <div className="space-y-1">
+                            <label className="block text-[8px] font-bold text-stone-400 uppercase">Роль/Должность</label>
+                            <select
+                              value={usr.role || 'Редактор'}
+                              onChange={(e) => {
+                                const updated = { ...usr, role: e.target.value };
+                                setUsersList(usersList.map(u => u.id === usr.id ? updated : u));
+                              }}
+                              className="w-full bg-stone-50 border border-stone-200 rounded-lg px-2 py-1.5 text-xs"
+                            >
+                              <option value="Редактор">Редактор</option>
+                              <option value="Администратор">Администратор</option>
+                              <option value="и.о. Начальника санатория">и.о. Начальника санатория</option>
+                              <option value="Начальник отдела">Начальник отдела</option>
+                              <option value="Сотрудник ФТС">Сотрудник ФТС</option>
+                            </select>
+                          </div>
+
+                          <div className="pt-2 flex justify-end gap-1.5">
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setEditingUserId(null);
+                                setUsersList([...(siteData.users || [])]); // rollback
+                              }}
+                              className="px-2.5 py-1 text-[10px] font-bold text-stone-500 bg-stone-100 rounded hover:bg-stone-200 uppercase"
+                            >
+                              Отмена
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => handleUpdateUser(usr.id, usr)}
+                              className="px-3 py-1 text-[10px] font-bold text-white bg-emerald-700 hover:bg-emerald-800 rounded flex items-center gap-1 uppercase"
+                            >
+                              <Check className="w-3 h-3" /> Сохранить
+                            </button>
+                          </div>
+                        </div>
+                      ) : (
+                        <>
+                          <div className="space-y-3 pt-2">
+                            <div className="flex items-center gap-3">
+                              <div className="w-10 h-10 bg-[#022C22]/5 border border-[#022C22]/10 rounded-xl flex items-center justify-center text-[#022C22]">
+                                <UserCheck className="w-5 h-5 text-[#c5a880]" />
+                              </div>
+                              <div>
+                                <h4 className="font-bold text-sm text-stone-800 flex items-center gap-1.5">
+                                  {usr.username}
+                                </h4>
+                                <span className="inline-block text-[9px] px-2 py-0.5 rounded-full bg-[#022C22]/10 text-[#022C22] font-semibold uppercase tracking-wider mt-0.5">
+                                  {usr.role || 'Редактор'}
+                                </span>
+                              </div>
+                            </div>
+
+                            <div className="border-t border-stone-100 pt-3 space-y-1.5 text-xs text-stone-600 font-mono">
+                              <p className="flex justify-between">
+                                <span className="text-stone-400">Пароль:</span>
+                                <span className="text-stone-800 select-all font-bold">●●●●●● ({usr.password})</span>
+                              </p>
+                              <p className="flex justify-between">
+                                <span className="text-stone-400">Последний вход:</span>
+                                <span className="text-stone-800 text-[10px]">{usr.lastLogin || 'Не входил в сессию'}</span>
+                              </p>
+                            </div>
+                          </div>
+
+                          <div className="pt-3 border-t border-stone-100 flex items-center justify-between">
+                            <span className="text-[10px] text-stone-400 font-mono font-bold uppercase tracking-wider">
+                              ID: {usr.id.slice(0, 8)}
+                            </span>
+                            <div className="flex items-center gap-1.5">
+                              <button
+                                onClick={() => {
+                                  setEditingUserId(usr.id);
+                                  setShowAddUser(false);
+                                }}
+                                className="p-1.5 text-stone-500 hover:text-[#022C22] hover:bg-stone-100 rounded transition-all cursor-pointer"
+                                title="Редактировать учетную запись"
+                              >
+                                <Edit2 className="w-3.5 h-3.5" />
+                              </button>
+                              {usr.username !== 'admin' ? (
+                                <button
+                                  onClick={() => handleDeleteUser(usr.id)}
+                                  className="p-1.5 text-stone-400 hover:text-red-600 hover:bg-red-50 rounded transition-all cursor-pointer"
+                                  title="Удалить сотрудника"
+                                >
+                                  <Trash2 className="w-3.5 h-3.5" />
+                                </button>
+                              ) : (
+                                <span className="p-1.5 text-stone-300 cursor-not-allowed" title="Главного системного администратора нельзя удалить">
+                                  🔒
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        </>
+                      )}
+                    </motion.div>
+                  );
+                })}
               </div>
             </div>
           )}

@@ -72,6 +72,7 @@ import MedicalPage from './components/MedicalPage';
 import ServicesPage from './components/ServicesPage';
 import DocumentsPage from './components/DocumentsPage';
 import TestimonialsPage from './components/TestimonialsPage';
+import LoginPage from './components/LoginPage';
 
 export default function App() {
   const { 
@@ -1461,6 +1462,11 @@ export default function App() {
             }} />
           ) : currentPage === 'testimonials' ? (
             <TestimonialsPage onBackToHome={() => {
+              setCurrentPage('home');
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }} />
+          ) : currentPage === 'login' ? (
+            <LoginPage onBackToHome={() => {
               setCurrentPage('home');
               window.scrollTo({ top: 0, behavior: 'smooth' });
             }} />

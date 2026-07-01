@@ -72,4 +72,13 @@ export interface GalleryCategory {
   name: string;
 }
 
+export interface AdminUser {
+  id: string;
+  username: string;
+  password?: string;
+  role?: string;
+  lastLogin?: string;
+}
+
+
 
