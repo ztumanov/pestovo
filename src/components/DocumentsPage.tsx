@@ -270,13 +270,13 @@ const INITIAL_DOCUMENTS: DocumentItem[] = [
   },
   {
     id: 'director-order',
-    title: 'Приказ на начальника санатория',
-    code: 'Приказ ФТС № 44-ЛС',
+    title: 'Приказ на и.о. начальника санатория',
+    code: 'Приказ ФТС № 81-ЛС',
     category: 'constituent',
     categoryLabel: 'Учредительные и общие',
-    summary: 'Выписка из приказа руководителя Федеральной таможенной службы России о назначении Логачёва Валерия Анатольевича на должность Начальника санатория.',
+    summary: 'Выписка из приказа руководителя Федеральной таможенной службы России о возложении обязанностей начальника санатория на Данилива Алексея Ивановича.',
     pdfUrl: null,
-    originalText: 'ПРИКАЗ РУКОВОДИТЕЛЯ ФЕДЕРАЛЬНОЙ ТАМОЖЕННОЙ СЛУЖБЫ РОССИЙСКОЙ ФЕДЕРАЦИИ\n\nО назначении на должность начальника Федерального государственного казенного учреждения «Санаторий «Ясная Поляна» ФТС России» Логачёва В.А.'
+    originalText: 'ПРИКАЗ РУКОВОДИТЕЛЯ ФЕДЕРАЛЬНОЙ ТАМОЖЕННОЙ СЛУЖБЫ РОССИЙСКОЙ ФЕДЕРАЦИИ\n\nО возложении временного исполнения обязанностей начальника Федерального государственного казенного учреждения «Санаторий «Ясная Поляна» ФТС России» на Данилива А.И.'
   },
   {
     id: 'structure-yasnayapolyana',
@@ -401,7 +401,7 @@ const INITIAL_DOCUMENTS: DocumentItem[] = [
 ];
 
 export default function DocumentsPage({ onBackToHome }: { onBackToHome: () => void }) {
-  const { isAdminMode } = useAdminData();
+  const { isAdminMode, siteData } = useAdminData();
   const [documents, setDocuments] = useState<DocumentItem[]>(() => {
     try {
       const saved = localStorage.getItem('pestovo_custom_documents');
@@ -725,8 +725,8 @@ export default function DocumentsPage({ onBackToHome }: { onBackToHome: () => vo
                               <div className="bg-stone-50 p-3 rounded border border-stone-200 space-y-1.5 shadow-xs">
                                 <span className="text-[#c5a880] block font-mono text-[9px] uppercase font-bold">Руководитель:</span>
                                 <div>
-                                  <p className="font-extrabold text-[#022C22] text-sm font-serif">Логачёв Валерий Анатольевич</p>
-                                  <p className="text-[10px] text-stone-500 font-mono">Начальник санатория</p>
+                                  <p className="font-extrabold text-[#022C22] text-sm font-serif">{siteData?.resortInfo?.directorName || 'Данилив Алексей Иванович'}</p>
+                                  <p className="text-[10px] text-stone-500 font-mono">{siteData?.resortInfo?.directorRole || 'исполняющий обязанности начальника санатория'}</p>
                                 </div>
                                 <div className="grid grid-cols-2 gap-2 pt-1 border-t border-stone-200 text-[11px]">
                                   <div>
@@ -989,7 +989,7 @@ export default function DocumentsPage({ onBackToHome }: { onBackToHome: () => vo
                           <Check className="w-4 h-4 text-emerald-600 flex-shrink-0" />
                           <div className="text-[10px] font-mono leading-tight">
                             <span className="block font-bold text-emerald-800 font-semibold font-sans">ГОСУДАРСТВЕННЫЙ КОНТРОЛЬ</span>
-                            <span className="text-stone-405 block font-serif">Логачёв В. А. (Начальник)</span>
+                            <span className="text-stone-405 block font-serif">Данилив А. И. (и.о. Начальника)</span>
                           </div>
                         </div>
                       </div>

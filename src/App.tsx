@@ -2296,8 +2296,8 @@ export default function App() {
                         <div className="space-y-3 text-xs mt-3">
                           <div>
                             <span className="block text-stone-400 font-mono text-[9px] uppercase tracking-wider">Руководитель (ФИО)</span>
-                            <strong className="block text-sm text-stone-800 mt-0.5">Логачёв Валерий Анатольевич</strong>
-                            <span className="text-[#c5a880] font-bold uppercase text-[9px] font-mono tracking-widest mt-0.5 block">Начальник санатория</span>
+                            <strong className="block text-sm text-stone-800 mt-0.5">{RESORT_INFO.directorName || 'Данилив Алексей Иванович'}</strong>
+                            <span className="text-[#c5a880] font-bold uppercase text-[9px] font-mono tracking-widest mt-0.5 block">{RESORT_INFO.directorRole || 'исполняющий обязанности начальника санатория'}</span>
                           </div>
                         </div>
                       </div>
@@ -3310,14 +3310,7 @@ export default function App() {
               <button type="button" className="hover:text-white">Политика обработки данных</button>
               <span>&bull;</span>
               <button type="button" className="hover:text-white">Карта сайта</button>
-              <span>&bull;</span>
-              <button 
-                type="button" 
-                onClick={() => window.dispatchEvent(new CustomEvent('trigger-admin-login'))}
-                className="text-[#c5a880] hover:text-[#FAF9F6] font-bold flex items-center gap-1.5 transition-all outline-none"
-              >
-                <Lock className="w-3.5 h-3.5" /> Панель управления
-              </button>
+
             </div>
           </div>
 

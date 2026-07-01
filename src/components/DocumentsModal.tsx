@@ -458,7 +458,7 @@ export default function DocumentsModal({ isOpen, onClose }: DocumentsModalProps)
                         <Check className="w-4 h-4 text-emerald-600 flex-shrink-0" />
                         <div className="text-[10px] font-mono leading-tight">
                           <span className="block font-bold text-emerald-800">ПОДПИСАНО ЭЦП</span>
-                          <span className="text-stone-405 block">Логачёв В. А. (Начальник)</span>
+                          <span className="text-stone-405 block">Данилив А. И. (и.о. Начальника)</span>
                         </div>
                       </div>
                     </div>

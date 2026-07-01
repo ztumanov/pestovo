@@ -73,6 +73,38 @@ export default function AdminFloatBar() {
     return () => window.removeEventListener('trigger-admin-login', triggerLogin);
   }, [isAdminMode, setCurrentPage]);
 
+  // Securely listen for specific URL address bar parameters (?admin, ?control, ?edit, or hash #admin)
+  useEffect(() => {
+    const handleUrlCheck = () => {
+      const search = window.location.search;
+      const hash = window.location.hash;
+      const searchParams = new URLSearchParams(search);
+      
+      const hasAdminQuery = searchParams.has('admin') || searchParams.has('control') || searchParams.has('edit') || searchParams.has('editor') || searchParams.has('secret');
+      const hasAdminHash = hash === '#admin' || hash === '#admin-login' || hash === '#admin-control';
+      
+      if (hasAdminQuery || hasAdminHash) {
+        if (isAdminMode) {
+          setCurrentPage('admin');
+        } else {
+          setShowLoginModal(true);
+        }
+      }
+    };
+
+    // Initial check on load
+    handleUrlCheck();
+
+    // Listen to route/hash changes in the address bar
+    window.addEventListener('popstate', handleUrlCheck);
+    window.addEventListener('hashchange', handleUrlCheck);
+    
+    return () => {
+      window.removeEventListener('popstate', handleUrlCheck);
+      window.removeEventListener('hashchange', handleUrlCheck);
+    };
+  }, [isAdminMode, setCurrentPage]);
+
   return (
     <>
       {/* FLOATING STATUS BAR FOR LOGGED IN ADMIN */}
