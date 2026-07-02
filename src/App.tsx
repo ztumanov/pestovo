@@ -1473,17 +1473,17 @@ export default function App() {
           ) : (
             <>
           {/* HERO / WELCOME ATRIUM */}
-          <header id="hero" className="relative min-h-[90vh] flex items-center justify-center overflow-hidden bg-[#022C22]">
+          <header id="hero" className="relative min-h-[90vh] flex items-center justify-center overflow-hidden bg-gradient-to-b from-[#033E31] to-[#01221A]">
         
         {/* Dynamic Background (Switchable Video/Image loops) */}
-        <motion.div className="absolute inset-0 z-0 bg-[#022C22]" style={{ y: yBg }}>
+        <motion.div className="absolute inset-0 z-0 bg-[#033E31]" style={{ y: yBg }}>
           <AnimatePresence mode="wait">
             {slides[activeSlideIndex] && (
               <motion.div 
                 key={`slide-${activeSlideIndex}-${slides[activeSlideIndex]?.url}`}
-                className="absolute inset-0 w-full h-full overflow-hidden brightness-[1.15]"
+                className="absolute inset-0 w-full h-full overflow-hidden brightness-[1.20] saturate-[1.05]"
                 initial={{ opacity: 0 }}
-                animate={{ opacity: 0.65 }}
+                animate={{ opacity: 0.90 }}
                 exit={{ opacity: 0 }}
                 transition={{ duration: 1.0 }}
               >
@@ -1516,8 +1516,14 @@ export default function App() {
             )}
           </AnimatePresence>
 
-          {/* Elegant geometric gradients imitating sunlight through pines */}
-          <div className="absolute inset-0 bg-gradient-to-t from-[#022C22] via-[#022C22]/60 to-transparent z-1"></div>
+          {/* Elegant geometric gradients imitating sunlight through pines with a warm golden sun overlay */}
+          {/* Elegant geometric gradients imitating sunlight through pines with a warm golden sun overlay */}
+          <div className="absolute inset-0 bg-gradient-to-t from-[#022C22]/40 via-[#011F19]/15 to-[#022C22]/20 z-1"></div>
+          {/* Warm sunset sun rays and ambient glowing effects */}
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-amber-400/50 via-amber-600/20 to-transparent mix-blend-screen z-1"></div>
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,_var(--tw-gradient-stops))] from-amber-200/20 via-transparent to-transparent mix-blend-screen z-1"></div>
+          {/* Subtle central radial gradient to keep text readable without making the background too dark */}
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-black/20 via-transparent to-black/10 z-1"></div>
           <div className="absolute inset-l-0 inset-r-0 bottom-0 h-48 bg-gradient-to-t from-[#FAF9F6] to-transparent z-2"></div>
         </motion.div>
 
@@ -1563,22 +1569,22 @@ export default function App() {
               if (text.toUpperCase().includes('САНАТОРИЙ') && (text.toUpperCase().includes('ЯСНАЯ ПОЛЯНА') || text.toUpperCase().includes('«ЯСНАЯ ПОЛЯНА»'))) {
                 return (
                   <>
-                    <span className="block text-stone-300 font-sans font-medium text-xl sm:text-2xl md:text-3xl lg:text-4xl tracking-[0.2em] uppercase opacity-90 mb-2 sm:mb-3">
+                    <span className="block text-stone-200 font-sans font-semibold text-xl sm:text-2xl md:text-3xl lg:text-4xl tracking-[0.2em] uppercase opacity-95 mb-2 sm:mb-3 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
                       САНАТОРИЙ
                     </span>
-                    <span className="block text-white font-serif font-black tracking-tight text-5xl sm:text-6xl md:text-7xl lg:text-8xl drop-shadow-md leading-tight">
+                    <span className="block text-white font-serif font-black tracking-tight text-5xl sm:text-6xl md:text-7xl lg:text-8xl drop-shadow-[0_4px_12px_rgba(0,0,0,0.9)] leading-tight">
                       «ЯСНАЯ ПОЛЯНА»
                     </span>
                   </>
                 );
               }
               return (
-                <span className="block text-white font-serif font-black tracking-tight text-4xl sm:text-5xl md:text-6xl lg:text-7xl">
+                <span className="block text-white font-serif font-black tracking-tight text-4xl sm:text-5xl md:text-6xl lg:text-7xl drop-shadow-[0_4px_12px_rgba(0,0,0,0.9)]">
                   {text}
                 </span>
               );
             })()}
-            <span className="italic text-[#c5a880] font-normal font-serif text-xl sm:text-2xl md:text-3xl lg:text-4xl block mt-4 sm:mt-5 tracking-wide">
+            <span className="italic text-[#c5a880] font-semibold font-serif text-xl sm:text-2xl md:text-3xl lg:text-4xl block mt-4 sm:mt-5 tracking-wide drop-shadow-[0_2px_6px_rgba(0,0,0,0.85)]">
               {HERO_DATA.titleSecondPart}
             </span>
           </motion.h1>
@@ -1587,7 +1593,7 @@ export default function App() {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.3 }}
-            className="mt-6 text-sm sm:text-lg md:text-xl text-stone-200 font-sans max-w-3xl leading-relaxed"
+            className="mt-6 text-sm sm:text-lg md:text-xl text-white font-sans max-w-3xl leading-relaxed drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)] font-medium"
           >
             {HERO_DATA.subtitle}
           </motion.p>
@@ -1612,7 +1618,7 @@ export default function App() {
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.8, delay: 0.6 }}
-              className="mt-20 w-full max-w-5xl grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 bg-[#022C22]/80 backdrop-blur-md p-6 sm:p-8 rounded-sm border border-[#c5a880]/20 shadow-2xl"
+              className="mt-20 w-full max-w-5xl grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 bg-emerald-950/40 backdrop-blur-md p-6 sm:p-8 rounded-sm border border-[#c5a880]/30 shadow-2xl"
             >
               {HERO_DATA.stats.map((stat, idx) => (
                 <div 
@@ -2394,7 +2400,7 @@ export default function App() {
       </section>
 
       {/* DETAILED INTERACTIVE MEDICAL PROGRAMS */}
-      <section id="medical" className="py-20 bg-[#022C22] text-white">
+      <section id="medical" className="py-20 bg-gradient-to-b from-[#033E31] via-[#022C22] to-[#01221A] text-white">
         <motion.div
           initial={{ opacity: 0, y: 45 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -2706,7 +2712,7 @@ export default function App() {
       </section>
 
       {/* REAL REVIEWS & TRUST */}
-      <section id="testimonials" className="py-24 bg-[#022C22] text-white">
+      <section id="testimonials" className="py-24 bg-gradient-to-b from-[#022C22] via-[#033E31] to-[#01221A] text-white">
         <motion.div
           initial={{ opacity: 0, y: 45 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -3253,7 +3259,7 @@ export default function App() {
       </AnimatePresence>
 
       {/* FOOTER */}
-      <footer className="bg-[#022C22] text-white border-t border-[#c5a880]/30 py-12 z-10">
+      <footer className="bg-gradient-to-b from-[#022C22] to-[#011712] text-white border-t border-[#c5a880]/30 py-12 z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
             
