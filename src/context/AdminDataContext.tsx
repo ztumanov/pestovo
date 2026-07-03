@@ -195,6 +195,20 @@ export function AdminDataProvider({ children }: { children: React.ReactNode }) {
         console.log('No published site-data.json found on hosting root, falling back to bundled defaults.', err);
       }
 
+      // 1b. Try to load dynamic reviews from the reviews.php script
+      try {
+        const reviewsResponse = await fetch('/reviews.php', { cache: 'no-store' });
+        if (reviewsResponse.ok) {
+          const serverReviews = await reviewsResponse.json();
+          if (Array.isArray(serverReviews) && serverReviews.length > 0) {
+            baseData.testimonials = serverReviews;
+            console.log('Successfully loaded dynamic reviews from reviews.php on server:', serverReviews.length);
+          }
+        }
+      } catch (reviewsErr) {
+        console.log('No server reviews.php found or error loading, falling back to static testimonials.', reviewsErr);
+      }
+
       // 2. Check if this browser has an active local draft in localStorage
       const savedData = localStorage.getItem(LOCAL_STORAGE_KEY);
       if (savedData) {
@@ -370,6 +384,22 @@ export function AdminDataProvider({ children }: { children: React.ReactNode }) {
       console.error('Failed to save to localStorage:', e);
       alert('Предупреждение: Превышена квота памяти браузера. Пожалуйста, сожмите или уменьшите размер загружаемых картинок перед загрузкой.');
     }
+
+    // Sync testimonials with PHP server if changed
+    if (newData.testimonials) {
+      fetch('/reviews.php', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          action: 'save_all',
+          reviews: newData.testimonials
+        })
+      }).catch(err => {
+        console.log('Skipping reviews.php sync in local development', err);
+      });
+    }
   };
 
   const updateSection = <K extends keyof SiteData>(key: K, value: SiteData[K]) => {
@@ -383,6 +413,26 @@ export function AdminDataProvider({ children }: { children: React.ReactNode }) {
       }
       return updated;
     });
+
+    // Sync with reviews.php if we are changing testimonials specifically
+    if (key === 'testimonials') {
+      fetch('/reviews.php', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          action: 'save_all',
+          reviews: value
+        })
+      }).then(res => {
+        if (res.ok) {
+          console.log('Successfully synced testimonials with server storage reviews_data.json');
+        }
+      }).catch(err => {
+        console.log('Skipping reviews.php sync in local development', err);
+      });
+    }
   };
 
   const resetToDefault = () => {
