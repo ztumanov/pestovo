@@ -31,7 +31,9 @@ import {
   Users,
   Shield,
   Key,
-  UserCheck
+  UserCheck,
+  Globe,
+  Loader2
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Room, MedicalProgram, Testimonial, FAQItem, NewsArticle, ServiceItem, GalleryItem, GalleryCategory, AdminUser } from '../types';
@@ -142,6 +144,8 @@ export default function AdminPage({ onBackToHome }: { onBackToHome: () => void }
 
   // State to show save indicator
   const [saveSuccess, setSaveSuccess] = useState(false);
+  const [isPublishing, setIsPublishing] = useState(false);
+  const [publishError, setPublishError] = useState('');
   const [dragActive, setDragActive] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [videoDragActive, setVideoDragActive] = useState(false);
@@ -2800,6 +2804,75 @@ export default function AdminPage({ onBackToHome }: { onBackToHome: () => void }
                     </p>
 
                     <div className="space-y-4">
+                      {/* Publish via PHP Button */}
+                      <button
+                        onClick={async () => {
+                          setIsPublishing(true);
+                          setPublishError('');
+                          try {
+                            const credsRaw = localStorage.getItem('pestovo_resort_admin_credentials');
+                            if (!credsRaw) {
+                              throw new Error('Учётные данные администратора не найдены. Пожалуйста, перезайдите в панель.');
+                            }
+                            const creds = JSON.parse(credsRaw);
+                            if (!creds || !creds.username || !creds.password) {
+                              throw new Error('Некорректные учётные данные. Пожалуйста, выйдите из панели и войдите заново.');
+                            }
+                            
+                            const response = await fetch('/save_settings.php', {
+                              method: 'POST',
+                              headers: {
+                                'Content-Type': 'application/json'
+                              },
+                              body: JSON.stringify({
+                                username: creds.username,
+                                password: creds.password,
+                                siteData: siteData
+                              })
+                            });
+
+                            if (response.ok) {
+                              const resJSON = await response.json();
+                              alert('Успешно! Все настройки сохранены на сервере в файле site-data.json.');
+                              triggerSuccess();
+                            } else {
+                              const resJSON = await response.json().catch(() => ({}));
+                              throw new Error(resJSON.error || `Ошибка сервера: ${response.status}`);
+                            }
+                          } catch (err: any) {
+                            console.error(err);
+                            setPublishError(err.message || 'Не удалось подключиться к серверу PHP');
+                            alert(`Ошибка публикации: ${err.message || 'Проверьте соединение'}`);
+                          } finally {
+                            setIsPublishing(false);
+                          }
+                        }}
+                        disabled={isPublishing}
+                        className={`w-full font-semibold text-xs py-3.5 px-4 rounded-xl transition-all uppercase tracking-wider flex items-center justify-center gap-2 border shadow cursor-pointer ${
+                          isPublishing 
+                            ? 'bg-stone-300 text-stone-500 border-transparent cursor-not-allowed'
+                            : 'bg-emerald-600 hover:bg-emerald-700 text-white border-transparent'
+                        }`}
+                      >
+                        {isPublishing ? (
+                          <>
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                            Сохранение...
+                          </>
+                        ) : (
+                          <>
+                            <Globe className="w-4 h-4" />
+                            Сохранить на сервере (PHP)
+                          </>
+                        )}
+                      </button>
+
+                      {publishError && (
+                        <div className="bg-red-50 text-red-700 p-2.5 rounded-lg text-[10px] leading-relaxed border border-red-100 font-mono text-center">
+                          {publishError}
+                        </div>
+                      )}
+
                       {/* Download JSON Button */}
                       <button
                         onClick={() => {
@@ -2879,12 +2952,11 @@ export default function AdminPage({ onBackToHome }: { onBackToHome: () => void }
                 <div className="lg:col-span-2 bg-white p-6 md:p-8 rounded-2xl border border-stone-200 shadow-sm space-y-5">
                   <h4 className="font-bold font-serif text-[#022C22] text-sm uppercase tracking-wider border-b border-stone-100 pb-2 flex items-center gap-2">
                     <CheckCircle className="w-5 h-5 text-[#c5a880]" />
-                    Инструкция по публикации на хостинг за 1 минуту
+                    Интеграция с хостингом (PHP авто-синхронизация)
                   </h4>
                   
                   <p className="text-xs text-stone-600 leading-relaxed">
-                    Мы настроили ваш сайт так, что он умеет <strong>автоматически считывать настройки из файла на вашем хостинге</strong>. 
-                    Вам больше не нужно разбираться в коде или заново компилировать (собирать) проект. Всё очень просто:
+                    Мы настроили ваш сайт так, что он <strong>полностью автоматически сохраняет и считывает настройки</strong> напрямую на вашем хостинге (ISPmanager / cPanel) через PHP-скрипты. Больше нет необходимости вручную скачивать и закачивать файлы настроек!
                   </p>
 
                   <div className="space-y-4 pt-2">
@@ -2893,10 +2965,9 @@ export default function AdminPage({ onBackToHome }: { onBackToHome: () => void }
                         1
                       </div>
                       <div className="space-y-1">
-                        <h5 className="font-bold text-slate-800 text-xs">Скачайте актуальный файл настроек</h5>
+                        <h5 className="font-bold text-slate-800 text-xs">Автоматическое сохранение при редактировании</h5>
                         <p className="text-xs text-stone-500 leading-relaxed">
-                          Сделайте все нужные правки на этом компьютере (добавьте фотографии, измените контакты или новости). После этого 
-                          нажмите слева кнопку <strong className="text-[#022C22]">«Скачать site-data.json»</strong>.
+                          Каждый раз, когда вы вносите изменения (редактируете номера, услуги, контакты, галерею или новости) и нажимаете кнопку «Сохранить», сайт отправляет защищённый запрос на ваш сервер. Изменения мгновенно перезаписывают файл <code className="bg-stone-100 px-1 py-0.5 rounded text-xs font-mono">site-data.json</code> в папке вашего сайта.
                         </p>
                       </div>
                     </div>
@@ -2906,10 +2977,9 @@ export default function AdminPage({ onBackToHome }: { onBackToHome: () => void }
                         2
                       </div>
                       <div className="space-y-1">
-                        <h5 className="font-bold text-slate-800 text-xs">Зайдите в вашу панель управления хостингом</h5>
+                        <h5 className="font-bold text-slate-800 text-xs">Ручное принудительное сохранение</h5>
                         <p className="text-xs text-stone-500 leading-relaxed">
-                          Откройте файловый менеджер в вашей панели хостинга (<strong>ISPmanager</strong>, cPanel, Beget и т.д.) или 
-                          подключитесь к вашему серверу через FTP-клиент (например, FileZilla).
+                          Для вашего спокойствия, на панели слева мы добавили большую зеленую кнопку <strong>«Сохранить на сервере (PHP)»</strong>. Вы можете нажать её в любой момент, чтобы принудительно синхронизировать текущую конфигурацию с сервером.
                         </p>
                       </div>
                     </div>
@@ -2919,23 +2989,9 @@ export default function AdminPage({ onBackToHome }: { onBackToHome: () => void }
                         3
                       </div>
                       <div className="space-y-1">
-                        <h5 className="font-bold text-slate-800 text-xs">Перейдите в корневую папку сайта</h5>
+                        <h5 className="font-bold text-slate-800 text-xs">Резервное копирование и оффлайн-режим</h5>
                         <p className="text-xs text-stone-500 leading-relaxed">
-                          Найдите директорию, куда загружен ваш сайт. Обычно она называется <strong>public_html</strong>, <strong>www/ваше_имя_сайта</strong> или 
-                          просто содержит файл <strong>index.html</strong>.
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="flex gap-4 items-start border-t border-stone-100 pt-3">
-                      <div className="flex-shrink-0 w-6 h-6 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold flex items-center justify-center font-mono">
-                        4
-                      </div>
-                      <div className="space-y-1">
-                        <h5 className="font-bold text-slate-800 text-xs">Загрузите site-data.json на хостинг</h5>
-                        <p className="text-xs text-stone-500 leading-relaxed">
-                          Загрузите скачанный файл <code className="bg-stone-100 px-1.5 py-0.5 rounded text-xs font-mono">site-data.json</code> прямо в эту папку (рядом с файлом index.html). 
-                          Если там уже был старый файл, просто перезапишите его.
+                          Если вы работаете локально на компьютере без интернета или ваш сервер временно недоступен, сайт сохранит все изменения в памяти текущего браузера. Вы всегда можете скачать файл <code className="bg-stone-100 px-1 py-0.5 rounded text-xs font-mono">site-data.json</code> на диск как резервную копию и восстановить настройки на любом другом устройстве через кнопку «Загрузить из JSON».
                         </p>
                       </div>
                     </div>
@@ -2944,11 +3000,10 @@ export default function AdminPage({ onBackToHome }: { onBackToHome: () => void }
                   <div className="bg-emerald-50 border border-emerald-200 p-4 rounded-xl mt-4">
                     <span className="text-xs font-bold text-emerald-900 block flex items-center gap-1.5">
                       <Check className="w-4 h-4 text-emerald-600" />
-                      Поздравляем, изменения опубликованы!
+                      Синхронизация полностью активна!
                     </span>
                     <p className="text-[11px] text-emerald-800 leading-relaxed mt-1">
-                      Теперь при входе на сайт с любого мобильного телефона, другого компьютера или в приватном режиме (инкогнито), 
-                      сайт автоматически применит все ваши новые картинки и тексты из этого файла!
+                      Все ваши изменения мгновенно видны на мобильных телефонах отдыхающих и компьютерах без дополнительных действий. Права на запись файлов настраиваются веб-сервером автоматически.
                     </p>
                   </div>
                 </div>

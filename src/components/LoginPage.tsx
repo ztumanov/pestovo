@@ -41,8 +41,9 @@ export default function LoginPage({ onBackToHome }: { onBackToHome: () => void }
 
       if (foundUser && foundUser.password === password) {
         setIsSuccess(true);
-        // Save last login time
+        // Save last login time and store credentials for server sync
         try {
+          localStorage.setItem('pestovo_resort_admin_credentials', JSON.stringify({ username: foundUser.username, password }));
           const updatedUsers = usersList.map(u => {
             if (u.id === foundUser.id) {
               return { ...u, lastLogin: new Date().toLocaleString('ru-RU') };

@@ -376,6 +376,36 @@ export function AdminDataProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
+  const syncSettingsWithServer = async (data: SiteData) => {
+    try {
+      const credsRaw = localStorage.getItem('pestovo_resort_admin_credentials');
+      if (!credsRaw) return;
+      const creds = JSON.parse(credsRaw);
+      if (!creds || !creds.username || !creds.password) return;
+
+      const response = await fetch('/save_settings.php', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          username: creds.username,
+          password: creds.password,
+          siteData: data
+        })
+      });
+
+      if (response.ok) {
+        console.log('Successfully saved settings to the hosting server via save_settings.php');
+      } else {
+        const errData = await response.json().catch(() => ({}));
+        console.warn('Server settings save returned non-OK status:', response.status, errData.error || '');
+      }
+    } catch (err) {
+      console.log('Skipping real-time save_settings.php sync (offline/local development or network error):', err);
+    }
+  };
+
   const updateSiteData = (newData: SiteData) => {
     setSiteData(newData);
     try {
@@ -400,6 +430,9 @@ export function AdminDataProvider({ children }: { children: React.ReactNode }) {
         console.log('Skipping reviews.php sync in local development', err);
       });
     }
+
+    // Securely sync all site settings to PHP server
+    syncSettingsWithServer(newData);
   };
 
   const updateSection = <K extends keyof SiteData>(key: K, value: SiteData[K]) => {
@@ -411,6 +444,10 @@ export function AdminDataProvider({ children }: { children: React.ReactNode }) {
         console.error('Failed to save to localStorage:', e);
         alert('Предупреждение: Превышена квота памяти браузера (localStorage). Не удалось сохранить некоторые файлы. Пожалуйста, используйте изображения меньшего разрешения.');
       }
+      
+      // Securely sync all site settings to PHP server
+      syncSettingsWithServer(updated);
+      
       return updated;
     });
 
@@ -438,6 +475,7 @@ export function AdminDataProvider({ children }: { children: React.ReactNode }) {
   const resetToDefault = () => {
     if (window.confirm('Вы действительно хотите сбросить все внесенные изменения и вернуть исходное оформление сайта?')) {
       localStorage.removeItem(LOCAL_STORAGE_KEY);
+      localStorage.removeItem('pestovo_resort_admin_credentials');
       setSiteData({ ...DEFAULT_SITE_DATA });
       window.location.reload();
     }
@@ -449,6 +487,7 @@ export function AdminDataProvider({ children }: { children: React.ReactNode }) {
       localStorage.setItem(ADMIN_MODE_KEY, 'true');
     } else {
       localStorage.removeItem(ADMIN_MODE_KEY);
+      localStorage.removeItem('pestovo_resort_admin_credentials');
       setShowAdminPanel(false);
     }
   };
