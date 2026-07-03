@@ -942,33 +942,112 @@ export default function App() {
     document.getElementById('contacts')?.scrollIntoView({ behavior: 'smooth' });
   };
 
-  // Climate details based on time of day
-  const climateDetails = {
-    morning: {
-      temp: '19°C',
-      seaTemp: '20°C',
-      phytoncides: 'Супер-концентрация',
-      aerosols: 'Насыщенный морской бриз',
-      recommendation: 'Идеальное время для утреннего терренкура по парку к морю и дыхательной гимнастики.',
-      humidity: '72%'
-    },
-    day: {
-      temp: '24°C',
-      seaTemp: '21°C',
-      phytoncides: 'Максимум хвойного эфира',
-      aerosols: 'Смешанный хвойно-морской',
-      recommendation: 'Прекрасно для прохождения лечебных ванн и грязелечения, а также отдыха на приватном пляже.',
-      humidity: '55%'
-    },
-    evening: {
-      temp: '21°C',
-      seaTemp: '21°C',
-      phytoncides: 'Умеренная концентрация',
-      aerosols: 'Горный бриз с Ай-Петри',
-      recommendation: 'Время для релаксационной йоги на террасе и вечерних климатотерапевтических прогулок у кипарисов.',
-      humidity: '64%'
+  // Climate details based on time of day - dynamically computed from real-time weather data
+  const climateDetails = React.useMemo(() => {
+    const defaultDetails = {
+      morning: {
+        temp: '19°C',
+        seaTemp: '20°C',
+        phytoncides: 'Супер-концентрация',
+        aerosols: 'Насыщенный морской бриз',
+        recommendation: 'Идеальное время для утреннего терренкура по парку к морю и дыхательной гимнастики.',
+        humidity: '72%',
+        windSpeed: '3.2 м/с',
+        weatherCode: 1,
+        weatherName: 'Ясно, свежий ветерок'
+      },
+      day: {
+        temp: '24°C',
+        seaTemp: '21°C',
+        phytoncides: 'Максимум хвойного эфира',
+        aerosols: 'Смешанный хвойно-морской',
+        recommendation: 'Прекрасно для прохождения лечебных ванн и грязелечения, а также отдыха на приватном пляже.',
+        humidity: '55%',
+        windSpeed: '4.5 м/с',
+        weatherCode: 0,
+        weatherName: 'Преимущественно ясно'
+      },
+      evening: {
+        temp: '21°C',
+        seaTemp: '21°C',
+        phytoncides: 'Умеренная концентрация',
+        aerosols: 'Горный бриз с Ай-Петри',
+        recommendation: 'Время для релаксационной йоги на террасе и вечерних климатотерапевтических прогулок у кипарисов.',
+        humidity: '64%',
+        windSpeed: '1.8 м/с',
+        weatherCode: 2,
+        weatherName: 'Малооблачно, штиль'
+      }
+    };
+
+    if (!realWeather) {
+      return defaultDetails;
     }
-  };
+
+    const baseTemp = realWeather.temp;
+    // For day, use the daytime max or base temp
+    const dayTemp = realWeather.forecast?.[0]?.tempMax ?? baseTemp;
+    // For morning, use the daytime min or dayTemp - 5
+    const morningTemp = realWeather.forecast?.[0]?.tempMin ?? Math.round(dayTemp - 5);
+    // For evening, use intermediate dayTemp - 3
+    const eveningTemp = Math.round(dayTemp - 3);
+
+    // Dynamic sea temperature
+    const seaTempDay = getSeaTemperature(dayTemp);
+    const seaTempMorning = Math.max(10, seaTempDay - 1);
+    const seaTempEvening = seaTempDay;
+
+    // Dynamic humidity
+    const baseHumidity = realWeather.humidity;
+    const morningHumidity = Math.min(98, baseHumidity + 12);
+    const dayHumidity = Math.max(30, baseHumidity - 5);
+    const eveningHumidity = Math.min(95, baseHumidity + 6);
+
+    // Dynamic wind speed
+    const baseWind = realWeather.windSpeed;
+    const morningWind = Math.max(0.5, Number((baseWind * 0.7).toFixed(1)));
+    const dayWind = baseWind;
+    const eveningWind = Math.max(0.5, Number((baseWind * 0.4).toFixed(1)));
+
+    // Weather name and code from real data
+    const realWeatherName = getWeatherName(realWeather.weatherCode);
+
+    return {
+      morning: {
+        temp: `${morningTemp}°C`,
+        seaTemp: `${seaTempMorning}°C`,
+        phytoncides: 'Супер-концентрация',
+        aerosols: 'Насыщенный морской бриз',
+        recommendation: 'Идеальное время для утреннего терренкура по парку к морю и дыхательной гимнастики.',
+        humidity: `${morningHumidity}%`,
+        windSpeed: `${morningWind} м/с`,
+        weatherCode: realWeather.weatherCode === 0 ? 1 : realWeather.weatherCode,
+        weatherName: realWeather.weatherCode === 0 ? 'Ясно, свежий ветерок' : `${realWeatherName}, свежо`
+      },
+      day: {
+        temp: `${dayTemp}°C`,
+        seaTemp: `${seaTempDay}°C`,
+        phytoncides: 'Максимум хвойного эфира',
+        aerosols: 'Смешанный хвойно-морской',
+        recommendation: 'Прекрасно для прохождения лечебных ванн и грязелечения, а также отдыха на приватном пляже.',
+        humidity: `${dayHumidity}%`,
+        windSpeed: `${dayWind} м/с`,
+        weatherCode: realWeather.weatherCode,
+        weatherName: realWeatherName
+      },
+      evening: {
+        temp: `${eveningTemp}°C`,
+        seaTemp: `${seaTempEvening}°C`,
+        phytoncides: 'Умеренная концентрация',
+        aerosols: 'Горный бриз с Ай-Петри',
+        recommendation: 'Время для релаксационной йоги на террасе и вечерних климатотерапевтических прогулок у кипарисов.',
+        humidity: `${eveningHumidity}%`,
+        windSpeed: `${eveningWind} м/с`,
+        weatherCode: realWeather.weatherCode,
+        weatherName: `${realWeatherName}, умеренный штиль`
+      }
+    };
+  }, [realWeather]);
 
   // Form inputs validation and handler for reviews
   const handleReviewInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -1962,7 +2041,7 @@ export default function App() {
                           >
                             <div className="flex items-center space-x-3.5">
                               <div className="bg-emerald-950/60 p-2.5 rounded border border-[#c5a880]/20">
-                                {getWeatherIcon(climateTime === 'day' ? 0 : climateTime === 'morning' ? 1 : 2, "w-11 h-11")}
+                                {getWeatherIcon(climateDetails[climateTime].weatherCode, "w-11 h-11")}
                               </div>
                               <div>
                                 <span className="text-[9px] text-[#c5a880] uppercase tracking-widest font-mono block">
@@ -1972,7 +2051,7 @@ export default function App() {
                                   {climateDetails[climateTime].temp}
                                 </div>
                                 <span className="text-xs text-stone-300 font-sans font-semibold block mt-1.5">
-                                  {climateTime === 'morning' ? 'Ясно, свежий ветерок' : climateTime === 'day' ? 'Преимущественно ясно' : 'Малооблачно, штиль'}
+                                  {climateDetails[climateTime].weatherName}
                                 </span>
                               </div>
                             </div>
@@ -2001,7 +2080,7 @@ export default function App() {
                             >
                               <Wind className="w-4 h-4 text-[#c5a880] shrink-0" />
                               <span className="text-xs font-extrabold text-[#FAF9F6] font-mono">
-                                {climateTime === 'morning' ? '3.2' : climateTime === 'day' ? '4.5' : '1.8'} м/с
+                                {climateDetails[climateTime].windSpeed}
                               </span>
                             </motion.div>
                           </AnimatePresence>
