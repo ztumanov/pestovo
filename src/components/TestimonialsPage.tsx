@@ -6,12 +6,13 @@ import { motion, AnimatePresence } from 'motion/react';
 export default function TestimonialsPage({ onBackToHome }: { onBackToHome: () => void }) {
   const { siteData, isAdminMode, setCurrentPage, setActiveSettingsTab } = useAdminData();
   const testimonials = siteData.testimonials;
+  const publishedTestimonials = isAdminMode ? testimonials : testimonials.filter(t => t.isApproved !== false);
 
   const [ratingFilter, setRatingFilter] = useState<number | 'all'>('all');
   const [searchQuery, setSearchQuery] = useState('');
 
   // Filter testimonials based on selected rating & search query
-  const filteredTestimonials = testimonials.filter(t => {
+  const filteredTestimonials = publishedTestimonials.filter(t => {
     const matchesRating = ratingFilter === 'all' || t.rating === ratingFilter;
     const matchesSearch = t.author.toLowerCase().includes(searchQuery.toLowerCase()) || 
                           t.text.toLowerCase().includes(searchQuery.toLowerCase()) ||

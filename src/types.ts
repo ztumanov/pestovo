@@ -32,6 +32,7 @@ export interface Testimonial {
   rating: number;
   text: string;
   date: string;
+  isApproved?: boolean;
 }
 
 export interface FAQItem {

@@ -763,7 +763,6 @@ export default function AdminPage({ onBackToHome }: { onBackToHome: () => void }
     { id: 'general', name: 'Контакты & Инфо', icon: Phone },
     { id: 'rooms', name: 'Каталог Номеров', icon: Building, badge: rooms.length },
     { id: 'medical', name: 'Программы Лечения', icon: HeartHandshake, badge: medPrograms.length },
-    { id: 'services', name: 'Каталог Услуг', icon: Sparkles, badge: services.length },
     { id: 'testimonials', name: 'Отзывы Гостей', icon: MessageSquare, badge: testimonials.length },
     { id: 'faq', name: 'Вопросы & Ответы', icon: HelpCircle, badge: faqs.length },
     { id: 'news', name: 'Новости', icon: Newspaper, badge: news.length },
@@ -1618,132 +1617,6 @@ export default function AdminPage({ onBackToHome }: { onBackToHome: () => void }
             </div>
           )}
 
-          {/* TAB: SERVICES */}
-          {activeSettingsTab === 'services' && (
-            <div className="space-y-6">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-stone-200 pb-3">
-                <div>
-                  <h3 className="font-serif font-black text-xl text-[#022C22]">Каталог медицинских и оздоровительных услуг</h3>
-                  <p className="text-xs text-stone-400 mt-1">Добавление, изменение категорий, показаний, методов проведения и пользы услуг.</p>
-                </div>
-                {!showAddService && !editingServiceId && (
-                  <button 
-                    onClick={() => setShowAddService(true)}
-                    className="bg-emerald-800 hover:bg-emerald-700 text-white font-bold text-xs px-4 py-3 rounded-xl flex items-center gap-1.5 uppercase tracking-wider transition-all shadow cursor-pointer"
-                  >
-                    <Plus className="w-4 h-4" /> Добавить услугу
-                  </button>
-                )}
-              </div>
-
-              {/* LIST SERVICES */}
-              {!showAddService && !editingServiceId && (
-                <div className="space-y-4">
-                  {services.length === 0 ? (
-                    <div className="bg-white rounded-2xl border border-dashed border-stone-300 p-8 text-center text-stone-500 font-sans">
-                      Список услуг пуст. Создайте первую услугу с помощью кнопки выше.
-                    </div>
-                  ) : (
-                    services.map((service) => {
-                      let categoryName = '';
-                      switch (service.category) {
-                        case 'methods': categoryName = 'Методы лечения'; break;
-                        case 'diagnostics': categoryName = 'Функциональная диагностика'; break;
-                        case 'laboratory': categoryName = 'Лабораторная база'; break;
-                        case 'infrastructure': categoryName = 'Инфраструктура и сервис'; break;
-                        default: categoryName = service.category;
-                      }
-
-                      return (
-                        <div 
-                          key={service.id}
-                          className="bg-white rounded-2xl border border-stone-200 p-5 flex flex-col md:flex-row md:items-start justify-between gap-5 shadow-sm hover:shadow-md transition-shadow"
-                        >
-                          <div className="flex-1 space-y-2">
-                            <div className="flex flex-wrap items-center gap-2">
-                              <h4 className="font-serif font-black text-[#022C22] text-base md:text-lg flex items-center gap-2">
-                                <span className="text-emerald-700 text-base">✨</span> {service.title}
-                              </h4>
-                              <span className="bg-amber-50 text-amber-800 text-[9px] uppercase font-mono tracking-wider font-bold px-2 py-0.5 border border-amber-200 rounded">
-                                {categoryName}
-                              </span>
-                              {service.duration && (
-                                <span className="text-[10px] text-stone-500 font-mono">
-                                  ⏱️ {service.duration}
-                                </span>
-                              )}
-                            </div>
-                            
-                            <div className="text-xs text-stone-600 space-y-1">
-                              <p className="leading-relaxed"><strong>Польза:</strong> {service.benefit}</p>
-                              <p className="leading-relaxed"><strong>Методика:</strong> {service.method}</p>
-                              {service.indications && service.indications.length > 0 && (
-                                <p className="leading-relaxed">
-                                  <strong>Показания:</strong> {service.indications.join(', ')}
-                                </p>
-                              )}
-                            </div>
-                          </div>
-                          
-                          <div className="flex items-center space-x-2 self-end md:self-center flex-shrink-0 mt-2 md:mt-0">
-                            <button 
-                              onClick={() => setEditingServiceId(service.id)}
-                              className="border border-[#022C22] hover:bg-[#022C22] text-[#022C22] hover:text-white font-bold text-xs px-4 py-2 rounded-xl transition-all cursor-pointer"
-                            >
-                              Редактировать
-                            </button>
-                            <button 
-                              onClick={() => handleDeleteService(service.id)}
-                              className="border border-red-200 bg-red-50 hover:bg-red-100 text-red-700 p-2.5 rounded-xl transition-all cursor-pointer"
-                              title="Удалить услугу"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </button>
-                          </div>
-                        </div>
-                      );
-                    })
-                  )}
-                </div>
-              )}
-
-              {/* ADD SERVICE FORM */}
-              {showAddService && (
-                <ServiceForm 
-                  initialData={{
-                    category: 'methods',
-                    title: '',
-                    benefit: '',
-                    method: '',
-                    duration: '20 мин',
-                    iconName: 'Sparkles',
-                    indications: []
-                  }}
-                  onCancel={() => setShowAddService(false)}
-                  onSave={handleAddService}
-                />
-              )}
-
-              {/* EDIT SERVICE FORM */}
-              {editingServiceId && (() => {
-                const service = services.find(s => s.id === editingServiceId);
-                return service ? (
-                  <div className="bg-stone-50 rounded-2xl border border-[#c5a880]/40 p-6 md:p-8 space-y-4 shadow-sm">
-                    <h4 className="font-serif font-black text-md text-[#022C22] flex items-center gap-1.5 uppercase tracking-wide">
-                      ⚙️ Редактирование услуги: <span className="text-[#b0936b]">{service.title}</span>
-                    </h4>
-                    <ServiceForm 
-                      initialData={service}
-                      onCancel={() => setEditingServiceId(null)}
-                      onSave={(data) => handleUpdateService(service.id, { ...data, id: service.id })}
-                    />
-                  </div>
-                ) : null;
-              })()}
-            </div>
-          )}
-
-          {/* TAB 5: TESTIMONIALS */}
           {activeSettingsTab === 'testimonials' && (
             <div className="space-y-6">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-stone-200 pb-3">
@@ -1775,11 +1648,28 @@ export default function AdminPage({ onBackToHome }: { onBackToHome: () => void }
                           <span className="bg-yellow-100 text-yellow-850 text-[10px] px-2 py-0.5 rounded-full flex items-center gap-0.5 font-bold font-mono">
                             ★ {test.rating}
                           </span>
+                          {test.isApproved === false ? (
+                            <span className="bg-orange-100 text-orange-800 text-[10px] px-2 py-0.5 rounded-full font-bold font-mono">
+                              ОЖИДАЕТ МОДЕРАЦИИ
+                            </span>
+                          ) : (
+                            <span className="bg-emerald-100 text-emerald-800 text-[10px] px-2 py-0.5 rounded-full font-bold font-mono">
+                              ОПУБЛИКОВАН
+                            </span>
+                          )}
                         </div>
                         <p className="text-[10px] text-stone-400 font-mono mt-1">{test.role} • {test.date}</p>
                         <p className="text-xs text-stone-600 mt-2.5 italic leading-relaxed">"{test.text}"</p>
                       </div>
                       <div className="flex items-center space-x-2 self-end md:self-center">
+                        {test.isApproved === false && (
+                          <button 
+                            onClick={() => handleUpdateTest(test.id, { ...test, isApproved: true })}
+                            className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-4 py-2 rounded-xl transition-all cursor-pointer"
+                          >
+                            Одобрить
+                          </button>
+                        )}
                         <button 
                           onClick={() => setEditingTestId(test.id)}
                           className="border border-[#022C22] hover:bg-[#022C22] text-[#022C22] hover:text-white font-bold text-xs px-4 py-2 rounded-xl transition-all cursor-pointer"

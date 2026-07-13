@@ -69,7 +69,6 @@ import AdminFloatBar from './components/AdminFloatBar';
 import DocumentsModal from './components/DocumentsModal';
 import NewsPage from './components/NewsPage';
 import MedicalPage from './components/MedicalPage';
-import ServicesPage from './components/ServicesPage';
 import DocumentsPage from './components/DocumentsPage';
 import TestimonialsPage from './components/TestimonialsPage';
 import LoginPage from './components/LoginPage';
@@ -1112,7 +1111,8 @@ export default function App() {
       role: reviewForm.role.trim() || 'Гость санатория',
       rating: reviewForm.rating,
       text: reviewForm.text.trim(),
-      date: dateStr
+      date: dateStr,
+      isApproved: false
     };
 
     setTimeout(async () => {
@@ -1468,24 +1468,12 @@ export default function App() {
                         <Newspaper className="w-4 h-4 text-[#c5a880] flex-shrink-0" />
                         <span>Новости санатория</span>
                       </button>
-                      <button
-                        onClick={() => {
-                          setCurrentPage('services');
-                          window.scrollTo({ top: 0, behavior: 'smooth' });
-                          setIsAboutDropdownOpen(false);
-                        }}
-                        className="w-full flex items-center space-x-2.5 px-4 py-2.5 text-xs hover:bg-[#034434] hover:text-[#c5a880] transition-colors text-left cursor-pointer text-stone-100"
-                      >
-                        <Compass className="w-4 h-4 text-[#c5a880] flex-shrink-0" />
-                        <span className="font-semibold text-[#c5a880]">Услуги и Сервисы</span>
-                      </button>
                     </motion.div>
                   )}
                 </AnimatePresence>
               </div>
 
               {[
-                { id: 'services', label: 'Услуги', isPage: true },
                 { id: 'medical', label: 'Лечение' },
                 { id: 'rooms', label: 'Номера' },
                 { id: 'gallery', label: 'Галерея' },
@@ -1601,24 +1589,12 @@ export default function App() {
                         >
                           • Новости санатория
                         </button>
-                        <button
-                          onClick={() => {
-                            setCurrentPage('services');
-                            window.scrollTo({ top: 0, behavior: 'smooth' });
-                            setIsMobileMenuOpen(false);
-                            setIsAboutDropdownOpen(false);
-                          }}
-                          className="w-full text-left block py-2 text-xs font-semibold text-[#c5a880] hover:text-white cursor-pointer font-bold"
-                        >
-                          • Услуги и Сервисы
-                        </button>
                       </motion.div>
                     )}
                   </AnimatePresence>
                 </div>
 
                 {[
-                  { id: 'services', label: 'Услуги и Сервисы', isPage: true },
                   { id: 'medical', label: 'Лечение' },
                   { id: 'rooms', label: 'Категории Номеров' },
                   { id: 'gallery', label: 'Галерея' },
@@ -1698,11 +1674,6 @@ export default function App() {
             }} />
           ) : currentPage === 'medical' ? (
             <MedicalPage onBackToHome={() => {
-              setCurrentPage('home');
-              window.scrollTo({ top: 0, behavior: 'smooth' });
-            }} />
-          ) : currentPage === 'services' ? (
-            <ServicesPage onBackToHome={() => {
               setCurrentPage('home');
               window.scrollTo({ top: 0, behavior: 'smooth' });
             }} />
@@ -1920,8 +1891,8 @@ export default function App() {
                 <span className="italic text-[#c5a880] font-normal font-serif">и комплексное оздоровление</span>
               </h2>
               <div className="text-stone-700 space-y-4 text-base md:text-lg leading-relaxed">
-                <p>{RESORT_INFO.historyText}</p>
-                <p>{RESORT_INFO.climatotherapyText}</p>
+                <p>Расположенный в курортном поселке Гаспра, в 8 км от Ялты, санаторий «Ясная Поляна» ФТС России предлагает качественное санаторно-курортное лечение на Южном берегу Крыма. Являясь ведомственным учреждением в федеральной собственности, наша организация специализируется на приеме и оздоровлении взрослого населения, обеспечивая строгие стандарты безопасности и комфорта. Уникальное географическое положение позволяет нашим гостям эффективно совмещать медицинские процедуры с отдыхом в одном из самых благоприятных климатических регионов полуострова.</p>
+                <p>Мы предлагаем комплексный подход к здоровью, включающий терапию, диетологию, физиотерапию и функциональную диагностику. Курсы лечения эффективно дополняются процедурами медицинского массажа, лечебной физкультуры и сестринского дела под контролем квалифицированных специалистов в области организации здравоохранения. Современная диагностическая база и индивидуально подобранные программы реабилитации направлены на оперативное восстановление сил и долгосрочное укрепление организма.</p>
               </div>
             </div>
 
@@ -2969,7 +2940,7 @@ export default function App() {
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {siteData.testimonials.slice(0, 3).map((t) => (
+            {siteData.testimonials.filter(t => t.isApproved !== false).slice(0, 3).map((t) => (
               <div 
                 key={t.id} 
                 className="bg-emerald-950 border border-[#c5a880]/20 p-6 sm:p-8 rounded-sm relative flex flex-col justify-between shadow-xl"
@@ -3235,13 +3206,13 @@ export default function App() {
 
                     <div className="space-y-3">
                       <span className="text-[10px] tracking-widest font-mono uppercase bg-[#c5a880] text-[#022C22] px-3 py-1 font-bold rounded-full">
-                        Публикация завершена
+                        Отзыв отправлен на модерацию
                       </span>
                       <h3 className="font-serif text-3xl font-bold text-[#022C22]">
                         Спасибо, {reviewForm.author.split(' ')[0]}!
                       </h3>
                       <p className="text-sm text-stone-600 max-w-md leading-relaxed">
-                        Ваш развернутый отзыв с оценкой <strong className="text-amber-500 font-bold">{reviewForm.rating} ★</strong> был успешно сохранен и добавлен в общую карусель отзывов выше!
+                        Ваш развернутый отзыв с оценкой <strong className="text-amber-500 font-bold">{reviewForm.rating} ★</strong> был успешно сохранен. Он будет опубликован после проверки модератором.
                       </p>
                     </div>
 
