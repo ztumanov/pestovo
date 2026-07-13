@@ -2887,6 +2887,7 @@ export default function App() {
                   <img
                     src={item.src || undefined}
                     alt={item.title}
+                    loading="lazy"
                     className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                     referrerPolicy="no-referrer"
                   />
@@ -3754,6 +3755,7 @@ export default function App() {
                     key={lightboxIndex}
                     src={filteredGallery[lightboxIndex]?.src || undefined}
                     alt={filteredGallery[lightboxIndex]?.title || ''}
+                    loading="lazy"
                     initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0, scale: 0.95 }}
