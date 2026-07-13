@@ -1699,7 +1699,7 @@ export default function App() {
         
         {/* Dynamic Background (Switchable Video/Image loops) */}
         <motion.div className="absolute inset-0 z-0 bg-[#033E31]" style={{ y: yBg }}>
-          <AnimatePresence mode="wait">
+          <AnimatePresence mode="wait" initial={false}>
             {slides[activeSlideIndex] && (
               <motion.div 
                 key={`slide-${activeSlideIndex}-${slides[activeSlideIndex]?.url}`}
@@ -1732,6 +1732,7 @@ export default function App() {
                     alt="Санаторий Ясная Поляна ФТС России"
                     className="w-full h-full object-cover object-center scale-105"
                     referrerPolicy="no-referrer"
+                    fetchPriority="high"
                   />
                 )}
               </motion.div>
