@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { Room, MedicalProgram, Testimonial, FAQItem, NewsArticle, ServiceItem, GalleryItem, GalleryCategory, AdminUser } from '../types';
+import { Room, MedicalProgram, Testimonial, FAQItem, NewsArticle, ServiceItem, GalleryItem, GalleryCategory, AdminUser, DocumentItem } from '../types';
 import { 
   ROOMS, 
   MEDICAL_PROGRAMS, 
@@ -11,6 +11,7 @@ import {
   VIDEOS 
 } from '../data/resortData';
 import { DEFAULT_SERVICES } from '../data/servicesData';
+import { INITIAL_DOCUMENTS } from '../data/documentsData';
 
 export interface SiteData {
   resortInfo: {
@@ -85,6 +86,7 @@ export interface SiteData {
   gallery: GalleryItem[];
   galleryCategories: GalleryCategory[];
   users?: AdminUser[];
+  documents?: DocumentItem[];
 }
 
 const DEFAULT_SITE_DATA: SiteData = {
@@ -146,7 +148,8 @@ const DEFAULT_SITE_DATA: SiteData = {
   users: [
     { id: 'user-1', username: 'admin', password: 'admin2026', role: 'Главный Администратор' },
     { id: 'user-2', username: 'daniliv', password: 'admin', role: 'и.о. Начальника санатория' }
-  ]
+  ],
+  documents: [...INITIAL_DOCUMENTS]
 };
 
 const LOCAL_STORAGE_KEY = 'pestovo_resort_editable_data';
@@ -350,6 +353,22 @@ export function AdminDataProvider({ children }: { children: React.ReactNode }) {
           // Backfill missing users
           if (!parsed.users || !Array.isArray(parsed.users)) {
             parsed.users = JSON.parse(JSON.stringify(baseData.users || DEFAULT_SITE_DATA.users || []));
+            morphed = true;
+          }
+
+          // Backfill missing documents
+          if (!parsed.documents || !Array.isArray(parsed.documents)) {
+            // Check if there is already a standalone local storage documents item, otherwise use INITIAL_DOCUMENTS
+            const savedDocsRaw = localStorage.getItem('pestovo_custom_documents');
+            if (savedDocsRaw) {
+              try {
+                parsed.documents = JSON.parse(savedDocsRaw);
+              } catch {
+                parsed.documents = JSON.parse(JSON.stringify(INITIAL_DOCUMENTS));
+              }
+            } else {
+              parsed.documents = JSON.parse(JSON.stringify(INITIAL_DOCUMENTS));
+            }
             morphed = true;
           }
 

@@ -401,15 +401,8 @@ const INITIAL_DOCUMENTS: DocumentItem[] = [
 ];
 
 export default function DocumentsPage({ onBackToHome }: { onBackToHome: () => void }) {
-  const { isAdminMode, siteData } = useAdminData();
-  const [documents, setDocuments] = useState<DocumentItem[]>(() => {
-    try {
-      const saved = localStorage.getItem('pestovo_custom_documents');
-      return saved ? JSON.parse(saved) : INITIAL_DOCUMENTS;
-    } catch {
-      return INITIAL_DOCUMENTS;
-    }
-  });
+  const { isAdminMode, siteData, updateSection } = useAdminData();
+  const documents = siteData.documents || INITIAL_DOCUMENTS;
 
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
@@ -424,7 +417,7 @@ export default function DocumentsPage({ onBackToHome }: { onBackToHome: () => vo
 
   const saveToLocalStorage = (newDocs: DocumentItem[]) => {
     localStorage.setItem('pestovo_custom_documents', JSON.stringify(newDocs));
-    setDocuments(newDocs);
+    updateSection('documents', newDocs);
   };
 
   const handleSimulatedPdfUpload = (docId: string, event: React.ChangeEvent<HTMLInputElement>) => {

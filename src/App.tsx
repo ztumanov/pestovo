@@ -1390,53 +1390,7 @@ export default function App() {
             <div className="flex items-center space-x-4 cursor-pointer" onClick={() => { setCurrentPage('home'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}>
               {/* Gold/Emerald High-Fidelity Vector Russian FTS Emblem */}
               <div className="w-14 h-14 bg-gradient-to-br from-[#c5a880]/30 to-[#9a7d56]/10 rounded-full p-1 shadow-inner flex items-center justify-center relative overflow-visible select-none">
-                <svg className="w-12 h-12 block select-none filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.4)]" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  {/* Eagle Wings & Tail (Elegant Antique Gold) */}
-                  <path d="M 50 42 C 43 30, 26 18, 12 28 C 15 38, 20 48, 30 58 C 24 61, 20 66, 16 73 C 24 71, 32 66, 38 60 C 34 69, 30 78, 22 85 C 32 81, 40 73, 44 63 L 44 48 C 45 44, 46 43, 46 42 Z" fill="#D4AF37" opacity="0.95" />
-                  <path d="M 50 42 C 57 30, 74 18, 88 28 C 85 38, 80 48, 70 58 C 76 61, 80 66, 84 73 C 76 71, 68 66, 62 60 C 66 69, 70 78, 78 85 C 68 81, 60 73, 56 63 L 56 48 C 55 44, 54 43, 54 42 Z" fill="#D4AF37" opacity="0.95" />
-                  
-                  {/* Eagle Heads */}
-                  <path d="M 45 37 C 42 37, 39 34, 39 31 C 39 28, 42 24, 45 24 C 48 24, 49 28, 48 30 C 47 33, 47 37, 45 37 Z" fill="#D4AF37" />
-                  <path d="M 39 29 L 34 27 L 38 31 Z" fill="#D6B85C" />
-                  
-                  <path d="M 55 37 C 58 37, 61 34, 61 31 C 61 28, 58 24, 55 24 C 52 24, 51 28, 52 30 C 53 33, 53 37, 55 37 Z" fill="#D4AF37" />
-                  <path d="M 61 29 L 66 27 L 62 31 Z" fill="#D6B85C" />
-
-                  {/* Imperial Crowns */}
-                  <path d="M 42 20 C 42 18, 44 17, 45 17 C 46 17, 48 18, 48 20 H 42 Z" fill="#F3E5AB" stroke="#9A7D56" strokeWidth="0.5" />
-                  <path d="M 52 20 C 52 18, 54 17, 55 17 C 56 17, 58 18, 58 20 H 52 Z" fill="#F3E5AB" stroke="#9A7D56" strokeWidth="0.5" />
-                  <g transform="translate(0, -1)">
-                    <path d="M 46 15 C 46 11, 48 10, 50 10 C 52 10, 54 11, 54 15" stroke="#F3E5AB" strokeWidth="1.2" strokeLinecap="round" />
-                    <path d="M 44 16 C 44 14, 47 13, 50 13 C 53 13, 56 14, 56 16 C 55 18, 45 18, 44 16 Z" fill="#F3E5AB" stroke="#9A7D56" strokeWidth="0.5" />
-                    <circle cx="50" cy="9" r="1" fill="#F3E5AB" />
-                  </g>
-
-                  {/* Green Heraldic Shield with Golden Border */}
-                  <g transform="translate(0, 3)">
-                    <path d="M 33 37 C 33 55, 35 70, 50 78 C 65 70, 67 55, 67 37 Z" fill="#D4AF37" stroke="#9A7D56" strokeWidth="0.5" />
-                    <path d="M 35 39 C 35 53, 37 67, 50 75 C 63 67, 65 53, 65 39 Z" fill="#006A2E" />
-                    
-                    {/* Crossed Torch & Caduceus */}
-                    <g transform="translate(50, 54) scale(0.65)">
-                      {/* Flamming Torch */}
-                      <path d="M 12 -18 C 15 -25, 10 -28, 13 -33 C 8 -29, 6 -24, 7 -21 C 9 -21, 11 -20, 12 -18 Z" fill="#FF4500" />
-                      <line x1="-15" y1="15" x2="11" y2="-11" stroke="#F3E5AB" strokeWidth="2.5" strokeLinecap="round" />
-                      <polygon points="6,-11 13,-18 11,-19 4,-12" fill="#F3E5AB" />
-                      
-                      {/* Caduceus */}
-                      <g transform="rotate(-90)">
-                        <line x1="-15" y1="15" x2="11" y2="-11" stroke="#F3E5AB" strokeWidth="2.5" strokeLinecap="round" />
-                        <circle cx="12" cy="-12" r="3" fill="#F3E5AB" />
-                        {/* Wings on the rod */}
-                        <path d="M 8 -16 C 11 -13, 14 -16, 14 -16 C 14 -16, 11 -19, 8 -16 Z" fill="#F3E5AB" />
-                        <path d="M 16 -8 C 13 -11, 16 -14, 16 -14 C 16 -14, 19 -11, 16 -8 Z" fill="#F3E5AB" />
-                        {/* Double Snakes winding */}
-                        <path d="M -11 11 Q -6 9 -4 4 Q -2 0 -3 -4 Q -4 -8 0 -9 Q 4 -10 7 -6" stroke="#D4AF37" strokeWidth="1.5" fill="none" strokeLinecap="round" />
-                        <path d="M -9 13 Q -11 7 -7 4 Q -4 1 -5 -4 Q -6 -9 -1 -10 Q 4 -11 6 -7" stroke="#D4AF37" strokeWidth="1.5" fill="none" strokeLinecap="round" />
-                      </g>
-                    </g>
-                  </g>
-                </svg>
+                <img src="https://upload.wikimedia.org/wikipedia/commons/1/14/Emblem_of_the_Federal_Customs_Service_of_Russia.svg" alt="ФТС России" className="w-12 h-12 object-contain filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.4)]" />
               </div>
               <div className="flex flex-col items-start justify-center pl-1">
                 <div className="flex items-center space-x-1.5">
@@ -1962,34 +1916,12 @@ export default function App() {
                 <span className="text-[11px] tracking-widest font-mono uppercase text-[#c5a880] font-bold">Оазис Здоровья в Гаспре</span>
               </div>
               <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl font-extrabold text-[#022C22] tracking-tight">
-                Уникальный парк-арборетум <br/>
-                <span className="italic text-[#c5a880] font-normal font-serif">и целебный климат</span>
+                Южнобережный климат <br/>
+                <span className="italic text-[#c5a880] font-normal font-serif">и комплексное оздоровление</span>
               </h2>
               <div className="text-stone-700 space-y-4 text-base md:text-lg leading-relaxed">
                 <p>{RESORT_INFO.historyText}</p>
                 <p>{RESORT_INFO.climatotherapyText}</p>
-              </div>
-
-              {/* Grid of details with icons */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4">
-                <div className="flex items-start space-x-3 p-4 bg-white rounded-sm border-l-4 border-[#022C22] shadow-sm">
-                  <div className="bg-[#FAF9F6] p-2 rounded-sm text-[#c5a880]">
-                    <Clock className="w-5 h-5 text-[#c5a880]" />
-                  </div>
-                  <div>
-                    <h4 className="font-semibold text-sm text-[#022C22]">Отдых 365 дней</h4>
-                    <p className="text-xs text-stone-500 mt-1">Климатотерапия эффективна круглосуточно в любой сезон.</p>
-                  </div>
-                </div>
-                <div className="flex items-start space-x-3 p-4 bg-white rounded-sm border-l-4 border-[#c5a880] shadow-sm">
-                  <div className="bg-[#FAF9F6] p-2 rounded-sm text-[#c5a880]">
-                    <Compass className="w-5 h-5 text-[#c5a880]" />
-                  </div>
-                  <div>
-                    <h4 className="font-semibold text-sm text-[#022C22]">Лифт к морю</h4>
-                    <p className="text-xs text-stone-500 mt-1">Комфортный спуск в скале к собственному мелкогалечному пляжу.</p>
-                  </div>
-                </div>
               </div>
             </div>
 

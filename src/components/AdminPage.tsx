@@ -36,7 +36,7 @@ import {
   Loader2
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Room, MedicalProgram, Testimonial, FAQItem, NewsArticle, ServiceItem, GalleryItem, GalleryCategory, AdminUser } from '../types';
+import { Room, MedicalProgram, Testimonial, FAQItem, NewsArticle, ServiceItem, GalleryItem, GalleryCategory, AdminUser, DocumentItem } from '../types';
 
 /**
  * Utility to downscale and compress images client-side before storing them in localStorage
@@ -116,6 +116,7 @@ export default function AdminPage({ onBackToHome }: { onBackToHome: () => void }
   const [galleryItems, setGalleryItems] = useState<GalleryItem[]>([...(siteData.gallery || [])]);
   const [galleryCats, setGalleryCats] = useState<GalleryCategory[]>([...(siteData.galleryCategories || [])]);
   const [usersList, setUsersList] = useState<AdminUser[]>([...(siteData.users || [])]);
+  const [documents, setDocuments] = useState<DocumentItem[]>([...(siteData.documents || [])]);
 
   // Selected sub-items being edited in forms
   const [editingRoomId, setEditingRoomId] = useState<string | null>(null);
@@ -125,6 +126,7 @@ export default function AdminPage({ onBackToHome }: { onBackToHome: () => void }
   const [editingNewsId, setEditingNewsId] = useState<string | null>(null);
   const [editingServiceId, setEditingServiceId] = useState<string | null>(null);
   const [editingUserId, setEditingUserId] = useState<string | null>(null);
+  const [editingDocId, setEditingDocId] = useState<string | null>(null);
 
   // States for adding new items
   const [showAddRoom, setShowAddRoom] = useState(false);
@@ -134,6 +136,7 @@ export default function AdminPage({ onBackToHome }: { onBackToHome: () => void }
   const [showAddNews, setShowAddNews] = useState(false);
   const [showAddService, setShowAddService] = useState(false);
   const [showAddUser, setShowAddUser] = useState(false);
+  const [showAddDoc, setShowAddDoc] = useState(false);
 
   // User form state
   const [userForm, setUserForm] = useState<Omit<AdminUser, 'id'>>({
@@ -211,6 +214,7 @@ export default function AdminPage({ onBackToHome }: { onBackToHome: () => void }
     setServices([...(siteData.services || [])]);
     setGalleryItems([...(siteData.gallery || [])]);
     setGalleryCats([...(siteData.galleryCategories || [])]);
+    setDocuments([...(siteData.documents || [])]);
   }, [siteData]);
 
   if (!isAdminMode) {
@@ -634,6 +638,43 @@ export default function AdminPage({ onBackToHome }: { onBackToHome: () => void }
     triggerSuccess();
   };
 
+  // DOCUMENTS HANDLERS
+  const handleUpdateDocument = (docId: string, updatedDoc: DocumentItem) => {
+    const nextDocs = documents.map(d => d.id === docId ? updatedDoc : d);
+    setDocuments(nextDocs);
+    updateSection('documents', nextDocs);
+    setEditingDocId(null);
+    triggerSuccess();
+  };
+
+  const handleDeleteDocument = (docId: string) => {
+    setConfirmModal({
+      isOpen: true,
+      title: 'Удалить официальный документ?',
+      message: 'Вы уверены, что хотите навсегда убрать этот документ? Его нельзя будет восстановить, и он исчезнет из общего перечня на сайте.',
+      confirmText: 'Да, удалить',
+      confirmClass: 'bg-red-600 hover:bg-red-750 text-white',
+      onConfirm: () => {
+        const nextDocs = documents.filter(d => d.id !== docId);
+        setDocuments(nextDocs);
+        updateSection('documents', nextDocs);
+        triggerSuccess();
+      }
+    });
+  };
+
+  const handleAddDocument = (newDoc: Omit<DocumentItem, 'id'>) => {
+    const created: DocumentItem = {
+      ...newDoc,
+      id: `doc-${Date.now()}`
+    };
+    const nextDocs = [...documents, created];
+    setDocuments(nextDocs);
+    updateSection('documents', nextDocs);
+    setShowAddDoc(false);
+    triggerSuccess();
+  };
+
   const handleFile = (file: File) => {
     if (!file.type.startsWith('image/')) {
       setUploadError('Пожалуйста, выберите файл изображения (png, jpg, jpeg, webp).');
@@ -726,6 +767,7 @@ export default function AdminPage({ onBackToHome }: { onBackToHome: () => void }
     { id: 'testimonials', name: 'Отзывы Гостей', icon: MessageSquare, badge: testimonials.length },
     { id: 'faq', name: 'Вопросы & Ответы', icon: HelpCircle, badge: faqs.length },
     { id: 'news', name: 'Новости', icon: Newspaper, badge: news.length },
+    { id: 'documents', name: 'Реестр Документов', icon: FileText, badge: documents.length },
     { id: 'media', name: 'Медиа & Ссылки', icon: Folder, badge: galleryItems.length },
     { id: 'users', name: 'Пользователи', icon: Users, badge: usersList.length },
     { id: 'publish', name: 'Сохранить на хостинг', icon: Database },
@@ -849,7 +891,7 @@ export default function AdminPage({ onBackToHome }: { onBackToHome: () => void }
 
         {/* METRICS & QUICK SUMMARY */}
         <section className="bg-white border-b border-stone-100 p-6 md:px-10">
-          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
             
             <div className="bg-[#FAF9F6] border border-stone-200/60 rounded-xl p-4 flex items-center space-x-3.5 shadow-sm">
               <div className="p-3 bg-indigo-50 text-indigo-700 rounded-lg">
@@ -888,6 +930,16 @@ export default function AdminPage({ onBackToHome }: { onBackToHome: () => void }
               <div>
                 <span className="text-[10px] text-stone-400 font-mono block uppercase">Частых Вопросов</span>
                 <span className="text-lg font-black block font-mono text-stone-800">{faqs.length}</span>
+              </div>
+            </div>
+
+            <div className="bg-[#FAF9F6] border border-stone-200/60 rounded-xl p-4 flex items-center space-x-3.5 shadow-sm">
+              <div className="p-3 bg-blue-50 text-blue-700 rounded-lg">
+                <FileText className="w-5 h-5" />
+              </div>
+              <div>
+                <span className="text-[10px] text-stone-400 font-mono block uppercase">Реестр Документов</span>
+                <span className="text-lg font-black block font-mono text-stone-800">{documents.length}</span>
               </div>
             </div>
 
@@ -2507,6 +2559,149 @@ export default function AdminPage({ onBackToHome }: { onBackToHome: () => void }
             </div>
           )}
 
+          {activeSettingsTab === 'documents' && (
+            <div className="space-y-6">
+              <div className="border-b border-stone-200 pb-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div>
+                  <h2 className="font-serif font-black text-2xl text-[#022C22] tracking-tight">Реестр Официальных Документов</h2>
+                  <p className="text-xs text-stone-500 mt-1">
+                    Создание, редактирование, удаление и загрузка PDF-файлов (лицензии, приказы, уставные документы).
+                  </p>
+                </div>
+                {!showAddDoc && !editingDocId && (
+                  <button
+                    onClick={() => setShowAddDoc(true)}
+                    className="self-start sm:self-auto bg-[#022C22] text-[#FAF9F6] hover:bg-[#c5a880] hover:text-[#022C22] font-semibold text-xs py-3 px-6 rounded-xl transition-all uppercase tracking-wider flex items-center gap-2 border border-transparent shadow cursor-pointer active:scale-95"
+                  >
+                    <Plus className="w-4 h-4" /> Добавить документ
+                  </button>
+                )}
+              </div>
+
+              {/* ADD DOCUMENT FORM */}
+              {showAddDoc && (
+                <div className="space-y-4 animate-fade-in">
+                  <div className="flex items-center gap-2 text-stone-600 mb-1">
+                    <FileText className="w-4 h-4 text-[#c5a880]" />
+                    <span className="text-sm font-bold uppercase tracking-wider">Новый документ</span>
+                  </div>
+                  <DocumentForm
+                    initialData={{
+                      title: '',
+                      category: 'constituent',
+                      categoryLabel: 'Учредительные и общие',
+                      summary: '',
+                      pdfUrl: null,
+                      fileSize: '',
+                      uploadDate: new Date().toLocaleDateString('ru-RU'),
+                      originalText: ''
+                    }}
+                    onCancel={() => setShowAddDoc(false)}
+                    onSave={handleAddDocument}
+                  />
+                </div>
+              )}
+
+              {/* EDIT DOCUMENT FORM */}
+              {editingDocId && (
+                <div className="space-y-4 animate-fade-in">
+                  <div className="flex items-center gap-2 text-stone-600 mb-1">
+                    <Edit2 className="w-4 h-4 text-[#c5a880]" />
+                    <span className="text-sm font-bold uppercase tracking-wider">Редактирование документа</span>
+                  </div>
+                  {(() => {
+                    const doc = documents.find(d => d.id === editingDocId);
+                    if (!doc) return <p className="text-sm text-red-500">Документ не найден</p>;
+                    return (
+                      <DocumentForm
+                        initialData={doc}
+                        onCancel={() => setEditingDocId(null)}
+                        onSave={(data) => handleUpdateDocument(editingDocId, { ...data, id: editingDocId })}
+                      />
+                    );
+                  })()}
+                </div>
+              )}
+
+              {/* LIST OF DOCUMENTS */}
+              {!showAddDoc && !editingDocId && (
+                <div className="bg-white border border-stone-200/80 rounded-2xl shadow-sm overflow-hidden animate-fade-in">
+                  <div className="p-4 border-b border-stone-100 bg-[#FAF9F6] flex flex-col md:flex-row gap-3 md:items-center md:justify-between">
+                    <span className="text-xs font-black uppercase tracking-wider text-[#022C22] block font-mono">
+                      Список документов ({documents.length})
+                    </span>
+                    <p className="text-[11px] text-stone-400">
+                      Изменения вступают в силу после нажатия кнопки «Опубликовать» во вкладке сохранения.
+                    </p>
+                  </div>
+
+                  <div className="divide-y divide-stone-100">
+                    {documents.map((doc, idx) => (
+                      <div key={doc.id || idx} className="p-5 flex flex-col md:flex-row md:items-center justify-between gap-4 hover:bg-stone-50/50 transition-colors">
+                        <div className="space-y-1.5 flex-1 min-w-0">
+                          <div className="flex flex-wrap items-center gap-2">
+                            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-stone-100 text-stone-600 border border-stone-200/50">
+                              {doc.categoryLabel || doc.category}
+                            </span>
+                            {doc.code && (
+                              <span className="text-[10px] font-mono font-bold text-[#c5a880] bg-[#c5a880]/5 px-2 py-0.5 rounded border border-[#c5a880]/15">
+                                {doc.code}
+                              </span>
+                            )}
+                            {doc.pdfUrl ? (
+                              <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-100 px-2 py-0.5 rounded flex items-center gap-1">
+                                📎 PDF ({doc.fileSize || 'Загружен'})
+                              </span>
+                            ) : (
+                              <span className="text-[10px] font-bold text-stone-400 bg-stone-50 border border-stone-200/60 px-2 py-0.5 rounded">
+                                Без PDF (только текст)
+                              </span>
+                            )}
+                          </div>
+                          <h3 className="font-serif font-bold text-[#022C22] text-sm leading-tight uppercase tracking-tight">
+                            {doc.title}
+                          </h3>
+                          <p className="text-xs text-stone-600 line-clamp-2 max-w-3xl leading-relaxed">
+                            {doc.summary}
+                          </p>
+                          {doc.uploadDate && (
+                            <span className="text-[10px] text-stone-400 block font-mono">
+                              Загружен: {doc.uploadDate}
+                            </span>
+                          )}
+                        </div>
+
+                        <div className="flex items-center gap-2 self-end md:self-auto">
+                          <button
+                            onClick={() => setEditingDocId(doc.id)}
+                            className="p-2 text-stone-500 hover:text-stone-800 hover:bg-stone-100 rounded-xl transition-all cursor-pointer"
+                            title="Редактировать"
+                          >
+                            <Edit2 className="w-4 h-4" />
+                          </button>
+                          <button
+                            onClick={() => handleDeleteDocument(doc.id)}
+                            className="p-2 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-xl transition-all cursor-pointer"
+                            title="Удалить"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+
+                    {documents.length === 0 && (
+                      <div className="p-10 text-center text-stone-400">
+                        <FileText className="w-8 h-8 mx-auto mb-2 text-stone-300" />
+                        <span className="text-xs">В реестре еще нет ни одного документа. Создайте первый!</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
           {activeSettingsTab === 'users' && (
             <div className="space-y-6">
               <div className="border-b border-stone-200 pb-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -3980,6 +4175,257 @@ function ServiceForm({ initialData, onCancel, onSave }: ServiceFormProps) {
         </button>
         <button type="submit" className="bg-[#022C22] text-[#FAF9F6] hover:bg-[#c5a880] hover:text-[#022C22] font-semibold text-xs py-2.5 px-6 rounded-xl transition-all">
           Сохранить услугу
+        </button>
+      </div>
+    </form>
+  );
+}
+
+// 7. DOCUMENT FORM
+interface DocumentFormProps {
+  initialData: Omit<DocumentItem, 'id'> & { id?: string };
+  onCancel: () => void;
+  onSave: (data: Omit<DocumentItem, 'id'>) => void;
+}
+
+const DOCUMENT_CATEGORIES = [
+  { id: 'constituent', name: 'Учредительные и общие' },
+  { id: 'medical', name: 'Лицензии и стандарты' },
+  { id: 'law', name: 'Законодательство и права' },
+  { id: 'reception', name: 'Лечебный regime и обращения' },
+  { id: 'finance', name: 'Финансовые и классификация' },
+  { id: 'modifications', name: 'Изменения реквизитов' }
+] as const;
+
+function DocumentForm({ initialData, onCancel, onSave }: DocumentFormProps) {
+  const [title, setTitle] = useState(initialData.title || '');
+  const [code, setCode] = useState(initialData.code || '');
+  const [category, setCategory] = useState<DocumentItem['category']>(initialData.category || 'constituent');
+  const [summary, setSummary] = useState(initialData.summary || '');
+  const [pdfUrl, setPdfUrl] = useState<string | null>(initialData.pdfUrl || null);
+  const [fileSize, setFileSize] = useState(initialData.fileSize || '');
+  const [uploadDate, setUploadDate] = useState(initialData.uploadDate || '');
+  const [originalText, setOriginalText] = useState(initialData.originalText || '');
+
+  const [dragActive, setDragActive] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [uploading, setUploading] = useState(false);
+
+  const handlePdfFile = (file: File) => {
+    if (file.type !== 'application/pdf') {
+      alert('Пожалуйста, выберите файл в формате PDF (.pdf)');
+      return;
+    }
+
+    setUploading(true);
+    setUploadProgress(10);
+
+    const interval = setInterval(() => {
+      setUploadProgress(prev => {
+        if (prev >= 90) {
+          clearInterval(interval);
+          return 90;
+        }
+        return prev + 15;
+      });
+    }, 150);
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      clearInterval(interval);
+      setUploadProgress(100);
+      setTimeout(() => {
+        if (e.target?.result && typeof e.target.result === 'string') {
+          setPdfUrl(e.target.result);
+          // Auto-set file size
+          const sizeKb = (file.size / 1024).toFixed(0);
+          if (Number(sizeKb) > 1024) {
+            setFileSize(`${(Number(sizeKb) / 1024).toFixed(1)} MB`);
+          } else {
+            setFileSize(`${sizeKb} KB`);
+          }
+          // Auto-set upload date
+          setUploadDate(new Date().toLocaleDateString('ru-RU'));
+        }
+        setUploading(false);
+        setUploadProgress(0);
+      }, 400);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!title.trim() || !summary.trim()) {
+      alert('Пожалуйста, заполните обязательные поля: Название документа и Краткое резюме!');
+      return;
+    }
+    const catObj = DOCUMENT_CATEGORIES.find(c => c.id === category);
+    const categoryLabel = catObj ? catObj.name : 'Документы';
+
+    onSave({
+      title: title.trim(),
+      code: code.trim() || undefined,
+      category,
+      categoryLabel,
+      summary: summary.trim(),
+      pdfUrl,
+      fileSize: fileSize.trim() || undefined,
+      uploadDate: uploadDate.trim() || undefined,
+      originalText: originalText.trim() || undefined
+    });
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="bg-white p-6 rounded-2xl border border-stone-200 space-y-5 shadow-sm animate-fade-in">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+        <div className="md:col-span-2">
+          <label className="block text-xs font-bold text-stone-500 mb-1">Официальное название документа (заглавными буквами)</label>
+          <input required type="text" value={title} onChange={e => setTitle(e.target.value)} className="w-full border border-stone-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#c5a880]" placeholder="Например: ПРИКАЗ МИНЗДРАВА РФ ОБ АККРЕДИТАЦИИ САНАТОРИЕВ" />
+        </div>
+
+        <div>
+          <label className="block text-xs font-bold text-stone-500 mb-1">Регистрационный номер / Код</label>
+          <input type="text" value={code} onChange={e => setCode(e.target.value)} className="w-full border border-stone-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#c5a880]" placeholder="Например: Рег. № 10328" />
+        </div>
+
+        <div>
+          <label className="block text-xs font-bold text-stone-500 mb-1">Раздел классификации</label>
+          <select value={category} onChange={e => setCategory(e.target.value as any)} className="w-full border border-stone-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#c5a880] bg-white">
+            {DOCUMENT_CATEGORIES.map(c => (
+              <option key={c.id} value={c.id}>{c.name}</option>
+            ))}
+          </select>
+        </div>
+
+        <div className="md:col-span-2">
+          <label className="block text-xs font-bold text-stone-500 mb-1">Краткое описание / Аннотация (будет отображаться на карточке)</label>
+          <textarea required rows={3} value={summary} onChange={e => setSummary(e.target.value)} className="w-full border border-stone-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#c5a880]" placeholder="Опишите, о чем этот документ..." />
+        </div>
+
+        <div className="md:col-span-2 border-t border-stone-100 pt-4 space-y-4">
+          <span className="block text-xs font-black uppercase tracking-wider text-[#022C22]">PDF Файл документа</span>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="md:col-span-2">
+              <div 
+                className={`border-2 border-dashed rounded-xl p-5 text-center cursor-pointer transition-all flex flex-col justify-center items-center h-32 relative ${
+                  dragActive 
+                    ? 'border-[#c5a880] bg-[#c5a880]/5' 
+                    : 'border-stone-300 hover:border-[#c5a880] bg-white'
+                }`}
+                onDragOver={e => {
+                  e.preventDefault();
+                  setDragActive(true);
+                }}
+                onDragLeave={() => setDragActive(false)}
+                onDrop={e => {
+                  e.preventDefault();
+                  setDragActive(false);
+                  if (e.dataTransfer.files?.[0]) {
+                    handlePdfFile(e.dataTransfer.files[0]);
+                  }
+                }}
+                onClick={() => document.getElementById('pdf-upload-input')?.click()}
+              >
+                <input 
+                  type="file" 
+                  id="pdf-upload-input" 
+                  accept="application/pdf" 
+                  className="hidden" 
+                  onChange={e => {
+                    if (e.target.files?.[0]) {
+                      handlePdfFile(e.target.files[0]);
+                    }
+                  }}
+                />
+                
+                {uploading ? (
+                  <div className="space-y-2 w-full max-w-xs">
+                    <span className="text-xs font-semibold text-[#022C22] block">Загрузка PDF документа...</span>
+                    <div className="w-full bg-stone-100 rounded-full h-2 overflow-hidden border border-stone-200">
+                      <div className="bg-[#c5a880] h-full transition-all duration-300" style={{ width: `${uploadProgress}%` }}></div>
+                    </div>
+                  </div>
+                ) : pdfUrl ? (
+                  <div className="text-center space-y-1">
+                    <span className="text-xs font-bold text-emerald-600 block flex items-center gap-1 justify-center">
+                      ✓ PDF документ успешно загружен
+                    </span>
+                    <span className="text-[10px] text-stone-400 font-mono block max-w-sm truncate">
+                      {pdfUrl.startsWith('data:') ? 'Локальный файл Base64' : pdfUrl}
+                    </span>
+                    <button 
+                      type="button" 
+                      onClick={e => {
+                        e.stopPropagation();
+                        setPdfUrl(null);
+                        setFileSize('');
+                      }} 
+                      className="text-[10px] text-red-600 hover:text-red-700 font-bold bg-red-50 hover:bg-red-100 px-2 py-0.5 rounded transition-colors mt-2"
+                    >
+                      Очистить файл
+                    </button>
+                  </div>
+                ) : (
+                  <>
+                    <FileText className="w-6 h-6 text-stone-400 mb-1" />
+                    <span className="text-xs font-bold text-stone-600">Нажмите для выбора PDF файла или перетащите его сюда</span>
+                    <span className="text-[9px] text-stone-400 block mt-0.5">Лимит файла: до 20 МБ</span>
+                  </>
+                )}
+              </div>
+            </div>
+
+            <div className="space-y-3">
+              <div>
+                <label className="block text-[10px] font-bold text-stone-400 uppercase tracking-wider mb-1">Ссылка на PDF (URL)</label>
+                <input 
+                  type="text" 
+                  value={pdfUrl || ''} 
+                  onChange={e => setPdfUrl(e.target.value || null)} 
+                  className="w-full border border-stone-300 rounded-xl px-3 py-2 text-xs font-mono focus:outline-none focus:border-[#c5a880]" 
+                  placeholder="https://... или base64"
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <label className="block text-[10px] font-bold text-stone-400 uppercase tracking-wider mb-1">Размер</label>
+                  <input 
+                    type="text" 
+                    value={fileSize} 
+                    onChange={e => setFileSize(e.target.value)} 
+                    className="w-full border border-stone-300 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-[#c5a880]" 
+                    placeholder="840 KB"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[10px] font-bold text-stone-400 uppercase tracking-wider mb-1">Дата</label>
+                  <input 
+                    type="text" 
+                    value={uploadDate} 
+                    onChange={e => setUploadDate(e.target.value)} 
+                    className="w-full border border-stone-300 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-[#c5a880]" 
+                    placeholder="24.01.2025"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="md:col-span-2 border-t border-stone-100 pt-4">
+          <label className="block text-xs font-bold text-stone-500 mb-1">Текстовое содержание документа (для встроенного поиска на сайте)</label>
+          <textarea rows={6} value={originalText} onChange={e => setOriginalText(e.target.value)} className="w-full border border-stone-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#c5a880] leading-relaxed font-sans" placeholder="Полный официальный текст или выписка..." />
+        </div>
+      </div>
+
+      <div className="flex justify-end gap-2 border-t border-stone-100 pt-4">
+        <button type="button" onClick={onCancel} className="bg-stone-100 hover:bg-stone-200 text-stone-700 font-bold text-xs py-2.5 px-5 rounded-xl transition-all">
+          Отмена
+        </button>
+        <button type="submit" className="bg-[#022C22] text-[#FAF9F6] hover:bg-[#c5a880] hover:text-[#022C22] font-semibold text-xs py-2.5 px-6 rounded-xl transition-all uppercase tracking-wider font-bold">
+          Сохранить документ
         </button>
       </div>
     </form>

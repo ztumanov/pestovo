@@ -80,5 +80,19 @@ export interface AdminUser {
   lastLogin?: string;
 }
 
+export interface DocumentItem {
+  id: string;
+  title: string;
+  code?: string;
+  category: 'constituent' | 'medical' | 'law' | 'reception' | 'finance' | 'modifications';
+  categoryLabel: string;
+  summary: string;
+  pdfUrl: string | null;
+  fileSize?: string;
+  uploadDate?: string;
+  originalText?: string;
+}
+
+
 
 
