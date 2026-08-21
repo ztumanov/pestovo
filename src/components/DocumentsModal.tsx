@@ -10,8 +10,11 @@ import {
   ArrowLeft,
   Check, 
   Printer, 
-  Shield 
+  Shield,
+  FileCheck
 } from 'lucide-react';
+import PdfViewer from './PdfViewer';
+import { getDocumentPdfUrl } from '../utils/pdfGenerator';
 
 interface DocumentsModalProps {
   isOpen: boolean;
@@ -189,25 +192,31 @@ export default function DocumentsModal({ isOpen, onClose }: DocumentsModalProps)
     return matchesSearch && matchesCategory;
   });
 
-  // Action simulate download
-  const handleDownload = (doc: DocItem) => {
+  // Action PDF download
+  const handleDownload = async (doc: DocItem) => {
     setDownloadingId(doc.id);
-    setTimeout(() => {
+    try {
+      const url = await getDocumentPdfUrl({
+        title: doc.title,
+        number: doc.number,
+        date: doc.date,
+        originalText: doc.fullText,
+        fullText: doc.fullText,
+        categoryLabel: doc.categoryLabel,
+        summary: doc.summary
+      });
+      const a = document.createElement("a");
+      a.href = url;
+      const cleanTitle = (doc.title || 'document').replace(/[^a-zA-Zа-яА-Я0-9_-]/g, '_').slice(0, 50);
+      a.download = `${cleanTitle}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    } catch (e) {
+      console.error('Failed to download document PDF:', e);
+    } finally {
       setDownloadingId(null);
-      // Simulate real download by opening a print window / text generator
-      const element = document.createElement("a");
-      const file = new Blob([doc.fullText], {type: 'text/plain'});
-      element.href = URL.createObjectURL(file);
-      element.download = `${doc.id}_document.txt`;
-      document.body.appendChild(element);
-      element.click();
-      document.body.removeChild(element);
-    }, 1200);
-  };
-
-  const handlePrint = () => {
-    setPrintSuccess(true);
-    setTimeout(() => setPrintSuccess(false), 2000);
+    }
   };
 
   return (
@@ -249,7 +258,7 @@ export default function DocumentsModal({ isOpen, onClose }: DocumentsModalProps)
           </button>
         </div>
 
-        {/* Outer Split screen layout: Grid based */}
+        {/* Outer Split screen layout */}
         <div className="flex-1 flex overflow-hidden min-h-0 bg-white">
           <AnimatePresence mode="wait">
             {!viewingDoc ? (
@@ -312,9 +321,16 @@ export default function DocumentsModal({ isOpen, onClose }: DocumentsModalProps)
                             <span className="text-stone-400 text-xs font-semibold font-mono">
                               от {doc.date} | Рег. № {doc.number}
                             </span>
+                            <span className="text-emerald-700 text-[10px] font-mono font-bold flex items-center space-x-1 border border-emerald-200/50 bg-emerald-50 px-2 py-0.5 rounded">
+                              <FileCheck className="w-3.5 h-3.5" />
+                              <span>ОФИЦИАЛЬНЫЙ PDF</span>
+                            </span>
                           </div>
                           
-                          <h4 className="font-serif text-sm sm:text-base font-bold text-[#022C22]">
+                          <h4 
+                            onClick={() => setViewingDoc(doc)}
+                            className="font-serif text-sm sm:text-base font-bold text-[#022C22] hover:text-[#c5a880] transition-colors cursor-pointer"
+                          >
                             {doc.title}
                           </h4>
                           
@@ -325,20 +341,24 @@ export default function DocumentsModal({ isOpen, onClose }: DocumentsModalProps)
 
                         <div className="flex items-center space-x-2 shrink-0 w-full md:w-auto mt-2 md:mt-0 pt-3 md:pt-0 border-t md:border-0 border-stone-100">
                           <button
+                            type="button"
                             onClick={() => setViewingDoc(doc)}
-                            className="bg-[#022C22] hover:bg-[#c5a880] text-white hover:text-[#022C22] px-3.5 py-2 rounded-sm text-xs font-bold uppercase tracking-wider flex items-center space-x-1.5 transition-colors cursor-pointer flex-1 md:flex-initial justify-center"
+                            className="bg-[#022C22] hover:bg-[#c5a880] text-white hover:text-[#022C22] px-3.5 py-2 rounded-sm text-xs font-bold uppercase tracking-wider flex items-center space-x-1.5 transition-colors cursor-pointer flex-1 md:flex-initial justify-center shadow-sm"
+                            title="Открыть и читать официальный PDF документ"
                           >
-                            <Eye className="w-4 h-4" />
-                            <span>Читать</span>
+                            <Eye className="w-4 h-4 text-[#c5a880]" />
+                            <span>Читать документ</span>
                           </button>
                           
                           <button
+                            type="button"
                             onClick={() => handleDownload(doc)}
-                            className="bg-stone-100 hover:bg-stone-200 text-stone-700 px-3.5 py-2 rounded-sm text-xs font-bold uppercase tracking-wider flex items-center space-x-1.5 transition-all cursor-pointer flex-1 md:flex-initial justify-center border border-stone-200/50"
+                            className="bg-stone-100 hover:bg-stone-200 text-stone-700 hover:text-[#022C22] px-3.5 py-2 rounded-sm text-xs font-bold uppercase tracking-wider flex items-center space-x-1.5 transition-all cursor-pointer flex-1 md:flex-initial justify-center border border-stone-200/50"
                             disabled={downloadingId === doc.id}
+                            title="Скачать PDF файл"
                           >
-                            <Download className={`w-4 h-4 ${downloadingId === doc.id ? 'animate-bounce' : ''}`} />
-                            <span>{downloadingId === doc.id ? 'Загрузка...' : 'TXT'}</span>
+                            <Download className={`w-4 h-4 text-stone-500 ${downloadingId === doc.id ? 'animate-bounce' : ''}`} />
+                            <span>{downloadingId === doc.id ? 'Загрузка...' : 'PDF'}</span>
                           </button>
                         </div>
                       </div>
@@ -358,120 +378,31 @@ export default function DocumentsModal({ isOpen, onClose }: DocumentsModalProps)
                 </div>
               </motion.div>
             ) : (
-              // READ MODE SCREEN overlay splitting text & print styles
-              <motion.div
-                key="read-view"
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: 20 }}
-                className="flex-1 flex flex-col overflow-hidden h-full"
-              >
-                {/* Back bar */}
-                <div className="bg-stone-100 p-4 border-b border-stone-200 shrink-0 flex items-center justify-between">
-                  <button
-                    onClick={() => setViewingDoc(null)}
-                    className="flex items-center space-x-2 text-stone-600 hover:text-[#022C22] text-xs font-bold uppercase tracking-wider cursor-pointer"
-                  >
-                    <ArrowLeft className="w-4 h-4" />
-                    <span>Назад к списку документов</span>
-                  </button>
-
-                  <div className="flex items-center space-x-2">
-                    <button
-                      onClick={handlePrint}
-                      className="p-2 bg-white text-stone-600 border border-stone-200 hover:border-stone-400 hover:text-[#022C22] rounded-sm transition-all cursor-pointer flex items-center space-x-1"
-                      title="Симулировать печать"
-                    >
-                      <Printer className="w-4 h-4" />
-                      <span className="text-xs font-semibold hidden sm:inline">Распечатать</span>
-                    </button>
-                    <button
-                      onClick={() => handleDownload(viewingDoc)}
-                      className="p-2 bg-[#022C22] text-white hover:bg-amber-600 rounded-sm transition-all cursor-pointer flex items-center space-x-2"
-                      title="Скачать документ как текстовый файл"
-                    >
-                      <Download className="w-4 h-4 text-[#c5a880]" />
-                      <span className="text-xs font-bold uppercase tracking-wide hidden sm:inline">Скачать TXT</span>
-                    </button>
-                  </div>
-                </div>
-
-                {/* Print success banner */}
-                <AnimatePresence>
-                  {printSuccess && (
-                    <motion.div
-                      initial={{ height: 0, opacity: 0 }}
-                      animate={{ height: 'auto', opacity: 1 }}
-                      exit={{ height: 0, opacity: 0 }}
-                      className="bg-emerald-50 text-emerald-800 text-xs py-2 px-6 border-b border-emerald-200 font-medium text-center flex items-center justify-center space-x-2"
-                    >
-                      <Check className="w-4 h-4 shrink-0 text-emerald-600" />
-                      <span>Имитация печати запущена. Документ экспортирован в буфер печати ведомственной службы ФТС.</span>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-
-                {/* Document Main page style reading container */}
-                <div className="flex-1 overflow-y-auto p-6 md:p-10 bg-stone-100/50">
-                  <div className="max-w-3xl mx-auto bg-white p-8 md:p-12 border border-stone-250/70 shadow-lg rounded-sm font-sans text-stone-850 relative">
-                    {/* Visual Stamp accent */}
-                    <div className="absolute right-12 top-12 opacity-[0.06] pointer-events-none select-none select-all-disabled">
-                      <Shield className="w-40 h-40 text-[#022C22]" />
-                    </div>
-
-                    {/* Emblem text */}
-                    <div className="text-center border-b border-stone-200 pb-6 mb-8 text-stone-500 font-mono text-xs uppercase tracking-widest font-bold">
-                      <p>Федеральная Таможенная Служба России</p>
-                      <p className="text-[10px] text-stone-400 mt-1">ФГКУ «Санаторий «Ясная Поляна» ФТС России»</p>
-                    </div>
-
-                    {/* Meta info tags */}
-                    <div className="flex justify-between items-start mb-6 text-xs text-stone-400 font-mono">
-                      <div>
-                        <span>Документ зарегистрирован</span>
-                        <p className="font-semibold text-stone-800 mt-0.5">Дата: {viewingDoc.date}</p>
-                      </div>
-                      <div className="text-right">
-                        <span>Идентификатор</span>
-                        <p className="font-semibold text-stone-800 mt-0.5">{viewingDoc.number}</p>
-                      </div>
-                    </div>
-
-                    {/* Title */}
-                    <h1 className="font-serif text-xl sm:text-2xl font-bold text-[#022C22] border-b pb-4 mb-6 leading-snug">
-                      {viewingDoc.title}
-                    </h1>
-
-                    {/* Body content */}
-                    <pre className="font-sans text-xs sm:text-sm text-stone-700 whitespace-pre-wrap leading-relaxed space-y-4">
-                      {viewingDoc.fullText}
-                    </pre>
-
-                    {/* Official Signature simulation at bottom */}
-                    <div className="mt-12 pt-8 border-t border-stone-250/50 flex flex-col sm:flex-row justify-between items-start sm:items-center text-xs gap-4">
-                      <div>
-                        <span className="block text-stone-400 uppercase tracking-widest font-mono text-[9px]">Экспертиза</span>
-                        <p className="font-bold text-[#022C22] mt-0.5">Юридический отдел санатория</p>
-                      </div>
-                      
-                      <div className="flex items-center space-x-2 bg-stone-50 px-4 py-2 rounded border border-stone-200">
-                        <Check className="w-4 h-4 text-emerald-600 flex-shrink-0" />
-                        <div className="text-[10px] font-mono leading-tight">
-                          <span className="block font-bold text-emerald-800">ПОДПИСАНО ЭЦП</span>
-                          <span className="text-stone-405 block">Данилив А. И. (и.о. Начальника)</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </motion.div>
+              // REAL PDF VIEWER IN MODAL
+              <div className="flex-1 flex flex-col h-full bg-stone-100">
+                <PdfViewer
+                  doc={{
+                    title: viewingDoc.title,
+                    code: viewingDoc.number,
+                    number: viewingDoc.number,
+                    uploadDate: viewingDoc.date,
+                    date: viewingDoc.date,
+                    summary: viewingDoc.summary,
+                    categoryLabel: viewingDoc.categoryLabel,
+                    originalText: viewingDoc.fullText,
+                    fullText: viewingDoc.fullText
+                  }}
+                  onBack={() => setViewingDoc(null)}
+                  className="h-full border-0 rounded-none shadow-none"
+                />
+              </div>
             )}
           </AnimatePresence>
         </div>
 
         {/* Bottom bar */}
-        <div className="p-4 bg-stone-100 border-t border-stone-200/80 shrink-0 text-center text-stone-400 font-mono text-[10px] uppercase tracking-wider flex flex-col sm:flex-row justify-between items-center gap-2">
-          <span>Реестр официальной документации ФГКУ «Санаторий «Ясная Поляна»</span>
+        <div className="p-3.5 bg-stone-100 border-t border-stone-200/80 shrink-0 text-center text-stone-400 font-mono text-[10px] uppercase tracking-wider flex flex-col sm:flex-row justify-between items-center gap-2">
+          <span>Реестр официальной документации ФГКУ «Санаторий «Ясная Поляна» ФТС России</span>
           <span className="text-[#c5a880] font-bold">Лицензия № Л041-00110-91/00554225</span>
         </div>
       </motion.div>

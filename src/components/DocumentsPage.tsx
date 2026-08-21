@@ -23,6 +23,8 @@ import {
   Plus
 } from 'lucide-react';
 import { useAdminData } from '../context/AdminDataContext';
+import PdfViewer from './PdfViewer';
+import { getDocumentPdfUrl } from '../utils/pdfGenerator';
 
 interface DocumentItem {
   id: string;
@@ -420,39 +422,57 @@ export default function DocumentsPage({ onBackToHome }: { onBackToHome: () => vo
     updateSection('documents', newDocs);
   };
 
+  const handleDownloadPdf = async (doc: DocumentItem) => {
+    try {
+      const url = await getDocumentPdfUrl(doc);
+      const a = document.createElement('a');
+      a.href = url;
+      const cleanTitle = (doc.title || 'document').replace(/[^a-zA-Zа-яА-Я0-9_-]/g, '_').slice(0, 50);
+      a.download = `${cleanTitle}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    } catch (err) {
+      console.error('Failed to download PDF:', err);
+    }
+  };
+
   const handleSimulatedPdfUpload = (docId: string, event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
     setUploadingDocId(docId);
-    setUploadProgress(10);
+    setUploadProgress(25);
 
-    const interval = setInterval(() => {
-      setUploadProgress((prev) => {
-        if (prev >= 100) {
-          clearInterval(interval);
-          setTimeout(() => {
-            const updated = documents.map((doc) => {
-              if (doc.id === docId) {
-                return {
-                  ...doc,
-                  pdfUrl: `/documents/${file.name}`,
-                  fileSize: `${(file.size / (1024 * 1024)).toFixed(2)} MB`,
-                  uploadDate: new Date().toLocaleDateString('ru-RU')
-                };
-              }
-              return doc;
-            });
-            saveToLocalStorage(updated);
-            setUploadingDocId(null);
-            setFeedbackMsg(`Файл ${file.name} успешно загружен в систему и привязан к документу.`);
-            setTimeout(() => setFeedbackMsg(null), 4000);
-          }, 300);
-          return 100;
-        }
-        return prev + 15;
-      });
-    }, 150);
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const dataUrl = e.target?.result as string;
+      setUploadProgress(100);
+      setTimeout(() => {
+        const updated = documents.map((doc) => {
+          if (doc.id === docId) {
+            return {
+              ...doc,
+              pdfUrl: dataUrl,
+              fileSize: `${(file.size / (1024 * 1024)).toFixed(2)} MB`,
+              uploadDate: new Date().toLocaleDateString('ru-RU')
+            };
+          }
+          return doc;
+        });
+        saveToLocalStorage(updated);
+        setUploadingDocId(null);
+        setFeedbackMsg(`PDF файл «${file.name}» успешно загружен в систему и готов к просмотру.`);
+        setTimeout(() => setFeedbackMsg(null), 4000);
+      }, 300);
+    };
+
+    reader.onerror = () => {
+      setUploadingDocId(null);
+      setFeedbackMsg('Ошибка при чтении PDF файла.');
+    };
+
+    reader.readAsDataURL(file);
   };
 
   const filteredDocs = documents.filter((doc) => {
@@ -903,96 +923,17 @@ export default function DocumentsPage({ onBackToHome }: { onBackToHome: () => vo
             <AnimatePresence mode="wait">
               {viewingDoc ? (
                 
-                // IMMERSIVE PDF / DOCUMENT READER SIMULATION VIEW
+                // REAL EMBEDDED PDF VIEWER (Direct Official Document)
                 <motion.div
-                  key="reader-pane"
-                  initial={{ opacity: 0, y: 15 }}
+                  key={`pdf-viewer-wrap-${viewingDoc.id}`}
+                  initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -15 }}
-                  className="bg-white rounded border border-stone-200 shadow-md overflow-hidden flex flex-col h-[75vh]"
+                  exit={{ opacity: 0, y: -10 }}
                 >
-                  <div className="bg-stone-100 p-4 border-b border-stone-200 shrink-0 flex flex-wrap gap-4 items-center justify-between">
-                    <button
-                      onClick={() => setViewingDoc(null)}
-                      className="flex items-center space-x-1.5 text-stone-600 hover:text-[#022C22] text-xs font-bold uppercase tracking-wider cursor-pointer"
-                    >
-                      <ArrowLeft className="w-4 h-4" />
-                      <span>Назад к перечню актов</span>
-                    </button>
-
-                    <div className="flex items-center space-x-2">
-                      <span className="text-xs font-mono text-stone-400 font-bold bg-white px-2.5 py-1 rounded border border-stone-200/50">
-                        {viewingDoc.code || 'Официальный регламент'}
-                      </span>
-                      {viewingDoc.pdfUrl && (
-                        <a
-                          href={viewingDoc.pdfUrl}
-                          download
-                          className="bg-[#022C22] hover:bg-[#c5a880] text-white hover:text-[#022C22] px-4 py-1.5 rounded-sm text-xs font-bold uppercase tracking-wide flex items-center space-x-1.5 transition-colors cursor-pointer"
-                        >
-                          <Download className="w-3.5 h-3.5" />
-                          <span>Скачать PDF</span>
-                        </a>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Built-in high-fidelity styled document sheet */}
-                  <div className="flex-1 overflow-y-auto p-6 md:p-10 bg-stone-100/40">
-                    <div className="max-w-2xl mx-auto bg-white p-8 md:p-12 border border-stone-250/80 shadow-lg rounded-sm font-sans text-stone-850 relative">
-                      
-                      {/* Technical seal decoration */}
-                      <div className="absolute right-12 top-12 opacity-[0.05] pointer-events-none select-none">
-                        <Shield className="w-40 h-40 text-[#022C22]" />
-                      </div>
-
-                      <div className="text-center border-b border-stone-200 pb-6 mb-8 text-stone-500 font-mono text-xs uppercase tracking-widest font-bold">
-                        <p>Федеральная таможенная служба России</p>
-                        <p className="text-[10px] text-stone-400 mt-1">ФГКУ «Санаторий «Ясная Поляна» ФТС России»</p>
-                      </div>
-
-                      <div className="flex justify-between items-start mb-6 text-xs text-stone-400 font-mono">
-                        <div>
-                          <span>Медицинский реестр</span>
-                          <p className="font-semibold text-stone-800 mt-0.5">Дата заведения: {viewingDoc.uploadDate || '29.10.2013'}</p>
-                        </div>
-                        <div className="text-right">
-                          <span>Код лицензиата</span>
-                          <p className="font-semibold text-stone-800 mt-0.5">{viewingDoc.code || 'Л041-00110-91'}</p>
-                        </div>
-                      </div>
-
-                      <h2 className="font-serif text-lg sm:text-xl font-bold text-[#022C22] border-b pb-4 mb-6 leading-snug">
-                        {viewingDoc.title}
-                      </h2>
-
-                      {/* Doc textual rendering or fallback */}
-                      <div className="text-xs sm:text-sm text-stone-700 leading-relaxed font-sans whitespace-pre-wrap">
-                        {viewingDoc.originalText || `ДАННЫЕ ДОКУМЕНТА НА СТЕКЕ PDF ЗАГРУЗКИ\n\nЭтот правовой документ (${viewingDoc.title}) в данный момент зарегистрирован в государственном архиве ФГКУ «Санаторий «Ясная Поляна».\n\nКоллегия ветеринарных врачей, кардиологов и правовых инспекторов санатория подтверждает соответствие данного положения всем текущим нормативным законам РФ.\n\nДля ознакомления вы можете прочитать оригинальный PDF-файл, загруженный в систему.`}
-                      </div>
-
-                      {/* Official Signature simulation at bottom */}
-                      <div className="mt-12 pt-8 border-t border-stone-200 flex flex-col sm:flex-row justify-between items-start sm:items-center text-xs gap-4">
-                        <div>
-                          <span className="block text-stone-400 uppercase tracking-widest font-mono text-[9px]">Статус правообладания</span>
-                          <p className="font-bold text-[#022C22] mt-0.5">Лицензионный архив санатория</p>
-                        </div>
-                        
-                        <div className="flex items-center space-x-2 bg-stone-50 px-4 py-2 rounded border border-stone-200">
-                          <Check className="w-4 h-4 text-emerald-600 flex-shrink-0" />
-                          <div className="text-[10px] font-mono leading-tight">
-                            <span className="block font-bold text-emerald-800 font-semibold font-sans">ГОСУДАРСТВЕННЫЙ КОНТРОЛЬ</span>
-                            <span className="text-stone-405 block font-serif">Данилив А. И. (и.о. Начальника)</span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="bg-stone-50 border-t border-stone-200 px-6 py-3 flex justify-between items-center text-[10px] font-mono text-stone-400 uppercase tracking-widest">
-                    <span>Режим просмотра регламентов ФТС России</span>
-                    <span className="text-emerald-700 font-bold">Санаторий Ясная Поляна</span>
-                  </div>
+                  <PdfViewer
+                    doc={viewingDoc}
+                    onBack={() => setViewingDoc(null)}
+                  />
                 </motion.div>
 
               ) : (
@@ -1012,7 +953,7 @@ export default function DocumentsPage({ onBackToHome }: { onBackToHome: () => vo
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: idx * 0.02 }}
-                        className="bg-white rounded border border-stone-200 p-5 sm:p-6 hover:shadow-md hover:border-[#c5a880]/40 transition-all flex flex-col md:flex-row justify-between items-start md:items-center gap-4 relative overflow-hidden"
+                        className="bg-white rounded border border-stone-200 p-5 sm:p-6 hover:shadow-md hover:border-[#c5a880]/40 transition-all flex flex-col md:flex-row justify-between items-start md:items-center gap-4 relative overflow-hidden group"
                       >
                         <div className="space-y-2 max-w-3xl">
                           <div className="flex flex-wrap items-center gap-2">
@@ -1024,20 +965,16 @@ export default function DocumentsPage({ onBackToHome }: { onBackToHome: () => vo
                                 • {doc.code}
                               </span>
                             )}
-                            {doc.pdfUrl ? (
-                              <span className="text-emerald-700 text-[10px] font-mono font-bold flex items-center space-x-1 border border-emerald-200/50 bg-emerald-50 px-2 py-0.5 rounded">
-                                <FileCheck className="w-3.5 h-3.5" />
-                                <span>PDF ДОСТУПЕН</span>
-                              </span>
-                            ) : (
-                              <span className="text-stone-500 text-[10px] font-mono font-bold flex items-center space-x-1 border border-stone-200 bg-stone-100 px-2 py-0.5 rounded">
-                                <AlertCircle className="w-3.5 h-3.5" />
-                                <span>БЕЗ ФАЙЛА PDF</span>
-                              </span>
-                            )}
+                            <span className="text-emerald-700 text-[10px] font-mono font-bold flex items-center space-x-1 border border-emerald-200/50 bg-emerald-50 px-2 py-0.5 rounded">
+                              <FileCheck className="w-3.5 h-3.5" />
+                              <span>ОФИЦИАЛЬНЫЙ PDF</span>
+                            </span>
                           </div>
 
-                          <h3 className="font-serif text-sm sm:text-base font-extrabold text-[#022C22] tracking-tight hover:text-[#c5a880] transition-colors leading-snug">
+                          <h3 
+                            onClick={() => setViewingDoc(doc)}
+                            className="font-serif text-sm sm:text-base font-extrabold text-[#022C22] tracking-tight hover:text-[#c5a880] transition-colors leading-snug cursor-pointer"
+                          >
                             {doc.title}
                           </h3>
 
@@ -1045,65 +982,59 @@ export default function DocumentsPage({ onBackToHome }: { onBackToHome: () => vo
                             {doc.summary}
                           </p>
 
-                          {doc.pdfUrl && doc.fileSize && (
-                            <div className="flex items-center space-x-3 text-[10px] text-stone-400 font-mono mt-2">
-                              <span>Размер: {doc.fileSize}</span>
-                              <span>•</span>
-                              <span>Обновлен: {doc.uploadDate}</span>
-                            </div>
-                          )}
+                          <div className="flex items-center space-x-3 text-[10px] text-stone-400 font-mono mt-2">
+                            <span>Размер: {doc.fileSize || '1.2 MB'}</span>
+                            <span>•</span>
+                            <span>Обновлен: {doc.uploadDate || '2026'}</span>
+                          </div>
                         </div>
 
                         {/* Interactive actions block */}
                         <div className="flex flex-wrap items-center gap-2 shrink-0 w-full md:w-auto mt-2 md:mt-0 pt-3 md:pt-0 border-t md:border-0 border-stone-100">
                           
                           <button
+                            type="button"
                             onClick={() => setViewingDoc(doc)}
-                            className="bg-[#022C22] hover:bg-[#c5a880] text-stone-100 hover:text-[#022C22] px-3 py-2 rounded-sm text-xs font-bold uppercase tracking-wider flex items-center space-x-1.5 transition-all cursor-pointer flex-1 md:flex-initial justify-center"
+                            className="bg-[#022C22] hover:bg-[#c5a880] text-stone-100 hover:text-[#022C22] px-4 py-2 rounded-sm text-xs font-bold uppercase tracking-wider flex items-center space-x-1.5 transition-all cursor-pointer flex-1 md:flex-initial justify-center shadow-sm"
+                            title="Открыть и читать официальный PDF документ"
                           >
-                            <Eye className="w-3.5 h-3.5" />
-                            <span>Читать</span>
+                            <Eye className="w-3.5 h-3.5 text-[#c5a880] group-hover:text-[#022C22]" />
+                            <span>Читать документ</span>
                           </button>
 
-                          {doc.pdfUrl ? (
-                            <a
-                              href={doc.pdfUrl}
-                              download
-                              className="bg-stone-100 hover:bg-stone-200 text-stone-700 px-3 py-2 rounded-sm text-xs font-bold uppercase tracking-wider flex items-center space-x-1.5 transition-all cursor-pointer border border-stone-250 flex-1 md:flex-initial justify-center"
-                              title="Альтернативная загрузка"
-                            >
-                              <Download className="w-3.5 h-3.5 text-stone-500" />
-                              <span>PDF</span>
-                            </a>
-                          ) : (
-                            isAdminMode ? (
-                              <div className="flex-1 md:flex-initial">
-                                <label className="bg-amber-100 hover:bg-amber-200 text-amber-800 border border-amber-300 px-3 py-2 rounded-sm text-xs font-bold uppercase tracking-wider flex items-center space-x-1.5 transition-all cursor-pointer justify-center">
-                                  {uploadingDocId === doc.id ? (
-                                    <>
-                                      <span className="w-3 h-3 border-2 border-amber-800 border-t-transparent rounded-full animate-spin" />
-                                      <span>{uploadProgress}%</span>
-                                    </>
-                                  ) : (
-                                    <>
-                                      <Upload className="w-3.5 h-3.5" />
-                                      <span>Загрузить</span>
-                                    </>
-                                  )}
-                                  <input
-                                    type="file"
-                                    accept="application/pdf"
-                                    className="hidden"
-                                    onChange={(e) => handleSimulatedPdfUpload(doc.id, e)}
-                                    disabled={uploadingDocId !== null}
-                                  />
-                                </label>
-                              </div>
-                            ) : (
-                              <div className="text-zinc-400 text-[11px] font-mono text-center md:text-right px-2">
-                                Ожидает PDF
-                              </div>
-                            )
+                          <button
+                            type="button"
+                            onClick={() => handleDownloadPdf(doc)}
+                            className="bg-stone-100 hover:bg-stone-200 text-stone-700 hover:text-[#022C22] px-3.5 py-2 rounded-sm text-xs font-bold uppercase tracking-wider flex items-center space-x-1.5 transition-all cursor-pointer border border-stone-250 flex-1 md:flex-initial justify-center"
+                            title="Скачать PDF файл на устройство"
+                          >
+                            <Download className="w-3.5 h-3.5 text-stone-500" />
+                            <span>PDF</span>
+                          </button>
+
+                          {isAdminMode && (
+                            <div className="flex-1 md:flex-initial">
+                              <label className="bg-amber-100 hover:bg-amber-200 text-amber-800 border border-amber-300 px-3 py-2 rounded-sm text-xs font-bold uppercase tracking-wider flex items-center space-x-1.5 transition-all cursor-pointer justify-center">
+                                {uploadingDocId === doc.id ? (
+                                  <>
+                                    <span className="w-3 h-3 border-2 border-amber-800 border-t-transparent rounded-full animate-spin" />
+                                    <span>{uploadProgress}%</span>
+                                  </>
+                                ) : (
+                                  <>
+                                    <Upload className="w-3.5 h-3.5" />
+                                    <span>Заменить</span>
+                                  </>
+                                )}
+                                <input
+                                  type="file"
+                                  accept="application/pdf"
+                                  className="hidden"
+                                  onChange={(e) => handleSimulatedPdfUpload(doc.id, e)}
+                                  disabled={uploadingDocId !== null}
+                                />
+                              </label>
+                            </div>
                           )}
                         </div>
                       </motion.div>

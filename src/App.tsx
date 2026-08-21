@@ -1473,13 +1473,15 @@ export default function App() {
                 </AnimatePresence>
               </div>
 
-              {[
-                { id: 'medical', label: 'Лечение' },
-                { id: 'rooms', label: 'Номера' },
-                { id: 'gallery', label: 'Галерея' },
-                { id: 'testimonials', label: 'Отзывы' },
-                { id: 'contacts', label: 'Контакты' },
-              ].map((item) => (
+              {(
+                [
+                  { id: 'medical', label: 'Лечение' },
+                  { id: 'rooms', label: 'Номера' },
+                  { id: 'gallery', label: 'Галерея' },
+                  { id: 'testimonials', label: 'Отзывы' },
+                  { id: 'contacts', label: 'Контакты' },
+                ] as { id: string; label: string; isPage?: boolean }[]
+              ).map((item) => (
                 <a
                   key={item.id}
                   href={item.isPage ? '#' : `#${item.id}`}
@@ -1594,13 +1596,15 @@ export default function App() {
                   </AnimatePresence>
                 </div>
 
-                {[
-                  { id: 'medical', label: 'Лечение' },
-                  { id: 'rooms', label: 'Категории Номеров' },
-                  { id: 'gallery', label: 'Галерея' },
-                  { id: 'testimonials', label: 'Отзывы' },
-                  { id: 'contacts', label: 'Контакты & FAQ' },
-                ].map((item) => (
+                {(
+                  [
+                    { id: 'medical', label: 'Лечение' },
+                    { id: 'rooms', label: 'Категории Номеров' },
+                    { id: 'gallery', label: 'Галерея' },
+                    { id: 'testimonials', label: 'Отзывы' },
+                    { id: 'contacts', label: 'Контакты & FAQ' },
+                  ] as { id: string; label: string; isPage?: boolean }[]
+                ).map((item) => (
                   <a
                     key={item.id}
                     href={item.isPage ? '#' : `#${item.id}`}
@@ -3524,7 +3528,21 @@ export default function App() {
               <button type="button" className="hover:text-white">Политика обработки данных</button>
               <span>&bull;</span>
               <button type="button" className="hover:text-white">Карта сайта</button>
-
+              <span>&bull;</span>
+              <button 
+                type="button" 
+                onClick={() => {
+                  if (isAdminMode) {
+                    setCurrentPage('admin');
+                  } else {
+                    setCurrentPage('login');
+                  }
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }}
+                className="hover:text-[#c5a880] transition-colors cursor-pointer"
+              >
+                Вход для сотрудников
+              </button>
             </div>
           </div>
 
