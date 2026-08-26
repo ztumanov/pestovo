@@ -72,6 +72,7 @@ import MedicalPage from './components/MedicalPage';
 import DocumentsPage from './components/DocumentsPage';
 import TestimonialsPage from './components/TestimonialsPage';
 import LoginPage from './components/LoginPage';
+import PrivacyPolicyModal from './components/PrivacyPolicyModal';
 
 export default function App() {
   const { 
@@ -595,6 +596,7 @@ export default function App() {
   const [showScrollTop, setShowScrollTop] = useState(false);
   const [isAboutDropdownOpen, setIsAboutDropdownOpen] = useState(false);
   const [activeSubModal, setActiveSubModal] = useState<'documents' | 'news' | null>(null);
+  const [isPrivacyModalOpen, setIsPrivacyModalOpen] = useState(false);
 
   // VISUALLY IMPAIRED / ACCESSIBILITY MODE STATE
   const [isAccessMode, setIsAccessMode] = useState<boolean>(() => {
@@ -2556,7 +2558,7 @@ export default function App() {
                           </p>
                           <p className="flex justify-between">
                             <span className="text-stone-500">Email:</span>
-                            <a href="mailto:priemnaya.yasnayapolyana@yandex.ru" className="font-mono font-bold text-[#022C22] hover:text-[#c5a880] hover:underline">priemnaya.yasnayapolyana@yandex.ru</a>
+                            <a href={`mailto:${RESORT_INFO.email}`} className="font-mono font-bold text-[#022C22] hover:text-[#c5a880] hover:underline">{RESORT_INFO.email}</a>
                           </p>
                         </div>
                       </div>
@@ -2799,29 +2801,12 @@ export default function App() {
                   </div>
 
                   <div>
-                    <div className="flex items-baseline justify-between mb-4">
-                      <span className="text-[10px] tracking-wider font-mono text-stone-400 uppercase">Стоимость сутки</span>
-                      <div className="text-[#022C22]">
-                        {(!room.price || room.price <= 0) ? (
-                          <span className="text-xs font-semibold text-[#c5a880] uppercase tracking-wide">Уточняйте у менеджера!</span>
-                        ) : (
-                          <>от <span className="text-xl font-serif font-bold text-[#c5a880]">{room.price.toLocaleString('ru-RU')} ₽</span></>
-                        )}
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-2">
+                    <div className="flex justify-center pt-2">
                       <button
                         onClick={() => handleOpenRoomDetails(room)}
-                        className="bg-stone-100 hover:bg-stone-200 text-stone-800 text-xs font-bold py-2.5 rounded-sm uppercase tracking-wider text-center transition-colors"
+                        className="w-full bg-[#022C22] hover:bg-[#c5a880] text-white hover:text-[#022C22] text-xs font-bold py-2.5 rounded-sm uppercase tracking-wider text-center transition-all duration-300 cursor-pointer shadow-sm"
                       >
                         Описание
-                      </button>
-                      <button
-                        onClick={() => handleBookRoom(room.name)}
-                        className="bg-[#022C22] hover:bg-[#c5a880] text-white hover:text-[#022C22] text-xs font-bold py-2.5 rounded-sm uppercase tracking-wider text-center transition-all duration-300"
-                      >
-                        Забронировать
                       </button>
                     </div>
                   </div>
@@ -3549,9 +3534,24 @@ export default function App() {
               &copy; {new Date().getFullYear()} Санаторий «Ясная Поляна» ФТС России. Официальное представительство. Все права защищены.
             </p>
             <div className="flex space-x-4 mt-4 md:mt-0 justify-center items-center">
-              <button type="button" className="hover:text-white">Политика обработки данных</button>
+              <button 
+                type="button" 
+                onClick={() => setIsPrivacyModalOpen(true)} 
+                className="hover:text-[#c5a880] transition-colors cursor-pointer underline-offset-4 hover:underline"
+              >
+                Политика обработки данных
+              </button>
               <span>&bull;</span>
-              <button type="button" className="hover:text-white">Карта сайта</button>
+              <button 
+                type="button" 
+                onClick={() => {
+                  const el = document.getElementById('about');
+                  el?.scrollIntoView({ behavior: 'smooth' });
+                }} 
+                className="hover:text-white transition-colors cursor-pointer"
+              >
+                Карта сайта
+              </button>
               <span>&bull;</span>
               <button 
                 type="button" 
@@ -3854,6 +3854,12 @@ export default function App() {
 
       {/* Embedded Admin Overlay Controllers */}
       <AdminFloatBar />
+
+      {/* Privacy Policy Modal (152-FZ / 323-FZ) */}
+      <PrivacyPolicyModal 
+        isOpen={isPrivacyModalOpen} 
+        onClose={() => setIsPrivacyModalOpen(false)} 
+      />
 
       {/* Scroll to Top Button */}
       <AnimatePresence>

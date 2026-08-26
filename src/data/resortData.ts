@@ -39,7 +39,7 @@ export const RESORT_INFO = {
   phone: '+7(3654)23-93-76',
   phoneDirect: '+7(3654)23-93-76',
   fax: '+73654239376',
-  email: 'priemnaya.yasnayapolyana@yandex.ru',
+  email: 'sanatoriy@ya-polyana.ru',
   inn: '7713778678',
   kpp: '910301001',
   directorName: 'Данилив Алексей Иванович',
