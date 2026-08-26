@@ -1934,33 +1934,36 @@ export default function App() {
             <div className="lg:col-span-5">
               
               {/* Фито-Барометр & Метео-Станция */}
-              <div className="bg-gradient-to-b from-[#02281f] via-[#02231b] to-[#011712] text-white p-4 sm:p-5 rounded-2xl shadow-xl relative overflow-hidden border border-[#c5a880]/30 backdrop-blur-sm">
-                {/* Decorative ambient background glows */}
-                <div className="absolute -top-10 -right-10 w-40 h-40 bg-[#c5a880]/10 rounded-full filter blur-3xl pointer-events-none"></div>
-                <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-emerald-600/10 rounded-full filter blur-3xl pointer-events-none"></div>
+              <div className="bg-gradient-to-br from-[#062c23] via-[#03201a] to-[#011410] text-white p-4 sm:p-5 rounded-2xl shadow-[0_16px_40px_-12px_rgba(2,44,34,0.45),0_0_0_1px_rgba(197,168,128,0.25)] relative overflow-hidden backdrop-blur-md">
+                {/* Decorative ambient background glows and subtle golden luxury haze */}
+                <div className="absolute -top-12 -right-12 w-48 h-48 bg-[#c5a880]/12 rounded-full filter blur-3xl pointer-events-none"></div>
+                <div className="absolute -bottom-12 -left-12 w-48 h-48 bg-emerald-500/10 rounded-full filter blur-3xl pointer-events-none"></div>
+                <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(197,168,128,0.08),transparent_60%)] pointer-events-none"></div>
                 
                 <div className="relative z-10 space-y-3.5">
                   
                   {/* Header Row with integrated Time-of-Day Switcher */}
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[#c5a880]/20 pb-3">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 border-b border-[#c5a880]/20 pb-3">
                     <div>
                       <div className="flex items-center space-x-2">
-                        <TreePine className="w-4 h-4 text-[#c5a880]" />
+                        <div className="p-1 rounded-lg bg-[#c5a880]/15 text-[#c5a880] shadow-[inset_0_1px_1px_rgba(255,255,255,0.15)]">
+                          <TreePine className="w-4 h-4" />
+                        </div>
                         <h3 className="font-serif text-lg sm:text-xl font-bold tracking-wide text-white">
                           Фито-Барометр
                         </h3>
-                        <div className="flex items-center space-x-1 bg-emerald-950/90 border border-emerald-600/50 px-2 py-0.5 rounded-full text-[10px] text-emerald-300 font-mono font-semibold">
+                        <div className="flex items-center space-x-1.5 bg-emerald-950/80 border border-emerald-500/40 px-2 py-0.5 rounded-full text-[10px] text-emerald-300 font-mono font-semibold shadow-sm">
                           <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span>
                           <span>LIVE</span>
                         </div>
                       </div>
                       <p className="text-[10px] text-[#c5a880] font-mono tracking-wider uppercase mt-0.5">
-                        Гаспра, ЮБК • Климатотерапия
+                        Гаспра, ЮБК • Курортная климатотерапия
                       </p>
                     </div>
 
                     {/* Compact Segmented Pills Switcher */}
-                    <div className="flex items-center bg-black/40 p-1 rounded-xl border border-white/10 shrink-0 self-start sm:self-auto">
+                    <div className="flex items-center bg-black/30 p-1 rounded-xl border border-white/10 shadow-[inset_0_1px_3px_rgba(0,0,0,0.3)] shrink-0 self-start sm:self-auto backdrop-blur-sm">
                       {[
                         { id: 'morning', title: 'Утро', icon: <Sunrise className="w-3.5 h-3.5 shrink-0" /> },
                         { id: 'day', title: 'День', icon: <Sun className="w-3.5 h-3.5 shrink-0" /> },
@@ -1974,7 +1977,7 @@ export default function App() {
                             onClick={() => setClimateTime(tab.id as 'morning' | 'day' | 'evening')}
                             className={`flex items-center space-x-1 py-1 px-2.5 rounded-lg text-xs font-serif font-bold transition-all duration-300 cursor-pointer ${
                               isActive
-                                ? 'bg-gradient-to-r from-[#c5a880] to-[#b09068] text-[#022C22] shadow-sm scale-105'
+                                ? 'bg-gradient-to-r from-[#d1b58f] via-[#c5a880] to-[#b4936a] text-[#022C22] shadow-[0_2px_8px_rgba(197,168,128,0.4)] scale-105'
                                 : 'text-stone-300 hover:text-white hover:bg-white/[0.08]'
                             }`}
                           >
@@ -1993,7 +1996,7 @@ export default function App() {
                       <span className="text-stone-300 text-xs font-mono">Синхронизация с метеостанцией...</span>
                     </div>
                   ) : weatherError || !realWeather ? (
-                    <div className="py-6 text-center text-xs text-stone-300 space-y-1 bg-emerald-950/40 rounded-xl border border-emerald-900 p-3">
+                    <div className="py-6 text-center text-xs text-stone-300 space-y-1 bg-emerald-950/40 rounded-xl border border-emerald-900/60 p-3 shadow-inner">
                       <p className="font-serif font-semibold text-[#c5a880]">Метеостанция Гаспры в сети</p>
                       <p className="text-stone-400">Погода: +22°C, Черное море: +19°C</p>
                     </div>
@@ -2001,7 +2004,7 @@ export default function App() {
                     <div className="space-y-3">
                       
                       {/* Compact Weather & Doctor note Hero Row */}
-                      <div className="bg-gradient-to-r from-emerald-950/80 via-emerald-900/40 to-emerald-950/80 p-3 rounded-xl border border-[#c5a880]/20 shadow-sm relative overflow-hidden">
+                      <div className="bg-gradient-to-r from-white/[0.07] via-white/[0.04] to-white/[0.06] p-3 rounded-2xl border border-[#c5a880]/25 shadow-[0_4px_16px_-4px_rgba(0,0,0,0.3)] relative overflow-hidden backdrop-blur-sm">
                         <AnimatePresence mode="wait">
                           <motion.div
                             key={climateTime}
@@ -2012,30 +2015,30 @@ export default function App() {
                             className="flex items-center justify-between gap-3"
                           >
                             <div className="flex items-center space-x-3">
-                              <div className="bg-emerald-900/90 p-2 rounded-xl border border-[#c5a880]/30 shadow-inner shrink-0">
+                              <div className="bg-gradient-to-br from-emerald-900/80 to-emerald-950/90 p-2 rounded-xl border border-[#c5a880]/30 shadow-[inset_0_1px_2px_rgba(255,255,255,0.15),0_4px_10px_rgba(0,0,0,0.25)] shrink-0">
                                 {getWeatherIcon(climateDetails[climateTime].weatherCode, "w-8 h-8 sm:w-9 sm:h-9")}
                               </div>
                               <div>
                                 <div className="flex items-baseline space-x-2">
-                                  <span className="text-2xl sm:text-3xl font-serif font-black text-white leading-none">
+                                  <span className="text-2xl sm:text-3xl font-serif font-black text-white leading-none tracking-tight">
                                     {climateDetails[climateTime].temp}
                                   </span>
-                                  <span className="text-[11px] text-stone-300 font-sans font-semibold">
+                                  <span className="text-[11px] text-stone-200 font-sans font-medium">
                                     {climateDetails[climateTime].weatherName}
                                   </span>
                                 </div>
                                 <div className="flex items-center space-x-1.5 mt-1 text-[11px] text-[#c5a880] font-mono">
                                   <Waves className="w-3.5 h-3.5 shrink-0" />
-                                  <span>Море: <strong>{climateDetails[climateTime].seaTemp}</strong></span>
+                                  <span>Море: <strong className="text-white font-semibold">{climateDetails[climateTime].seaTemp}</strong></span>
                                 </div>
                               </div>
                             </div>
 
-                            <div className="text-right max-w-[170px] hidden sm:block border-l border-[#c5a880]/20 pl-3">
+                            <div className="text-right max-w-[180px] hidden sm:block border-l border-[#c5a880]/20 pl-3">
                               <span className="text-[9px] text-[#c5a880] uppercase tracking-wider font-mono font-bold block">
-                                Рекомендация
+                                Рекомендация врача
                               </span>
-                              <div className="text-[10px] font-serif italic text-stone-200 line-clamp-2 leading-tight">
+                              <div className="text-[10px] font-serif italic text-stone-200 line-clamp-2 leading-tight mt-0.5">
                                 «{climateDetails[climateTime].recommendation}»
                               </div>
                             </div>
@@ -2043,38 +2046,38 @@ export default function App() {
                         </AnimatePresence>
                       </div>
 
-                      {/* Extended Live Parameters (Sleek 3-Column Mini Cards) */}
+                      {/* Extended Live Parameters (Sleek 3-Column Rounded Cards with Soft Glow) */}
                       <div className="grid grid-cols-3 gap-2">
-                        <div className="bg-emerald-950/50 hover:bg-emerald-900/50 p-2 rounded-lg border border-emerald-900/60 hover:border-[#c5a880]/30 transition-all text-center flex flex-col justify-center">
-                          <span className="text-[8px] uppercase tracking-wider font-mono text-stone-400 font-semibold block">
+                        <div className="bg-gradient-to-b from-white/[0.06] to-white/[0.02] hover:from-white/[0.1] hover:to-white/[0.04] p-2.5 rounded-xl border border-white/[0.08] hover:border-[#c5a880]/35 transition-all duration-300 text-center flex flex-col justify-center shadow-[0_4px_12px_rgba(0,0,0,0.15)] hover:shadow-[0_6px_16px_rgba(0,0,0,0.25)] group">
+                          <span className="text-[8px] uppercase tracking-wider font-mono text-stone-400 group-hover:text-stone-300 font-semibold block">
                             Ветер
                           </span>
                           <div className="flex items-center justify-center space-x-1 mt-0.5">
-                            <Wind className="w-3.5 h-3.5 text-[#c5a880] shrink-0" />
+                            <Wind className="w-3.5 h-3.5 text-[#c5a880] shrink-0 group-hover:rotate-12 transition-transform duration-300" />
                             <span className="text-xs font-bold text-white font-mono">
                               {climateDetails[climateTime].windSpeed}
                             </span>
                           </div>
                         </div>
 
-                        <div className="bg-emerald-950/50 hover:bg-emerald-900/50 p-2 rounded-lg border border-emerald-900/60 hover:border-[#c5a880]/30 transition-all text-center flex flex-col justify-center">
-                          <span className="text-[8px] uppercase tracking-wider font-mono text-stone-400 font-semibold block">
+                        <div className="bg-gradient-to-b from-white/[0.06] to-white/[0.02] hover:from-white/[0.1] hover:to-white/[0.04] p-2.5 rounded-xl border border-white/[0.08] hover:border-[#c5a880]/35 transition-all duration-300 text-center flex flex-col justify-center shadow-[0_4px_12px_rgba(0,0,0,0.15)] hover:shadow-[0_6px_16px_rgba(0,0,0,0.25)] group">
+                          <span className="text-[8px] uppercase tracking-wider font-mono text-stone-400 group-hover:text-stone-300 font-semibold block">
                             Влажность
                           </span>
                           <div className="flex items-center justify-center space-x-1 mt-0.5">
-                            <Droplet className="w-3.5 h-3.5 text-[#c5a880] shrink-0" />
+                            <Droplet className="w-3.5 h-3.5 text-[#c5a880] shrink-0 group-hover:scale-110 transition-transform duration-300" />
                             <span className="text-xs font-bold text-white font-mono">
                               {climateDetails[climateTime].humidity}
                             </span>
                           </div>
                         </div>
 
-                        <div className="bg-emerald-950/50 hover:bg-emerald-900/50 p-2 rounded-lg border border-[#c5a880]/20 hover:border-[#c5a880]/40 transition-all text-center flex flex-col justify-center">
+                        <div className="bg-gradient-to-b from-[#c5a880]/15 to-emerald-950/40 hover:from-[#c5a880]/25 hover:to-emerald-900/40 p-2.5 rounded-xl border border-[#c5a880]/30 hover:border-[#c5a880]/50 transition-all duration-300 text-center flex flex-col justify-center shadow-[0_4px_12px_rgba(0,0,0,0.15)] hover:shadow-[0_6px_16px_rgba(197,168,128,0.15)] group">
                           <span className="text-[8px] uppercase tracking-wider font-mono text-emerald-300 font-semibold block">
                             Черное море
                           </span>
                           <div className="flex items-center justify-center space-x-1 mt-0.5">
-                            <Waves className="w-3.5 h-3.5 text-[#c5a880] shrink-0" />
+                            <Waves className="w-3.5 h-3.5 text-[#c5a880] shrink-0 group-hover:translate-x-0.5 transition-transform duration-300" />
                             <span className="text-xs font-bold text-[#c5a880] font-mono">
                               {climateDetails[climateTime].seaTemp}
                             </span>
@@ -2082,21 +2085,21 @@ export default function App() {
                         </div>
                       </div>
 
-                      {/* Phyto-Barometer Indicators (Compact Bars) */}
-                      <div className="bg-emerald-950/60 p-2.5 rounded-xl border border-[#c5a880]/15 space-y-2">
+                      {/* Phyto-Barometer Indicators (Compact Rounded Bars) */}
+                      <div className="bg-gradient-to-b from-white/[0.04] to-black/20 p-3 rounded-xl border border-[#c5a880]/20 space-y-2.5 shadow-[inset_0_1px_2px_rgba(0,0,0,0.2)]">
                         <div className="space-y-1">
                           <div className="flex justify-between items-center text-[11px]">
                             <span className="text-stone-300 font-medium truncate">Фитонциды хвои (кедр, можжевельник):</span>
-                            <span className="font-bold text-emerald-300 font-mono text-[9px] bg-emerald-950 px-1.5 py-0.5 rounded border border-emerald-800/80 shrink-0 ml-1">
+                            <span className="font-bold text-emerald-300 font-mono text-[9px] bg-emerald-950/90 px-1.5 py-0.5 rounded-md border border-emerald-700/60 shrink-0 ml-1 shadow-sm">
                               {climateDetails[climateTime].phytoncides}
                             </span>
                           </div>
-                          <div className="h-1.5 bg-black/40 rounded-full overflow-hidden">
+                          <div className="h-1.5 bg-black/40 rounded-full overflow-hidden p-px border border-white/5">
                             <motion.div 
                               initial={{ width: '50%' }}
                               animate={{ width: climateTime === 'day' ? '100%' : climateTime === 'morning' ? '85%' : '65%' }}
                               transition={{ duration: 0.5, ease: "easeOut" }}
-                              className="h-full bg-gradient-to-r from-emerald-500 to-[#c5a880] rounded-full"
+                              className="h-full bg-gradient-to-r from-emerald-500 via-emerald-400 to-[#c5a880] rounded-full shadow-[0_0_8px_rgba(16,185,129,0.3)]"
                             ></motion.div>
                           </div>
                         </div>
@@ -2104,22 +2107,22 @@ export default function App() {
                         <div className="space-y-1">
                           <div className="flex justify-between items-center text-[11px]">
                             <span className="text-stone-300 font-medium truncate">Морские аэроионы и соли:</span>
-                            <span className="font-bold text-[#c5a880] font-mono text-[9px] bg-emerald-950 px-1.5 py-0.5 rounded border border-emerald-800/80 shrink-0 ml-1">
+                            <span className="font-bold text-[#c5a880] font-mono text-[9px] bg-emerald-950/90 px-1.5 py-0.5 rounded-md border border-[#c5a880]/40 shrink-0 ml-1 shadow-sm">
                               {climateDetails[climateTime].aerosols}
                             </span>
                           </div>
-                          <div className="h-1.5 bg-black/40 rounded-full overflow-hidden">
+                          <div className="h-1.5 bg-black/40 rounded-full overflow-hidden p-px border border-white/5">
                             <motion.div 
                               initial={{ width: '40%' }}
                               animate={{ width: climateTime === 'morning' ? '95%' : climateTime === 'day' ? '70%' : '50%' }}
                               transition={{ duration: 0.5, ease: "easeOut" }}
-                              className="h-full bg-gradient-to-r from-[#c5a880] to-emerald-400 rounded-full"
+                              className="h-full bg-gradient-to-r from-[#c5a880] via-amber-300 to-emerald-400 rounded-full shadow-[0_0_8px_rgba(197,168,128,0.3)]"
                             ></motion.div>
                           </div>
                         </div>
                       </div>
 
-                      {/* 3 Days Forecast Grid (Compact) */}
+                      {/* 3 Days Forecast Grid (Compact Rounded Cards) */}
                       <div className="border-t border-[#c5a880]/15 pt-2">
                         <div className="flex items-center justify-between mb-1.5">
                           <span className="text-[9px] uppercase tracking-widest font-mono text-stone-300 font-bold flex items-center gap-1">
@@ -2131,10 +2134,10 @@ export default function App() {
                           {realWeather.forecast.map((f, index) => (
                             <div 
                               key={index} 
-                              className="bg-white/[0.04] hover:bg-white/[0.08] transition-all p-1.5 rounded-lg border border-white/[0.06] text-center flex items-center justify-between px-2 group"
+                              className="bg-gradient-to-b from-white/[0.05] to-white/[0.02] hover:from-white/[0.09] hover:to-white/[0.04] transition-all duration-300 p-1.5 rounded-xl border border-white/[0.07] hover:border-[#c5a880]/40 text-center flex items-center justify-between px-2.5 group shadow-[0_2px_8px_rgba(0,0,0,0.1)] hover:shadow-[0_4px_12px_rgba(0,0,0,0.2)]"
                             >
                               <div className="text-left">
-                                <span className="block text-[10px] font-bold text-stone-200 leading-none">
+                                <span className="block text-[10px] font-bold text-stone-200 leading-none group-hover:text-white transition-colors">
                                   {formatForecastDate(f.date)}
                                 </span>
                                 <span className="block text-[8px] text-[#c5a880] truncate max-w-[55px] mt-0.5">
@@ -2142,7 +2145,9 @@ export default function App() {
                                 </span>
                               </div>
                               <div className="flex items-center space-x-1.5">
-                                {getWeatherIcon(f.weatherCode, "w-4 h-4")}
+                                <div className="group-hover:scale-110 transition-transform duration-300">
+                                  {getWeatherIcon(f.weatherCode, "w-4 h-4")}
+                                </div>
                                 <span className="text-[11px] font-bold text-white font-mono">
                                   {f.tempMax}°
                                 </span>
@@ -2163,477 +2168,573 @@ export default function App() {
           </div>
 
           {/* OFFICIAL DETAILED INFORMATION REGISTRY */}
-          <div className="mt-20 border-t border-stone-200/80 pt-16">
-            <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
-              <div className="max-w-3xl">
-                <span className="text-[#c5a880] text-xs font-mono uppercase tracking-widest font-bold">Официальный реестр и медицинская лицензия</span>
-                <h3 className="font-serif text-2xl sm:text-3xl md:text-4xl font-extrabold text-[#022C22] tracking-tight mt-1">
-                  Общие данные и медицинская специализация санатория
-                </h3>
-                <p className="text-stone-500 text-sm mt-3 leading-relaxed">
-                  Федеральное государственное казенное учреждение «Санаторий «Ясная Поляна» ФТС России». Полная ведомственная и нормативная информация с официального реестра учреждения.
-                </p>
+          <div className="mt-14 sm:mt-16 bg-gradient-to-b from-stone-50/90 via-white to-stone-50/50 rounded-3xl border border-[#c5a880]/30 shadow-[0_20px_50px_-15px_rgba(2,44,34,0.07)] p-5 sm:p-7 md:p-9 relative overflow-hidden">
+            {/* Ambient luxury corner glow */}
+            <div className="absolute -top-16 -right-16 w-60 h-60 bg-[#c5a880]/8 rounded-full filter blur-3xl pointer-events-none"></div>
+            <div className="absolute -bottom-16 -left-16 w-60 h-60 bg-emerald-700/5 rounded-full filter blur-3xl pointer-events-none"></div>
+            
+            <div className="relative z-10">
+              {/* Header Row */}
+              <div className="flex flex-col lg:flex-row lg:items-end justify-between mb-8 gap-4 pb-6 border-b border-stone-200/70">
+                <div className="max-w-3xl space-y-2">
+                  <div className="flex items-center space-x-2">
+                    <span className="h-[1px] w-6 bg-[#c5a880]"></span>
+                    <span className="text-[#c5a880] text-[11px] font-mono uppercase tracking-widest font-bold flex items-center gap-1.5">
+                      <Shield className="w-3.5 h-3.5" />
+                      Официальный реестр и медицинская лицензия
+                    </span>
+                  </div>
+                  <h3 className="font-serif text-2xl sm:text-3xl md:text-4xl font-extrabold text-[#022C22] tracking-tight">
+                    Общие данные и медицинская специализация
+                  </h3>
+                  <p className="text-stone-600 text-sm leading-relaxed max-w-2xl">
+                    ФГКУ «Санаторий «Ясная Поляна» ФТС России». Полная ведомственная и нормативная информация с официального государственного реестра учреждения.
+                  </p>
+                </div>
+                
+                {/* Official License Badge */}
+                <div className="flex items-center space-x-3 bg-gradient-to-r from-emerald-950/[0.04] to-[#c5a880]/10 border border-[#c5a880]/40 px-4 py-2.5 rounded-2xl shadow-sm self-start lg:self-auto shrink-0">
+                  <div className="w-8 h-8 rounded-xl bg-[#022C22] text-[#c5a880] flex items-center justify-center shrink-0 shadow-sm">
+                    <Award className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <span className="block text-[9px] uppercase font-mono tracking-wider text-stone-500 font-semibold">Лицензия Минздрава РФ</span>
+                    <strong className="block text-xs font-mono font-bold text-[#022C22]">№ Л041-00110-91/00554225</strong>
+                  </div>
+                </div>
               </div>
-              
-              <div className="flex items-center space-x-2 text-xs text-stone-500 font-mono bg-stone-100 px-3 py-1.5 rounded border border-stone-250/20">
-                <Shield className="w-4 h-4 text-[#c5a880] flex-shrink-0" />
-                <span>Лицензия № Л041-00110-91/00554225</span>
+
+              {/* Intuitive Modern Segmented Tab Switcher */}
+              <div className="mb-6">
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 p-1.5 bg-stone-200/50 rounded-2xl border border-stone-200/90 shadow-[inset_0_1px_3px_rgba(0,0,0,0.04)]">
+                  {[
+                    { 
+                      id: 'general', 
+                      label: 'Общие сведения', 
+                      sub: 'Реквизиты и адрес', 
+                      icon: Building2 
+                    },
+                    { 
+                      id: 'medical', 
+                      label: 'Медицинский профиль', 
+                      sub: 'Лицензия и показания', 
+                      icon: Activity 
+                    },
+                    { 
+                      id: 'treatment', 
+                      label: 'Методы лечения', 
+                      sub: 'Комплекс процедур и кабинеты', 
+                      icon: FileText 
+                    },
+                    { 
+                      id: 'registry', 
+                      label: 'Контакты & Реестр', 
+                      sub: 'Руководство и ЕГРЮЛ', 
+                      icon: UserCheck 
+                    }
+                  ].map((t) => {
+                    const IconComp = t.icon;
+                    const isActive = aboutTab === t.id;
+                    return (
+                      <button
+                        key={t.id}
+                        type="button"
+                        onClick={() => {
+                          setAboutTab(t.id as any);
+                          if (isAccessMode && accessSpeech && window.speechSynthesis) {
+                            const switchVoice = new SpeechSynthesisUtterance(`Открыта вкладка ${t.label}`);
+                            switchVoice.lang = 'ru-RU';
+                            window.speechSynthesis.speak(switchVoice);
+                          }
+                        }}
+                        className={`group relative p-3 sm:p-3.5 rounded-xl text-left transition-all duration-300 cursor-pointer flex items-center space-x-3 select-none ${
+                          isActive 
+                            ? 'bg-gradient-to-br from-[#022C22] via-[#02281e] to-[#011d16] text-white shadow-[0_8px_20px_-4px_rgba(2,44,34,0.4),0_0_0_1px_rgba(197,168,128,0.35)] scale-[1.01]' 
+                            : 'bg-white/80 hover:bg-white text-stone-700 hover:text-[#022C22] border border-stone-200/60 hover:border-stone-300 shadow-sm hover:shadow'
+                        }`}
+                      >
+                        <div className={`p-2 rounded-lg shrink-0 transition-colors ${
+                          isActive 
+                            ? 'bg-[#c5a880] text-[#022C22] shadow-[0_2px_8px_rgba(197,168,128,0.4)]' 
+                            : 'bg-stone-100 text-[#022C22] group-hover:bg-[#c5a880]/20 group-hover:text-[#022C22]'
+                        }`}>
+                          <IconComp className="w-4 h-4" />
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <span className={`block text-xs sm:text-sm font-serif font-bold tracking-tight truncate leading-tight ${
+                            isActive ? 'text-white' : 'text-[#022C22]'
+                          }`}>
+                            {t.label}
+                          </span>
+                          <span className={`block text-[10px] font-mono tracking-tight mt-0.5 truncate ${
+                            isActive ? 'text-[#c5a880] font-medium' : 'text-stone-500 group-hover:text-stone-700'
+                          }`}>
+                            {t.sub}
+                          </span>
+                        </div>
+                        {isActive && (
+                          <span className="w-1.5 h-1.5 rounded-full bg-[#c5a880] shadow-[0_0_6px_#c5a880] shrink-0 hidden sm:block"></span>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
-            </div>
 
-            {/* Tab switch bar */}
-            <div className="flex flex-wrap border-b border-stone-200 mb-6 gap-1">
-              {[
-                { id: 'general', label: 'Общие сведения', icon: Building2 },
-                { id: 'medical', label: 'Медицинский профиль', icon: Activity },
-                { id: 'treatment', label: 'Методы лечения и структура', icon: FileText },
-                { id: 'registry', label: 'Контакты и гос. регистрация', icon: UserCheck }
-              ].map((t) => {
-                const IconComp = t.icon;
-                return (
-                  <button
-                    key={t.id}
-                    onClick={() => {
-                      setAboutTab(t.id as any);
-                      if (isAccessMode && accessSpeech && window.speechSynthesis) {
-                        const switchVoice = new SpeechSynthesisUtterance(`Открыта вкладка ${t.label}`);
-                        switchVoice.lang = 'ru-RU';
-                        window.speechSynthesis.speak(switchVoice);
-                      }
-                    }}
-                    className={`flex items-center space-x-3 px-4 py-3 text-xs sm:text-sm font-semibold tracking-wide border-b-2 transition-all cursor-pointer ${
-                      aboutTab === t.id 
-                        ? 'border-[#022C22] text-[#022C22] font-bold bg-[#022C22]/5 rounded-t' 
-                        : 'border-transparent text-stone-500 hover:text-stone-800'
-                    }`}
-                  >
-                    <IconComp className="w-4 h-4 text-[#c5a880] flex-shrink-0" />
-                    <span>{t.label}</span>
-                  </button>
-                );
-              })}
-            </div>
-
-            {/* Tab Content Cards */}
-            <div className="bg-white rounded-sm border border-stone-200 shadow-md p-6 md:p-8">
-              <AnimatePresence mode="wait">
-                {aboutTab === 'general' && (
-                  <motion.div
-                    key="general"
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -10 }}
-                    transition={{ duration: 0.2 }}
-                    className="grid grid-cols-1 md:grid-cols-2 gap-8 text-sm text-stone-700 font-sans"
-                  >
-                    <div className="space-y-4">
-                      <div>
-                        <span className="block text-xs uppercase tracking-widest font-mono text-stone-400">Полное наименование организации</span>
-                        <p className="font-serif text-base sm:text-lg text-[#022C22] font-semibold mt-1 leading-snug">
-                          Федеральное государственное казенное учреждение «Санаторий «Ясная Поляна» ФТС России»
-                        </p>
-                      </div>
-
-                      <div>
-                        <span className="block text-xs uppercase tracking-widest font-mono text-stone-400">Сокращенное наименование</span>
-                        <p className="font-semibold text-stone-800 mt-1">Санаторий «Ясная Поляна» ФТС России</p>
-                      </div>
-
-                      <div className="grid grid-cols-2 gap-4 pt-2">
-                        <div>
-                          <span className="block text-xs uppercase tracking-widest font-mono text-stone-400">ИНН</span>
-                          <p className="font-mono text-stone-900 font-bold mt-0.5">7713778678</p>
+              {/* Tab Content Box with Refined Cards */}
+              <div className="bg-white rounded-2xl border border-stone-200/80 shadow-[0_4px_24px_rgba(0,0,0,0.04)] p-5 sm:p-7 md:p-8">
+                <AnimatePresence mode="wait">
+                  {aboutTab === 'general' && (
+                    <motion.div
+                      key="general"
+                      initial={{ opacity: 0, y: 8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -8 }}
+                      transition={{ duration: 0.25 }}
+                      className="grid grid-cols-1 lg:grid-cols-12 gap-8 text-sm text-stone-700 font-sans"
+                    >
+                      {/* Left: Organization Credentials */}
+                      <div className="lg:col-span-7 space-y-5">
+                        <div className="bg-stone-50/80 p-4 sm:p-5 rounded-xl border border-stone-200/70 space-y-3">
+                          <span className="block text-[10px] uppercase tracking-widest font-mono text-[#c5a880] font-bold">
+                            Полное наименование организации
+                          </span>
+                          <p className="font-serif text-base sm:text-lg text-[#022C22] font-bold leading-snug">
+                            Федеральное государственное казенное учреждение «Санаторий «Ясная Поляна» Федеральной таможенной службы»
+                          </p>
+                          <div className="pt-1 flex items-center gap-2">
+                            <span className="text-xs text-stone-500 font-sans font-medium">Сокращенное:</span>
+                            <span className="font-semibold text-stone-800 text-xs bg-white px-2 py-0.5 rounded border border-stone-200">
+                              ФГКУ «Санаторий «Ясная Поляна» ФТС России»
+                            </span>
+                          </div>
                         </div>
-                        <div>
-                          <span className="block text-xs uppercase tracking-widest font-mono text-stone-400">КПП</span>
-                          <p className="font-mono text-stone-900 font-bold mt-0.5">910301001</p>
+
+                        {/* Tax & Legal IDs Grid */}
+                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                          <div className="bg-stone-50/80 p-3.5 rounded-xl border border-stone-200/70">
+                            <span className="block text-[10px] uppercase tracking-widest font-mono text-stone-400 font-semibold">ИНН</span>
+                            <p className="font-mono text-stone-900 font-bold text-sm sm:text-base mt-0.5">7713778678</p>
+                          </div>
+                          <div className="bg-stone-50/80 p-3.5 rounded-xl border border-stone-200/70">
+                            <span className="block text-[10px] uppercase tracking-widest font-mono text-stone-400 font-semibold">КПП</span>
+                            <p className="font-mono text-stone-900 font-bold text-sm sm:text-base mt-0.5">910301001</p>
+                          </div>
+                          <div className="bg-stone-50/80 p-3.5 rounded-xl border border-stone-200/70 col-span-2 sm:col-span-1">
+                            <span className="block text-[10px] uppercase tracking-widest font-mono text-stone-400 font-semibold">ОГРН</span>
+                            <p className="font-mono text-stone-900 font-bold text-xs sm:text-sm mt-1">5137746004787</p>
+                          </div>
+                        </div>
+
+                        <div className="bg-stone-50/80 p-3.5 rounded-xl border border-stone-200/70">
+                          <span className="block text-[10px] uppercase tracking-widest font-mono text-stone-400 font-semibold">Организационно-правовая форма (ОПФ)</span>
+                          <p className="text-stone-800 font-semibold text-xs sm:text-sm mt-0.5">Федеральные государственные казенные учреждения</p>
                         </div>
                       </div>
 
-                      <div>
-                        <span className="block text-xs uppercase tracking-widest font-mono text-stone-400">Организационно-правовая форма (ОПФ)</span>
-                        <p className="text-stone-800 mt-1">Федеральные государственные казенные учреждения</p>
-                      </div>
-                    </div>
-
-                    <div className="space-y-4 border-t md:border-t-0 md:border-l border-stone-200/80 md:pl-8 pt-4 md:pt-0">
-                      <div>
-                        <span className="block text-xs uppercase tracking-widest font-mono text-stone-400">Юридический, фактический & почтовый адрес</span>
-                        <p className="text-stone-800 font-medium mt-1">
-                          298660, Крым Респ, г Ялта, пгт Гаспра, ш Севастопольское, д. 52
-                        </p>
-                      </div>
-
-                      <div className="pt-2">
-                        <span className="block text-xs uppercase tracking-widest font-mono text-stone-400">Характеристики санатория</span>
-                        <ul className="mt-1.5 space-y-2">
-                          <li className="flex items-center space-x-2">
-                            <span className="w-1.5 h-1.5 rounded-full bg-[#c5a880] flex-shrink-0"></span>
-                            <span><strong>Курортная зона:</strong> Ялта (Южный берег Крыма)</span>
-                          </li>
-                          <li className="flex items-center space-x-2">
-                            <span className="w-1.5 h-1.5 rounded-full bg-[#c5a880] flex-shrink-0"></span>
-                            <span><strong>Медицинская помощь:</strong> Санаторно-курортное лечение</span>
-                          </li>
-                          <li className="flex items-center space-x-2">
-                            <span className="w-1.5 h-1.5 rounded-full bg-[#c5a880] flex-shrink-0"></span>
-                            <span><strong>Тип организации:</strong> Санаторий для взрослых</span>
-                          </li>
-                          <li className="flex items-center space-x-2">
-                            <span className="w-1.5 h-1.5 rounded-full bg-[#c5a880] flex-shrink-0"></span>
-                            <span><strong>Ведомственная принадлежность:</strong> Федеральная таможенная служба (ФТС РФ)</span>
-                          </li>
-                          <li className="flex items-center space-x-2">
-                            <span className="w-1.5 h-1.5 rounded-full bg-[#c5a880] flex-shrink-0"></span>
-                            <span><strong>Форма собственности:</strong> Федеральная собственность</span>
-                          </li>
-                        </ul>
-                      </div>
-                    </div>
-                  </motion.div>
-                )}
-
-                {aboutTab === 'medical' && (
-                  <motion.div
-                    key="medical"
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -10 }}
-                    transition={{ duration: 0.2 }}
-                    className="space-y-6 text-sm text-stone-700 font-sans"
-                  >
-                    {/* License Details Header */}
-                    <div className="bg-emerald-950/[0.03] p-5 rounded-xl border border-[#c5a880]/30 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                      <div>
-                        <div className="flex items-center space-x-2 text-[#c5a880] text-[10px] font-mono uppercase tracking-widest font-bold">
-                          <Award className="w-3.5 h-3.5" />
-                          <span>Государственный Медицинский Стандарт</span>
+                      {/* Right: Geographic & Property details */}
+                      <div className="lg:col-span-5 space-y-4 border-t lg:border-t-0 lg:border-l border-stone-200/80 lg:pl-8 pt-4 lg:pt-0">
+                        <div className="bg-gradient-to-br from-[#022C22]/[0.03] to-stone-50 p-4 rounded-xl border border-[#c5a880]/30 space-y-2">
+                          <div className="flex items-center space-x-2 text-[#022C22]">
+                            <MapPin className="w-4 h-4 text-[#c5a880]" />
+                            <span className="block text-xs uppercase tracking-widest font-mono text-[#022C22] font-bold">
+                              Адрес и местоположение
+                            </span>
+                          </div>
+                          <p className="text-stone-800 font-semibold text-xs sm:text-sm leading-relaxed">
+                            298660, Республика Крым, г. Ялта, пгт Гаспра, шоссе Севастопольское, д. 52
+                          </p>
                         </div>
-                        <h4 className="font-serif text-xl font-extrabold text-[#022C22] mt-1">Лицензия № Л041-00110-91/00554225</h4>
-                        <p className="text-stone-500 text-xs mt-1">
-                          Выдана лицензирующим органом на осуществление высокотехнологичного санаторно-курортного лечения.
-                        </p>
-                      </div>
-                      <div className="flex flex-col text-right font-mono text-xs text-[#022C22] bg-white border border-stone-200 shadow-sm p-3 rounded-lg md:self-center shrink-0">
-                        <div><span className="text-stone-400">Дата выдачи:</span> <strong>2022-06-22</strong></div>
-                        <div className="border-t border-stone-100 mt-1 pt-1"><span className="text-stone-400">Срок действия:</span> <strong className="text-emerald-700">Бессрочно</strong></div>
-                      </div>
-                    </div>
 
-                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 pt-2">
-                      {/* Left: Specializations */}
-                      <div className="lg:col-span-6 space-y-6">
-                        <div className="space-y-3">
-                          <h5 className="font-serif text-base font-bold text-[#022C22] border-b border-stone-200 pb-2 flex items-center space-x-2">
-                            <Stethoscope className="w-4 h-4 text-[#c5a880]" />
-                            <span>Разрешенная профессиональная специализация:</span>
-                          </h5>
-                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-stone-700">
+                        <div className="space-y-2">
+                          <span className="block text-[10px] uppercase tracking-widest font-mono text-stone-400 font-bold">
+                            Характеристики учреждения
+                          </span>
+                          <div className="space-y-1.5 text-xs">
                             {[
-                              { name: 'диетология', desc: 'Терапевтическое и лечебное питание' },
-                              { name: 'лечебная физкультура', desc: 'Индивидуальные программы ЛФК' },
-                              { name: 'медицинский массаж', desc: 'Профессиональный ручной массаж' },
-                              { name: 'организация здравоохранения', desc: 'Высшие ведомственные стандарты ФТС' },
-                              { name: 'сестринское дело', desc: 'Круглосуточный квалифицированный уход' },
-                              { name: 'терапия', desc: 'Индивидуальное ведение лечащим врачом' },
-                              { name: 'физиотерапия', desc: 'Полный комплекс аппаратного лечения' },
-                              { name: 'функциональная диагностика', desc: 'ЭКГ и спирометрия на месте' }
-                            ].map((item, id) => (
-                              <div key={id} className="bg-stone-50 hover:bg-stone-100/50 border border-stone-200/60 p-2.5 rounded-lg transition-all">
-                                <span className="font-bold text-[13px] text-[#022C22] block capitalize">{item.name}</span>
-                                <span className="text-[11px] text-stone-500 block">{item.desc}</span>
+                              { label: 'Курортная зона', val: 'Большая Ялта (Южный берег Крыма)' },
+                              { label: 'Медицинская помощь', val: 'Санаторно-курортное лечение взрослых' },
+                              { label: 'Ведомство', val: 'Федеральная таможенная служба (ФТС РФ)' },
+                              { label: 'Форма собственности', val: 'Федеральная государственная собственность' },
+                            ].map((item, idx) => (
+                              <div key={idx} className="flex items-center justify-between p-2.5 rounded-lg bg-stone-50 border border-stone-200/60">
+                                <span className="text-stone-500 font-medium">{item.label}:</span>
+                                <span className="font-semibold text-stone-800 text-right">{item.val}</span>
                               </div>
                             ))}
                           </div>
                         </div>
+                      </div>
+                    </motion.div>
+                  )}
 
-                        {/* Diagnostics & Labs */}
-                        <div className="pt-2 space-y-3">
-                          <h5 className="font-serif text-base font-bold text-[#022C22] border-b border-stone-200 pb-2 flex items-center space-x-2">
-                            <Activity className="w-4 h-4 text-[#c5a880]" />
-                            <span>Медицинская диагностика и клиническая лаборатория:</span>
-                          </h5>
-                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <div className="bg-emerald-50/40 p-4 rounded-xl border border-emerald-100">
-                              <h6 className="font-serif text-xs font-bold text-[#022C22] uppercase tracking-wider font-mono">Лабораторная база</h6>
-                              <p className="text-stone-600 mt-1 text-xs leading-relaxed">
-                                • Биохимические исследования крови и мочи<br />
-                                • Общеклинические исследования на высокоточном оборудовании
-                              </p>
-                            </div>
-                            <div className="bg-amber-50/40 p-4 rounded-xl border border-amber-100">
-                              <h6 className="font-serif text-xs font-bold text-[#022C22] uppercase tracking-wider font-mono">Функциональная диагностика</h6>
-                              <p className="text-stone-600 mt-1 text-xs leading-relaxed">
-                                • Спирография (диагностика функции дыхания)<br />
-                                • Электрокардиография (ЭКГ-исследования сердца)
-                              </p>
-                            </div>
+                  {aboutTab === 'medical' && (
+                    <motion.div
+                      key="medical"
+                      initial={{ opacity: 0, y: 8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -8 }}
+                      transition={{ duration: 0.25 }}
+                      className="space-y-6 text-sm text-stone-700 font-sans"
+                    >
+                      {/* License Details Header */}
+                      <div className="bg-gradient-to-r from-[#022C22]/[0.04] via-[#c5a880]/10 to-[#022C22]/[0.02] p-4 sm:p-5 rounded-2xl border border-[#c5a880]/40 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 shadow-sm">
+                        <div className="space-y-1">
+                          <div className="flex items-center space-x-2 text-[#c5a880] text-[10px] font-mono uppercase tracking-widest font-bold">
+                            <Award className="w-4 h-4" />
+                            <span>Государственный Медицинский Стандарт</span>
+                          </div>
+                          <h4 className="font-serif text-lg sm:text-xl font-extrabold text-[#022C22]">
+                            Лицензия № Л041-00110-91/00554225
+                          </h4>
+                          <p className="text-stone-600 text-xs">
+                            Предоставлена на осуществление специализированной первичной и санаторно-курортной медицинской помощи.
+                          </p>
+                        </div>
+                        <div className="flex items-center gap-3 font-mono text-xs text-[#022C22] bg-white border border-stone-200/80 shadow-sm p-3 rounded-xl shrink-0">
+                          <div>
+                            <span className="block text-[9px] uppercase tracking-wider text-stone-400 font-medium">Выдана</span>
+                            <strong className="text-stone-800">22.06.2022</strong>
+                          </div>
+                          <div className="w-[1px] h-7 bg-stone-200"></div>
+                          <div>
+                            <span className="block text-[9px] uppercase tracking-wider text-stone-400 font-medium">Срок</span>
+                            <strong className="text-emerald-700 flex items-center gap-1 font-bold">
+                              <Check className="w-3.5 h-3.5" /> Бессрочно
+                            </strong>
                           </div>
                         </div>
                       </div>
 
-                      {/* Right: Pathologies & Basic Illness Profiles */}
-                      <div className="lg:col-span-6 bg-[#022C22]/[0.02] p-6 rounded-xl border border-stone-200 shadow-sm space-y-4">
-                        <h5 className="font-serif text-lg font-bold text-[#022C22] flex items-center space-x-2 border-b border-stone-200 pb-2 select-none">
-                          <Shield className="w-5 h-5 text-[#c5a880]" />
-                          <span>Медицинские показания (Лечебные профили)</span>
-                        </h5>
-                        
-                        <div className="space-y-4 divide-y divide-stone-200/50 text-xs text-stone-700">
-                          <div className="pt-0 pb-2">
-                            <span className="inline-block bg-red-50 text-red-800 text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-full mb-1">Рекомендовано</span>
-                            <strong className="block text-stone-850 font-bold text-sm text-[#022C22] mb-1">Болезни системы кровообращения:</strong>
-                            <p className="leading-relaxed text-stone-600">
-                              Болезни, характеризующиеся повышенным кровяным давлением; Гипертензивная болезнь сердца [гипертоническая болезнь с преимущественным поражением сердца]; Гипертензивная [гипертоническая] болезнь с преимущественным поражением сердца с застойной сердечной недостаточностью.
-                            </p>
-                          </div>
-
-                          <div className="pt-3 pb-2">
-                            <span className="inline-block bg-sky-50 text-sky-800 text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-full mb-1">Рекомендовано</span>
-                            <strong className="block text-stone-850 font-bold text-sm text-[#022C22] mb-1">Болезни органов дыхания:</strong>
-                            <p className="leading-relaxed text-stone-600">
-                              Хронические болезни нижних дыхательных путей; Хронический бронхит неуточненный; Оздоровление после респираторных вирусных заболеваний.
-                            </p>
-                          </div>
-
-                          <div className="pt-3">
-                            <span className="inline-block bg-amber-50 text-amber-800 text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-full mb-1">Рекомендовано</span>
-                            <strong className="block text-stone-850 font-bold text-sm text-[#022C22] mb-1">Болезни костно-мышечной системы и суставов:</strong>
-                            <p className="leading-relaxed text-stone-600">
-                              Артрозы; Коксартроз [артроз тазобедренного сустава] (первичный, двусторонний); Гонартроз [артроз коленного сустава] (первичный коленного сустава, двусторонний); Другие виды артрозов; Артроз неуточненный.
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </motion.div>
-                )}
-
-                {aboutTab === 'treatment' && (
-                  <motion.div
-                    key="treatment"
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -10 }}
-                    transition={{ duration: 0.2 }}
-                    className="grid grid-cols-1 lg:grid-cols-12 gap-8 text-sm text-stone-700 font-sans"
-                  >
-                    {/* Treatment list */}
-                    <div className="lg:col-span-8 space-y-6">
-                      <div>
-                        <h4 className="font-serif text-xl font-bold text-[#022C22] flex items-center">
-                          <Stethoscope className="w-5 h-5 text-[#c5a880] mr-2" />
-                          Применяемые высокотехнологичные методы лечения
-                        </h4>
-                        <p className="text-xs text-stone-500 mt-1">
-                          Комплексный перечень терапевтических процедур, проводимых квалифицированными специалистами на современном лицензированном оборудовании.
-                        </p>
-                      </div>
-
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        {[
-                          {
-                            category: 'Аппаратная электро- и магнитотерапия',
-                            items: [
-                              { name: 'Электромагнитное воздействие', desc: 'Воздействие электромагнитным лечебным полем на органы и ткани.' },
-                              { name: 'Электрофорез лекарственных средств', desc: 'Чрескожное введение медицинских препаратов с помощью токов по органам и системам.' },
-                              { name: 'УВЧ-терапия (э.п. УВЧ)', desc: 'Воздействие электрическим полем ультравысокой частоты для снятия воспалений.' },
-                              { name: 'Магнитотерапия', desc: 'Регенерация и улучшение трофики тканей благодаря импульсным магнитным полям.' },
-                              { name: 'СМТ-терапия', desc: 'Амплипульстерапия синусоидальными модулированными токами для стимуляции.' }
-                            ]
-                          },
-                          {
-                            category: 'Светолечение & Стимуляция',
-                            items: [
-                              { name: 'Лучевое лечение', desc: 'Различные методики светового, ультрафиолетового, звукового и лазерного воздействия.' },
-                              { name: 'Лазеротерапия', desc: 'Воздействие низкоинтенсивным лазерным излучением для активации обмена веществ.' },
-                              { name: 'Ультразвуковая терапия', desc: 'Микрозональное массажное действие на ткани с помощью звуковых колебаний.' },
-                              { name: 'Инфракрасное (ИК) излучение', desc: 'Глубокий тепловой прогрев суставов и мышечной системы человека.' }
-                            ]
-                          },
-                          {
-                            category: 'Бальнеология & Массаж',
-                            items: [
-                              { name: 'Подводный душ-массаж', desc: 'Интенсивный массаж струей воды под давлением в гидромассажной ванне.' },
-                              { name: 'Аромаванны лечебные', desc: 'Расслабляющие ванны с хвойными, солевыми и ароматными эссенциями.' },
-                              { name: 'Медицинский и сегментарный массаж', desc: 'Прогрессивное ручное разминание мышц при различных заболеваниях.' },
-                              { name: 'Лечебная физкультура (ЛФК)', desc: 'Дозированные физические упражнения в залах кинезотерапии под наблюдением врача.' }
-                            ]
-                          },
-                          {
-                            category: 'Климатотерапия & Оксигенация',
-                            items: [
-                              { name: 'Климатотерапия', desc: 'Лечение климатическими и целебными природными факторами ЮБК.' },
-                              { name: 'Воздействие климатом', desc: 'Аэротерапия, гелиотерапия и прогулки в парковой реликтовой зоне.' },
-                              { name: 'Терренкур (лечебная ходьба)', desc: 'Дозированное террентное лечение по специально проложенным маршрутам.' },
-                              { name: 'Ингаляционная терапия', desc: 'Ингаляторное введение противовоспалительных лекарств и растворов.' },
-                              { name: 'Кислородная терапия', desc: 'Введение чистого медицинского кислорода для компенсации гипоксии.' }
-                            ]
-                          }
-                        ].map((cat, groupIdx) => (
-                          <div key={groupIdx} className="bg-stone-50 border border-stone-200/85 p-4 rounded-xl space-y-3 hover:shadow-md transition-all duration-300">
-                            <div className="flex items-center space-x-2 border-b border-stone-200/60 pb-2">
-                              <span className={`w-2 h-2 rounded-full ${
-                                groupIdx === 0 ? 'bg-emerald-600' :
-                                groupIdx === 1 ? 'bg-amber-500' :
-                                groupIdx === 2 ? 'bg-blue-500' : 'bg-teal-600'
-                              }`} />
-                              <h5 className="font-serif text-xs font-bold text-[#022C22] tracking-wide uppercase">{cat.category}</h5>
-                            </div>
-                            <div className="space-y-3">
-                              {cat.items.map((item, itemIdx) => (
-                                <div key={itemIdx} className="group/item">
-                                  <div className="flex items-start space-x-1.5">
-                                    <Check className="w-3.5 h-3.5 text-[#c5a880] mt-0.5 shrink-0" />
-                                    <div>
-                                      <span className="text-[12px] font-bold text-stone-850 block leading-tight text-[#022C22]">{item.name}</span>
-                                      <span className="text-[10px] text-stone-500 block leading-normal mt-0.5">{item.desc}</span>
-                                    </div>
-                                  </div>
+                      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 pt-2">
+                        {/* Left: Specializations & Labs */}
+                        <div className="lg:col-span-6 space-y-6">
+                          <div className="space-y-3">
+                            <h5 className="font-serif text-base font-bold text-[#022C22] pb-1 flex items-center space-x-2 border-b border-stone-200">
+                              <Stethoscope className="w-4 h-4 text-[#c5a880]" />
+                              <span>Разрешенная медицинская специализация:</span>
+                            </h5>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-stone-700">
+                              {[
+                                { name: 'Диетология', desc: 'Терапевтическое и лечебное питание' },
+                                { name: 'Лечебная физкультура', desc: 'Индивидуальные программы ЛФК' },
+                                { name: 'Медицинский массаж', desc: 'Профессиональный ручной массаж' },
+                                { name: 'Организация здравоохранения', desc: 'Стандарты качества ФТС' },
+                                { name: 'Сестринское дело', desc: 'Круглосуточный сестринский уход' },
+                                { name: 'Терапия', desc: 'Ведение личным врачом-терапевтом' },
+                                { name: 'Физиотерапия', desc: 'Комплекс аппаратного лечения' },
+                                { name: 'Функциональная диагностика', desc: 'ЭКГ и спирометрия на месте' }
+                              ].map((item, id) => (
+                                <div key={id} className="bg-stone-50 hover:bg-white border border-stone-200/70 hover:border-[#c5a880]/40 p-2.5 rounded-xl transition-all duration-200 hover:shadow-sm group">
+                                  <span className="font-serif font-bold text-xs sm:text-[13px] text-[#022C22] block group-hover:text-emerald-900 transition-colors">
+                                    {item.name}
+                                  </span>
+                                  <span className="text-[10px] text-stone-500 block mt-0.5">{item.desc}</span>
                                 </div>
                               ))}
                             </div>
                           </div>
-                        ))}
-                      </div>
-                    </div>
 
-                    {/* Structure / Chambers */}
-                    <div className="lg:col-span-4 bg-[#022C22]/[0.02] p-5 rounded-xl border border-stone-200/85 space-y-4">
-                      <h4 className="font-serif text-base font-bold text-[#022C22] border-b border-stone-200 pb-2 flex items-center space-x-2">
-                        <Building2 className="w-4 h-4 text-[#c5a880]" />
-                        <span>Структура медицинских кабинетов</span>
-                      </h4>
-                      <p className="text-xs text-stone-500 leading-relaxed">
-                        Внутреннее устройство лечебно-диагностического подразделения Санатория:
-                      </p>
-                      
-                      <div className="space-y-1.5 text-xs font-semibold text-stone-700">
-                        {[
-                          'Кабинет функциональной диагностики',
-                          'Отделение аппаратной физиотерапии',
-                          'Отделение водолечения (бальнеотерапия)',
-                          'Специализированный зал ЛФК',
-                          'Кабинеты медицинского массажа',
-                          'Ингаляторий и кислородный пункт',
-                          'Изолятор и процедурные кабинеты',
-                          'Клинико-диагностическая лаборатория',
-                          'Комната дежурного медицинского персонала'
-                        ].map((cab, idx) => (
-                          <div key={idx} className="flex items-center space-x-2 bg-white p-2 border border-stone-200/80 rounded-lg shadow-sm hover:border-[#c5a880]/30 transition-all">
-                            <Check className="w-3.5 h-3.5 text-[#022C22] flex-shrink-0" />
-                            <span className="font-sans text-stone-750 font-medium">{cab}</span>
+                          {/* Diagnostics */}
+                          <div className="space-y-3">
+                            <h5 className="font-serif text-base font-bold text-[#022C22] pb-1 flex items-center space-x-2 border-b border-stone-200">
+                              <Activity className="w-4 h-4 text-[#c5a880]" />
+                              <span>Диагностическая и лабораторная база:</span>
+                            </h5>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                              <div className="bg-emerald-50/60 p-3.5 rounded-xl border border-emerald-200/60">
+                                <h6 className="font-serif text-xs font-bold text-[#022C22] uppercase tracking-wider font-mono">Клиническая лаборатория</h6>
+                                <p className="text-stone-600 mt-1 text-xs leading-relaxed">
+                                  Биохимические и общеклинические исследования крови и мочи на автоматических анализаторах.
+                                </p>
+                              </div>
+                              <div className="bg-amber-50/60 p-3.5 rounded-xl border border-amber-200/60">
+                                <h6 className="font-serif text-xs font-bold text-[#022C22] uppercase tracking-wider font-mono">Функциональная база</h6>
+                                <p className="text-stone-600 mt-1 text-xs leading-relaxed">
+                                  Спирография (диагностика внешнего дыхания), ЭКГ-исследования и суточный мониторинг.
+                                </p>
+                              </div>
+                            </div>
                           </div>
-                        ))}
-                      </div>
-                    </div>
-                  </motion.div>
-                )}
+                        </div>
 
-                {aboutTab === 'registry' && (
-                  <motion.div
-                    key="registry"
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -10 }}
-                    transition={{ duration: 0.2 }}
-                    className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 text-sm text-stone-700 font-sans"
-                  >
-                    {/* Management and Contacts */}
-                    <div className="space-y-4 bg-stone-50 p-5 rounded border border-stone-200/90 flex flex-col justify-between">
-                      <div>
-                        <h4 className="font-serif text-base font-bold text-[#022C22] border-b pb-1.5 flex items-center space-x-2">
-                          <UserCheck className="w-4 h-4 text-[#c5a880]" />
-                          <span>Начальник & Руководство</span>
-                        </h4>
-                        <div className="space-y-3 text-xs mt-3">
-                          <div>
-                            <span className="block text-stone-400 font-mono text-[9px] uppercase tracking-wider">Руководитель (ФИО)</span>
-                            <strong className="block text-sm text-stone-800 mt-0.5">{RESORT_INFO.directorName || 'Данилив Алексей Иванович'}</strong>
-                            <span className="text-[#c5a880] font-bold uppercase text-[9px] font-mono tracking-widest mt-0.5 block">{RESORT_INFO.directorRole || 'исполняющий обязанности начальника санатория'}</span>
+                        {/* Right: Pathologies & Basic Illness Profiles */}
+                        <div className="lg:col-span-6 bg-gradient-to-b from-stone-50/90 to-stone-50/40 p-5 sm:p-6 rounded-2xl border border-stone-200 shadow-sm space-y-4">
+                          <h5 className="font-serif text-lg font-bold text-[#022C22] flex items-center space-x-2 border-b border-stone-200/80 pb-2.5">
+                            <Shield className="w-5 h-5 text-[#c5a880]" />
+                            <span>Основные лечебные профили санатория</span>
+                          </h5>
+                          
+                          <div className="space-y-3.5 text-xs text-stone-700">
+                            <div className="bg-white p-3.5 rounded-xl border border-red-100 shadow-xs space-y-1">
+                              <span className="inline-block bg-red-50 text-red-700 text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md font-mono">
+                                Кардиологический профиль
+                              </span>
+                              <strong className="block text-stone-900 font-bold text-sm text-[#022C22]">
+                                Болезни системы кровообращения:
+                              </strong>
+                              <p className="leading-relaxed text-stone-600 text-[11px]">
+                                Гипертоническая болезнь, ишемическая болезнь сердца без тяжелых нарушений ритма, вегетососудистая дистония, постинфарктное долечивание.
+                              </p>
+                            </div>
+
+                            <div className="bg-white p-3.5 rounded-xl border border-sky-100 shadow-xs space-y-1">
+                              <span className="inline-block bg-sky-50 text-sky-700 text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md font-mono">
+                                Пульмонологический профиль
+                              </span>
+                              <strong className="block text-stone-900 font-bold text-sm text-[#022C22]">
+                                Болезни органов дыхания нетуберкулезного характера:
+                              </strong>
+                              <p className="leading-relaxed text-stone-600 text-[11px]">
+                                Хронические бронхиты, трахеиты, бронхиальная астма в стадии ремиссии, респираторная реабилитация после пневмоний.
+                              </p>
+                            </div>
+
+                            <div className="bg-white p-3.5 rounded-xl border border-amber-100 shadow-xs space-y-1">
+                              <span className="inline-block bg-amber-50 text-amber-700 text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md font-mono">
+                                Опорно-двигательный профиль
+                              </span>
+                              <strong className="block text-stone-900 font-bold text-sm text-[#022C22]">
+                                Болезни костно-мышечной системы и суставов:
+                              </strong>
+                              <p className="leading-relaxed text-stone-600 text-[11px]">
+                                Деформирующие артрозы, коксартроз, гонартроз, остеохондроз позвоночника, спондилез, миозиты и последствия травм.
+                              </p>
+                            </div>
                           </div>
                         </div>
                       </div>
+                    </motion.div>
+                  )}
 
-                      <div className="pt-3 border-t border-stone-200/50 mt-4 space-y-1">
-                        <span className="block text-stone-400 font-mono text-[9px] uppercase tracking-wider">Приемная и связь</span>
-                        <div className="space-y-1 bg-white p-2 rounded justify-between border border-stone-200 text-xs">
-                          <p className="flex justify-between">
-                            <span className="text-stone-500">Телефон:</span>
-                            <a href="tel:+73654239376" className="font-mono font-bold text-stone-900 hover:text-[#c5a880] transition-all">+7(3654)23-93-76</a>
+                  {aboutTab === 'treatment' && (
+                    <motion.div
+                      key="treatment"
+                      initial={{ opacity: 0, y: 8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -8 }}
+                      transition={{ duration: 0.25 }}
+                      className="grid grid-cols-1 lg:grid-cols-12 gap-8 text-sm text-stone-700 font-sans"
+                    >
+                      {/* Treatment list */}
+                      <div className="lg:col-span-8 space-y-5">
+                        <div>
+                          <h4 className="font-serif text-xl font-bold text-[#022C22] flex items-center">
+                            <Stethoscope className="w-5 h-5 text-[#c5a880] mr-2" />
+                            Применяемые терапевтические методики
+                          </h4>
+                          <p className="text-xs text-stone-500 mt-1">
+                            Комплексный перечень процедур, проводимых квалифицированными врачами на современном лицензированном оборудовании.
                           </p>
-                          <p className="flex justify-between">
-                            <span className="text-stone-500">Факс:</span>
-                            <span className="font-mono text-stone-800">+73654239376</span>
-                          </p>
-                          <p className="flex justify-between">
-                            <span className="text-stone-500">Email:</span>
-                            <a href={`mailto:${RESORT_INFO.email}`} className="font-mono font-bold text-[#022C22] hover:text-[#c5a880] hover:underline">{RESORT_INFO.email}</a>
-                          </p>
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                          {[
+                            {
+                              category: 'Аппаратная электро- и магнитотерапия',
+                              color: 'bg-emerald-600',
+                              items: [
+                                { name: 'Электрофорез лекарственных средств', desc: 'Чрескожное введение препаратов токами.' },
+                                { name: 'УВЧ-терапия', desc: 'Снятие глубоких воспалений электрополем.' },
+                                { name: 'Магнитотерапия', desc: 'Улучшение трофики импульсными полями.' },
+                                { name: 'СМТ-терапия (Амплипульс)', desc: 'Стимуляция тканей модулированными токами.' }
+                              ]
+                            },
+                            {
+                              category: 'Светолечение & Лазеротерапия',
+                              color: 'bg-amber-500',
+                              items: [
+                                { name: 'Лазеротерапия', desc: 'Активация клеточного метаболизма.' },
+                                { name: 'Ультразвуковая терапия', desc: 'Микромассаж тканей звуковыми волнами.' },
+                                { name: 'Инфракрасное излучение', desc: 'Глубокий тепловой прогрев суставов.' },
+                                { name: 'УФО-тубус терапия', desc: 'Местная санация носоглотки и дыхания.' }
+                              ]
+                            },
+                            {
+                              category: 'Бальнеология & Массаж',
+                              color: 'bg-blue-500',
+                              items: [
+                                { name: 'Подводный душ-массаж', desc: 'Гидромассаж струей высокого давления.' },
+                                { name: 'Лечебные аромаванны', desc: 'Хвойные, солевые и йодобромные ванны.' },
+                                { name: 'Классический массаж', desc: 'Ручной медицинский массаж отделов тела.' },
+                                { name: 'Лечебная физкультура (ЛФК)', desc: 'Занятия в залах кинезотерапии.' }
+                              ]
+                            },
+                            {
+                              category: 'Климатотерапия & Оксигенация',
+                              color: 'bg-teal-600',
+                              items: [
+                                { name: 'Аэро- и гелиотерапия', desc: 'Лечение морским бризом и солнцем.' },
+                                { name: 'Терренкур по парку', desc: 'Дозированная лечебная ходьба по хвое.' },
+                                { name: 'Ингаляционная терапия', desc: 'Небулайзерные ингаляции фитосборами.' },
+                                { name: 'Кислородные коктейли', desc: 'Энтеральная оксигенотерапия.' }
+                              ]
+                            }
+                          ].map((cat, groupIdx) => (
+                            <div key={groupIdx} className="bg-stone-50/90 border border-stone-200/80 p-4 rounded-xl space-y-3 hover:shadow-md transition-all duration-300">
+                              <div className="flex items-center space-x-2 border-b border-stone-200/60 pb-2">
+                                <span className={`w-2 h-2 rounded-full ${cat.color}`} />
+                                <h5 className="font-serif text-xs font-bold text-[#022C22] tracking-wide uppercase">{cat.category}</h5>
+                              </div>
+                              <div className="space-y-2.5">
+                                {cat.items.map((item, itemIdx) => (
+                                  <div key={itemIdx} className="flex items-start space-x-2">
+                                    <Check className="w-3.5 h-3.5 text-[#c5a880] mt-0.5 shrink-0" />
+                                    <div>
+                                      <span className="text-xs font-bold text-[#022C22] block leading-tight">{item.name}</span>
+                                      <span className="text-[10px] text-stone-500 block mt-0.5">{item.desc}</span>
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          ))}
                         </div>
                       </div>
-                    </div>
 
-                    {/* Registry details */}
-                    <div className="space-y-4 bg-stone-100/50 p-5 rounded border border-stone-200/90 flex flex-col justify-between">
-                      <div>
-                        <h4 className="font-serif text-base font-bold text-[#022C22] border-b pb-1.5 flex items-center space-x-2">
-                          <FileText className="w-4 h-4 text-[#c5a880]" />
-                          <span>Гос. регистрация</span>
+                      {/* Cabinets Structure */}
+                      <div className="lg:col-span-4 bg-gradient-to-b from-[#022C22]/[0.03] to-stone-50 p-5 rounded-2xl border border-stone-200 space-y-3.5">
+                        <h4 className="font-serif text-base font-bold text-[#022C22] border-b border-stone-200 pb-2 flex items-center space-x-2">
+                          <Building2 className="w-4 h-4 text-[#c5a880]" />
+                          <span>Структура медицинских кабинетов</span>
                         </h4>
-                        <div className="space-y-3.5 text-xs mt-3">
-                          <div>
-                            <span className="block text-stone-400 font-mono text-[9px] uppercase tracking-wider">Наименование регоргана</span>
-                            <p className="font-medium text-stone-850 mt-0.5">Межрайонная инспекция Федеральной налоговой службы №46 по г. Москве</p>
+                        <p className="text-xs text-stone-500 leading-relaxed">
+                          Лечебно-диагностические подразделения Санатория «Ясная Поляна»:
+                        </p>
+                        
+                        <div className="space-y-1.5 text-xs text-stone-700">
+                          {[
+                            'Кабинет функциональной диагностики',
+                            'Отделение аппаратной физиотерапии',
+                            'Отделение водолечения (бальнеотерапия)',
+                            'Специализированный зал ЛФК',
+                            'Кабинеты медицинского массажа',
+                            'Ингаляторий и кислородный пункт',
+                            'Изолятор и процедурные кабинеты',
+                            'Клинико-диагностическая лаборатория',
+                            'Круглосуточный медицинский пост'
+                          ].map((cab, idx) => (
+                            <div key={idx} className="flex items-center space-x-2 bg-white p-2 border border-stone-200/70 rounded-lg shadow-xs hover:border-[#c5a880]/50 transition-all">
+                              <Check className="w-3.5 h-3.5 text-[#022C22] flex-shrink-0" />
+                              <span className="font-sans text-stone-800 font-medium text-[11px]">{cab}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </motion.div>
+                  )}
+
+                  {aboutTab === 'registry' && (
+                    <motion.div
+                      key="registry"
+                      initial={{ opacity: 0, y: 8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -8 }}
+                      transition={{ duration: 0.25 }}
+                      className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 text-sm text-stone-700 font-sans"
+                    >
+                      {/* Management and Contacts */}
+                      <div className="space-y-4 bg-stone-50/90 p-5 rounded-2xl border border-stone-200 flex flex-col justify-between shadow-xs">
+                        <div>
+                          <h4 className="font-serif text-base font-bold text-[#022C22] border-b border-stone-200 pb-2 flex items-center space-x-2">
+                            <UserCheck className="w-4 h-4 text-[#c5a880]" />
+                            <span>Руководство учреждения</span>
+                          </h4>
+                          <div className="space-y-2.5 text-xs mt-3">
+                            <div>
+                              <span className="block text-stone-400 font-mono text-[9px] uppercase tracking-wider font-semibold">Начальник санатория (ФИО)</span>
+                              <strong className="block text-sm sm:text-base text-stone-900 font-serif font-bold mt-0.5">
+                                {RESORT_INFO.directorName || 'Данилив Алексей Иванович'}
+                              </strong>
+                              <span className="text-[#c5a880] font-bold uppercase text-[9px] font-mono tracking-widest mt-0.5 block">
+                                {RESORT_INFO.directorRole || 'и.о. начальника санатория'}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="pt-3 border-t border-stone-200/80 space-y-1.5">
+                          <span className="block text-stone-400 font-mono text-[9px] uppercase tracking-wider font-semibold">Приемная и связь</span>
+                          <div className="space-y-1.5 bg-white p-2.5 rounded-xl border border-stone-200/80 text-xs">
+                            <p className="flex justify-between items-center">
+                              <span className="text-stone-500">Телефон:</span>
+                              <a href="tel:+73654239376" className="font-mono font-bold text-stone-900 hover:text-[#c5a880] transition-all">+7(3654)23-93-76</a>
+                            </p>
+                            <p className="flex justify-between items-center">
+                              <span className="text-stone-500">Факс:</span>
+                              <span className="font-mono text-stone-800">+7(3654)23-93-76</span>
+                            </p>
+                            <p className="flex justify-between items-center">
+                              <span className="text-stone-500">Email:</span>
+                              <a href={`mailto:${RESORT_INFO.email}`} className="font-mono font-bold text-[#022C22] hover:text-[#c5a880] hover:underline">{RESORT_INFO.email}</a>
+                            </p>
                           </div>
                         </div>
                       </div>
 
-                      <div className="border-t border-stone-200/60 pt-3 flex flex-wrap gap-x-4 gap-y-2 mt-4 text-xs">
+                      {/* Registry details */}
+                      <div className="space-y-4 bg-stone-50/90 p-5 rounded-2xl border border-stone-200 flex flex-col justify-between shadow-xs">
                         <div>
-                          <span className="block text-stone-400 font-mono text-[9px] uppercase tracking-wider">Серия</span>
-                          <span className="font-mono font-extrabold text-stone-900">77</span>
+                          <h4 className="font-serif text-base font-bold text-[#022C22] border-b border-stone-200 pb-2 flex items-center space-x-2">
+                            <FileText className="w-4 h-4 text-[#c5a880]" />
+                            <span>Гос. регистрация</span>
+                          </h4>
+                          <div className="space-y-2.5 text-xs mt-3">
+                            <div>
+                              <span className="block text-stone-400 font-mono text-[9px] uppercase tracking-wider font-semibold">Регистрирующий орган</span>
+                              <p className="font-medium text-stone-900 mt-1 leading-snug">
+                                Межрайонная инспекция Федеральной налоговой службы №46 по г. Москве
+                              </p>
+                            </div>
+                          </div>
                         </div>
-                        <div>
-                          <span className="block text-stone-400 font-mono text-[9px] uppercase tracking-wider">Номер свидетельства</span>
-                          <span className="font-mono font-extrabold text-stone-900">015463944</span>
-                        </div>
-                        <div>
-                          <span className="block text-stone-400 font-mono text-[9px] uppercase tracking-wider">Дата регистрации</span>
-                          <span className="font-mono font-semibold text-stone-800">2013-10-29</span>
-                        </div>
-                      </div>
-                    </div>
 
-                    {/* Creation foundation */}
-                    <div className="space-y-4 bg-stone-100/50 p-5 rounded border border-stone-200/90 flex flex-col justify-between">
-                      <div>
-                        <h4 className="font-serif text-base font-bold text-[#022C22] border-b pb-1.5 flex items-center space-x-2">
-                          <Shield className="w-4 h-4 text-[#c5a880]" />
-                          <span>Создание учреждения</span>
-                        </h4>
-                        <div className="space-y-3 text-xs mt-3 leading-relaxed">
-                          <div>
-                            <span className="block text-stone-400 font-mono text-[9px] uppercase tracking-wider">Основание</span>
-                            <p className="text-stone-750 font-medium">Наименование документа: ЕГРЮЛ</p>
+                        <div className="border-t border-stone-200/80 pt-3 grid grid-cols-2 gap-2 text-xs">
+                          <div className="bg-white p-2 rounded-lg border border-stone-200/70">
+                            <span className="block text-stone-400 font-mono text-[9px] uppercase tracking-wider">Серия</span>
+                            <span className="font-mono font-extrabold text-stone-900">77</span>
+                          </div>
+                          <div className="bg-white p-2 rounded-lg border border-stone-200/70">
+                            <span className="block text-stone-400 font-mono text-[9px] uppercase tracking-wider">Свидетельство</span>
+                            <span className="font-mono font-extrabold text-stone-900 text-[11px]">015463944</span>
+                          </div>
+                          <div className="bg-white p-2 rounded-lg border border-stone-200/70 col-span-2">
+                            <span className="block text-stone-400 font-mono text-[9px] uppercase tracking-wider">Дата регистрации</span>
+                            <span className="font-mono font-semibold text-stone-800">29 октября 2013 г.</span>
                           </div>
                         </div>
                       </div>
 
-                      <div className="border-t border-stone-200/60 pt-3 flex flex-wrap gap-4 mt-4 text-xs">
+                      {/* Creation foundation */}
+                      <div className="space-y-4 bg-stone-50/90 p-5 rounded-2xl border border-stone-200 flex flex-col justify-between shadow-xs md:col-span-2 lg:col-span-1">
                         <div>
-                          <span className="block text-stone-400 font-mono text-[9px] uppercase tracking-wider">Дата создания</span>
-                          <p className="font-semibold text-stone-800">2013-10-29</p>
+                          <h4 className="font-serif text-base font-bold text-[#022C22] border-b border-stone-200 pb-2 flex items-center space-x-2">
+                            <Shield className="w-4 h-4 text-[#c5a880]" />
+                            <span>Создание учреждения</span>
+                          </h4>
+                          <div className="space-y-2.5 text-xs mt-3 leading-relaxed">
+                            <div>
+                              <span className="block text-stone-400 font-mono text-[9px] uppercase tracking-wider font-semibold">Основание внесения</span>
+                              <p className="text-stone-800 font-medium mt-1">Внесение в ЕГРЮЛ сведений о юридическом лице</p>
+                            </div>
+                          </div>
                         </div>
-                        <div>
-                          <span className="block text-stone-400 font-mono text-[9px] uppercase tracking-wider">Номер ОГРН</span>
-                          <strong className="font-mono text-[#022C22]">5137746004787</strong>
+
+                        <div className="border-t border-stone-200/80 pt-3 grid grid-cols-2 gap-2 text-xs">
+                          <div className="bg-white p-2 rounded-lg border border-stone-200/70">
+                            <span className="block text-stone-400 font-mono text-[9px] uppercase tracking-wider">Дата создания</span>
+                            <p className="font-semibold text-stone-900 mt-0.5">29.10.2013</p>
+                          </div>
+                          <div className="bg-white p-2 rounded-lg border border-stone-200/70">
+                            <span className="block text-stone-400 font-mono text-[9px] uppercase tracking-wider">ОГРН</span>
+                            <strong className="font-mono text-[#022C22] text-[11px] mt-0.5 block">5137746004787</strong>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
             </div>
           </div>
 
