@@ -46,9 +46,11 @@ export interface SiteData {
     subtitle: string;
     ctaText: string;
     defaultBackgroundMode?: 'video_palace' | 'video_nature' | 'photo' | 'video' | 'all';
+    showStats?: boolean;
     stats?: {
       value: string;
       label: string;
+      description?: string;
     }[];
     slides?: {
       id: string;
@@ -99,11 +101,12 @@ const DEFAULT_SITE_DATA: SiteData = {
     ctaText: 'Рассчитать путевку & Забронировать',
     defaultBackgroundMode: 'video_nature',
     stats: [
-      { value: '8 га', label: 'Реликтовый Парк' },
-      { value: '120+', label: 'Процедур' },
-      { value: '50 м', label: 'До собственного пляжа' },
-      { value: 'ФТС', label: 'Высший стандарт надежности' }
+      { value: 'ФТС России', label: 'Ведомственный статус', description: 'Федеральное государственное казенное учреждение' },
+      { value: '№ Л041-00110-91', label: 'Лицензия Минздрава РФ', description: 'Официальный медицинский реестр' },
+      { value: 'Гаспра • ЮБК', label: 'Южный берег Крыма', description: 'Севастопольское шоссе, 52' },
+      { value: 'Климатотерапия', label: 'Профиль оздоровления', description: 'Терапия, реабилитация и ЛФК' }
     ],
+    showStats: true,
     slides: [
       { id: '1', type: 'video', url: 'https://assets.mixkit.co/videos/preview/mixkit-waves-crashing-on-rocks-from-above-41851-large.mp4' },
       { id: '2', type: 'photo', url: '/src/assets/images/pestovo_palace_1779780890544.png' },
@@ -297,6 +300,19 @@ export function AdminDataProvider({ children }: { children: React.ReactNode }) {
             
             if (!parsed.hero.stats || !Array.isArray(parsed.hero.stats) || parsed.hero.stats.length === 0) {
               parsed.hero.stats = JSON.parse(JSON.stringify(defaultHero.stats));
+              morphed = true;
+            } else {
+              // Auto-migrate legacy simulated/fake stats if present
+              const hasLegacyStats = parsed.hero.stats.some((s: any) => 
+                s.value === '8 га' || s.value === '120+' || s.value === '50 м' || s.label === 'Реликтовый Парк'
+              );
+              if (hasLegacyStats) {
+                parsed.hero.stats = JSON.parse(JSON.stringify(defaultHero.stats));
+                morphed = true;
+              }
+            }
+            if (parsed.hero.showStats === undefined) {
+              parsed.hero.showStats = true;
               morphed = true;
             }
             if (!parsed.hero.slides || !Array.isArray(parsed.hero.slides) || parsed.hero.slides.length === 0) {

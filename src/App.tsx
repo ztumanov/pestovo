@@ -92,11 +92,12 @@ export default function App() {
       ctaText: 'Рассчитать путевку & Забронировать',
       defaultBackgroundMode: 'video_nature',
       stats: [
-        { value: '8 га', label: 'Реликтовый Парк' },
-        { value: '120+', label: 'Процедур' },
-        { value: '50 м', label: 'До собственного пляжа' },
-        { value: 'ФТС', label: 'Высший стандарт надежности' }
+        { value: 'ФТС России', label: 'Ведомственный статус', description: 'Федеральное государственное казенное учреждение' },
+        { value: '№ Л041-00110-91', label: 'Лицензия Минздрава РФ', description: 'Официальный медицинский реестр' },
+        { value: 'Гаспра • ЮБК', label: 'Южный берег Крыма', description: 'Севастопольское шоссе, 52' },
+        { value: 'Климатотерапия', label: 'Профиль оздоровления', description: 'Терапия, реабилитация и ЛФК' }
       ],
+      showStats: true,
       slides: [
         { id: '1', type: 'video', url: 'https://assets.mixkit.co/videos/preview/mixkit-waves-crashing-on-rocks-from-above-41851-large.mp4' },
          { id: '2', type: 'photo', url: '/src/assets/images/pestovo_palace_1779780890544.png' },
@@ -1839,23 +1840,46 @@ export default function App() {
             </a>
           </motion.div>
 
-          {/* Quick Stats Grid */}
-          {HERO_DATA.stats && HERO_DATA.stats.length > 0 && (
+          {/* Quick Verified Highlights / Official Institutional Facts */}
+          {HERO_DATA.showStats !== false && HERO_DATA.stats && HERO_DATA.stats.length > 0 && (
             <motion.div 
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.8, delay: 0.6 }}
-              className="mt-20 w-full max-w-5xl grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 bg-emerald-950/40 backdrop-blur-md p-6 sm:p-8 rounded-sm border border-[#c5a880]/30 shadow-2xl"
+              initial={{ opacity: 0, y: 25 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.55 }}
+              className="mt-14 sm:mt-16 w-full max-w-5xl"
             >
-              {HERO_DATA.stats.map((stat, idx) => (
-                <div 
-                  key={idx} 
-                  className="text-center border-r border-white/10 last:border-r-0 pe-2"
-                >
-                  <span className="block font-serif text-3xl sm:text-4xl font-semibold text-[#c5a880]">{stat.value}</span>
-                  <span className="block text-stone-300 text-[11px] tracking-wider uppercase font-mono mt-2 leading-none">{stat.label}</span>
-                </div>
-              ))}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5 sm:gap-4 bg-[#011a14]/75 backdrop-blur-xl p-4 sm:p-5 rounded-2xl border border-[#c5a880]/30 shadow-[0_20px_50px_rgba(0,0,0,0.6)]">
+                {HERO_DATA.stats.map((stat, idx) => (
+                  <div 
+                    key={idx} 
+                    className="relative flex flex-col items-center justify-center p-3.5 sm:p-4 rounded-xl bg-white/[0.04] border border-white/[0.08] hover:border-[#c5a880]/50 hover:bg-white/[0.07] transition-all duration-300 group text-center"
+                  >
+                    <div className="w-8 h-8 rounded-lg bg-[#c5a880]/15 border border-[#c5a880]/30 flex items-center justify-center mb-2.5 text-[#c5a880] group-hover:scale-110 group-hover:bg-[#c5a880] group-hover:text-[#022C22] transition-all duration-300 shadow-sm shrink-0">
+                      {idx === 0 ? (
+                        <Shield className="w-4 h-4" />
+                      ) : idx === 1 ? (
+                        <Award className="w-4 h-4" />
+                      ) : idx === 2 ? (
+                        <MapPin className="w-4 h-4" />
+                      ) : (
+                        <Stethoscope className="w-4 h-4" />
+                      )}
+                    </div>
+                    
+                    <span className="block font-serif text-sm sm:text-base font-bold text-white tracking-tight group-hover:text-[#c5a880] transition-colors leading-snug">
+                      {stat.value}
+                    </span>
+                    <span className="block text-[#c5a880] text-[10px] sm:text-[11px] font-mono font-semibold uppercase tracking-wider mt-1 leading-tight">
+                      {stat.label}
+                    </span>
+                    {stat.description && (
+                      <span className="block text-stone-300/80 text-[10px] font-sans mt-1 leading-tight">
+                        {stat.description}
+                      </span>
+                    )}
+                  </div>
+                ))}
+              </div>
             </motion.div>
           )}
 

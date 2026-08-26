@@ -1038,74 +1038,114 @@ export default function AdminPage({ onBackToHome }: { onBackToHome: () => void }
                   />
                 </div>
 
-                {/* HERO STATS CONFIGURATION SECTION */}
+                {/* HERO HIGHLIGHTS / STATS CONFIGURATION SECTION */}
                 <div className="border-t border-stone-100 pt-6 mt-6 space-y-4">
-                  <h4 className="font-bold font-serif text-[#022C22] text-sm uppercase tracking-wider flex items-center gap-2">
-                    <Sparkles className="w-5 h-5 text-[#c5a880]" />
-                    Показатели / Статистика (Блок из 4-х колонок)
-                  </h4>
-                  <p className="text-xs text-stone-500 leading-relaxed">
-                    Настройте 4 ключевых показателя, которые отображаются на главном экране в виде горизонтальной плашки под кнопками.
-                  </p>
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div>
+                      <h4 className="font-bold font-serif text-[#022C22] text-sm uppercase tracking-wider flex items-center gap-2">
+                        <Sparkles className="w-5 h-5 text-[#c5a880]" />
+                        Блок официальных ориентиров / Статуса (4 карточки)
+                      </h4>
+                      <p className="text-xs text-stone-500 leading-relaxed mt-0.5">
+                        Официальные ведомственные ориентиры и лицензии санатория под главным заголовком. Вы можете изменить их или полностью скрыть.
+                      </p>
+                    </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                    {(localHero.stats || [
-                      { value: '8 га', label: 'Реликтовый Парк' },
-                      { value: '120+', label: 'Процедур' },
-                      { value: '50 м', label: 'До собственного пляжа' },
-                      { value: 'ФТС', label: 'Высший стандарт надежности' }
-                    ]).map((stat, idx) => (
-                      <div key={idx} className="bg-[#FAF9F6] border border-stone-200 p-4 rounded-xl space-y-2 shadow-sm">
-                        <span className="block text-[10px] font-black uppercase text-[#022C22]/60 tracking-wider">Колонка {idx + 1}</span>
-                        <div>
-                          <label className="block text-[9px] font-bold uppercase tracking-wider text-stone-400 mb-0.5">Значение</label>
-                          <input 
-                            type="text"
-                            value={stat.value}
-                            onChange={e => {
-                              const defaultStats = [
-                                { value: '8 га', label: 'Реликтовый Парк' },
-                                { value: '120+', label: 'Процедур' },
-                                { value: '50 м', label: 'До собственного пляжа' },
-                                { value: 'ФТС', label: 'Высший стандарт надежности' }
-                              ];
-                              const statsArray = localHero.stats && localHero.stats.length > 0 ? localHero.stats : defaultStats;
-                              const newStats = [...statsArray];
-                              if (newStats[idx]) {
-                                newStats[idx] = { ...newStats[idx], value: e.target.value };
-                                setLocalHero({ ...localHero, stats: newStats });
-                              }
-                            }}
-                            placeholder="Значение"
-                            className="w-full bg-white border border-stone-300 rounded-lg px-2.5 py-1.5 text-xs font-bold font-mono text-stone-800 focus:outline-none focus:border-[#c5a880]"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-[9px] font-bold uppercase tracking-wider text-stone-400 mb-0.5">Подпись</label>
-                          <input 
-                            type="text"
-                            value={stat.label}
-                            onChange={e => {
-                              const defaultStats = [
-                                { value: '8 га', label: 'Реликтовый Парк' },
-                                { value: '120+', label: 'Процедур' },
-                                { value: '50 м', label: 'До собственного пляжа' },
-                                { value: 'ФТС', label: 'Высший стандарт надежности' }
-                              ];
-                              const statsArray = localHero.stats && localHero.stats.length > 0 ? localHero.stats : defaultStats;
-                              const newStats = [...statsArray];
-                              if (newStats[idx]) {
-                                newStats[idx] = { ...newStats[idx], label: e.target.value };
-                                setLocalHero({ ...localHero, stats: newStats });
-                              }
-                            }}
-                            placeholder="Подпись"
-                            className="w-full bg-white border border-stone-300 rounded-lg px-2.5 py-1.5 text-xs text-stone-700 font-medium focus:outline-none focus:border-[#c5a880]"
-                          />
-                        </div>
-                      </div>
-                    ))}
+                    {/* Toggle show/hide block switch */}
+                    <label className="inline-flex items-center gap-2.5 cursor-pointer bg-stone-50 hover:bg-stone-100 px-3.5 py-2 rounded-xl border border-stone-200 shrink-0 select-none">
+                      <input 
+                        type="checkbox"
+                        checked={localHero.showStats !== false}
+                        onChange={e => setLocalHero({ ...localHero, showStats: e.target.checked })}
+                        className="w-4 h-4 text-[#022C22] rounded focus:ring-[#c5a880] cursor-pointer"
+                      />
+                      <span className="text-xs font-bold text-[#022C22]">Отображать на сайте</span>
+                    </label>
                   </div>
+
+                  {localHero.showStats !== false && (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pt-2">
+                      {(localHero.stats || [
+                        { value: 'ФТС России', label: 'Ведомственный статус', description: 'Федеральное государственное казенное учреждение' },
+                        { value: '№ Л041-00110-91', label: 'Лицензия Минздрава РФ', description: 'Официальный медицинский реестр' },
+                        { value: 'Гаспра • ЮБК', label: 'Южный берег Крыма', description: 'Севастопольское шоссе, 52' },
+                        { value: 'Климатотерапия', label: 'Профиль оздоровления', description: 'Терапия, реабилитация и ЛФК' }
+                      ]).map((stat, idx) => (
+                        <div key={idx} className="bg-[#FAF9F6] border border-stone-200 p-4 rounded-xl space-y-2 shadow-sm">
+                          <span className="block text-[10px] font-black uppercase text-[#022C22]/60 tracking-wider">Карточка {idx + 1}</span>
+                          <div>
+                            <label className="block text-[9px] font-bold uppercase tracking-wider text-stone-400 mb-0.5">Заголовок / Статус</label>
+                            <input 
+                              type="text"
+                              value={stat.value}
+                              onChange={e => {
+                                const defaultStats = [
+                                  { value: 'ФТС России', label: 'Ведомственный статус', description: 'Федеральное государственное казенное учреждение' },
+                                  { value: '№ Л041-00110-91', label: 'Лицензия Минздрава РФ', description: 'Официальный медицинский реестр' },
+                                  { value: 'Гаспра • ЮБК', label: 'Южный берег Крыма', description: 'Севастопольское шоссе, 52' },
+                                  { value: 'Климатотерапия', label: 'Профиль оздоровления', description: 'Терапия, реабилитация и ЛФК' }
+                                ];
+                                const statsArray = localHero.stats && localHero.stats.length > 0 ? localHero.stats : defaultStats;
+                                const newStats = [...statsArray];
+                                if (newStats[idx]) {
+                                  newStats[idx] = { ...newStats[idx], value: e.target.value };
+                                  setLocalHero({ ...localHero, stats: newStats });
+                                }
+                              }}
+                              placeholder="Например: ФТС России"
+                              className="w-full bg-white border border-stone-300 rounded-lg px-2.5 py-1.5 text-xs font-bold font-sans text-stone-800 focus:outline-none focus:border-[#c5a880]"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-[9px] font-bold uppercase tracking-wider text-stone-400 mb-0.5">Подзаголовок</label>
+                            <input 
+                              type="text"
+                              value={stat.label}
+                              onChange={e => {
+                                const defaultStats = [
+                                  { value: 'ФТС России', label: 'Ведомственный статус', description: 'Федеральное государственное казенное учреждение' },
+                                  { value: '№ Л041-00110-91', label: 'Лицензия Минздрава РФ', description: 'Официальный медицинский реестр' },
+                                  { value: 'Гаспра • ЮБК', label: 'Южный берег Крыма', description: 'Севастопольское шоссе, 52' },
+                                  { value: 'Климатотерапия', label: 'Профиль оздоровления', description: 'Терапия, реабилитация и ЛФК' }
+                                ];
+                                const statsArray = localHero.stats && localHero.stats.length > 0 ? localHero.stats : defaultStats;
+                                const newStats = [...statsArray];
+                                if (newStats[idx]) {
+                                  newStats[idx] = { ...newStats[idx], label: e.target.value };
+                                  setLocalHero({ ...localHero, stats: newStats });
+                                }
+                              }}
+                              placeholder="Например: Ведомственный статус"
+                              className="w-full bg-white border border-stone-300 rounded-lg px-2.5 py-1.5 text-xs text-stone-700 font-medium focus:outline-none focus:border-[#c5a880]"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-[9px] font-bold uppercase tracking-wider text-stone-400 mb-0.5">Краткое пояснение</label>
+                            <input 
+                              type="text"
+                              value={(stat as any).description || ''}
+                              onChange={e => {
+                                const defaultStats = [
+                                  { value: 'ФТС России', label: 'Ведомственный статус', description: 'Федеральное государственное казенное учреждение' },
+                                  { value: '№ Л041-00110-91', label: 'Лицензия Минздрава РФ', description: 'Официальный медицинский реестр' },
+                                  { value: 'Гаспра • ЮБК', label: 'Южный берег Крыма', description: 'Севастопольское шоссе, 52' },
+                                  { value: 'Климатотерапия', label: 'Профиль оздоровления', description: 'Терапия, реабилитация и ЛФК' }
+                                ];
+                                const statsArray = localHero.stats && localHero.stats.length > 0 ? localHero.stats : defaultStats;
+                                const newStats = [...statsArray];
+                                if (newStats[idx]) {
+                                  newStats[idx] = { ...newStats[idx], description: e.target.value };
+                                  setLocalHero({ ...localHero, stats: newStats });
+                                }
+                              }}
+                              placeholder="Необязательно"
+                              className="w-full bg-white border border-stone-300 rounded-lg px-2.5 py-1.5 text-[11px] text-stone-600 focus:outline-none focus:border-[#c5a880]"
+                            />
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
 
                 {/* BACKGROUND IMAGE/VIDEO SLIDES CONFIGURATION SECTION */}
