@@ -34,6 +34,9 @@ import {
   Lock,
   Edit,
   Sun,
+  Sunrise,
+  Sunset,
+  Moon,
   Cloud,
   CloudRain,
   CloudSnow,
@@ -1889,19 +1892,19 @@ export default function App() {
       </header>
 
       {/* ABOUT & MICROCLIMATE INTERACTIVE EXPERIENCE */}
-      <section id="about" className="py-24 bg-[#FAF9F6]">
+      <section id="about" className="py-14 sm:py-16 md:py-20 bg-[#FAF9F6]">
         <motion.div
-          initial={{ opacity: 0, y: 45 }}
+          initial={{ opacity: 0, y: 35 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-100px" }}
-          transition={{ duration: 0.85, ease: [0.16, 1, 0.3, 1] }}
+          transition={{ duration: 0.75, ease: [0.16, 1, 0.3, 1] }}
           className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"
         >
           
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-center">
             
             {/* Visual presentation and Arboretum description */}
-            <div className="lg:col-span-7 space-y-6">
+            <div className="lg:col-span-7 space-y-4 sm:space-y-5">
               {isAdminMode && (
                 <div className="mb-2">
                   <button 
@@ -1928,213 +1931,220 @@ export default function App() {
             </div>
 
             {/* INTERACTIVE CLIMATE WIDGET */}
-            <div className="lg:col-span-5 h-full">
+            <div className="lg:col-span-5">
               
               {/* Фито-Барометр & Метео-Станция */}
-              <div className="bg-[#022C22] text-white p-5 sm:p-6 rounded-sm shadow-2xl relative overflow-hidden border border-[#c5a880]/30 h-full flex flex-col justify-between">
-                <div className="absolute top-0 right-0 w-44 h-44 bg-emerald-950/45 rounded-full filter blur-2xl"></div>
+              <div className="bg-gradient-to-b from-[#02281f] via-[#02231b] to-[#011712] text-white p-4 sm:p-5 rounded-2xl shadow-xl relative overflow-hidden border border-[#c5a880]/30 backdrop-blur-sm">
+                {/* Decorative ambient background glows */}
+                <div className="absolute -top-10 -right-10 w-40 h-40 bg-[#c5a880]/10 rounded-full filter blur-3xl pointer-events-none"></div>
+                <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-emerald-600/10 rounded-full filter blur-3xl pointer-events-none"></div>
                 
-                <div className="relative z-10 space-y-4 flex-grow flex flex-col justify-between">
+                <div className="relative z-10 space-y-3.5">
                   
-                  {/* Header Row */}
-                  <div className="flex justify-between items-center border-b border-[#c5a880]/25 pb-3.5">
+                  {/* Header Row with integrated Time-of-Day Switcher */}
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[#c5a880]/20 pb-3">
                     <div>
-                      <h3 className="font-serif text-xl sm:text-2xl font-semibold tracking-wide text-white">Фито-Барометр & Погода</h3>
-                      <p className="text-[10px] text-[#c5a880] font-mono tracking-widest uppercase mt-0.5">Климатотерапия • Гаспра Live</p>
+                      <div className="flex items-center space-x-2">
+                        <TreePine className="w-4 h-4 text-[#c5a880]" />
+                        <h3 className="font-serif text-lg sm:text-xl font-bold tracking-wide text-white">
+                          Фито-Барометр
+                        </h3>
+                        <div className="flex items-center space-x-1 bg-emerald-950/90 border border-emerald-600/50 px-2 py-0.5 rounded-full text-[10px] text-emerald-300 font-mono font-semibold">
+                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span>
+                          <span>LIVE</span>
+                        </div>
+                      </div>
+                      <p className="text-[10px] text-[#c5a880] font-mono tracking-wider uppercase mt-0.5">
+                        Гаспра, ЮБК • Климатотерапия
+                      </p>
                     </div>
-                    <div className="flex items-center space-x-1.5 bg-emerald-950/80 border border-emerald-700/60 px-2.5 py-1 rounded-full text-[10px] text-emerald-300 font-medium font-mono">
-                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-                      <span>LIVE</span>
+
+                    {/* Compact Segmented Pills Switcher */}
+                    <div className="flex items-center bg-black/40 p-1 rounded-xl border border-white/10 shrink-0 self-start sm:self-auto">
+                      {[
+                        { id: 'morning', title: 'Утро', icon: <Sunrise className="w-3.5 h-3.5 shrink-0" /> },
+                        { id: 'day', title: 'День', icon: <Sun className="w-3.5 h-3.5 shrink-0" /> },
+                        { id: 'evening', title: 'Вечер', icon: <Moon className="w-3.5 h-3.5 shrink-0" /> },
+                      ].map((tab) => {
+                        const isActive = climateTime === tab.id;
+                        return (
+                          <button
+                            key={tab.id}
+                            type="button"
+                            onClick={() => setClimateTime(tab.id as 'morning' | 'day' | 'evening')}
+                            className={`flex items-center space-x-1 py-1 px-2.5 rounded-lg text-xs font-serif font-bold transition-all duration-300 cursor-pointer ${
+                              isActive
+                                ? 'bg-gradient-to-r from-[#c5a880] to-[#b09068] text-[#022C22] shadow-sm scale-105'
+                                : 'text-stone-300 hover:text-white hover:bg-white/[0.08]'
+                            }`}
+                          >
+                            <span className={isActive ? 'text-[#022C22]' : 'text-[#c5a880]'}>{tab.icon}</span>
+                            <span className="leading-none">{tab.title}</span>
+                          </button>
+                        );
+                      })}
                     </div>
                   </div>
 
                   {/* Loading & Error or Loaded content */}
                   {weatherLoading ? (
-                    <div className="py-20 flex flex-col items-center justify-center space-y-3">
-                      <div className="w-7 h-7 rounded-full border-2 border-[#c5a880] border-t-transparent animate-spin"></div>
-                      <span className="text-stone-300 text-xs font-mono">Синхронизация...</span>
+                    <div className="py-12 flex flex-col items-center justify-center space-y-2">
+                      <div className="w-6 h-6 rounded-full border-2 border-[#c5a880] border-t-transparent animate-spin"></div>
+                      <span className="text-stone-300 text-xs font-mono">Синхронизация с метеостанцией...</span>
                     </div>
                   ) : weatherError || !realWeather ? (
-                    <div className="py-12 text-center text-sm text-stone-300 space-y-2 bg-emerald-950/40 rounded-sm border border-emerald-900">
-                      <p className="font-serif font-semibold text-[#c5a880]">Связь с метеостанцией ограничена</p>
-                      <p className="text-xs text-stone-400">Погода в Гаспре: +22°C, море: +19°C</p>
+                    <div className="py-6 text-center text-xs text-stone-300 space-y-1 bg-emerald-950/40 rounded-xl border border-emerald-900 p-3">
+                      <p className="font-serif font-semibold text-[#c5a880]">Метеостанция Гаспры в сети</p>
+                      <p className="text-stone-400">Погода: +22°C, Черное море: +19°C</p>
                     </div>
                   ) : (
-                    <div className="space-y-4">
+                    <div className="space-y-3">
                       
-                      {/* Big Weather Panel */}
-                      <div className="bg-emerald-950/50 p-4 rounded-sm border border-emerald-900/40 min-h-[110px] flex items-center justify-between relative overflow-hidden">
+                      {/* Compact Weather & Doctor note Hero Row */}
+                      <div className="bg-gradient-to-r from-emerald-950/80 via-emerald-900/40 to-emerald-950/80 p-3 rounded-xl border border-[#c5a880]/20 shadow-sm relative overflow-hidden">
                         <AnimatePresence mode="wait">
                           <motion.div
                             key={climateTime}
-                            initial={{ opacity: 0, y: 8 }}
+                            initial={{ opacity: 0, y: 6 }}
                             animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0, y: -8 }}
-                            transition={{ duration: 0.25, ease: "easeInOut" }}
-                            className="flex items-center justify-between w-full"
+                            exit={{ opacity: 0, y: -6 }}
+                            transition={{ duration: 0.2 }}
+                            className="flex items-center justify-between gap-3"
                           >
-                            <div className="flex items-center space-x-3.5">
-                              <div className="bg-emerald-950/60 p-2.5 rounded border border-[#c5a880]/20">
-                                {getWeatherIcon(climateDetails[climateTime].weatherCode, "w-11 h-11")}
+                            <div className="flex items-center space-x-3">
+                              <div className="bg-emerald-900/90 p-2 rounded-xl border border-[#c5a880]/30 shadow-inner shrink-0">
+                                {getWeatherIcon(climateDetails[climateTime].weatherCode, "w-8 h-8 sm:w-9 sm:h-9")}
                               </div>
                               <div>
-                                <span className="text-[9px] text-[#c5a880] uppercase tracking-widest font-mono block">
-                                  {climateTime === 'morning' ? 'Утро на курорте' : climateTime === 'day' ? 'День на курорте' : 'Вечер на курорте'}
-                                </span>
-                                <div className="text-3xl font-serif font-extrabold text-[#FAF9F6] leading-none mt-1">
-                                  {climateDetails[climateTime].temp}
+                                <div className="flex items-baseline space-x-2">
+                                  <span className="text-2xl sm:text-3xl font-serif font-black text-white leading-none">
+                                    {climateDetails[climateTime].temp}
+                                  </span>
+                                  <span className="text-[11px] text-stone-300 font-sans font-semibold">
+                                    {climateDetails[climateTime].weatherName}
+                                  </span>
                                 </div>
-                                <span className="text-xs text-stone-300 font-sans font-semibold block mt-1.5">
-                                  {climateDetails[climateTime].weatherName}
-                                </span>
+                                <div className="flex items-center space-x-1.5 mt-1 text-[11px] text-[#c5a880] font-mono">
+                                  <Waves className="w-3.5 h-3.5 shrink-0" />
+                                  <span>Море: <strong>{climateDetails[climateTime].seaTemp}</strong></span>
+                                </div>
                               </div>
                             </div>
-                            <div className="text-right space-y-0.5 max-w-[150px] hidden sm:block">
-                              <span className="text-[9px] text-[#c5a880] uppercase tracking-wider font-mono block mb-1">Показание климата</span>
-                              <div className="text-[10px] sm:text-xs font-serif italic text-stone-200 leading-tight">
-                                "{climateDetails[climateTime].recommendation}"
+
+                            <div className="text-right max-w-[170px] hidden sm:block border-l border-[#c5a880]/20 pl-3">
+                              <span className="text-[9px] text-[#c5a880] uppercase tracking-wider font-mono font-bold block">
+                                Рекомендация
+                              </span>
+                              <div className="text-[10px] font-serif italic text-stone-200 line-clamp-2 leading-tight">
+                                «{climateDetails[climateTime].recommendation}»
                               </div>
                             </div>
                           </motion.div>
                         </AnimatePresence>
                       </div>
 
-                      {/* Extended Live Parameters (Sleek 3-Column Layout with Black Sea Temperature) */}
+                      {/* Extended Live Parameters (Sleek 3-Column Mini Cards) */}
                       <div className="grid grid-cols-3 gap-2">
-                        <div className="bg-emerald-950/30 p-2.5 rounded-sm border border-emerald-900/35 flex flex-col justify-between overflow-hidden">
-                          <span className="text-[8px] uppercase tracking-wider font-mono text-stone-400 block mb-1">Ветер в Гаспре</span>
-                          <AnimatePresence mode="wait">
-                            <motion.div
-                              key={climateTime}
-                              initial={{ opacity: 0, y: 4 }}
-                              animate={{ opacity: 1, y: 0 }}
-                              exit={{ opacity: 0, y: -4 }}
-                              transition={{ duration: 0.2 }}
-                              className="flex items-center space-x-1"
-                            >
-                              <Wind className="w-4 h-4 text-[#c5a880] shrink-0" />
-                              <span className="text-xs font-extrabold text-[#FAF9F6] font-mono">
-                                {climateDetails[climateTime].windSpeed}
-                              </span>
-                            </motion.div>
-                          </AnimatePresence>
-                        </div>
-                        <div className="bg-emerald-950/30 p-2.5 rounded-sm border border-emerald-900/35 flex flex-col justify-between overflow-hidden">
-                          <span className="text-[8px] uppercase tracking-wider font-mono text-stone-400 block mb-1">Влажность</span>
-                          <AnimatePresence mode="wait">
-                            <motion.div
-                              key={climateTime}
-                              initial={{ opacity: 0, y: 4 }}
-                              animate={{ opacity: 1, y: 0 }}
-                              exit={{ opacity: 0, y: -4 }}
-                              transition={{ duration: 0.2 }}
-                              className="flex items-center space-x-1"
-                            >
-                              <Droplet className="w-4 h-4 text-[#c5a880] shrink-0" />
-                              <span className="text-xs font-extrabold text-[#FAF9F6] font-mono">
-                                {climateDetails[climateTime].humidity}
-                              </span>
-                            </motion.div>
-                          </AnimatePresence>
-                        </div>
-                        <div className="bg-emerald-920/10 hover:bg-[#023a2d]/40 transition bg-emerald-950/20 p-2.5 rounded-sm border border-[#c5a880]/20 flex flex-col justify-between overflow-hidden">
-                          <span className="text-[8px] uppercase tracking-wider font-mono text-emerald-300 block mb-1">Черное море t°</span>
-                          <AnimatePresence mode="wait">
-                            <motion.div
-                              key={climateTime}
-                              initial={{ opacity: 0, y: 4 }}
-                              animate={{ opacity: 1, y: 0 }}
-                              exit={{ opacity: 0, y: -4 }}
-                              transition={{ duration: 0.2 }}
-                              className="flex items-center space-x-1"
-                            >
-                              <Waves className="w-4 h-4 text-[#c5a880] shrink-0" />
-                              <span className="text-xs font-extrabold text-white font-mono">
-                                {climateDetails[climateTime].seaTemp}
-                              </span>
-                            </motion.div>
-                          </AnimatePresence>
-                        </div>
-                      </div>
-
-                      {/* Therapeutic Climate details (Time of day indicator) */}
-                      <div className="bg-emerald-950/70 p-4 rounded-sm border border-[#c5a880]/15 space-y-3">
-                        <div className="flex justify-between items-center">
-                          <div>
-                            <span className="text-xs font-serif font-bold text-[#c5a880] block">Аэроионы и фитонциды</span>
-                            <span className="text-[9px] text-stone-400 font-mono uppercase mt-0.5 block">Биоклим. фактор суток:</span>
-                          </div>
-                          <div className="flex space-x-1 bg-emerald-900/30 p-0.5 rounded border border-emerald-800 font-mono">
-                            {(['morning', 'day', 'evening'] as const).map((t) => (
-                              <button
-                                key={t}
-                                onClick={() => setClimateTime(t)}
-                                className={`px-2 py-0.5 text-[9px] font-bold rounded-sm transition-all uppercase tracking-wider ${
-                                  climateTime === t 
-                                    ? 'bg-[#c5a880] text-[#022C22]' 
-                                    : 'hover:bg-emerald-900/35 text-stone-300'
-                                }`}
-                              >
-                                {t === 'morning' ? 'Утро' : t === 'day' ? 'День' : 'Веч'}
-                              </button>
-                            ))}
+                        <div className="bg-emerald-950/50 hover:bg-emerald-900/50 p-2 rounded-lg border border-emerald-900/60 hover:border-[#c5a880]/30 transition-all text-center flex flex-col justify-center">
+                          <span className="text-[8px] uppercase tracking-wider font-mono text-stone-400 font-semibold block">
+                            Ветер
+                          </span>
+                          <div className="flex items-center justify-center space-x-1 mt-0.5">
+                            <Wind className="w-3.5 h-3.5 text-[#c5a880] shrink-0" />
+                            <span className="text-xs font-bold text-white font-mono">
+                              {climateDetails[climateTime].windSpeed}
+                            </span>
                           </div>
                         </div>
 
-                        {/* Animated bars and metrics */}
-                        <div className="space-y-2 pt-0.5">
-                          <div className="space-y-0.5">
-                            <div className="flex justify-between items-center text-[11px]">
-                              <span className="text-stone-300">Фитонциды хвои (кипарис, кедр):</span>
-                              <span className="font-semibold text-emerald-300 font-mono text-[10px] bg-emerald-950/90 px-1.5 py-0.2 rounded">{climateDetails[climateTime].phytoncides}</span>
-                            </div>
-                            <div className="h-1 bg-emerald-900 rounded-full overflow-hidden">
-                              <motion.div 
-                                initial={{ width: '50%' }}
-                                animate={{ width: climateTime === 'day' ? '100%' : climateTime === 'morning' ? '85%' : '65%' }}
-                                transition={{ duration: 0.5 }}
-                                className="h-full bg-gradient-to-r from-emerald-500 to-[#c5a880]"
-                              ></motion.div>
-                            </div>
+                        <div className="bg-emerald-950/50 hover:bg-emerald-900/50 p-2 rounded-lg border border-emerald-900/60 hover:border-[#c5a880]/30 transition-all text-center flex flex-col justify-center">
+                          <span className="text-[8px] uppercase tracking-wider font-mono text-stone-400 font-semibold block">
+                            Влажность
+                          </span>
+                          <div className="flex items-center justify-center space-x-1 mt-0.5">
+                            <Droplet className="w-3.5 h-3.5 text-[#c5a880] shrink-0" />
+                            <span className="text-xs font-bold text-white font-mono">
+                              {climateDetails[climateTime].humidity}
+                            </span>
                           </div>
+                        </div>
 
-                          <div className="space-y-0.5">
-                            <div className="flex justify-between items-center text-[11px]">
-                              <span className="text-stone-300">Фитоаэрозоли морской соли:</span>
-                              <span className="font-semibold text-[#c5a880] font-mono text-[10px] bg-emerald-950/90 px-1.5 py-0.2 rounded">{climateDetails[climateTime].aerosols}</span>
-                            </div>
-                            <div className="h-1 bg-emerald-900 rounded-full overflow-hidden">
-                              <motion.div 
-                                initial={{ width: '40%' }}
-                                animate={{ width: climateTime === 'morning' ? '95%' : climateTime === 'day' ? '70%' : '50%' }}
-                                transition={{ duration: 0.5 }}
-                                className="h-full bg-gradient-to-r from-[#c5a880] to-emerald-400"
-                              ></motion.div>
-                            </div>
+                        <div className="bg-emerald-950/50 hover:bg-emerald-900/50 p-2 rounded-lg border border-[#c5a880]/20 hover:border-[#c5a880]/40 transition-all text-center flex flex-col justify-center">
+                          <span className="text-[8px] uppercase tracking-wider font-mono text-emerald-300 font-semibold block">
+                            Черное море
+                          </span>
+                          <div className="flex items-center justify-center space-x-1 mt-0.5">
+                            <Waves className="w-3.5 h-3.5 text-[#c5a880] shrink-0" />
+                            <span className="text-xs font-bold text-[#c5a880] font-mono">
+                              {climateDetails[climateTime].seaTemp}
+                            </span>
                           </div>
                         </div>
                       </div>
 
-                      {/* 3 Days Forecast Grid */}
-                      <div className="border-t border-[#c5a880]/15 pt-3">
-                        <span className="block text-[9px] uppercase tracking-widest font-mono text-stone-300 mb-2 font-semibold">Прогноз на 3 дня (Гаспра, Крым):</span>
-                        <div className="grid grid-cols-3 gap-2.5">
+                      {/* Phyto-Barometer Indicators (Compact Bars) */}
+                      <div className="bg-emerald-950/60 p-2.5 rounded-xl border border-[#c5a880]/15 space-y-2">
+                        <div className="space-y-1">
+                          <div className="flex justify-between items-center text-[11px]">
+                            <span className="text-stone-300 font-medium truncate">Фитонциды хвои (кедр, можжевельник):</span>
+                            <span className="font-bold text-emerald-300 font-mono text-[9px] bg-emerald-950 px-1.5 py-0.5 rounded border border-emerald-800/80 shrink-0 ml-1">
+                              {climateDetails[climateTime].phytoncides}
+                            </span>
+                          </div>
+                          <div className="h-1.5 bg-black/40 rounded-full overflow-hidden">
+                            <motion.div 
+                              initial={{ width: '50%' }}
+                              animate={{ width: climateTime === 'day' ? '100%' : climateTime === 'morning' ? '85%' : '65%' }}
+                              transition={{ duration: 0.5, ease: "easeOut" }}
+                              className="h-full bg-gradient-to-r from-emerald-500 to-[#c5a880] rounded-full"
+                            ></motion.div>
+                          </div>
+                        </div>
+
+                        <div className="space-y-1">
+                          <div className="flex justify-between items-center text-[11px]">
+                            <span className="text-stone-300 font-medium truncate">Морские аэроионы и соли:</span>
+                            <span className="font-bold text-[#c5a880] font-mono text-[9px] bg-emerald-950 px-1.5 py-0.5 rounded border border-emerald-800/80 shrink-0 ml-1">
+                              {climateDetails[climateTime].aerosols}
+                            </span>
+                          </div>
+                          <div className="h-1.5 bg-black/40 rounded-full overflow-hidden">
+                            <motion.div 
+                              initial={{ width: '40%' }}
+                              animate={{ width: climateTime === 'morning' ? '95%' : climateTime === 'day' ? '70%' : '50%' }}
+                              transition={{ duration: 0.5, ease: "easeOut" }}
+                              className="h-full bg-gradient-to-r from-[#c5a880] to-emerald-400 rounded-full"
+                            ></motion.div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* 3 Days Forecast Grid (Compact) */}
+                      <div className="border-t border-[#c5a880]/15 pt-2">
+                        <div className="flex items-center justify-between mb-1.5">
+                          <span className="text-[9px] uppercase tracking-widest font-mono text-stone-300 font-bold flex items-center gap-1">
+                            <Calendar className="w-3 h-3 text-[#c5a880]" />
+                            Прогноз на 3 дня (Гаспра):
+                          </span>
+                        </div>
+                        <div className="grid grid-cols-3 gap-1.5">
                           {realWeather.forecast.map((f, index) => (
                             <div 
                               key={index} 
-                              className="bg-emerald-950/45 hover:bg-emerald-950/80 hover:border-[#c5a880]/20 transition-all p-2.5 rounded-sm border border-emerald-900/80 text-center flex flex-col justify-between space-y-1"
+                              className="bg-white/[0.04] hover:bg-white/[0.08] transition-all p-1.5 rounded-lg border border-white/[0.06] text-center flex items-center justify-between px-2 group"
                             >
-                              <span className="block text-[10px] font-bold text-stone-300 leading-none">{formatForecastDate(f.date)}</span>
-                              <div className="my-1 flex justify-center">
-                                {getWeatherIcon(f.weatherCode, "w-6 h-6")}
-                              </div>
-                              <div className="space-y-0.5">
-                                <div className="flex items-center justify-center space-x-1 text-xs">
-                                  <span className="font-bold text-white">{f.tempMax}°</span>
-                                  <span className="text-stone-400 text-[10px]">/ {f.tempMin}°</span>
-                                </div>
-                                <span className="block text-[8px] text-[#c5a880] truncate font-medium">
+                              <div className="text-left">
+                                <span className="block text-[10px] font-bold text-stone-200 leading-none">
+                                  {formatForecastDate(f.date)}
+                                </span>
+                                <span className="block text-[8px] text-[#c5a880] truncate max-w-[55px] mt-0.5">
                                   {getWeatherName(f.weatherCode)}
+                                </span>
+                              </div>
+                              <div className="flex items-center space-x-1.5">
+                                {getWeatherIcon(f.weatherCode, "w-4 h-4")}
+                                <span className="text-[11px] font-bold text-white font-mono">
+                                  {f.tempMax}°
                                 </span>
                               </div>
                             </div>
