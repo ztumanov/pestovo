@@ -12,6 +12,7 @@ import {
 } from '../data/resortData';
 import { DEFAULT_SERVICES } from '../data/servicesData';
 import { INITIAL_DOCUMENTS } from '../data/documentsData';
+import { getStorageData, setStorageData, clearStorageData } from '../lib/storage';
 
 export interface SiteData {
   resortInfo: {
@@ -215,11 +216,11 @@ export function AdminDataProvider({ children }: { children: React.ReactNode }) {
         console.log('No server reviews.php found or error loading, falling back to static testimonials.', reviewsErr);
       }
 
-      // 2. Check if this browser has an active local draft in localStorage
-      const savedData = localStorage.getItem(LOCAL_STORAGE_KEY);
+      // 2. Check if this browser has an active local draft in high-capacity IndexedDB or localStorage
+      const savedData = await getStorageData<SiteData>();
       if (savedData) {
         try {
-          const parsed = JSON.parse(savedData);
+          const parsed = savedData;
           
           // Gentle migration: if the client is still pointing to old defaults, auto-update them to the uploaded images
           let morphed = false;
@@ -443,12 +444,10 @@ export function AdminDataProvider({ children }: { children: React.ReactNode }) {
 
   const updateSiteData = (newData: SiteData) => {
     setSiteData(newData);
-    try {
-      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(newData));
-    } catch (e) {
-      console.error('Failed to save to localStorage:', e);
-      alert('Предупреждение: Превышена квота памяти браузера. Пожалуйста, сожмите или уменьшите размер загружаемых картинок перед загрузкой.');
-    }
+    // Save to high-capacity IndexedDB (bypasses 5MB browser quota)
+    setStorageData(newData).catch(e => {
+      console.error('Failed to save to IndexedDB storage:', e);
+    });
 
     // Sync testimonials with PHP server if changed
     if (newData.testimonials) {
@@ -473,12 +472,11 @@ export function AdminDataProvider({ children }: { children: React.ReactNode }) {
   const updateSection = <K extends keyof SiteData>(key: K, value: SiteData[K]) => {
     setSiteData(prev => {
       const updated = { ...prev, [key]: value };
-      try {
-        localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(updated));
-      } catch (e) {
-        console.error('Failed to save to localStorage:', e);
-        alert('Предупреждение: Превышена квота памяти браузера (localStorage). Не удалось сохранить некоторые файлы. Пожалуйста, используйте изображения меньшего разрешения.');
-      }
+      
+      // Save to high-capacity IndexedDB (bypasses 5MB browser quota)
+      setStorageData(updated).catch(e => {
+        console.error('Failed to save to IndexedDB storage:', e);
+      });
       
       // Securely sync all site settings to PHP server
       syncSettingsWithServer(updated);
@@ -507,9 +505,9 @@ export function AdminDataProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const resetToDefault = () => {
+  const resetToDefault = async () => {
     if (window.confirm('Вы действительно хотите сбросить все внесенные изменения и вернуть исходное оформление сайта?')) {
-      localStorage.removeItem(LOCAL_STORAGE_KEY);
+      await clearStorageData();
       localStorage.removeItem('pestovo_resort_admin_credentials');
       setSiteData({ ...DEFAULT_SITE_DATA });
       window.location.reload();

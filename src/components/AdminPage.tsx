@@ -33,56 +33,36 @@ import {
   Key,
   UserCheck,
   Globe,
-  Loader2
+  Loader2,
+  HardDrive,
+  RefreshCw,
+  Download,
+  UploadCloud,
+  CheckCircle2,
+  AlertTriangle
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Room, MedicalProgram, Testimonial, FAQItem, NewsArticle, ServiceItem, GalleryItem, GalleryCategory, AdminUser, DocumentItem } from '../types';
+import { calculateStorageSize, clearStorageData, compressImageFile } from '../lib/storage';
 
 /**
- * Utility to downscale and compress images client-side before storing them in localStorage
+ * High-efficiency compression utility that downscales and optimizes images
+ * to prevent memory overflow and guarantee smooth hosting synchronization
  */
 function compressImage(file: File, maxDim: number, quality: number, callback: (base64: string) => void) {
-  const reader = new FileReader();
-  reader.onload = (e) => {
-    const originalResult = e.target?.result;
-    if (originalResult && typeof originalResult === 'string') {
-      // If it's not actually an image mimetype (failsafe), just return raw reader result
-      if (!file.type.startsWith('image/')) {
-        callback(originalResult);
-        return;
-      }
-      const img = new Image();
-      img.src = originalResult;
-      img.onload = () => {
-        let width = img.width;
-        let height = img.height;
-        if (width > maxDim || height > maxDim) {
-          if (width > height) {
-            height = Math.round((height * maxDim) / width);
-            width = maxDim;
-          } else {
-            width = Math.round((width * maxDim) / height);
-            height = maxDim;
-          }
-        }
-        const canvas = document.createElement('canvas');
-        canvas.width = width;
-        canvas.height = height;
-        const ctx = canvas.getContext('2d');
-        if (ctx) {
-          ctx.drawImage(img, 0, 0, width, height);
-          const optimized = canvas.toDataURL('image/jpeg', quality);
-          callback(optimized);
-        } else {
-          callback(originalResult);
-        }
-      };
-      img.onerror = () => {
-        callback(originalResult);
-      };
-    }
-  };
-  reader.readAsDataURL(file);
+  // Use adaptive dimension (default max 1280px) and quality 0.78 for optimal crispness + minimal KB
+  const targetDim = Math.min(maxDim || 1280, 1280);
+  const targetQuality = Math.min(quality || 0.78, 0.82);
+  
+  compressImageFile(file, targetDim, targetQuality)
+    .then((result) => {
+      callback(result);
+    })
+    .catch(() => {
+      const reader = new FileReader();
+      reader.onload = (e) => callback((e.target?.result as string) || '');
+      reader.readAsDataURL(file);
+    });
 }
 
 export default function AdminPage({ onBackToHome }: { onBackToHome: () => void }) {
@@ -2896,22 +2876,29 @@ export default function AdminPage({ onBackToHome }: { onBackToHome: () => void }
 
           {activeSettingsTab === 'publish' && (
             <div className="space-y-6">
-              <div className="border-b border-stone-200 pb-3">
-                <h3 className="font-serif font-black text-xl text-[#022C22]">Публикация изменений на хостинг</h3>
-                <p className="text-xs text-stone-400 mt-1 font-medium">Как сохранить ваши правки навсегда для всех посетителей вашего сайта.</p>
+              <div className="border-b border-stone-200 pb-3 flex flex-col md:flex-row md:items-center md:justify-between gap-2">
+                <div>
+                  <h3 className="font-serif font-black text-xl text-[#022C22]">Публикация изменений и Память сайта</h3>
+                  <p className="text-xs text-stone-400 mt-1 font-medium">Управление базой данных, выгрузка на хостинг и синхронизация.</p>
+                </div>
+                <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-emerald-50 border border-emerald-200 rounded-xl text-emerald-800 text-xs font-semibold">
+                  <Database className="w-3.5 h-3.5 text-emerald-600" />
+                  <span>Объём данных: <strong>{calculateStorageSize(siteData).formatted}</strong> (IndexedDB &gt;500 МБ)</span>
+                </div>
               </div>
 
-              {/* Informational banner about local storage */}
-              <div className="bg-amber-50 border border-amber-200 p-5 rounded-2xl flex flex-col md:flex-row gap-4 items-start md:items-center">
-                <div className="p-3 bg-amber-100 rounded-xl text-amber-800">
-                  <Database className="w-6 h-6" />
+              {/* Informational banner about modern database storage */}
+              <div className="bg-emerald-50/80 border border-emerald-200/80 p-5 rounded-2xl flex flex-col md:flex-row gap-4 items-start md:items-center">
+                <div className="p-3 bg-emerald-100/90 rounded-xl text-emerald-800 shrink-0">
+                  <CheckCircle2 className="w-6 h-6 text-emerald-700" />
                 </div>
-                <div>
-                  <h4 className="font-bold text-amber-900 text-sm">Почему правки видны только на одном устройстве?</h4>
-                  <p className="text-xs text-amber-800 leading-relaxed mt-1">
-                    Этот сайт — это современное и очень быстрое клиентское приложение. Когда вы редактируете тексты или добавляете картинки, они сохраняются 
-                    исключительно в <strong>памяти вашего текущего браузера (localStorage)</strong>. Другие пользователи на своих смартфонах, компьютерах 
-                    или в режиме инкогнито эти изменения не увидят, так как у них в браузере своя пустая память.
+                <div className="space-y-1">
+                  <h4 className="font-bold text-emerald-950 text-sm flex items-center gap-2">
+                    <span>Безлимитное хранилище данных активировано</span>
+                    <span className="text-[10px] bg-emerald-200/70 text-emerald-900 px-2 py-0.5 rounded-full font-mono font-bold">IndexedDB 2026</span>
+                  </h4>
+                  <p className="text-xs text-emerald-800 leading-relaxed">
+                    Все правки, фотографии и тексты сохраняются в расширенную клиентскую базу данных <strong>IndexedDB</strong> без ограничений по памяти браузера. Вы можете безопасно загружать любые объёмы материалов и скачивать готовый <code className="bg-emerald-150/70 font-bold px-1 rounded font-mono">site-data.json</code> для хостинга.
                   </p>
                 </div>
               </div>
@@ -2998,7 +2985,7 @@ export default function AdminPage({ onBackToHome }: { onBackToHome: () => void }
                         </div>
                       )}
 
-                      {/* Download JSON Button */}
+                      {/* Download JSON Button with File Size */}
                       <button
                         onClick={() => {
                           const jsonString = `data:text/json;charset=utf-8,${encodeURIComponent(
@@ -3014,8 +3001,8 @@ export default function AdminPage({ onBackToHome }: { onBackToHome: () => void }
                         }}
                         className="w-full bg-[#022C22] hover:bg-[#c5a880] text-[#FAF9F6] hover:text-[#022C22] font-semibold text-xs py-3.5 px-4 rounded-xl transition-all uppercase tracking-wider flex items-center justify-center gap-2 border border-transparent shadow cursor-pointer"
                       >
-                        <Save className="w-4 h-4" />
-                        Скачать site-data.json
+                        <Download className="w-4 h-4" />
+                        <span>Скачать site-data.json ({calculateStorageSize(siteData).formatted})</span>
                       </button>
 
                       {/* Import JSON file input and label */}
@@ -3024,7 +3011,7 @@ export default function AdminPage({ onBackToHome }: { onBackToHome: () => void }
                           Резервная копия / Перенос данных
                         </label>
                         <label className="w-full bg-stone-100 hover:bg-stone-200 text-stone-700 font-semibold text-xs py-3 px-4 rounded-xl transition-all uppercase tracking-wider flex items-center justify-center gap-2 border border-stone-300 border-dashed cursor-pointer text-center">
-                          <ImageIcon className="w-4 h-4 text-stone-500" />
+                          <UploadCloud className="w-4 h-4 text-stone-500" />
                           <span>Загрузить из JSON</span>
                           <input
                             type="file"
@@ -3052,6 +3039,31 @@ export default function AdminPage({ onBackToHome }: { onBackToHome: () => void }
                             className="hidden"
                           />
                         </label>
+                      </div>
+
+                      {/* Clear Cache / Memory Button */}
+                      <div className="pt-1">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setConfirmModal({
+                              isOpen: true,
+                              title: 'Очистить кэш памяти?',
+                              message: 'Вы хотите очистить локальный черновик в памяти браузера? Если вы сохранили файл на сервере или скачали JSON, данные не потеряются.',
+                              confirmText: 'Да, очистить',
+                              confirmClass: 'bg-amber-600 hover:bg-amber-700 text-white font-bold',
+                              onConfirm: async () => {
+                                await clearStorageData();
+                                localStorage.removeItem('pestovo_resort_editable_data');
+                                window.location.reload();
+                              }
+                            });
+                          }}
+                          className="w-full bg-stone-50 hover:bg-stone-100 text-stone-600 hover:text-red-700 font-medium text-[11px] py-2.5 px-3 rounded-xl transition-all flex items-center justify-center gap-1.5 border border-stone-200 cursor-pointer"
+                        >
+                          <RefreshCw className="w-3.5 h-3.5" />
+                          <span>Очистить память браузера (кэш)</span>
+                        </button>
                       </div>
                     </div>
                   </div>
