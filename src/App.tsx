@@ -2281,8 +2281,8 @@ export default function App() {
                 </div>
               </div>
 
-              {/* Tab Content Box with Refined Cards */}
-              <div className="bg-white rounded-2xl border border-stone-200/80 shadow-[0_4px_24px_rgba(0,0,0,0.04)] p-5 sm:p-7 md:p-8">
+              {/* Tab Content Box with Enhanced Contrast & Modern Hierarchy */}
+              <div className="bg-[#fcfbf9] rounded-2xl border border-stone-200/90 shadow-[0_12px_36px_-12px_rgba(2,44,34,0.07)] p-5 sm:p-7 md:p-8">
                 <AnimatePresence mode="wait">
                   {aboutTab === 'general' && (
                     <motion.div
@@ -2291,20 +2291,21 @@ export default function App() {
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: -8 }}
                       transition={{ duration: 0.25 }}
-                      className="grid grid-cols-1 lg:grid-cols-12 gap-8 text-sm text-stone-700 font-sans"
+                      className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 text-sm text-stone-800 font-sans"
                     >
                       {/* Left: Organization Credentials */}
-                      <div className="lg:col-span-7 space-y-5">
-                        <div className="bg-stone-50/80 p-4 sm:p-5 rounded-xl border border-stone-200/70 space-y-3">
-                          <span className="block text-[10px] uppercase tracking-widest font-mono text-[#c5a880] font-bold">
-                            Полное наименование организации
+                      <div className="lg:col-span-7 space-y-4">
+                        <div className="bg-white p-5 sm:p-6 rounded-xl border border-stone-200 shadow-sm relative overflow-hidden">
+                          <div className="absolute top-0 left-0 bottom-0 w-1.5 bg-[#022C22]"></div>
+                          <span className="block text-[11px] uppercase tracking-wider font-mono text-[#c5a880] font-bold">
+                            Полное официальное наименование
                           </span>
-                          <p className="font-serif text-base sm:text-lg text-[#022C22] font-bold leading-snug">
+                          <h4 className="font-serif text-base sm:text-lg md:text-xl text-[#022C22] font-bold mt-1.5 leading-snug">
                             Федеральное государственное казенное учреждение «Санаторий «Ясная Поляна» Федеральной таможенной службы»
-                          </p>
-                          <div className="pt-1 flex items-center gap-2">
-                            <span className="text-xs text-stone-500 font-sans font-medium">Сокращенное:</span>
-                            <span className="font-semibold text-stone-800 text-xs bg-white px-2 py-0.5 rounded border border-stone-200">
+                          </h4>
+                          <div className="mt-3 pt-3 border-t border-stone-100 flex flex-wrap items-center gap-2">
+                            <span className="text-xs text-stone-500 font-medium">Сокращенное наименование:</span>
+                            <span className="font-semibold text-[#022C22] text-xs bg-stone-100/90 px-2.5 py-1 rounded-md border border-stone-200">
                               ФГКУ «Санаторий «Ясная Поляна» ФТС России»
                             </span>
                           </div>
@@ -2312,54 +2313,56 @@ export default function App() {
 
                         {/* Tax & Legal IDs Grid */}
                         <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                          <div className="bg-stone-50/80 p-3.5 rounded-xl border border-stone-200/70">
-                            <span className="block text-[10px] uppercase tracking-widest font-mono text-stone-400 font-semibold">ИНН</span>
-                            <p className="font-mono text-stone-900 font-bold text-sm sm:text-base mt-0.5">7713778678</p>
+                          <div className="bg-white p-4 rounded-xl border border-stone-200 shadow-sm">
+                            <span className="block text-[11px] uppercase tracking-wider font-mono text-stone-500 font-bold">ИНН</span>
+                            <p className="font-mono text-[#022C22] font-bold text-base sm:text-lg mt-1">7713778678</p>
                           </div>
-                          <div className="bg-stone-50/80 p-3.5 rounded-xl border border-stone-200/70">
-                            <span className="block text-[10px] uppercase tracking-widest font-mono text-stone-400 font-semibold">КПП</span>
-                            <p className="font-mono text-stone-900 font-bold text-sm sm:text-base mt-0.5">910301001</p>
+                          <div className="bg-white p-4 rounded-xl border border-stone-200 shadow-sm">
+                            <span className="block text-[11px] uppercase tracking-wider font-mono text-stone-500 font-bold">КПП</span>
+                            <p className="font-mono text-[#022C22] font-bold text-base sm:text-lg mt-1">910301001</p>
                           </div>
-                          <div className="bg-stone-50/80 p-3.5 rounded-xl border border-stone-200/70 col-span-2 sm:col-span-1">
-                            <span className="block text-[10px] uppercase tracking-widest font-mono text-stone-400 font-semibold">ОГРН</span>
-                            <p className="font-mono text-stone-900 font-bold text-xs sm:text-sm mt-1">5137746004787</p>
+                          <div className="bg-white p-4 rounded-xl border border-stone-200 shadow-sm col-span-2 sm:col-span-1">
+                            <span className="block text-[11px] uppercase tracking-wider font-mono text-stone-500 font-bold">ОГРН</span>
+                            <p className="font-mono text-[#022C22] font-bold text-xs sm:text-sm mt-1.5">5137746004787</p>
                           </div>
                         </div>
 
-                        <div className="bg-stone-50/80 p-3.5 rounded-xl border border-stone-200/70">
-                          <span className="block text-[10px] uppercase tracking-widest font-mono text-stone-400 font-semibold">Организационно-правовая форма (ОПФ)</span>
-                          <p className="text-stone-800 font-semibold text-xs sm:text-sm mt-0.5">Федеральные государственные казенные учреждения</p>
+                        <div className="bg-white p-4 rounded-xl border border-stone-200 shadow-sm">
+                          <span className="block text-[11px] uppercase tracking-wider font-mono text-stone-500 font-bold">Организационно-правовая форма (ОПФ)</span>
+                          <p className="text-[#022C22] font-semibold text-sm sm:text-base mt-1">Федеральные государственные казенные учреждения</p>
                         </div>
                       </div>
 
                       {/* Right: Geographic & Property details */}
-                      <div className="lg:col-span-5 space-y-4 border-t lg:border-t-0 lg:border-l border-stone-200/80 lg:pl-8 pt-4 lg:pt-0">
-                        <div className="bg-gradient-to-br from-[#022C22]/[0.03] to-stone-50 p-4 rounded-xl border border-[#c5a880]/30 space-y-2">
+                      <div className="lg:col-span-5 space-y-4 border-t lg:border-t-0 lg:border-l border-stone-200 lg:pl-8 pt-4 lg:pt-0">
+                        <div className="bg-white p-5 rounded-xl border border-stone-200 shadow-sm space-y-2">
                           <div className="flex items-center space-x-2 text-[#022C22]">
-                            <MapPin className="w-4 h-4 text-[#c5a880]" />
-                            <span className="block text-xs uppercase tracking-widest font-mono text-[#022C22] font-bold">
-                              Адрес и местоположение
+                            <div className="p-1.5 rounded-lg bg-emerald-50 text-[#022C22] border border-emerald-100">
+                              <MapPin className="w-4 h-4 text-[#c5a880]" />
+                            </div>
+                            <span className="block text-xs uppercase tracking-wider font-mono text-[#022C22] font-bold">
+                              Адрес и локация
                             </span>
                           </div>
-                          <p className="text-stone-800 font-semibold text-xs sm:text-sm leading-relaxed">
-                            298660, Республика Крым, г. Ялта, пгт Гаспра, шоссе Севастопольское, д. 52
+                          <p className="text-stone-800 font-semibold text-sm leading-relaxed pt-1">
+                            298660, Россия, Республика Крым, г. Ялта, пгт Гаспра, шоссе Севастопольское, д. 52
                           </p>
                         </div>
 
-                        <div className="space-y-2">
-                          <span className="block text-[10px] uppercase tracking-widest font-mono text-stone-400 font-bold">
-                            Характеристики учреждения
+                        <div className="bg-white p-5 rounded-xl border border-stone-200 shadow-sm space-y-3">
+                          <span className="block text-[11px] uppercase tracking-wider font-mono text-stone-500 font-bold border-b border-stone-100 pb-2">
+                            Параметры и принадлежность
                           </span>
-                          <div className="space-y-1.5 text-xs">
+                          <div className="space-y-2 text-xs sm:text-[13px]">
                             {[
                               { label: 'Курортная зона', val: 'Большая Ялта (Южный берег Крыма)' },
-                              { label: 'Медицинская помощь', val: 'Санаторно-курортное лечение взрослых' },
-                              { label: 'Ведомство', val: 'Федеральная таможенная служба (ФТС РФ)' },
+                              { label: 'Профиль помощи', val: 'Санаторно-курортное лечение взрослых' },
+                              { label: 'Ведомство', val: 'Федеральная таможенная служба (ФТС России)' },
                               { label: 'Форма собственности', val: 'Федеральная государственная собственность' },
                             ].map((item, idx) => (
-                              <div key={idx} className="flex items-center justify-between p-2.5 rounded-lg bg-stone-50 border border-stone-200/60">
-                                <span className="text-stone-500 font-medium">{item.label}:</span>
-                                <span className="font-semibold text-stone-800 text-right">{item.val}</span>
+                              <div key={idx} className="flex items-center justify-between p-2 rounded-lg bg-stone-50/70 border border-stone-100">
+                                <span className="text-stone-600 font-medium">{item.label}:</span>
+                                <span className="font-bold text-[#022C22] text-right">{item.val}</span>
                               </div>
                             ))}
                           </div>
@@ -2375,46 +2378,46 @@ export default function App() {
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: -8 }}
                       transition={{ duration: 0.25 }}
-                      className="space-y-6 text-sm text-stone-700 font-sans"
+                      className="space-y-6 text-sm text-stone-800 font-sans"
                     >
                       {/* License Details Header */}
-                      <div className="bg-gradient-to-r from-[#022C22]/[0.04] via-[#c5a880]/10 to-[#022C22]/[0.02] p-4 sm:p-5 rounded-2xl border border-[#c5a880]/40 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 shadow-sm">
-                        <div className="space-y-1">
-                          <div className="flex items-center space-x-2 text-[#c5a880] text-[10px] font-mono uppercase tracking-widest font-bold">
-                            <Award className="w-4 h-4" />
-                            <span>Государственный Медицинский Стандарт</span>
+                      <div className="bg-white p-5 sm:p-6 rounded-2xl border border-[#c5a880]/40 shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                        <div className="space-y-1.5">
+                          <div className="flex items-center space-x-2 text-[#c5a880] text-[11px] font-mono uppercase tracking-wider font-bold">
+                            <Award className="w-4 h-4 text-[#c5a880]" />
+                            <span>Государственный реестр лицензий</span>
                           </div>
-                          <h4 className="font-serif text-lg sm:text-xl font-extrabold text-[#022C22]">
-                            Лицензия № Л041-00110-91/00554225
+                          <h4 className="font-serif text-lg sm:text-xl font-bold text-[#022C22]">
+                            Медицинская лицензия № Л041-00110-91/00554225
                           </h4>
-                          <p className="text-stone-600 text-xs">
+                          <p className="text-stone-600 text-xs sm:text-sm">
                             Предоставлена на осуществление специализированной первичной и санаторно-курортной медицинской помощи.
                           </p>
                         </div>
-                        <div className="flex items-center gap-3 font-mono text-xs text-[#022C22] bg-white border border-stone-200/80 shadow-sm p-3 rounded-xl shrink-0">
+                        <div className="flex items-center gap-4 font-mono text-xs text-[#022C22] bg-stone-50 border border-stone-200/90 shadow-xs p-3.5 rounded-xl shrink-0">
                           <div>
-                            <span className="block text-[9px] uppercase tracking-wider text-stone-400 font-medium">Выдана</span>
-                            <strong className="text-stone-800">22.06.2022</strong>
+                            <span className="block text-[10px] uppercase tracking-wider text-stone-500 font-semibold">Дата выдачи</span>
+                            <strong className="text-[#022C22] font-bold text-sm">22.06.2022</strong>
                           </div>
-                          <div className="w-[1px] h-7 bg-stone-200"></div>
+                          <div className="w-[1px] h-8 bg-stone-200"></div>
                           <div>
-                            <span className="block text-[9px] uppercase tracking-wider text-stone-400 font-medium">Срок</span>
-                            <strong className="text-emerald-700 flex items-center gap-1 font-bold">
-                              <Check className="w-3.5 h-3.5" /> Бессрочно
+                            <span className="block text-[10px] uppercase tracking-wider text-stone-500 font-semibold">Срок действия</span>
+                            <strong className="text-emerald-700 flex items-center gap-1 font-bold text-sm">
+                              <Check className="w-4 h-4" /> Бессрочно
                             </strong>
                           </div>
                         </div>
                       </div>
 
-                      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 pt-2">
+                      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 pt-2">
                         {/* Left: Specializations & Labs */}
                         <div className="lg:col-span-6 space-y-6">
-                          <div className="space-y-3">
-                            <h5 className="font-serif text-base font-bold text-[#022C22] pb-1 flex items-center space-x-2 border-b border-stone-200">
+                          <div className="bg-white p-5 rounded-2xl border border-stone-200 shadow-sm space-y-4">
+                            <h5 className="font-serif text-base font-bold text-[#022C22] pb-2 flex items-center space-x-2 border-b border-stone-100">
                               <Stethoscope className="w-4 h-4 text-[#c5a880]" />
-                              <span>Разрешенная медицинская специализация:</span>
+                              <span>Разрешенные медицинские специализации:</span>
                             </h5>
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-stone-700">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                               {[
                                 { name: 'Диетология', desc: 'Терапевтическое и лечебное питание' },
                                 { name: 'Лечебная физкультура', desc: 'Индивидуальные программы ЛФК' },
@@ -2425,32 +2428,32 @@ export default function App() {
                                 { name: 'Физиотерапия', desc: 'Комплекс аппаратного лечения' },
                                 { name: 'Функциональная диагностика', desc: 'ЭКГ и спирометрия на месте' }
                               ].map((item, id) => (
-                                <div key={id} className="bg-stone-50 hover:bg-white border border-stone-200/70 hover:border-[#c5a880]/40 p-2.5 rounded-xl transition-all duration-200 hover:shadow-sm group">
-                                  <span className="font-serif font-bold text-xs sm:text-[13px] text-[#022C22] block group-hover:text-emerald-900 transition-colors">
+                                <div key={id} className="bg-stone-50/80 hover:bg-stone-100/70 border border-stone-200/80 p-3 rounded-xl transition-all">
+                                  <span className="font-serif font-bold text-xs sm:text-[13px] text-[#022C22] block">
                                     {item.name}
                                   </span>
-                                  <span className="text-[10px] text-stone-500 block mt-0.5">{item.desc}</span>
+                                  <span className="text-[11px] text-stone-600 block mt-0.5 leading-snug">{item.desc}</span>
                                 </div>
                               ))}
                             </div>
                           </div>
 
                           {/* Diagnostics */}
-                          <div className="space-y-3">
-                            <h5 className="font-serif text-base font-bold text-[#022C22] pb-1 flex items-center space-x-2 border-b border-stone-200">
+                          <div className="bg-white p-5 rounded-2xl border border-stone-200 shadow-sm space-y-4">
+                            <h5 className="font-serif text-base font-bold text-[#022C22] pb-2 flex items-center space-x-2 border-b border-stone-100">
                               <Activity className="w-4 h-4 text-[#c5a880]" />
                               <span>Диагностическая и лабораторная база:</span>
                             </h5>
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                              <div className="bg-emerald-50/60 p-3.5 rounded-xl border border-emerald-200/60">
+                              <div className="bg-emerald-50/70 p-4 rounded-xl border border-emerald-200/80">
                                 <h6 className="font-serif text-xs font-bold text-[#022C22] uppercase tracking-wider font-mono">Клиническая лаборатория</h6>
-                                <p className="text-stone-600 mt-1 text-xs leading-relaxed">
+                                <p className="text-stone-700 mt-1.5 text-xs leading-relaxed">
                                   Биохимические и общеклинические исследования крови и мочи на автоматических анализаторах.
                                 </p>
                               </div>
-                              <div className="bg-amber-50/60 p-3.5 rounded-xl border border-amber-200/60">
+                              <div className="bg-amber-50/70 p-4 rounded-xl border border-amber-200/80">
                                 <h6 className="font-serif text-xs font-bold text-[#022C22] uppercase tracking-wider font-mono">Функциональная база</h6>
-                                <p className="text-stone-600 mt-1 text-xs leading-relaxed">
+                                <p className="text-stone-700 mt-1.5 text-xs leading-relaxed">
                                   Спирография (диагностика внешнего дыхания), ЭКГ-исследования и суточный мониторинг.
                                 </p>
                               </div>
@@ -2459,45 +2462,54 @@ export default function App() {
                         </div>
 
                         {/* Right: Pathologies & Basic Illness Profiles */}
-                        <div className="lg:col-span-6 bg-gradient-to-b from-stone-50/90 to-stone-50/40 p-5 sm:p-6 rounded-2xl border border-stone-200 shadow-sm space-y-4">
-                          <h5 className="font-serif text-lg font-bold text-[#022C22] flex items-center space-x-2 border-b border-stone-200/80 pb-2.5">
+                        <div className="lg:col-span-6 bg-white p-5 sm:p-6 rounded-2xl border border-stone-200 shadow-sm space-y-4">
+                          <h5 className="font-serif text-lg font-bold text-[#022C22] flex items-center space-x-2 border-b border-stone-100 pb-3">
                             <Shield className="w-5 h-5 text-[#c5a880]" />
                             <span>Основные лечебные профили санатория</span>
                           </h5>
                           
                           <div className="space-y-3.5 text-xs text-stone-700">
-                            <div className="bg-white p-3.5 rounded-xl border border-red-100 shadow-xs space-y-1">
-                              <span className="inline-block bg-red-50 text-red-700 text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md font-mono">
-                                Кардиологический профиль
-                              </span>
+                            <div className="bg-stone-50/80 p-4 rounded-xl border border-stone-200 space-y-1.5">
+                              <div className="flex items-center space-x-2">
+                                <span className="w-2.5 h-2.5 rounded-full bg-red-600 shrink-0"></span>
+                                <span className="text-[11px] font-bold uppercase tracking-wider text-red-800 font-mono">
+                                  Кардиологический профиль
+                                </span>
+                              </div>
                               <strong className="block text-stone-900 font-bold text-sm text-[#022C22]">
                                 Болезни системы кровообращения:
                               </strong>
-                              <p className="leading-relaxed text-stone-600 text-[11px]">
+                              <p className="leading-relaxed text-stone-700 text-xs sm:text-[13px]">
                                 Гипертоническая болезнь, ишемическая болезнь сердца без тяжелых нарушений ритма, вегетососудистая дистония, постинфарктное долечивание.
                               </p>
                             </div>
 
-                            <div className="bg-white p-3.5 rounded-xl border border-sky-100 shadow-xs space-y-1">
-                              <span className="inline-block bg-sky-50 text-sky-700 text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md font-mono">
-                                Пульмонологический профиль
-                              </span>
+                            <div className="bg-stone-50/80 p-4 rounded-xl border border-stone-200 space-y-1.5">
+                              <div className="flex items-center space-x-2">
+                                <span className="w-2.5 h-2.5 rounded-full bg-sky-600 shrink-0"></span>
+                                <span className="text-[11px] font-bold uppercase tracking-wider text-sky-800 font-mono">
+                                  Пульмонологический профиль
+                                </span>
+                              </div>
                               <strong className="block text-stone-900 font-bold text-sm text-[#022C22]">
                                 Болезни органов дыхания нетуберкулезного характера:
                               </strong>
-                              <p className="leading-relaxed text-stone-600 text-[11px]">
+                              <p className="leading-relaxed text-stone-700 text-xs sm:text-[13px]">
                                 Хронические бронхиты, трахеиты, бронхиальная астма в стадии ремиссии, респираторная реабилитация после пневмоний.
                               </p>
                             </div>
 
-                            <div className="bg-white p-3.5 rounded-xl border border-amber-100 shadow-xs space-y-1">
-                              <span className="inline-block bg-amber-50 text-amber-700 text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md font-mono">
-                                Опорно-двигательный профиль
-                              </span>
+                            <div className="bg-stone-50/80 p-4 rounded-xl border border-stone-200 space-y-1.5">
+                              <div className="flex items-center space-x-2">
+                                <span className="w-2.5 h-2.5 rounded-full bg-amber-600 shrink-0"></span>
+                                <span className="text-[11px] font-bold uppercase tracking-wider text-amber-800 font-mono">
+                                  Опорно-двигательный профиль
+                                </span>
+                              </div>
                               <strong className="block text-stone-900 font-bold text-sm text-[#022C22]">
                                 Болезни костно-мышечной системы и суставов:
                               </strong>
-                              <p className="leading-relaxed text-stone-600 text-[11px]">
+                              <p className="leading-relaxed text-stone-700 text-xs sm:text-[13px]">
                                 Деформирующие артрозы, коксартроз, гонартроз, остеохондроз позвоночника, спондилез, миозиты и последствия травм.
                               </p>
                             </div>
@@ -2514,16 +2526,16 @@ export default function App() {
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: -8 }}
                       transition={{ duration: 0.25 }}
-                      className="grid grid-cols-1 lg:grid-cols-12 gap-8 text-sm text-stone-700 font-sans"
+                      className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 text-sm text-stone-800 font-sans"
                     >
                       {/* Treatment list */}
                       <div className="lg:col-span-8 space-y-5">
-                        <div>
-                          <h4 className="font-serif text-xl font-bold text-[#022C22] flex items-center">
-                            <Stethoscope className="w-5 h-5 text-[#c5a880] mr-2" />
+                        <div className="bg-white p-5 rounded-2xl border border-stone-200 shadow-sm">
+                          <h4 className="font-serif text-lg sm:text-xl font-bold text-[#022C22] flex items-center">
+                            <Stethoscope className="w-5 h-5 text-[#c5a880] mr-2.5" />
                             Применяемые терапевтические методики
                           </h4>
-                          <p className="text-xs text-stone-500 mt-1">
+                          <p className="text-xs sm:text-sm text-stone-600 mt-1.5">
                             Комплексный перечень процедур, проводимых квалифицированными врачами на современном лицензированном оборудовании.
                           </p>
                         </div>
@@ -2571,18 +2583,20 @@ export default function App() {
                               ]
                             }
                           ].map((cat, groupIdx) => (
-                            <div key={groupIdx} className="bg-stone-50/90 border border-stone-200/80 p-4 rounded-xl space-y-3 hover:shadow-md transition-all duration-300">
-                              <div className="flex items-center space-x-2 border-b border-stone-200/60 pb-2">
-                                <span className={`w-2 h-2 rounded-full ${cat.color}`} />
-                                <h5 className="font-serif text-xs font-bold text-[#022C22] tracking-wide uppercase">{cat.category}</h5>
+                            <div key={groupIdx} className="bg-white border border-stone-200 p-4 sm:p-5 rounded-2xl space-y-3.5 shadow-sm hover:shadow-md transition-all">
+                              <div className="flex items-center space-x-2 border-b border-stone-100 pb-2.5">
+                                <span className={`w-2.5 h-2.5 rounded-full ${cat.color}`} />
+                                <h5 className="font-serif text-xs sm:text-[13px] font-bold text-[#022C22] tracking-wide uppercase">{cat.category}</h5>
                               </div>
-                              <div className="space-y-2.5">
+                              <div className="space-y-3">
                                 {cat.items.map((item, itemIdx) => (
-                                  <div key={itemIdx} className="flex items-start space-x-2">
-                                    <Check className="w-3.5 h-3.5 text-[#c5a880] mt-0.5 shrink-0" />
+                                  <div key={itemIdx} className="flex items-start space-x-2.5">
+                                    <div className="p-0.5 rounded bg-emerald-50 text-emerald-800 shrink-0 mt-0.5">
+                                      <Check className="w-3.5 h-3.5" />
+                                    </div>
                                     <div>
-                                      <span className="text-xs font-bold text-[#022C22] block leading-tight">{item.name}</span>
-                                      <span className="text-[10px] text-stone-500 block mt-0.5">{item.desc}</span>
+                                      <span className="text-xs sm:text-[13px] font-bold text-[#022C22] block leading-tight">{item.name}</span>
+                                      <span className="text-[11px] text-stone-600 block mt-0.5">{item.desc}</span>
                                     </div>
                                   </div>
                                 ))}
@@ -2593,16 +2607,18 @@ export default function App() {
                       </div>
 
                       {/* Cabinets Structure */}
-                      <div className="lg:col-span-4 bg-gradient-to-b from-[#022C22]/[0.03] to-stone-50 p-5 rounded-2xl border border-stone-200 space-y-3.5">
-                        <h4 className="font-serif text-base font-bold text-[#022C22] border-b border-stone-200 pb-2 flex items-center space-x-2">
-                          <Building2 className="w-4 h-4 text-[#c5a880]" />
-                          <span>Структура медицинских кабинетов</span>
-                        </h4>
-                        <p className="text-xs text-stone-500 leading-relaxed">
-                          Лечебно-диагностические подразделения Санатория «Ясная Поляна»:
-                        </p>
+                      <div className="lg:col-span-4 bg-white p-5 sm:p-6 rounded-2xl border border-stone-200 shadow-sm space-y-4">
+                        <div>
+                          <h4 className="font-serif text-base sm:text-lg font-bold text-[#022C22] border-b border-stone-100 pb-2.5 flex items-center space-x-2">
+                            <Building2 className="w-4 h-4 text-[#c5a880]" />
+                            <span>Структура медицинских кабинетов</span>
+                          </h4>
+                          <p className="text-xs text-stone-600 mt-2 leading-relaxed">
+                            Лечебно-диагностические подразделения Санатория «Ясная Поляна»:
+                          </p>
+                        </div>
                         
-                        <div className="space-y-1.5 text-xs text-stone-700">
+                        <div className="space-y-2 text-xs sm:text-[13px] text-stone-800">
                           {[
                             'Кабинет функциональной диагностики',
                             'Отделение аппаратной физиотерапии',
@@ -2614,9 +2630,9 @@ export default function App() {
                             'Клинико-диагностическая лаборатория',
                             'Круглосуточный медицинский пост'
                           ].map((cab, idx) => (
-                            <div key={idx} className="flex items-center space-x-2 bg-white p-2 border border-stone-200/70 rounded-lg shadow-xs hover:border-[#c5a880]/50 transition-all">
-                              <Check className="w-3.5 h-3.5 text-[#022C22] flex-shrink-0" />
-                              <span className="font-sans text-stone-800 font-medium text-[11px]">{cab}</span>
+                            <div key={idx} className="flex items-center space-x-2.5 bg-stone-50/80 p-2.5 border border-stone-200/80 rounded-xl hover:bg-stone-100/80 transition-all">
+                              <Check className="w-4 h-4 text-[#022C22] flex-shrink-0" />
+                              <span className="font-sans text-stone-900 font-semibold text-xs sm:text-[12px]">{cab}</span>
                             </div>
                           ))}
                         </div>
@@ -2631,41 +2647,41 @@ export default function App() {
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: -8 }}
                       transition={{ duration: 0.25 }}
-                      className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 text-sm text-stone-700 font-sans"
+                      className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 text-sm text-stone-800 font-sans"
                     >
                       {/* Management and Contacts */}
-                      <div className="space-y-4 bg-stone-50/90 p-5 rounded-2xl border border-stone-200 flex flex-col justify-between shadow-xs">
+                      <div className="space-y-4 bg-white p-5 sm:p-6 rounded-2xl border border-stone-200 flex flex-col justify-between shadow-sm">
                         <div>
-                          <h4 className="font-serif text-base font-bold text-[#022C22] border-b border-stone-200 pb-2 flex items-center space-x-2">
+                          <h4 className="font-serif text-base font-bold text-[#022C22] border-b border-stone-100 pb-2.5 flex items-center space-x-2">
                             <UserCheck className="w-4 h-4 text-[#c5a880]" />
                             <span>Руководство учреждения</span>
                           </h4>
-                          <div className="space-y-2.5 text-xs mt-3">
+                          <div className="space-y-2 text-xs sm:text-[13px] mt-3.5">
                             <div>
-                              <span className="block text-stone-400 font-mono text-[9px] uppercase tracking-wider font-semibold">Начальник санатория (ФИО)</span>
-                              <strong className="block text-sm sm:text-base text-stone-900 font-serif font-bold mt-0.5">
+                              <span className="block text-stone-500 font-mono text-[10px] uppercase tracking-wider font-bold">Начальник санатория</span>
+                              <strong className="block text-base sm:text-lg text-[#022C22] font-serif font-bold mt-1">
                                 {RESORT_INFO.directorName || 'Данилив Алексей Иванович'}
                               </strong>
-                              <span className="text-[#c5a880] font-bold uppercase text-[9px] font-mono tracking-widest mt-0.5 block">
+                              <span className="text-[#c5a880] font-bold uppercase text-[10px] font-mono tracking-wider mt-0.5 block">
                                 {RESORT_INFO.directorRole || 'и.о. начальника санатория'}
                               </span>
                             </div>
                           </div>
                         </div>
 
-                        <div className="pt-3 border-t border-stone-200/80 space-y-1.5">
-                          <span className="block text-stone-400 font-mono text-[9px] uppercase tracking-wider font-semibold">Приемная и связь</span>
-                          <div className="space-y-1.5 bg-white p-2.5 rounded-xl border border-stone-200/80 text-xs">
+                        <div className="pt-3 border-t border-stone-100 space-y-2">
+                          <span className="block text-stone-500 font-mono text-[10px] uppercase tracking-wider font-bold">Приемная и связь</span>
+                          <div className="space-y-2 bg-stone-50/80 p-3 rounded-xl border border-stone-200/80 text-xs sm:text-[13px]">
                             <p className="flex justify-between items-center">
-                              <span className="text-stone-500">Телефон:</span>
-                              <a href="tel:+73654239376" className="font-mono font-bold text-stone-900 hover:text-[#c5a880] transition-all">+7(3654)23-93-76</a>
+                              <span className="text-stone-600 font-medium">Телефон:</span>
+                              <a href="tel:+73654239376" className="font-mono font-bold text-[#022C22] hover:text-[#c5a880] transition-all">+7(3654)23-93-76</a>
                             </p>
                             <p className="flex justify-between items-center">
-                              <span className="text-stone-500">Факс:</span>
-                              <span className="font-mono text-stone-800">+7(3654)23-93-76</span>
+                              <span className="text-stone-600 font-medium">Факс:</span>
+                              <span className="font-mono text-stone-900 font-semibold">+7(3654)23-93-76</span>
                             </p>
                             <p className="flex justify-between items-center">
-                              <span className="text-stone-500">Email:</span>
+                              <span className="text-stone-600 font-medium">Email:</span>
                               <a href={`mailto:${RESORT_INFO.email}`} className="font-mono font-bold text-[#022C22] hover:text-[#c5a880] hover:underline">{RESORT_INFO.email}</a>
                             </p>
                           </div>
@@ -2673,61 +2689,61 @@ export default function App() {
                       </div>
 
                       {/* Registry details */}
-                      <div className="space-y-4 bg-stone-50/90 p-5 rounded-2xl border border-stone-200 flex flex-col justify-between shadow-xs">
+                      <div className="space-y-4 bg-white p-5 sm:p-6 rounded-2xl border border-stone-200 flex flex-col justify-between shadow-sm">
                         <div>
-                          <h4 className="font-serif text-base font-bold text-[#022C22] border-b border-stone-200 pb-2 flex items-center space-x-2">
+                          <h4 className="font-serif text-base font-bold text-[#022C22] border-b border-stone-100 pb-2.5 flex items-center space-x-2">
                             <FileText className="w-4 h-4 text-[#c5a880]" />
                             <span>Гос. регистрация</span>
                           </h4>
-                          <div className="space-y-2.5 text-xs mt-3">
+                          <div className="space-y-2 text-xs sm:text-[13px] mt-3.5">
                             <div>
-                              <span className="block text-stone-400 font-mono text-[9px] uppercase tracking-wider font-semibold">Регистрирующий орган</span>
-                              <p className="font-medium text-stone-900 mt-1 leading-snug">
+                              <span className="block text-stone-500 font-mono text-[10px] uppercase tracking-wider font-bold">Регистрирующий орган</span>
+                              <p className="font-semibold text-stone-900 mt-1 leading-snug">
                                 Межрайонная инспекция Федеральной налоговой службы №46 по г. Москве
                               </p>
                             </div>
                           </div>
                         </div>
 
-                        <div className="border-t border-stone-200/80 pt-3 grid grid-cols-2 gap-2 text-xs">
-                          <div className="bg-white p-2 rounded-lg border border-stone-200/70">
-                            <span className="block text-stone-400 font-mono text-[9px] uppercase tracking-wider">Серия</span>
-                            <span className="font-mono font-extrabold text-stone-900">77</span>
+                        <div className="border-t border-stone-100 pt-3 grid grid-cols-2 gap-2 text-xs">
+                          <div className="bg-stone-50/80 p-2.5 rounded-xl border border-stone-200">
+                            <span className="block text-stone-500 font-mono text-[10px] uppercase tracking-wider font-bold">Серия</span>
+                            <span className="font-mono font-extrabold text-[#022C22] text-sm">77</span>
                           </div>
-                          <div className="bg-white p-2 rounded-lg border border-stone-200/70">
-                            <span className="block text-stone-400 font-mono text-[9px] uppercase tracking-wider">Свидетельство</span>
-                            <span className="font-mono font-extrabold text-stone-900 text-[11px]">015463944</span>
+                          <div className="bg-stone-50/80 p-2.5 rounded-xl border border-stone-200">
+                            <span className="block text-stone-500 font-mono text-[10px] uppercase tracking-wider font-bold">Свидетельство</span>
+                            <span className="font-mono font-extrabold text-[#022C22] text-xs">015463944</span>
                           </div>
-                          <div className="bg-white p-2 rounded-lg border border-stone-200/70 col-span-2">
-                            <span className="block text-stone-400 font-mono text-[9px] uppercase tracking-wider">Дата регистрации</span>
-                            <span className="font-mono font-semibold text-stone-800">29 октября 2013 г.</span>
+                          <div className="bg-stone-50/80 p-2.5 rounded-xl border border-stone-200 col-span-2">
+                            <span className="block text-stone-500 font-mono text-[10px] uppercase tracking-wider font-bold">Дата регистрации</span>
+                            <span className="font-mono font-bold text-[#022C22]">29 октября 2013 г.</span>
                           </div>
                         </div>
                       </div>
 
                       {/* Creation foundation */}
-                      <div className="space-y-4 bg-stone-50/90 p-5 rounded-2xl border border-stone-200 flex flex-col justify-between shadow-xs md:col-span-2 lg:col-span-1">
+                      <div className="space-y-4 bg-white p-5 sm:p-6 rounded-2xl border border-stone-200 flex flex-col justify-between shadow-sm md:col-span-2 lg:col-span-1">
                         <div>
-                          <h4 className="font-serif text-base font-bold text-[#022C22] border-b border-stone-200 pb-2 flex items-center space-x-2">
+                          <h4 className="font-serif text-base font-bold text-[#022C22] border-b border-stone-100 pb-2.5 flex items-center space-x-2">
                             <Shield className="w-4 h-4 text-[#c5a880]" />
                             <span>Создание учреждения</span>
                           </h4>
-                          <div className="space-y-2.5 text-xs mt-3 leading-relaxed">
+                          <div className="space-y-2 text-xs sm:text-[13px] mt-3.5 leading-relaxed">
                             <div>
-                              <span className="block text-stone-400 font-mono text-[9px] uppercase tracking-wider font-semibold">Основание внесения</span>
-                              <p className="text-stone-800 font-medium mt-1">Внесение в ЕГРЮЛ сведений о юридическом лице</p>
+                              <span className="block text-stone-500 font-mono text-[10px] uppercase tracking-wider font-bold">Основание внесения</span>
+                              <p className="text-stone-900 font-semibold mt-1">Внесение в ЕГРЮЛ сведений о юридическом лице</p>
                             </div>
                           </div>
                         </div>
 
-                        <div className="border-t border-stone-200/80 pt-3 grid grid-cols-2 gap-2 text-xs">
-                          <div className="bg-white p-2 rounded-lg border border-stone-200/70">
-                            <span className="block text-stone-400 font-mono text-[9px] uppercase tracking-wider">Дата создания</span>
-                            <p className="font-semibold text-stone-900 mt-0.5">29.10.2013</p>
+                        <div className="border-t border-stone-100 pt-3 grid grid-cols-2 gap-2 text-xs">
+                          <div className="bg-stone-50/80 p-2.5 rounded-xl border border-stone-200">
+                            <span className="block text-stone-500 font-mono text-[10px] uppercase tracking-wider font-bold">Дата создания</span>
+                            <p className="font-bold text-[#022C22] mt-0.5">29.10.2013</p>
                           </div>
-                          <div className="bg-white p-2 rounded-lg border border-stone-200/70">
-                            <span className="block text-stone-400 font-mono text-[9px] uppercase tracking-wider">ОГРН</span>
-                            <strong className="font-mono text-[#022C22] text-[11px] mt-0.5 block">5137746004787</strong>
+                          <div className="bg-stone-50/80 p-2.5 rounded-xl border border-stone-200">
+                            <span className="block text-stone-500 font-mono text-[10px] uppercase tracking-wider font-bold">ОГРН</span>
+                            <strong className="font-mono text-[#022C22] text-xs mt-0.5 block">5137746004787</strong>
                           </div>
                         </div>
                       </div>
