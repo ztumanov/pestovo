@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { 
   Heart, 
   Brain, 
@@ -135,31 +135,49 @@ export default function App() {
   const opacityHeroText = useTransform(smoothScrollY, [0, 800], [1, 0]);
   
   // Slideshow state for automatic background rotation
-  const rawSlides: Array<{ id: string; type: string; url: string }> = Array.isArray(HERO_DATA?.slides)
-    ? HERO_DATA.slides
-    : (IMAGES?.hero ? [{ id: 'hero-photo-1', type: 'photo', url: IMAGES.hero }] : []);
+  const rawSlides: Array<{ id: string; type: string; url: string }> = useMemo(() => {
+    let list: Array<{ id: string; type: string; url: string }> = [];
+    if (Array.isArray(HERO_DATA?.slides) && HERO_DATA.slides.length > 0) {
+      list = [...HERO_DATA.slides];
+    } else if (IMAGES?.hero) {
+      list = [{ id: 'hero-photo-1', type: 'photo', url: IMAGES.hero }];
+    }
+    // If IMAGES.hero is specifically configured and not in the slides array, prepend it
+    if (IMAGES?.hero && !list.some(s => s.url === IMAGES.hero)) {
+      list.unshift({ id: 'custom-hero-photo', type: 'photo', url: IMAGES.hero });
+    }
+    return list.filter(slide => Boolean(slide && slide.url));
+  }, [HERO_DATA?.slides, IMAGES?.hero]);
 
   const bgMode = HERO_DATA?.defaultBackgroundMode || 'all';
-  const filteredSlides = rawSlides.filter(slide => {
-    if (!slide || !slide.url) return false;
-    if (bgMode === 'photo') return slide.type === 'photo';
-    if (bgMode === 'video' || bgMode === 'video_nature' || bgMode === 'video_palace') return slide.type === 'video';
-    return true;
-  });
+  const slides = useMemo(() => {
+    let filtered = rawSlides;
+    if (bgMode === 'photo') {
+      const photos = rawSlides.filter(s => s.type === 'photo');
+      filtered = photos.length > 0 ? photos : rawSlides;
+    } else if (bgMode === 'video') {
+      const videos = rawSlides.filter(s => s.type === 'video');
+      filtered = videos.length > 0 ? videos : rawSlides;
+    }
+    return filtered.length > 0 ? filtered : rawSlides;
+  }, [rawSlides, bgMode]);
 
-  const slides = filteredSlides;
   const [activeSlideIndex, setActiveSlideIndex] = useState(0);
+
+  // Keep index within bounds whenever slides change
+  useEffect(() => {
+    if (activeSlideIndex >= slides.length && slides.length > 0) {
+      setActiveSlideIndex(0);
+    }
+  }, [slides.length, activeSlideIndex]);
 
   // Auto-cycling slideshow timer
   useEffect(() => {
     if (slides.length <= 1) {
-      if (activeSlideIndex !== 0 && slides.length > 0) {
-        setActiveSlideIndex(0);
-      }
       return;
     }
     const currentSlide = slides[activeSlideIndex];
-    const duration = currentSlide?.type === 'video' ? 14000 : 7000;
+    const duration = currentSlide?.type === 'video' ? 12000 : 6500;
     const timer = setTimeout(() => {
       setActiveSlideIndex(prev => (prev + 1) % slides.length);
     }, duration);
@@ -1914,6 +1932,53 @@ export default function App() {
                   </div>
                 ))}
               </div>
+            </motion.div>
+          )}
+
+          {/* Slideshow pagination indicators if multiple slides exist */}
+          {slides.length > 1 && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.8 }}
+              className="mt-6 flex items-center gap-2 bg-black/40 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/10 z-20"
+            >
+              <button
+                type="button"
+                onClick={() => setActiveSlideIndex(prev => (prev - 1 + slides.length) % slides.length)}
+                className="text-stone-300 hover:text-white p-1 rounded-full hover:bg-white/10 transition-colors cursor-pointer"
+                title="Предыдущий слайд"
+                aria-label="Предыдущий слайд"
+              >
+                <ChevronLeft className="w-3.5 h-3.5" />
+              </button>
+
+              <div className="flex items-center gap-1.5 px-1">
+                {slides.map((s, idx) => (
+                  <button
+                    key={s.id || idx}
+                    type="button"
+                    onClick={() => setActiveSlideIndex(idx)}
+                    className={`h-1.5 rounded-full transition-all cursor-pointer ${
+                      activeSlideIndex === idx
+                        ? 'w-6 bg-[#c5a880]'
+                        : 'w-1.5 bg-white/40 hover:bg-white/70'
+                    }`}
+                    title={`Слайд ${idx + 1} (${s.type === 'video' ? 'Видео' : 'Фото'})`}
+                    aria-label={`Перейти к слайду ${idx + 1}`}
+                  />
+                ))}
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setActiveSlideIndex(prev => (prev + 1) % slides.length)}
+                className="text-stone-300 hover:text-white p-1 rounded-full hover:bg-white/10 transition-colors cursor-pointer"
+                title="Следующий слайд"
+                aria-label="Следующий слайд"
+              >
+                <ChevronRight className="w-3.5 h-3.5" />
+              </button>
             </motion.div>
           )}
 

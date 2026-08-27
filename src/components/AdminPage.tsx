@@ -236,6 +236,7 @@ export default function AdminPage({ onBackToHome }: { onBackToHome: () => void }
 
   const handleSaveMedia = () => {
     updateSections({
+      hero: localHero,
       images: localImages,
       videos: localVideos,
       extraImages: localExtraImages,
@@ -746,9 +747,23 @@ export default function AdminPage({ onBackToHome }: { onBackToHome: () => void }
         type: isVideo ? 'video' : 'photo',
         url: base64Data
       };
-      setLocalHero({
+      const nextSlides = [...currentSlides, newSlide];
+      const updatedHero = {
         ...localHero,
-        slides: [...currentSlides, newSlide]
+        slides: nextSlides,
+        defaultBackgroundMode: (localHero.defaultBackgroundMode === 'video' && !isVideo) ? 'all' : (localHero.defaultBackgroundMode || 'all')
+      };
+      setLocalHero(updatedHero);
+      
+      let nextImages = localImages;
+      if (!isVideo) {
+        nextImages = { ...localImages, hero: base64Data };
+        setLocalImages(nextImages);
+      }
+
+      updateSections({
+        hero: updatedHero,
+        images: nextImages
       });
       triggerSuccess();
     };
@@ -1175,7 +1190,12 @@ export default function AdminPage({ onBackToHome }: { onBackToHome: () => void }
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                       <button
                         type="button"
-                        onClick={() => setLocalHero(prev => ({ ...prev, defaultBackgroundMode: 'all' }))}
+                        onClick={() => {
+                          const updatedHero = { ...localHero, defaultBackgroundMode: 'all' as const };
+                          setLocalHero(updatedHero);
+                          updateSection('hero', updatedHero);
+                          triggerSuccess();
+                        }}
                         className={`py-2 px-4 rounded-xl text-xs font-bold transition-all border text-center flex items-center justify-center gap-1.5 cursor-pointer ${
                           (!localHero.defaultBackgroundMode || localHero.defaultBackgroundMode === 'all')
                             ? 'bg-[#022C22] border-transparent text-[#FAF9F6] shadow-sm'
@@ -1186,7 +1206,12 @@ export default function AdminPage({ onBackToHome }: { onBackToHome: () => void }
                       </button>
                       <button
                         type="button"
-                        onClick={() => setLocalHero(prev => ({ ...prev, defaultBackgroundMode: 'photo' }))}
+                        onClick={() => {
+                          const updatedHero = { ...localHero, defaultBackgroundMode: 'photo' as const };
+                          setLocalHero(updatedHero);
+                          updateSection('hero', updatedHero);
+                          triggerSuccess();
+                        }}
                         className={`py-2 px-4 rounded-xl text-xs font-bold transition-all border text-center flex items-center justify-center gap-1.5 cursor-pointer ${
                           localHero.defaultBackgroundMode === 'photo'
                             ? 'bg-[#022C22] border-transparent text-[#FAF9F6] shadow-sm'
@@ -1197,7 +1222,12 @@ export default function AdminPage({ onBackToHome }: { onBackToHome: () => void }
                       </button>
                       <button
                         type="button"
-                        onClick={() => setLocalHero(prev => ({ ...prev, defaultBackgroundMode: 'video' }))}
+                        onClick={() => {
+                          const updatedHero = { ...localHero, defaultBackgroundMode: 'video' as const };
+                          setLocalHero(updatedHero);
+                          updateSection('hero', updatedHero);
+                          triggerSuccess();
+                        }}
                         className={`py-2 px-4 rounded-xl text-xs font-bold transition-all border text-center flex items-center justify-center gap-1.5 cursor-pointer ${
                           (localHero.defaultBackgroundMode === 'video' || localHero.defaultBackgroundMode === 'video_nature' || localHero.defaultBackgroundMode === 'video_palace')
                             ? 'bg-[#022C22] border-transparent text-[#FAF9F6] shadow-sm'

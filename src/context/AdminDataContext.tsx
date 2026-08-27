@@ -118,7 +118,7 @@ const DEFAULT_SITE_DATA: SiteData = {
     titleSecondPart: 'ЮЖНЫЙ БЕРЕГ КРЫМА',
     subtitle: 'Современный центр оздоровления, эффективного лечения и комплексной реабилитации для должностных лиц таможенных органов и членов их семей.',
     ctaText: 'Рассчитать путевку & Забронировать',
-    defaultBackgroundMode: 'video_nature',
+    defaultBackgroundMode: 'all',
     stats: [
       { value: 'ФТС России', label: 'Ведомственный статус', description: 'Федеральное государственное казенное учреждение' },
       { value: '№ Л041-00110-91', label: 'Лицензия Минздрава РФ', description: 'Официальный медицинский реестр' },
@@ -348,7 +348,10 @@ export function AdminDataProvider({ children }: { children: React.ReactNode }) {
               morphed = true;
             }
             if (!parsed.hero.ctaText) { parsed.hero.ctaText = defaultHero.ctaText; morphed = true; }
-            if (!parsed.hero.defaultBackgroundMode) { parsed.hero.defaultBackgroundMode = defaultHero.defaultBackgroundMode; morphed = true; }
+            if (!parsed.hero.defaultBackgroundMode || parsed.hero.defaultBackgroundMode === 'video_nature' || parsed.hero.defaultBackgroundMode === 'video_palace') {
+              parsed.hero.defaultBackgroundMode = 'all';
+              morphed = true;
+            }
             
             if (!parsed.hero.stats || !Array.isArray(parsed.hero.stats) || parsed.hero.stats.length === 0) {
               parsed.hero.stats = JSON.parse(JSON.stringify(defaultHero.stats));
