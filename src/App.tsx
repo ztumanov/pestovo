@@ -59,6 +59,8 @@ import {
   Shield,
   UserCheck,
   ChevronDown,
+  ChevronUp,
+  Images,
   ArrowUp,
   Download,
   Newspaper,
@@ -164,8 +166,14 @@ export default function App() {
     return () => clearTimeout(timer);
   }, [activeSlideIndex, slides]);
 
-  // Gallery tabs
-  const [galleryTab, setGalleryTab] = useState<'all' | 'rooms' | 'nature' | 'medical' | 'infrastructure'>('all');
+  // Gallery tabs & expansion (limit to 3 rows = 9 photos)
+  const [galleryTab, setGalleryTab] = useState<string>('all');
+  const [isGalleryExpanded, setIsGalleryExpanded] = useState<boolean>(false);
+  const GALLERY_VISIBLE_LIMIT = 9;
+
+  useEffect(() => {
+    setIsGalleryExpanded(false);
+  }, [galleryTab]);
 
   // About Sanatorium interactive tabs
   const [aboutTab, setAboutTab] = useState<'general' | 'medical' | 'treatment' | 'registry'>('general');
@@ -1200,6 +1208,13 @@ export default function App() {
   const filteredGallery = galleryTab === 'all' 
     ? ALL_GALLERY_ITEMS 
     : ALL_GALLERY_ITEMS.filter(item => item.category === galleryTab);
+
+  const visibleGalleryItems = isGalleryExpanded 
+    ? filteredGallery 
+    : filteredGallery.slice(0, GALLERY_VISIBLE_LIMIT);
+
+  const hasHiddenGalleryPhotos = filteredGallery.length > GALLERY_VISIBLE_LIMIT;
+  const hiddenGalleryPhotosCount = filteredGallery.length - GALLERY_VISIBLE_LIMIT;
 
   // Keyboard navigation and key listeners for image lightbox
   useEffect(() => {
@@ -3042,66 +3057,146 @@ export default function App() {
           </div>
 
           {/* Tab Filter Controls */}
-          <div className="flex flex-wrap justify-center gap-1.5 mb-10 pb-2 border-b border-stone-200">
+          <div className="flex flex-wrap justify-center gap-2 mb-10 pb-3 border-b border-stone-200">
             {[
-              { id: 'all', label: 'Все фото' },
-              ...(siteData.galleryCategories || []).map(cat => ({ id: cat.id, label: cat.name }))
-            ].map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => setGalleryTab(tab.id as any)}
-                className={`px-4 py-2 text-xs font-bold uppercase tracking-wider rounded-sm transition-all ${
-                  galleryTab === tab.id
-                    ? 'bg-[#022C22] text-[#c5a880]'
-                    : 'text-stone-500 hover:text-[#022C22] hover:bg-stone-150'
-                }`}
-              >
-                {tab.label}
-              </button>
-            ))}
+              { id: 'all', label: 'Все фото', count: ALL_GALLERY_ITEMS.length },
+              ...(siteData.galleryCategories || []).map(cat => ({ 
+                id: cat.id, 
+                label: cat.name,
+                count: ALL_GALLERY_ITEMS.filter(i => i.category === cat.id).length
+              }))
+            ].map((tab) => {
+              const isActive = galleryTab === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => setGalleryTab(tab.id as any)}
+                  className={`px-4 py-2 text-xs font-bold uppercase tracking-wider rounded-lg transition-all flex items-center gap-2 cursor-pointer ${
+                    isActive
+                      ? 'bg-[#022C22] text-[#c5a880] shadow-md'
+                      : 'text-stone-600 hover:text-[#022C22] hover:bg-stone-200/60 bg-stone-100'
+                  }`}
+                >
+                  <span>{tab.label}</span>
+                  <span className={`text-[10px] font-mono px-1.5 py-0.5 rounded-md ${
+                    isActive ? 'bg-[#c5a880]/20 text-[#c5a880]' : 'bg-stone-200 text-stone-600'
+                  }`}>
+                    {tab.count}
+                  </span>
+                </button>
+              );
+            })}
           </div>
 
-          {/* Grid Layout of photos */}
-          <motion.div 
-            layout 
-            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
-          >
-            <AnimatePresence mode="popLayout">
-              {filteredGallery.map((item, index) => (
-                <motion.div
-                  layout
-                  key={index}
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.9 }}
-                  transition={{ duration: 0.35 }}
-                  onClick={() => setLightboxIndex(index)}
-                  className="relative group h-64 overflow-hidden rounded-sm border border-stone-200 shadow-sm cursor-zoom-in"
-                >
-                  <img
-                    src={item.src || undefined}
-                    alt={item.title}
-                    loading="lazy"
-                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                    referrerPolicy="no-referrer"
-                  />
-                  
-                  {/* Magnifier badge in corner */}
-                  <div className="absolute top-4 right-4 bg-black/60 hover:bg-black/95 text-white rounded-full p-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 backdrop-blur-sm z-10">
-                    <ZoomIn className="w-4 h-4 text-[#c5a880]" />
-                  </div>
+          {/* Empty state if no photos in active category */}
+          {filteredGallery.length === 0 ? (
+            <div className="text-center py-16 bg-white border border-stone-200 rounded-2xl p-8 max-w-md mx-auto shadow-sm">
+              <Images className="w-12 h-12 text-stone-300 mx-auto mb-3" />
+              <h4 className="font-serif font-bold text-stone-800 text-lg">В этой категории пока нет фото</h4>
+              <p className="text-stone-500 text-xs mt-1">Выберите другую вкладку или добавьте фотографии через панель управления.</p>
+            </div>
+          ) : (
+            <>
+              {/* Grid Layout of photos (Limited to 3 rows = 9 photos initially) */}
+              <motion.div 
+                layout 
+                className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
+              >
+                <AnimatePresence mode="popLayout">
+                  {visibleGalleryItems.map((item) => {
+                    const originalIndex = filteredGallery.indexOf(item);
+                    return (
+                      <motion.div
+                        layout
+                        key={item.id || item.src || originalIndex}
+                        initial={{ opacity: 0, scale: 0.92 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.92 }}
+                        transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+                        onClick={() => setLightboxIndex(originalIndex >= 0 ? originalIndex : 0)}
+                        className="relative group h-64 overflow-hidden rounded-xl border border-stone-200/80 shadow-sm hover:shadow-xl transition-all duration-500 cursor-zoom-in bg-stone-100"
+                      >
+                        <img
+                          src={item.src || undefined}
+                          alt={item.title}
+                          loading="lazy"
+                          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-108"
+                          referrerPolicy="no-referrer"
+                        />
+                        
+                        {/* Magnifier badge in corner */}
+                        <div className="absolute top-3.5 right-3.5 bg-black/60 hover:bg-black/90 text-white rounded-xl p-2.5 opacity-0 group-hover:opacity-100 transition-all duration-300 backdrop-blur-md z-10 border border-white/20 scale-90 group-hover:scale-100">
+                          <ZoomIn className="w-4 h-4 text-[#c5a880]" />
+                        </div>
 
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-5">
-                    <span className="text-[10px] tracking-wider text-[#c5a880] uppercase font-mono">
-                      {siteData.galleryCategories?.find(c => c.id === item.category)?.name || item.category}
+                        {/* Hover Overlay */}
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-5">
+                          <span className="text-[10px] tracking-wider text-[#c5a880] uppercase font-mono font-bold">
+                            {siteData.galleryCategories?.find(c => c.id === item.category)?.name || item.category}
+                          </span>
+                          <h4 className="text-white font-serif text-lg font-medium leading-snug mt-1">{item.title}</h4>
+                          <p className="text-stone-300 text-[11px] mt-1 opacity-80 flex items-center gap-1">
+                            <ZoomIn className="w-3 h-3 text-[#c5a880]" /> Нажмите для просмотра в полный экран
+                          </p>
+                        </div>
+                      </motion.div>
+                    );
+                  })}
+                </AnimatePresence>
+              </motion.div>
+
+              {/* Expand / Collapse Button when more than 3 rows (9 photos) exist */}
+              {hasHiddenGalleryPhotos && (
+                <motion.div 
+                  initial={{ opacity: 0, y: 15 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="flex flex-col items-center justify-center mt-12 pt-4 border-t border-stone-200/60"
+                >
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (isGalleryExpanded) {
+                        setIsGalleryExpanded(false);
+                        const galleryEl = document.getElementById('gallery');
+                        if (galleryEl) {
+                          galleryEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                        }
+                      } else {
+                        setIsGalleryExpanded(true);
+                      }
+                    }}
+                    className="group relative inline-flex items-center gap-3 px-8 py-4 bg-[#022C22] hover:bg-[#c5a880] text-white hover:text-[#022C22] rounded-xl font-serif font-bold text-xs sm:text-sm tracking-wider uppercase shadow-lg hover:shadow-2xl hover:shadow-[#c5a880]/20 transition-all duration-300 transform hover:-translate-y-0.5 cursor-pointer border border-[#c5a880]/40"
+                  >
+                    <div className="w-7 h-7 rounded-lg bg-white/10 group-hover:bg-[#022C22]/10 flex items-center justify-center transition-colors">
+                      {isGalleryExpanded ? (
+                        <ChevronUp className="w-4 h-4 text-[#c5a880] group-hover:text-[#022C22] transition-colors" />
+                      ) : (
+                        <ChevronDown className="w-4 h-4 text-[#c5a880] group-hover:text-[#022C22] transition-colors" />
+                      )}
+                    </div>
+                    
+                    <span>
+                      {isGalleryExpanded
+                        ? 'Свернуть фотографии'
+                        : `Показать все фотографии (ещё +${hiddenGalleryPhotosCount})`
+                      }
                     </span>
-                    <h4 className="text-white font-serif text-lg font-medium leading-snug mt-1">{item.title}</h4>
-                    <p className="text-stone-300 text-[10px] sm:text-xs mt-1 opacity-75">Посмотреть в полный экран</p>
-                  </div>
+                    
+                    <span className="bg-[#c5a880]/20 group-hover:bg-[#022C22]/20 text-[#c5a880] group-hover:text-[#022C22] text-[11px] font-mono font-bold px-2 py-0.5 rounded-md transition-colors">
+                      {filteredGallery.length} фото
+                    </span>
+                  </button>
+
+                  <p className="text-stone-500 text-xs font-mono mt-3">
+                    {isGalleryExpanded
+                      ? `Показаны все ${filteredGallery.length} кадров`
+                      : `Отображаются первые 9 фото (3 ряда) из ${filteredGallery.length}`
+                    }
+                  </p>
                 </motion.div>
-              ))}
-            </AnimatePresence>
-          </motion.div>
+              )}
+            </>
+          )}
 
         </motion.div>
       </section>
