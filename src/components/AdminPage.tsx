@@ -1256,15 +1256,19 @@ export default function AdminPage({ onBackToHome }: { onBackToHome: () => void }
                                 type="button"
                                 onClick={() => {
                                   const currentSlides = (localHero as any).slides || [];
-                                  if (currentSlides.length <= 1) {
-                                    alert('Нельзя удалить последний слайд. Должен оставаться как минимум один фоновый элемент!');
-                                    return;
-                                  }
                                   const nextSlides = currentSlides.filter((s: any) => s.id !== slide.id);
+                                  const remainingPhotos = nextSlides.filter((s: any) => s.type === 'photo');
+                                  const newHeroPhoto = remainingPhotos.length > 0 ? remainingPhotos[0].url : '';
+                                  
                                   setLocalHero({
                                     ...localHero,
                                     slides: nextSlides
                                   });
+                                  
+                                  if (localImages.hero === slide.url) {
+                                    setLocalImages(prev => ({ ...prev, hero: newHeroPhoto }));
+                                  }
+                                  triggerSuccess();
                                 }}
                                 className="text-[10px] text-red-600 hover:text-red-700 bg-red-50 hover:bg-red-100 py-1 px-2.5 rounded-lg transition-all font-semibold flex items-center gap-1 cursor-pointer"
                               >
@@ -2029,26 +2033,62 @@ export default function AdminPage({ onBackToHome }: { onBackToHome: () => void }
                     <div className="bg-[#FAF9F6] p-4 rounded-xl border border-stone-200 space-y-2">
                       <div className="flex justify-between items-center">
                         <label className="block text-xs font-bold text-stone-700">Фон заставки Welcome (Фото-обои)</label>
-                        <label className="bg-white hover:bg-stone-50 text-[#022C22] border border-stone-300 text-[10px] font-bold px-2.5 py-1 rounded-lg cursor-pointer flex items-center gap-1 shadow-sm transition-all">
-                          <UploadCloud className="w-3 h-3 text-[#c5a880]" /> Выбрать файл
-                          <input 
-                            type="file" 
-                            accept="image/*" 
-                            className="hidden" 
-                            onChange={e => {
-                              if (e.target.files?.[0]) {
-                                compressImage(e.target.files[0], 1400, 0.8, (b64) => {
-                                  setLocalImages({ ...localImages, hero: b64 });
-                                });
-                              }
-                            }} 
-                          />
-                        </label>
+                        <div className="flex items-center gap-2">
+                          {localImages.hero && (
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const oldHero = localImages.hero;
+                                setLocalImages({ ...localImages, hero: '' });
+                                const currentSlides = (localHero as any).slides || [];
+                                const nextSlides = currentSlides.filter((s: any) => s.url !== oldHero && s.type !== 'photo');
+                                setLocalHero({ ...localHero, slides: nextSlides });
+                                triggerSuccess();
+                              }}
+                              className="text-[10px] text-red-600 hover:text-red-700 bg-red-50 hover:bg-red-100 py-1 px-2 rounded-lg font-semibold flex items-center gap-1 cursor-pointer transition-colors"
+                            >
+                              <Trash2 className="w-3 h-3" /> Очистить
+                            </button>
+                          )}
+                          <label className="bg-white hover:bg-stone-50 text-[#022C22] border border-stone-300 text-[10px] font-bold px-2.5 py-1 rounded-lg cursor-pointer flex items-center gap-1 shadow-sm transition-all">
+                            <UploadCloud className="w-3 h-3 text-[#c5a880]" /> Выбрать файл
+                            <input 
+                              type="file" 
+                              accept="image/*" 
+                              className="hidden" 
+                              onChange={e => {
+                                if (e.target.files?.[0]) {
+                                  compressImage(e.target.files[0], 1400, 0.8, (b64) => {
+                                    setLocalImages({ ...localImages, hero: b64 });
+                                    const currentSlides = (localHero as any).slides || [];
+                                    const nonPhotoSlides = currentSlides.filter((s: any) => s.type !== 'photo');
+                                    setLocalHero({
+                                      ...localHero,
+                                      slides: [...nonPhotoSlides, { id: `photo-${Date.now()}`, type: 'photo', url: b64 }]
+                                    });
+                                    triggerSuccess();
+                                  });
+                                }
+                              }} 
+                            />
+                          </label>
+                        </div>
                       </div>
                       <input 
                         type="text" 
                         value={localImages.hero} 
-                        onChange={e => setLocalImages({ ...localImages, hero: e.target.value })}
+                        onChange={e => {
+                          const val = e.target.value;
+                          setLocalImages({ ...localImages, hero: val });
+                          if (val) {
+                            const currentSlides = (localHero as any).slides || [];
+                            const nonPhotoSlides = currentSlides.filter((s: any) => s.type !== 'photo');
+                            setLocalHero({
+                              ...localHero,
+                              slides: [...nonPhotoSlides, { id: `photo-${Date.now()}`, type: 'photo', url: val }]
+                            });
+                          }
+                        }}
                         className="w-full border border-stone-300 rounded-lg px-3 py-1.5 text-xs focus:outline-none focus:border-[#c5a880]/80 font-mono"
                         placeholder="URL или загрузите файл выше"
                       />

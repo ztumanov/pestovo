@@ -28,13 +28,23 @@ export default function MedicalPage({ onBackToHome }: { onBackToHome: () => void
   const [searchTerm, setSearchTerm] = useState<string>('');
 
   const getMedicalIcon = (iconName: string) => {
-    switch (iconName) {
-      case 'Lungs': return <Activity className="w-5 h-5 text-[#c5a880]" />;
-      case 'Heart': return <Heart className="w-5 h-5 text-[#c5a880]" />;
-      case 'Brain': return <Brain className="w-5 h-5 text-[#c5a880]" />;
-      case 'Activity': return <Waves className="w-5 h-5 text-[#c5a880]" />;
-      default: return <Sparkles className="w-5 h-5 text-[#c5a880]" />;
+    const icon = iconName?.toLowerCase() || '';
+    if (icon.includes('lung') || icon.includes('breath') || icon.includes('activity')) {
+      return <Activity className="w-5 h-5 text-[#c5a880]" />;
     }
+    if (icon.includes('heart') || icon.includes('cardio')) {
+      return <Heart className="w-5 h-5 text-[#c5a880]" />;
+    }
+    if (icon.includes('brain') || icon.includes('stress') || icon.includes('nerv')) {
+      return <Brain className="w-5 h-5 text-[#c5a880]" />;
+    }
+    if (icon.includes('stetho') || icon.includes('med')) {
+      return <Stethoscope className="w-5 h-5 text-[#c5a880]" />;
+    }
+    if (icon.includes('wave') || icon.includes('water')) {
+      return <Waves className="w-5 h-5 text-[#c5a880]" />;
+    }
+    return <Sparkles className="w-5 h-5 text-[#c5a880]" />;
   };
 
   const filteredPrograms = medicalPrograms.filter(prog => 
@@ -211,7 +221,7 @@ export default function MedicalPage({ onBackToHome }: { onBackToHome: () => void
                       </div>
                       <div className="bg-[#FAF9F6]/10 backdrop-blur-md border border-white/20 text-white font-mono text-xs uppercase px-4 py-2 rounded-lg shrink-0 flex items-center gap-2">
                         <Clock className="w-4 h-4 text-[#c5a880]" />
-                        <span>Курс: {prog.duration}</span>
+                        <span>Курс: {prog.duration || ((prog as any).durationDays ? `от ${(prog as any).durationDays} дней` : 'от 10 до 21 дня')}</span>
                       </div>
                     </div>
                   </div>

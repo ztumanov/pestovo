@@ -283,6 +283,38 @@ export function AdminDataProvider({ children }: { children: React.ReactNode }) {
             }
           }
 
+          // Safeguard and normalize medical programs
+          if (!parsed.medicalPrograms || !Array.isArray(parsed.medicalPrograms) || parsed.medicalPrograms.length === 0) {
+            parsed.medicalPrograms = [...MEDICAL_PROGRAMS];
+            morphed = true;
+          } else {
+            // Fix any missing duration or fields in medical programs
+            parsed.medicalPrograms = parsed.medicalPrograms.map((prog: any) => {
+              const defaultImage = prog.id === 'respiratory' 
+                ? '/images/pestovo_medical_1779777676990.png' 
+                : prog.id === 'cardio' 
+                ? '/images/pestovo_palace_1779780890544.png' 
+                : (prog.id === 'antistress' || prog.id === 'nervous')
+                ? '/images/pestovo_beach_1779780925661.png'
+                : '/images/pestovo_block_1779780908700.png';
+
+              const computedDuration = prog.duration || (prog.durationDays ? `от ${prog.durationDays} дней` : 'от 10 до 21 дня');
+              const computedIcon = prog.icon || 'Lungs';
+              const computedImage = prog.image || defaultImage;
+
+              if (prog.duration !== computedDuration || !prog.icon || !prog.image) {
+                morphed = true;
+              }
+
+              return {
+                ...prog,
+                duration: computedDuration,
+                icon: computedIcon,
+                image: computedImage
+              };
+            });
+          }
+
           // Backfill and safeguard missing hero or hero properties
           if (!parsed.hero) {
             parsed.hero = JSON.parse(JSON.stringify(baseData.hero));
@@ -335,7 +367,7 @@ export function AdminDataProvider({ children }: { children: React.ReactNode }) {
               parsed.hero.showStats = true;
               morphed = true;
             }
-            if (!parsed.hero.slides || !Array.isArray(parsed.hero.slides) || parsed.hero.slides.length === 0) {
+            if (parsed.hero.slides === undefined || !Array.isArray(parsed.hero.slides)) {
               parsed.hero.slides = JSON.parse(JSON.stringify(defaultHero.slides));
               morphed = true;
             } else {

@@ -133,27 +133,29 @@ export default function App() {
   const opacityHeroText = useTransform(smoothScrollY, [0, 800], [1, 0]);
   
   // Slideshow state for automatic background rotation
-  const rawSlides = (HERO_DATA && HERO_DATA.slides && HERO_DATA.slides.length > 0)
+  const rawSlides: Array<{ id: string; type: string; url: string }> = Array.isArray(HERO_DATA?.slides)
     ? HERO_DATA.slides
-    : [
-        { id: '1', type: 'video', url: 'https://assets.mixkit.co/videos/preview/mixkit-waves-crashing-on-rocks-from-above-41851-large.mp4' },
-        { id: '2', type: 'photo', url: '/images/pestovo_palace_1779780890544.png' },
-        { id: '3', type: 'photo', url: '/images/pestovo_beach_1779780925661.png' }
-      ];
+    : (IMAGES?.hero ? [{ id: 'hero-photo-1', type: 'photo', url: IMAGES.hero }] : []);
 
   const bgMode = HERO_DATA?.defaultBackgroundMode || 'all';
   const filteredSlides = rawSlides.filter(slide => {
+    if (!slide || !slide.url) return false;
     if (bgMode === 'photo') return slide.type === 'photo';
     if (bgMode === 'video' || bgMode === 'video_nature' || bgMode === 'video_palace') return slide.type === 'video';
     return true;
   });
 
-  const slides = filteredSlides.length > 0 ? filteredSlides : rawSlides;
+  const slides = filteredSlides;
   const [activeSlideIndex, setActiveSlideIndex] = useState(0);
 
   // Auto-cycling slideshow timer
   useEffect(() => {
-    if (slides.length <= 1) return;
+    if (slides.length <= 1) {
+      if (activeSlideIndex !== 0 && slides.length > 0) {
+        setActiveSlideIndex(0);
+      }
+      return;
+    }
     const currentSlide = slides[activeSlideIndex];
     const duration = currentSlide?.type === 'video' ? 14000 : 7000;
     const timer = setTimeout(() => {
@@ -1173,13 +1175,23 @@ export default function App() {
   };
 
   const getMedicalIcon = (iconName: string) => {
-    switch (iconName) {
-      case 'Lungs': return <Activity className="w-6 h-6 text-[#c5a880]" />;
-      case 'Heart': return <Heart className="w-6 h-6 text-[#c5a880]" />;
-      case 'Brain': return <Brain className="w-6 h-6 text-[#c5a880]" />;
-      case 'Activity': return <Waves className="w-6 h-6 text-[#c5a880]" />;
-      default: return <Sparkles className="w-6 h-6 text-[#c5a880]" />;
+    const icon = iconName?.toLowerCase() || '';
+    if (icon.includes('lung') || icon.includes('breath') || icon.includes('activity')) {
+      return <Activity className="w-5 h-5" />;
     }
+    if (icon.includes('heart') || icon.includes('cardio')) {
+      return <Heart className="w-5 h-5" />;
+    }
+    if (icon.includes('brain') || icon.includes('stress') || icon.includes('nerv')) {
+      return <Brain className="w-5 h-5" />;
+    }
+    if (icon.includes('stetho') || icon.includes('med')) {
+      return <Stethoscope className="w-5 h-5" />;
+    }
+    if (icon.includes('wave') || icon.includes('water')) {
+      return <Waves className="w-5 h-5" />;
+    }
+    return <Sparkles className="w-5 h-5" />;
   };
 
   // Combine generated images + fallback Unsplash pictures for the big filterable gallery
@@ -1727,13 +1739,15 @@ export default function App() {
                     playsInline
                     loop
                     preload="auto"
-                    poster="/images/pestovo_palace_1779780890544.png"
+                    poster={slides.find(s => s.type === 'photo')?.url || (IMAGES?.hero && !IMAGES.hero.includes('pestovo_palace') ? IMAGES.hero : undefined)}
                     className="w-full h-full object-cover object-center scale-105"
                     onEnded={() => {
-                      setActiveSlideIndex(prev => (prev + 1) % slides.length);
+                      if (slides.length > 1) {
+                        setActiveSlideIndex(prev => (prev + 1) % slides.length);
+                      }
                     }}
                     onError={() => {
-                      console.warn("Video background failed to load, displaying poster fallback.");
+                      console.warn("Video background failed to load.");
                     }}
                   />
                 ) : (
@@ -2788,42 +2802,81 @@ export default function App() {
             </p>
           </div>
 
-          {/* Compact 4-column grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {MEDICAL_PROGRAMS.map((prog, index) => (
-              <motion.div 
-                key={prog.id}
-                initial={{ opacity: 0, y: 35 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-50px" }}
-                transition={{ duration: 0.65, delay: index * 0.1, ease: [0.16, 1, 0.3, 1] }}
-                onClick={() => {
-                  setCurrentPage('medical');
-                  window.scrollTo({ top: 0, behavior: 'smooth' });
-                }}
-                className="bg-emerald-950/45 border border-emerald-900/60 p-6 rounded-xl hover:border-[#c5a880]/50 transition-all duration-300 hover:-translate-y-1 hover:scale-[1.02] hover:shadow-2xl hover:shadow-[#c5a880]/10 block cursor-pointer group flex flex-col justify-between h-full hover:bg-emerald-950"
-              >
-                <div>
-                  <div className="w-10 h-10 rounded-lg bg-emerald-900/40 flex items-center justify-center mb-4 text-[#c5a880] border border-emerald-800/20 group-hover:bg-[#c5a880] group-hover:text-[#022C22] transition-colors duration-300">
-                    {getMedicalIcon(prog.icon)}
+          {/* Dynamic Responsive Grid for Medical Programs */}
+          <div className={`grid grid-cols-1 md:grid-cols-2 ${MEDICAL_PROGRAMS.length === 3 ? 'lg:grid-cols-3 max-w-6xl' : 'lg:grid-cols-4 max-w-7xl'} gap-6 mx-auto`}>
+            {MEDICAL_PROGRAMS.map((prog, index) => {
+              const progImg = prog.image || (
+                prog.id === 'respiratory' ? '/images/pestovo_medical_1779777676990.png' :
+                prog.id === 'cardio' ? '/images/pestovo_palace_1779780890544.png' :
+                (prog.id === 'antistress' || prog.id === 'nervous') ? '/images/pestovo_beach_1779780925661.png' :
+                '/images/pestovo_block_1779780908700.png'
+              );
+              const durationText = prog.duration || ((prog as any).durationDays ? `от ${(prog as any).durationDays} дней` : 'от 10 до 21 дня');
+
+              return (
+                <motion.div 
+                  key={prog.id || index}
+                  initial={{ opacity: 0, y: 35 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: "-50px" }}
+                  transition={{ duration: 0.65, delay: index * 0.1, ease: [0.16, 1, 0.3, 1] }}
+                  onClick={() => {
+                    setCurrentPage('medical');
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                  }}
+                  className="bg-[#02221A]/95 border border-emerald-900/70 rounded-2xl overflow-hidden hover:border-[#c5a880]/70 transition-all duration-300 hover:-translate-y-1.5 hover:shadow-2xl hover:shadow-[#c5a880]/15 cursor-pointer group flex flex-col justify-between h-full"
+                >
+                  <div>
+                    {/* Image Preview Header */}
+                    <div className="relative h-44 w-full overflow-hidden bg-[#011B14]">
+                      <img
+                        src={progImg}
+                        alt={prog.title}
+                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                        referrerPolicy="no-referrer"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-[#02221A] via-black/35 to-transparent"></div>
+                      
+                      {/* Floating Icon */}
+                      <div className="absolute bottom-3 left-4 w-10 h-10 rounded-xl bg-[#022C22]/95 text-[#c5a880] border border-[#c5a880]/40 flex items-center justify-center shadow-lg group-hover:bg-[#c5a880] group-hover:text-[#022C22] transition-colors duration-300">
+                        {getMedicalIcon(prog.icon)}
+                      </div>
+
+                      {/* Floating Duration Badge */}
+                      <div className="absolute top-3 right-3 bg-[#022C22]/90 backdrop-blur-md border border-[#c5a880]/40 text-[#c5a880] font-mono text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-lg flex items-center gap-1 shadow-md">
+                        <Clock className="w-3 h-3 text-[#c5a880]" />
+                        <span>{durationText}</span>
+                      </div>
+                    </div>
+
+                    {/* Content Details */}
+                    <div className="p-6">
+                      <h3 className="font-serif font-bold text-lg text-white mb-2 leading-tight group-hover:text-[#c5a880] transition-colors">
+                        {prog.title}
+                      </h3>
+                      <p className="text-stone-300 text-xs leading-relaxed line-clamp-3 mb-4">
+                        {prog.shortDesc}
+                      </p>
+
+                      {/* Procedures / Indications Pill Preview */}
+                      {prog.procedures && prog.procedures.length > 0 && (
+                        <div className="pt-3 border-t border-emerald-900/50 flex items-center justify-between text-[11px] text-stone-400 font-mono">
+                          <span>Процедур в комплексе:</span>
+                          <span className="text-[#c5a880] font-bold">{prog.procedures.length}+</span>
+                        </div>
+                      )}
+                    </div>
                   </div>
-                  <h3 className="font-serif font-bold text-lg text-white mb-2 leading-tight group-hover:text-[#c5a880] transition-colors">
-                    {prog.title}
-                  </h3>
-                  <span className="inline-block font-mono text-[10px] uppercase text-[#c5a880] tracking-wider mb-3">
-                    Срок: {prog.duration}
-                  </span>
-                  <p className="text-stone-300 text-xs leading-relaxed line-clamp-3">
-                    {prog.shortDesc}
-                  </p>
-                </div>
-                
-                <div className="mt-6 flex items-center space-x-1.5 text-xs text-[#c5a880] font-bold uppercase tracking-wider border-b border-transparent group-hover:border-[#c5a880] w-max pb-0.5 transition-all">
-                  <span>Подробнее</span>
-                  <ChevronRight className="w-3.5 h-3.5" />
-                </div>
-              </motion.div>
-            ))}
+                  
+                  <div className="px-6 pb-6 pt-0">
+                    <div className="flex items-center space-x-1.5 text-xs text-[#c5a880] font-bold uppercase tracking-wider group-hover:translate-x-1 transition-transform">
+                      <span>Подробнее о программе</span>
+                      <ChevronRight className="w-3.5 h-3.5 text-[#c5a880]" />
+                    </div>
+                  </div>
+                </motion.div>
+              );
+            })}
           </div>
 
           <div className="flex justify-center mt-12">
