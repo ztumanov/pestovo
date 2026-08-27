@@ -289,9 +289,48 @@ export async function generateDocumentPdfBlobUrl(doc: Partial<DocumentItem> & { 
 }
 
 /**
+ * Safely converts a base64 or Data URI string to a Uint8Array binary buffer.
+ */
+export function base64ToUint8Array(base64OrDataUri: string): Uint8Array {
+  try {
+    let base64 = base64OrDataUri;
+    if (base64OrDataUri.includes(',')) {
+      const parts = base64OrDataUri.split(',');
+      base64 = parts[1];
+    }
+    const binaryString = atob(base64.replace(/\s/g, ''));
+    const bytes = new Uint8Array(binaryString.length);
+    for (let i = 0; i < binaryString.length; i++) {
+      bytes[i] = binaryString.charCodeAt(i);
+    }
+    return bytes;
+  } catch (err) {
+    console.error('Failed to convert base64 to Uint8Array:', err);
+    return new Uint8Array();
+  }
+}
+
+/**
+ * Safely converts a base64 or Data URI string to a standard binary application/pdf Blob URL.
+ * This fixes the browser issue where data:application/pdf displays a blank screen in iframes/objects.
+ */
+export function base64ToBlobUrl(base64OrDataUri: string, mimeType = 'application/pdf'): string {
+  try {
+    const bytes = base64ToUint8Array(base64OrDataUri);
+    if (bytes.length === 0) return base64OrDataUri;
+    const blob = new Blob([bytes], { type: mimeType });
+    return URL.createObjectURL(blob);
+  } catch (err) {
+    console.error('Failed to convert base64 to Blob URL:', err);
+    return base64OrDataUri;
+  }
+}
+
+/**
  * Returns a valid PDF URL for viewing/downloading:
- * - If already a data URI or blob URL, returns as is.
- * - Otherwise generates a real binary PDF Blob URL.
+ * - If already a blob URL, returns as is.
+ * - If a data URI (base64), converts it to a standard Blob URL to bypass browser iframe restrictions.
+ * - Otherwise generates a real binary PDF Blob URL from metadata.
  */
 export async function getDocumentPdfUrl(doc: Partial<DocumentItem> & { 
   title: string; 
@@ -304,7 +343,19 @@ export async function getDocumentPdfUrl(doc: Partial<DocumentItem> & {
   categoryLabel?: string;
   [key: string]: any;
 }): Promise<string> {
-  if (doc.pdfUrl && (doc.pdfUrl.startsWith('data:application/pdf') || doc.pdfUrl.startsWith('blob:'))) {
+  if (doc.pdfUrl) {
+    if (doc.pdfUrl.startsWith('blob:')) {
+      return doc.pdfUrl;
+    }
+    if (doc.pdfUrl.startsWith('data:application/pdf') || doc.pdfUrl.startsWith('data:')) {
+      const cacheKey = `data-blob-${doc.id || doc.title}-${doc.pdfUrl.length}-${doc.pdfUrl.slice(0, 30)}`;
+      if (pdfBlobCache.has(cacheKey)) {
+        return pdfBlobCache.get(cacheKey)!;
+      }
+      const blobUrl = base64ToBlobUrl(doc.pdfUrl, 'application/pdf');
+      pdfBlobCache.set(cacheKey, blobUrl);
+      return blobUrl;
+    }
     return doc.pdfUrl;
   }
   return await generateDocumentPdfBlobUrl(doc as any);

@@ -104,8 +104,8 @@ export default function App() {
       showStats: true,
       slides: [
         { id: '1', type: 'video', url: 'https://assets.mixkit.co/videos/preview/mixkit-waves-crashing-on-rocks-from-above-41851-large.mp4' },
-         { id: '2', type: 'photo', url: '/src/assets/images/pestovo_palace_1779780890544.png' },
-         { id: '3', type: 'photo', url: '/src/assets/images/pestovo_beach_1779780925661.png' }
+         { id: '2', type: 'photo', url: '/images/pestovo_palace_1779780890544.png' },
+         { id: '3', type: 'photo', url: '/images/pestovo_beach_1779780925661.png' }
       ]
     }, 
     rooms: ROOMS = [], 
@@ -137,8 +137,8 @@ export default function App() {
     ? HERO_DATA.slides
     : [
         { id: '1', type: 'video', url: 'https://assets.mixkit.co/videos/preview/mixkit-waves-crashing-on-rocks-from-above-41851-large.mp4' },
-        { id: '2', type: 'photo', url: '/src/assets/images/pestovo_palace_1779780890544.png' },
-        { id: '3', type: 'photo', url: '/src/assets/images/pestovo_beach_1779780925661.png' }
+        { id: '2', type: 'photo', url: '/images/pestovo_palace_1779780890544.png' },
+        { id: '3', type: 'photo', url: '/images/pestovo_beach_1779780925661.png' }
       ];
 
   const bgMode = HERO_DATA?.defaultBackgroundMode || 'all';
@@ -1727,7 +1727,7 @@ export default function App() {
                     playsInline
                     loop
                     preload="auto"
-                    poster="/src/assets/images/pestovo_palace_1779780890544.png"
+                    poster="/images/pestovo_palace_1779780890544.png"
                     className="w-full h-full object-cover object-center scale-105"
                     onEnded={() => {
                       setActiveSlideIndex(prev => (prev + 1) % slides.length);

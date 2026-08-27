@@ -92,6 +92,24 @@ export interface SiteData {
   documents?: DocumentItem[];
 }
 
+// Deep cleaner for asset paths ensuring all legacy /src/assets/images are converted to /images/
+export function deepCleanAssetPaths<T>(obj: T): T {
+  if (typeof obj === 'string') {
+    return (obj as string).replace(/\/src\/assets\/images\//g, '/images/') as unknown as T;
+  }
+  if (Array.isArray(obj)) {
+    return obj.map(item => deepCleanAssetPaths(item)) as unknown as T;
+  }
+  if (obj !== null && typeof obj === 'object') {
+    const res: any = {};
+    for (const key of Object.keys(obj)) {
+      res[key] = deepCleanAssetPaths((obj as any)[key]);
+    }
+    return res;
+  }
+  return obj;
+}
+
 const DEFAULT_SITE_DATA: SiteData = {
   resortInfo: { ...RESORT_INFO },
   hero: {
@@ -110,8 +128,8 @@ const DEFAULT_SITE_DATA: SiteData = {
     showStats: true,
     slides: [
       { id: '1', type: 'video', url: 'https://assets.mixkit.co/videos/preview/mixkit-waves-crashing-on-rocks-from-above-41851-large.mp4' },
-      { id: '2', type: 'photo', url: '/src/assets/images/pestovo_palace_1779780890544.png' },
-      { id: '3', type: 'photo', url: '/src/assets/images/pestovo_beach_1779780925661.png' }
+      { id: '2', type: 'photo', url: '/images/pestovo_palace_1779780890544.png' },
+      { id: '3', type: 'photo', url: '/images/pestovo_beach_1779780925661.png' }
     ]
   },
   rooms: [...ROOMS],
@@ -165,6 +183,7 @@ interface AdminDataContextProps {
   setIsAdminMode: (active: boolean) => void;
   updateSiteData: (newData: SiteData) => void;
   updateSection: <K extends keyof SiteData>(key: K, value: SiteData[K]) => void;
+  updateSections: (updates: Partial<SiteData>) => void;
   resetToDefault: () => void;
   activeSettingsTab: string;
   setActiveSettingsTab: (tab: string) => void;
@@ -194,7 +213,7 @@ export function AdminDataProvider({ children }: { children: React.ReactNode }) {
         if (response.ok) {
           const published = await response.json();
           if (published && typeof published === 'object') {
-            baseData = { ...baseData, ...published };
+            baseData = deepCleanAssetPaths({ ...baseData, ...published });
             console.log('Successfully loaded published site-data.json from hosting root');
           }
         }
@@ -220,7 +239,7 @@ export function AdminDataProvider({ children }: { children: React.ReactNode }) {
       const savedData = await getStorageData<SiteData>();
       if (savedData) {
         try {
-          const parsed = savedData;
+          const parsed = deepCleanAssetPaths(savedData);
           
           // Gentle migration: if the client is still pointing to old defaults, auto-update them to the uploaded images
           let morphed = false;
@@ -414,31 +433,51 @@ export function AdminDataProvider({ children }: { children: React.ReactNode }) {
 
   const syncSettingsWithServer = async (data: SiteData) => {
     try {
+      let username = 'admin';
+      let password = '';
       const credsRaw = localStorage.getItem('pestovo_resort_admin_credentials');
-      if (!credsRaw) return;
-      const creds = JSON.parse(credsRaw);
-      if (!creds || !creds.username || !creds.password) return;
+      if (credsRaw) {
+        try {
+          const creds = JSON.parse(credsRaw);
+          if (creds && creds.username) username = creds.username;
+          if (creds && creds.password) password = creds.password;
+        } catch {}
+      }
+
+      // Try /save_settings.php first
+      const payload = {
+        username,
+        password,
+        siteData: data
+      };
 
       const response = await fetch('/save_settings.php', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({
-          username: creds.username,
-          password: creds.password,
-          siteData: data
-        })
+        body: JSON.stringify(payload)
       });
 
       if (response.ok) {
-        console.log('Successfully saved settings to the hosting server via save_settings.php');
+        const resJson = await response.json().catch(() => ({}));
+        console.log('Successfully saved settings to hosting server via save_settings.php:', resJson);
       } else {
-        const errData = await response.json().catch(() => ({}));
-        console.warn('Server settings save returned non-OK status:', response.status, errData.error || '');
+        // Fallback to /api/save_settings
+        const altResponse = await fetch('/api/save_settings', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        }).catch(() => null);
+
+        if (altResponse && altResponse.ok) {
+          console.log('Successfully saved settings via /api/save_settings fallback');
+        } else {
+          console.warn('Server settings save returned non-OK status:', response.status);
+        }
       }
     } catch (err) {
-      console.log('Skipping real-time save_settings.php sync (offline/local development or network error):', err);
+      console.log('Skipping real-time save_settings.php sync (offline or network error):', err);
     }
   };
 
@@ -467,6 +506,17 @@ export function AdminDataProvider({ children }: { children: React.ReactNode }) {
 
     // Securely sync all site settings to PHP server
     syncSettingsWithServer(newData);
+  };
+
+  const updateSections = (updates: Partial<SiteData>) => {
+    setSiteData(prev => {
+      const updated = { ...prev, ...updates };
+      setStorageData(updated).catch(e => {
+        console.error('Failed to save to IndexedDB storage:', e);
+      });
+      syncSettingsWithServer(updated);
+      return updated;
+    });
   };
 
   const updateSection = <K extends keyof SiteData>(key: K, value: SiteData[K]) => {
@@ -532,6 +582,7 @@ export function AdminDataProvider({ children }: { children: React.ReactNode }) {
       setIsAdminMode: handleSetAdminMode,
       updateSiteData,
       updateSection,
+      updateSections,
       resetToDefault,
       activeSettingsTab,
       setActiveSettingsTab,

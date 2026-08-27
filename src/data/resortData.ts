@@ -2,11 +2,11 @@ import { Room, MedicalProgram, Testimonial, FAQItem } from '../types';
 
 // Let's specify the paths of the generated images
 export const IMAGES = {
-  hero: '/src/assets/images/pestovo_palace_1779780890544.png',
-  suite: '/src/assets/images/pestovo_suite_1779777660563.png',
-  medical: '/src/assets/images/pestovo_medical_1779777676990.png',
-  nature: '/src/assets/images/pestovo_beach_1779780925661.png',
-  block: '/src/assets/images/pestovo_block_1779780908700.png',
+  hero: '/images/pestovo_palace_1779780890544.png',
+  suite: '/images/pestovo_suite_1779777660563.png',
+  medical: '/images/pestovo_medical_1779777676990.png',
+  nature: '/images/pestovo_beach_1779780925661.png',
+  block: '/images/pestovo_block_1779780908700.png',
 };
 
 // Elegant background video loops
@@ -20,7 +20,7 @@ export const VIDEOS = {
 
 // Additional high-quality fallback images to enrich the options
 export const EXTRA_IMAGES = {
-  standardRoom: '/src/assets/images/pestovo_block_1779780908700.png',
+  standardRoom: '/images/pestovo_block_1779780908700.png',
   deluxeRoom: 'https://images.unsplash.com/photo-1590490360182-c33d57733427?auto=format&fit=crop&w=800&q=80',
   lobby: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=1200&q=80',
   pool: 'https://images.unsplash.com/photo-1576013551627-0cc20b96c2a7?auto=format&fit=crop&w=800&q=80',

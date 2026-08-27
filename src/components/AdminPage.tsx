@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useAdminData, SiteData } from '../context/AdminDataContext';
+import { useAdminData, SiteData, deepCleanAssetPaths } from '../context/AdminDataContext';
 import { 
   X, 
   Save, 
@@ -70,6 +70,7 @@ export default function AdminPage({ onBackToHome }: { onBackToHome: () => void }
     siteData,
     updateSiteData,
     updateSection,
+    updateSections,
     resetToDefault,
     isAdminMode,
     setIsAdminMode,
@@ -225,22 +226,49 @@ export default function AdminPage({ onBackToHome }: { onBackToHome: () => void }
   };
 
   const handleSaveHero = () => {
-    updateSection('hero', localHero);
-    updateSection('images', localImages);
-    updateSection('videos', localVideos);
+    updateSections({
+      hero: localHero,
+      images: localImages,
+      videos: localVideos
+    });
     triggerSuccess();
   };
 
   const handleSaveMedia = () => {
-    updateSection('images', localImages);
-    updateSection('videos', localVideos);
-    updateSection('extraImages', localExtraImages);
+    updateSections({
+      images: localImages,
+      videos: localVideos,
+      extraImages: localExtraImages,
+      gallery: galleryItems,
+      galleryCategories: galleryCats
+    });
     triggerSuccess();
   };
 
   const triggerSuccess = () => {
     setSaveSuccess(true);
     setTimeout(() => setSaveSuccess(false), 2500);
+  };
+
+  const getConsolidatedSiteData = (): SiteData => {
+    return deepCleanAssetPaths({
+      ...siteData,
+      resortInfo: localResortInfo,
+      hero: localHero,
+      images: localImages,
+      videos: localVideos,
+      extraImages: localExtraImages,
+      rooms,
+      medicalPrograms: medPrograms,
+      testimonials,
+      faqs,
+      news,
+      documents,
+      gallery: galleryItems,
+      galleryCategories: galleryCats,
+      users: usersList,
+      services
+    });
   };
 
   // ROOMS HANDLERS
@@ -1997,52 +2025,151 @@ export default function AdminPage({ onBackToHome }: { onBackToHome: () => void }
                   </h4>
                   
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                    <div className="bg-[#FAF9F6] p-4 rounded-xl border border-stone-200">
-                      <label className="block text-xs font-bold text-stone-500 mb-1.5">Фон заставки Welcome (Фото-обои)</label>
+                    {/* Hero image */}
+                    <div className="bg-[#FAF9F6] p-4 rounded-xl border border-stone-200 space-y-2">
+                      <div className="flex justify-between items-center">
+                        <label className="block text-xs font-bold text-stone-700">Фон заставки Welcome (Фото-обои)</label>
+                        <label className="bg-white hover:bg-stone-50 text-[#022C22] border border-stone-300 text-[10px] font-bold px-2.5 py-1 rounded-lg cursor-pointer flex items-center gap-1 shadow-sm transition-all">
+                          <UploadCloud className="w-3 h-3 text-[#c5a880]" /> Выбрать файл
+                          <input 
+                            type="file" 
+                            accept="image/*" 
+                            className="hidden" 
+                            onChange={e => {
+                              if (e.target.files?.[0]) {
+                                compressImage(e.target.files[0], 1400, 0.8, (b64) => {
+                                  setLocalImages({ ...localImages, hero: b64 });
+                                });
+                              }
+                            }} 
+                          />
+                        </label>
+                      </div>
                       <input 
                         type="text" 
                         value={localImages.hero} 
                         onChange={e => setLocalImages({ ...localImages, hero: e.target.value })}
-                        className="w-full border border-stone-300 rounded-lg px-3 py-1.5 text-xs focus:outline-none focus:border-[#c5a880]/80 mb-2"
+                        className="w-full border border-stone-300 rounded-lg px-3 py-1.5 text-xs focus:outline-none focus:border-[#c5a880]/80 font-mono"
+                        placeholder="URL или загрузите файл выше"
                       />
                       {localImages.hero && (
-                        <img src={localImages.hero} alt="hero preview" className="w-full h-24 object-cover rounded-lg border border-stone-200 shadow-inner" referrerPolicy="no-referrer" />
+                        <div className="relative h-28 w-full rounded-lg overflow-hidden border border-stone-200 shadow-inner group">
+                          <img src={localImages.hero} alt="hero preview" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                          <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                            <span className="text-white text-[10px] font-bold">Текущий фон</span>
+                          </div>
+                        </div>
                       )}
                     </div>
-                    <div className="bg-[#FAF9F6] p-4 rounded-xl border border-stone-200">
-                      <label className="block text-xs font-bold text-stone-500 mb-1.5">Изображение номера Полулюкс (Раздел спальни)</label>
+
+                    {/* Suite image */}
+                    <div className="bg-[#FAF9F6] p-4 rounded-xl border border-stone-200 space-y-2">
+                      <div className="flex justify-between items-center">
+                        <label className="block text-xs font-bold text-stone-700">Номер Люкс (Раздел проживания)</label>
+                        <label className="bg-white hover:bg-stone-50 text-[#022C22] border border-stone-300 text-[10px] font-bold px-2.5 py-1 rounded-lg cursor-pointer flex items-center gap-1 shadow-sm transition-all">
+                          <UploadCloud className="w-3 h-3 text-[#c5a880]" /> Выбрать файл
+                          <input 
+                            type="file" 
+                            accept="image/*" 
+                            className="hidden" 
+                            onChange={e => {
+                              if (e.target.files?.[0]) {
+                                compressImage(e.target.files[0], 1200, 0.8, (b64) => {
+                                  setLocalImages({ ...localImages, suite: b64 });
+                                });
+                              }
+                            }} 
+                          />
+                        </label>
+                      </div>
                       <input 
                         type="text" 
                         value={localImages.suite} 
                         onChange={e => setLocalImages({ ...localImages, suite: e.target.value })}
-                        className="w-full border border-stone-300 rounded-lg px-3 py-1.5 text-xs focus:outline-none focus:border-[#c5a880]/80 mb-2"
+                        className="w-full border border-stone-300 rounded-lg px-3 py-1.5 text-xs focus:outline-none focus:border-[#c5a880]/80 font-mono"
+                        placeholder="URL или загрузите файл выше"
                       />
                       {localImages.suite && (
-                        <img src={localImages.suite} alt="suite preview" className="w-full h-24 object-cover rounded-lg border border-stone-200 shadow-inner" referrerPolicy="no-referrer" />
+                        <div className="relative h-28 w-full rounded-lg overflow-hidden border border-stone-200 shadow-inner group">
+                          <img src={localImages.suite} alt="suite preview" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                          <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                            <span className="text-white text-[10px] font-bold">Фото номера</span>
+                          </div>
+                        </div>
                       )}
                     </div>
-                    <div className="bg-[#FAF9F6] p-4 rounded-xl border border-stone-200">
-                      <label className="block text-xs font-bold text-stone-500 mb-1.5">Кабинет физиотерапии (Медицина)</label>
+
+                    {/* Medical image */}
+                    <div className="bg-[#FAF9F6] p-4 rounded-xl border border-stone-200 space-y-2">
+                      <div className="flex justify-between items-center">
+                        <label className="block text-xs font-bold text-stone-700">Кабинет физиотерапии (Медицина)</label>
+                        <label className="bg-white hover:bg-stone-50 text-[#022C22] border border-stone-300 text-[10px] font-bold px-2.5 py-1 rounded-lg cursor-pointer flex items-center gap-1 shadow-sm transition-all">
+                          <UploadCloud className="w-3 h-3 text-[#c5a880]" /> Выбрать файл
+                          <input 
+                            type="file" 
+                            accept="image/*" 
+                            className="hidden" 
+                            onChange={e => {
+                              if (e.target.files?.[0]) {
+                                compressImage(e.target.files[0], 1200, 0.8, (b64) => {
+                                  setLocalImages({ ...localImages, medical: b64 });
+                                });
+                              }
+                            }} 
+                          />
+                        </label>
+                      </div>
                       <input 
                         type="text" 
                         value={localImages.medical} 
                         onChange={e => setLocalImages({ ...localImages, medical: e.target.value })}
-                        className="w-full border border-stone-300 rounded-lg px-3 py-1.5 text-xs focus:outline-none focus:border-[#c5a880]/80 mb-2"
+                        className="w-full border border-stone-300 rounded-lg px-3 py-1.5 text-xs focus:outline-none focus:border-[#c5a880]/80 font-mono"
+                        placeholder="URL или загрузите файл выше"
                       />
                       {localImages.medical && (
-                        <img src={localImages.medical} alt="medical preview" className="w-full h-24 object-cover rounded-lg border border-stone-200 shadow-inner" referrerPolicy="no-referrer" />
+                        <div className="relative h-28 w-full rounded-lg overflow-hidden border border-stone-200 shadow-inner group">
+                          <img src={localImages.medical} alt="medical preview" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                          <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                            <span className="text-white text-[10px] font-bold">Фото медицины</span>
+                          </div>
+                        </div>
                       )}
                     </div>
-                    <div className="bg-[#FAF9F6] p-4 rounded-xl border border-stone-200">
-                      <label className="block text-xs font-bold text-stone-500 mb-1.5">Терренкур и природа Царской тропы</label>
+
+                    {/* Nature image */}
+                    <div className="bg-[#FAF9F6] p-4 rounded-xl border border-stone-200 space-y-2">
+                      <div className="flex justify-between items-center">
+                        <label className="block text-xs font-bold text-stone-700">Терренкур и природа Гаспры</label>
+                        <label className="bg-white hover:bg-stone-50 text-[#022C22] border border-stone-300 text-[10px] font-bold px-2.5 py-1 rounded-lg cursor-pointer flex items-center gap-1 shadow-sm transition-all">
+                          <UploadCloud className="w-3 h-3 text-[#c5a880]" /> Выбрать файл
+                          <input 
+                            type="file" 
+                            accept="image/*" 
+                            className="hidden" 
+                            onChange={e => {
+                              if (e.target.files?.[0]) {
+                                compressImage(e.target.files[0], 1200, 0.8, (b64) => {
+                                  setLocalImages({ ...localImages, nature: b64 });
+                                });
+                              }
+                            }} 
+                          />
+                        </label>
+                      </div>
                       <input 
                         type="text" 
                         value={localImages.nature} 
                         onChange={e => setLocalImages({ ...localImages, nature: e.target.value })}
-                        className="w-full border border-stone-300 rounded-lg px-3 py-1.5 text-xs focus:outline-none focus:border-[#c5a880]/80 mb-2"
+                        className="w-full border border-stone-300 rounded-lg px-3 py-1.5 text-xs focus:outline-none focus:border-[#c5a880]/80 font-mono"
+                        placeholder="URL или загрузите файл выше"
                       />
                       {localImages.nature && (
-                        <img src={localImages.nature} alt="nature preview" className="w-full h-24 object-cover rounded-lg border border-stone-200 shadow-inner" referrerPolicy="no-referrer" />
+                        <div className="relative h-28 w-full rounded-lg overflow-hidden border border-stone-200 shadow-inner group">
+                          <img src={localImages.nature} alt="nature preview" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                          <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                            <span className="text-white text-[10px] font-bold">Фото природы</span>
+                          </div>
+                        </div>
                       )}
                     </div>
                   </div>
@@ -2931,6 +3058,9 @@ export default function AdminPage({ onBackToHome }: { onBackToHome: () => void }
                               throw new Error('Некорректные учётные данные. Пожалуйста, выйдите из панели и войдите заново.');
                             }
                             
+                            const fullData = getConsolidatedSiteData();
+                            updateSiteData(fullData);
+
                             const response = await fetch('/save_settings.php', {
                               method: 'POST',
                               headers: {
@@ -2939,13 +3069,13 @@ export default function AdminPage({ onBackToHome }: { onBackToHome: () => void }
                               body: JSON.stringify({
                                 username: creds.username,
                                 password: creds.password,
-                                siteData: siteData
+                                siteData: fullData
                               })
                             });
 
                             if (response.ok) {
-                              const resJSON = await response.json();
-                              alert('Успешно! Все настройки сохранены на сервере в файле site-data.json.');
+                              await response.json().catch(() => ({}));
+                              alert('Успешно! Все настройки, тексты и медиа-файлы сохранены на сервере в файле site-data.json.');
                               triggerSuccess();
                             } else {
                               const resJSON = await response.json().catch(() => ({}));
@@ -2988,21 +3118,24 @@ export default function AdminPage({ onBackToHome }: { onBackToHome: () => void }
                       {/* Download JSON Button with File Size */}
                       <button
                         onClick={() => {
-                          const jsonString = `data:text/json;charset=utf-8,${encodeURIComponent(
-                            JSON.stringify(siteData, null, 2)
-                          )}`;
+                          const fullData = getConsolidatedSiteData();
+                          updateSiteData(fullData);
+                          const jsonString = JSON.stringify(fullData, null, 2);
+                          const blob = new Blob([jsonString], { type: 'application/json;charset=utf-8' });
+                          const blobUrl = URL.createObjectURL(blob);
                           const downloadAnchor = document.createElement('a');
-                          downloadAnchor.setAttribute('href', jsonString);
-                          downloadAnchor.setAttribute('download', 'site-data.json');
+                          downloadAnchor.href = blobUrl;
+                          downloadAnchor.download = 'site-data.json';
                           document.body.appendChild(downloadAnchor);
                           downloadAnchor.click();
                           downloadAnchor.remove();
+                          setTimeout(() => URL.revokeObjectURL(blobUrl), 1000);
                           triggerSuccess();
                         }}
                         className="w-full bg-[#022C22] hover:bg-[#c5a880] text-[#FAF9F6] hover:text-[#022C22] font-semibold text-xs py-3.5 px-4 rounded-xl transition-all uppercase tracking-wider flex items-center justify-center gap-2 border border-transparent shadow cursor-pointer"
                       >
                         <Download className="w-4 h-4" />
-                        <span>Скачать site-data.json ({calculateStorageSize(siteData).formatted})</span>
+                        <span>Скачать site-data.json ({calculateStorageSize(getConsolidatedSiteData()).formatted})</span>
                       </button>
 
                       {/* Import JSON file input and label */}
@@ -3022,9 +3155,11 @@ export default function AdminPage({ onBackToHome }: { onBackToHome: () => void }
                               if (!file) return;
                               fileReader.onload = (event) => {
                                 try {
-                                  const parsed = JSON.parse(event.target?.result as string);
+                                  const raw = event.target?.result as string;
+                                  const parsed = JSON.parse(raw);
                                   if (parsed && typeof parsed === 'object') {
-                                    updateSiteData(parsed);
+                                    const cleaned = deepCleanAssetPaths(parsed);
+                                    updateSiteData(cleaned);
                                     alert('Конфигурация успешно импортирована! Страница будет обновлена.');
                                     window.location.reload();
                                   } else {
@@ -3452,7 +3587,7 @@ function RoomForm({ initialData, onCancel, onSave }: RoomFormProps) {
                 <button
                   type="button"
                   onClick={() => {
-                    const preset = '/src/assets/images/pestovo_block_1779780908700.png';
+                    const preset = '/images/pestovo_block_1779780908700.png';
                     setImages(prev => prev.includes(preset) ? prev : [...prev, preset]);
                   }}
                   className="px-2 py-1.5 bg-stone-100 hover:bg-stone-200 border border-stone-200 rounded-lg text-left text-[10px] truncate cursor-pointer text-stone-700"
@@ -3462,7 +3597,7 @@ function RoomForm({ initialData, onCancel, onSave }: RoomFormProps) {
                 <button
                   type="button"
                   onClick={() => {
-                    const preset = '/src/assets/images/pestovo_suite_1779777660563.png';
+                    const preset = '/images/pestovo_suite_1779777660563.png';
                     setImages(prev => prev.includes(preset) ? prev : [...prev, preset]);
                   }}
                   className="px-2 py-1.5 bg-stone-100 hover:bg-stone-200 border border-stone-200 rounded-lg text-left text-[10px] truncate cursor-pointer text-stone-700"
@@ -3725,9 +3860,9 @@ function MedicalForm({ initialData, onCancel, onSave }: MedicalFormProps) {
               <div className="grid grid-cols-2 gap-2">
                 <button
                   type="button"
-                  onClick={() => setImage('/src/assets/images/pestovo_medical_1779777676990.png')}
+                  onClick={() => setImage('/images/pestovo_medical_1779777676990.png')}
                   className={`px-2 py-1.5 text-[10px] rounded-lg text-left truncate transition-all border cursor-pointer ${
-                    image === '/src/assets/images/pestovo_medical_1779777676990.png'
+                    image === '/images/pestovo_medical_1779777676990.png'
                       ? 'bg-amber-100 border-amber-400 font-bold text-amber-955'
                       : 'bg-stone-100 hover:bg-stone-200 border-stone-200 text-stone-700'
                   }`}
@@ -3736,9 +3871,9 @@ function MedicalForm({ initialData, onCancel, onSave }: MedicalFormProps) {
                 </button>
                 <button
                   type="button"
-                  onClick={() => setImage('/src/assets/images/pestovo_beach_1779780925661.png')}
+                  onClick={() => setImage('/images/pestovo_beach_1779780925661.png')}
                   className={`px-2 py-1.5 text-[10px] rounded-lg text-left truncate transition-all border cursor-pointer ${
-                    image === '/src/assets/images/pestovo_beach_1779780925661.png'
+                    image === '/images/pestovo_beach_1779780925661.png'
                       ? 'bg-amber-100 border-amber-400 font-bold text-amber-955'
                       : 'bg-stone-100 hover:bg-stone-200 border-stone-200 text-stone-700'
                   }`}
@@ -3786,7 +3921,7 @@ function MedicalForm({ initialData, onCancel, onSave }: MedicalFormProps) {
             ) : (
               <div className="relative aspect-video rounded-lg overflow-hidden border border-stone-200 bg-stone-200 shadow-sm">
                 <img 
-                  src="/src/assets/images/pestovo_medical_1779777676990.png" 
+                  src="/images/pestovo_medical_1779777676990.png" 
                   alt="Default medical program prew" 
                   className="w-full h-full object-cover brightness-90" 
                   referrerPolicy="no-referrer"
