@@ -104,6 +104,9 @@ export interface SiteData {
 // Deep cleaner for asset paths ensuring all legacy /src/assets/images are converted to /images/
 export function deepCleanAssetPaths<T>(obj: T): T {
   if (typeof obj === 'string') {
+    if ((obj as string).startsWith('data:') || !(obj as string).includes('/src/assets/images/')) {
+      return obj;
+    }
     return (obj as string).replace(/\/src\/assets\/images\//g, '/images/') as unknown as T;
   }
   if (Array.isArray(obj)) {
@@ -117,6 +120,76 @@ export function deepCleanAssetPaths<T>(obj: T): T {
     return res;
   }
   return obj;
+}
+
+export function normalizeSiteData(data: Partial<SiteData> | any): SiteData {
+  if (!data || typeof data !== 'object') {
+    return JSON.parse(JSON.stringify(DEFAULT_SITE_DATA));
+  }
+
+  const rawTestimonials = Array.isArray(data.testimonials) ? data.testimonials : (DEFAULT_SITE_DATA.testimonials || []);
+  const normalizedTestimonials = rawTestimonials.map((t: any, idx: number) => ({
+    id: String(t?.id || `test-${idx + 1}`),
+    author: t?.author || 'Гость санатория',
+    role: t?.role || t?.city || 'Отдыхающий',
+    city: t?.city || t?.role || '',
+    rating: typeof t?.rating === 'number' ? t.rating : 5,
+    text: t?.text || t?.content || '',
+    content: t?.content || t?.text || '',
+    date: t?.date || '2026',
+    isApproved: t?.isApproved !== false,
+    stayDate: t?.stayDate || '',
+    verified: t?.verified ?? true,
+    avatar: t?.avatar || ''
+  }));
+
+  const rawRooms = Array.isArray(data.rooms) ? data.rooms : (DEFAULT_SITE_DATA.rooms || []);
+  const normalizedRooms = rawRooms.map((r: any) => ({
+    ...r,
+    amenities: Array.isArray(r?.amenities) ? r.amenities : [],
+    images: Array.isArray(r?.images) ? r.images : (r?.image ? [r.image] : [])
+  }));
+
+  const rawMed = Array.isArray(data.medicalPrograms) ? data.medicalPrograms : (DEFAULT_SITE_DATA.medicalPrograms || []);
+  const normalizedMed = rawMed.map((m: any) => {
+    const def = DEFAULT_SITE_DATA.medicalPrograms.find(dm => dm.id === m?.id);
+    return {
+      ...(def || {}),
+      ...m,
+      indications: Array.isArray(m?.indications) ? m.indications : (def?.indications || []),
+      procedures: Array.isArray(m?.procedures) ? m.procedures : (def?.procedures || [])
+    };
+  });
+
+  const merged: SiteData = {
+    ...DEFAULT_SITE_DATA,
+    ...data,
+    resortInfo: { ...DEFAULT_SITE_DATA.resortInfo, ...(data.resortInfo || {}) },
+    hero: {
+      ...DEFAULT_SITE_DATA.hero,
+      ...(data.hero || {}),
+      slides: (Array.isArray(data.hero?.slides) && data.hero.slides.length > 0)
+        ? data.hero.slides
+        : DEFAULT_SITE_DATA.hero.slides,
+      stats: (Array.isArray(data.hero?.stats) && data.hero.stats.length > 0)
+        ? data.hero.stats
+        : DEFAULT_SITE_DATA.hero.stats
+    },
+    rooms: normalizedRooms,
+    medicalPrograms: normalizedMed,
+    testimonials: normalizedTestimonials,
+    faqs: Array.isArray(data.faqs) ? data.faqs : (DEFAULT_SITE_DATA.faqs || []),
+    news: Array.isArray(data.news) ? data.news : (DEFAULT_SITE_DATA.news || []),
+    services: Array.isArray(data.services) ? data.services : (DEFAULT_SERVICES || []),
+    gallery: Array.isArray(data.gallery) ? data.gallery : (DEFAULT_SITE_DATA.gallery || []),
+    galleryCategories: Array.isArray(data.galleryCategories) ? data.galleryCategories : (DEFAULT_SITE_DATA.galleryCategories || []),
+    users: Array.isArray(data.users) ? data.users : (DEFAULT_SITE_DATA.users || []),
+    documents: Array.isArray(data.documents) ? data.documents : (DEFAULT_SITE_DATA.documents || []),
+    images: { ...DEFAULT_SITE_DATA.images, ...(data.images || {}) },
+    extraImages: { ...DEFAULT_SITE_DATA.extraImages, ...(data.extraImages || {}) },
+    videos: { ...DEFAULT_SITE_DATA.videos, ...(data.videos || {}) }
+  };
+  return merged;
 }
 
 const DEFAULT_SITE_DATA: SiteData = {
@@ -192,14 +265,48 @@ const ADMIN_MODE_KEY = 'pestovo_resort_admin_active';
  */
 function getInitialSynchronousSiteData(): SiteData {
   try {
-    const fastData = getFastStorageData<SiteData>();
-    if (fastData && typeof fastData === 'object' && fastData.rooms && Array.isArray(fastData.rooms) && fastData.rooms.length > 0) {
-      return deepCleanAssetPaths(fastData);
+    const fastData = getFastStorageData<Partial<SiteData>>();
+    if (fastData && typeof fastData === 'object' && (fastData.resortInfo || fastData.rooms)) {
+      const merged: SiteData = deepCleanAssetPaths({
+        ...DEFAULT_SITE_DATA,
+        ...fastData,
+        hero: {
+          ...DEFAULT_SITE_DATA.hero,
+          ...(fastData.hero || {}),
+          slides: (fastData.hero?.slides && Array.isArray(fastData.hero.slides) && fastData.hero.slides.length > 0)
+            ? fastData.hero.slides
+            : DEFAULT_SITE_DATA.hero.slides
+        },
+        images: {
+          ...DEFAULT_SITE_DATA.images,
+          ...(fastData.images || {})
+        },
+        extraImages: {
+          ...DEFAULT_SITE_DATA.extraImages,
+          ...(fastData.extraImages || {})
+        },
+        rooms: (Array.isArray(fastData.rooms) && fastData.rooms.length > 0)
+          ? DEFAULT_SITE_DATA.rooms.map(defRoom => {
+              const f = fastData.rooms?.find(r => r.id === defRoom.id || r.name === defRoom.name);
+              return f ? { ...defRoom, ...f } : defRoom;
+            })
+          : DEFAULT_SITE_DATA.rooms
+      });
+
+      // Synchronize hero image with first photo slide
+      if (Array.isArray(merged.hero.slides)) {
+        const firstPhoto = merged.hero.slides.find((s: any) => s.type === 'photo');
+        if (firstPhoto?.url) {
+          merged.images.hero = firstPhoto.url;
+        }
+      }
+
+      return normalizeSiteData(merged);
     }
 
     const overrides = getFastMediaOverrides();
     if (overrides) {
-      const merged: SiteData = JSON.parse(JSON.stringify(DEFAULT_SITE_DATA));
+      const merged: SiteData = normalizeSiteData(JSON.parse(JSON.stringify(DEFAULT_SITE_DATA)));
       if (overrides.rooms && Array.isArray(overrides.rooms) && overrides.rooms.length > 0) {
         merged.rooms = merged.rooms.map(defRoom => {
           const match = overrides.rooms.find((o: any) => o.id === defRoom.id || o.name === defRoom.name);
@@ -256,12 +363,13 @@ function getInitialSynchronousSiteData(): SiteData {
       if (overrides.news && Array.isArray(overrides.news) && overrides.news.length > 0) {
         merged.news = overrides.news;
       }
-      return deepCleanAssetPaths(merged);
+
+      return normalizeSiteData(deepCleanAssetPaths(merged));
     }
   } catch (err) {
     console.warn('Initial synchronous data read error:', err);
   }
-  return DEFAULT_SITE_DATA;
+  return normalizeSiteData(DEFAULT_SITE_DATA);
 }
 
 interface AdminDataContextProps {
@@ -492,48 +600,99 @@ export function AdminDataProvider({ children }: { children: React.ReactNode }) {
             morphed = true;
           }
 
+          const normalized = normalizeSiteData(deepCleanAssetPaths(parsed));
+
           // Keep fast cache up to date
-          saveFastStorageData(parsed);
+          saveFastStorageData(normalized);
 
           if (!isCancelled) {
-            setSiteData(parsed);
+            setSiteData(normalized);
           }
         } catch (e) {
           console.error('Error parsing stored site data:', e);
         }
       }
 
-      // 2. Non-blocking parallel network fetch for server updates (site-data.json & reviews.php)
+      // 2. High-speed parallel network fetch for server updates (site-data.json & reviews.php)
       try {
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 2000);
+        const earlyPromise = (typeof window !== 'undefined' && (window as any).__SITE_DATA_EARLY_PROMISE__) || null;
+        
+        const fetchServerSiteData = async (): Promise<any> => {
+          if (earlyPromise) {
+            const earlyRes = await earlyPromise.catch(() => null);
+            if (earlyRes && earlyRes.data) {
+              return earlyRes.data;
+            }
+          }
+          const res = await fetch('/site-data.json?t=' + Date.now(), {
+            cache: 'no-store',
+            headers: {
+              'Cache-Control': 'no-cache, no-store, must-revalidate',
+              'Pragma': 'no-cache'
+            }
+          });
+          if (res.ok) {
+            return await res.json();
+          }
+          return null;
+        };
 
-        const [siteDataRes, reviewsRes] = await Promise.allSettled([
-          fetch('/site-data.json', { cache: 'no-store', signal: controller.signal }),
-          fetch('/reviews.php', { cache: 'no-store', signal: controller.signal })
+        const [serverJson, reviewsRes] = await Promise.allSettled([
+          fetchServerSiteData(),
+          fetch('/reviews.php', { cache: 'no-store' })
         ]);
-
-        clearTimeout(timeoutId);
 
         if (isCancelled) return;
 
-        // If no saved draft existed in IndexedDB, use published site-data.json
-        if (!savedData && siteDataRes.status === 'fulfilled' && siteDataRes.value.ok) {
-          const published = await siteDataRes.value.json().catch(() => null);
-          if (published && typeof published === 'object') {
-            const cleaned = deepCleanAssetPaths({ ...DEFAULT_SITE_DATA, ...published });
-            saveFastStorageData(cleaned);
-            setSiteData(cleaned);
-            console.log('Applied published site-data.json from server');
+        // Apply published site-data.json from server whenever it is updated or missing locally
+        if (serverJson.status === 'fulfilled' && serverJson.value && typeof serverJson.value === 'object') {
+          const published = serverJson.value;
+          if (published.resortInfo || published.rooms || published.hero) {
+            const cleaned = normalizeSiteData(deepCleanAssetPaths({ ...DEFAULT_SITE_DATA, ...published }));
+
+            // Generate content fingerprint to instantly detect server changes
+            const calcFingerprint = (obj: any): string => {
+              const meta = obj._metadata;
+              if (meta && (meta.updatedAt || meta.version)) {
+                return String(meta.updatedAt || meta.version);
+              }
+              const heroP = obj.hero?.slides?.[0]?.url || obj.images?.hero || '';
+              const r1 = obj.rooms?.[0]?.image || '';
+              const r2 = obj.rooms?.[1]?.image || '';
+              return `fp_${heroP.slice(0, 40)}_${r1.slice(0, 40)}_${r2.slice(0, 40)}_${JSON.stringify(obj.rooms || []).length}_${JSON.stringify(obj.hero?.slides || []).length}`;
+            };
+
+            const serverFp = calcFingerprint(published);
+            const lastSyncedFp = localStorage.getItem('yasnaya_server_data_fingerprint');
+
+            // Overwrite local state if server has changed or if there was no saved local data
+            if (serverFp !== lastSyncedFp || !savedData) {
+              console.log('[Sync] Server site-data.json has changed or is new! Updating state immediately.');
+              localStorage.setItem('yasnaya_server_data_fingerprint', serverFp);
+              saveFastStorageData(cleaned);
+              await setStorageData(cleaned);
+              if (!isCancelled) {
+                setSiteData(cleaned);
+              }
+            } else {
+              console.log('[Sync] Server site-data.json is already up to date.');
+            }
+
+            // Pre-warm hero image into browser cache
+            const heroUrl = cleaned.images?.hero || cleaned.hero?.slides?.[0]?.url;
+            if (heroUrl && typeof heroUrl === 'string' && !heroUrl.startsWith('data:')) {
+              const preImg = new Image();
+              preImg.src = heroUrl;
+            }
           }
         }
 
         // Apply server reviews if available
-        if (reviewsRes.status === 'fulfilled' && reviewsRes.value.ok) {
+        if (reviewsRes.status === 'fulfilled' && reviewsRes.value && reviewsRes.value.ok) {
           const serverReviews = await reviewsRes.value.json().catch(() => null);
           if (Array.isArray(serverReviews) && serverReviews.length > 0) {
             setSiteData(prev => {
-              const updated = { ...prev, testimonials: serverReviews };
+              const updated = normalizeSiteData({ ...prev, testimonials: serverReviews });
               saveFastStorageData(updated);
               return updated;
             });
@@ -541,7 +700,7 @@ export function AdminDataProvider({ children }: { children: React.ReactNode }) {
           }
         }
       } catch (networkErr) {
-        console.log('Background network sync finished or timed out:', networkErr);
+        console.log('Background network sync finished or encountered error:', networkErr);
       }
     }
 
@@ -570,23 +729,36 @@ export function AdminDataProvider({ children }: { children: React.ReactNode }) {
         } catch {}
       }
 
+      // Ensure fresh metadata timestamp
+      const dataWithMeta = {
+        ...data,
+        _metadata: {
+          updatedAt: new Date().toISOString(),
+          version: Date.now(),
+          source: 'admin-panel'
+        }
+      };
+
       // Try /save_settings.php first
       const payload = {
         username,
         password,
-        siteData: data
+        siteData: dataWithMeta
       };
 
       const response = await fetch('/save_settings.php', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Cache-Control': 'no-cache'
         },
         body: JSON.stringify(payload)
       });
 
       if (response.ok) {
         const resJson = await response.json().catch(() => ({}));
+        // Update local sync fingerprint so subsequent fetches know client and server are identical
+        localStorage.setItem('yasnaya_server_data_fingerprint', String(dataWithMeta._metadata.updatedAt));
         console.log('Successfully saved settings to hosting server via save_settings.php:', resJson);
       } else {
         // Fallback to /api/save_settings
@@ -597,6 +769,7 @@ export function AdminDataProvider({ children }: { children: React.ReactNode }) {
         }).catch(() => null);
 
         if (altResponse && altResponse.ok) {
+          localStorage.setItem('yasnaya_server_data_fingerprint', String(dataWithMeta._metadata.updatedAt));
           console.log('Successfully saved settings via /api/save_settings fallback');
         } else {
           console.warn('Server settings save returned non-OK status:', response.status);
@@ -609,7 +782,7 @@ export function AdminDataProvider({ children }: { children: React.ReactNode }) {
 
   const updateSiteData = (newData: SiteData) => {
     // Ensure bidirectional synchronization between rooms and media images
-    const synchronized = { ...newData };
+    const synchronized = normalizeSiteData({ ...newData });
     if (synchronized.rooms && Array.isArray(synchronized.rooms)) {
       const stdRoom = synchronized.rooms.find(r => r.id === 'standard');
       if (stdRoom && stdRoom.image) {
@@ -648,7 +821,7 @@ export function AdminDataProvider({ children }: { children: React.ReactNode }) {
 
   const updateSections = (updates: Partial<SiteData>) => {
     setSiteData(prev => {
-      const updated = { ...prev, ...updates };
+      const updated = normalizeSiteData({ ...prev, ...updates });
 
       // Bidirectional sync
       if (updates.rooms && Array.isArray(updates.rooms)) {
@@ -689,7 +862,7 @@ export function AdminDataProvider({ children }: { children: React.ReactNode }) {
 
   const updateSection = <K extends keyof SiteData>(key: K, value: SiteData[K]) => {
     setSiteData(prev => {
-      const updated = { ...prev, [key]: value };
+      const updated = normalizeSiteData({ ...prev, [key]: value });
 
       // Bidirectional sync between room cards and media images
       if (key === 'rooms' && Array.isArray(value)) {

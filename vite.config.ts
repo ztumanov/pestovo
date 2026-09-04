@@ -11,6 +11,19 @@ function serverStoragePlugin(): Plugin {
       server.middlewares.use((req, res, next) => {
         const url = req.url ? req.url.split('?')[0] : '';
 
+        // Serve site-data.json with strict anti-cache headers
+        if (url === '/site-data.json' && req.method === 'GET') {
+          const siteDataPath = path.resolve(__dirname, 'public/site-data.json');
+          if (fs.existsSync(siteDataPath)) {
+            res.statusCode = 200;
+            res.setHeader('Content-Type', 'application/json; charset=utf-8');
+            res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate');
+            res.setHeader('Pragma', 'no-cache');
+            res.end(fs.readFileSync(siteDataPath));
+            return;
+          }
+        }
+
         // Handle settings save: POST /save_settings.php or POST /api/save_settings
         if (url === '/save_settings.php' || url === '/api/save_settings') {
           if (req.method === 'POST') {
@@ -30,6 +43,12 @@ function serverStoragePlugin(): Plugin {
                   return;
                 }
 
+                siteData._metadata = {
+                  updatedAt: new Date().toISOString(),
+                  version: Date.now(),
+                  source: 'vite-server'
+                };
+
                 const publicDir = path.resolve(__dirname, 'public');
                 if (!fs.existsSync(publicDir)) {
                   fs.mkdirSync(publicDir, { recursive: true });
@@ -46,6 +65,8 @@ function serverStoragePlugin(): Plugin {
 
                 res.statusCode = 200;
                 res.setHeader('Content-Type', 'application/json; charset=utf-8');
+                res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate');
+                res.setHeader('Pragma', 'no-cache');
                 res.end(JSON.stringify({
                   success: true,
                   message: 'Настройки и медиа успешно сохранены на сервере в файле site-data.json!',

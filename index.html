@@ -6,6 +6,29 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="alternate icon" href="/favicon.svg" />
     <title>ФГКУ «Санаторий «Ясная Поляна» ФТС России»</title>
+    <script>
+      // Instantly start parallel non-blocking fetch for site-data.json before scripts parse
+      (function() {
+        try {
+          var cacheBuster = Date.now();
+          window.__SITE_DATA_EARLY_PROMISE__ = fetch('/site-data.json?t=' + cacheBuster, {
+            cache: 'no-store',
+            headers: {
+              'Cache-Control': 'no-cache, no-store, must-revalidate',
+              'Pragma': 'no-cache'
+            }
+          }).then(function(res) {
+            if (!res.ok) return null;
+            var etag = res.headers.get('ETag') || res.headers.get('Last-Modified') || ('sz_' + res.headers.get('Content-Length')) || '';
+            return res.json().then(function(data) {
+              return { data: data, etag: etag, timestamp: cacheBuster };
+            });
+          }).catch(function() { return null; });
+        } catch (e) {
+          window.__SITE_DATA_EARLY_PROMISE__ = null;
+        }
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>

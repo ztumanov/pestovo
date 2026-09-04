@@ -71,55 +71,105 @@ export function getFastMediaOverrides(): any | null {
 }
 
 /**
- * Synchronously caches site data and visual assets to localStorage for instant startup display
+ * Synchronously caches site data and essential visual assets to localStorage for instant startup display.
+ * Implements a smart tiered strategy:
+ * - If full site data fits, it's saved.
+ * - If full site data exceeds quota (due to heavy base64 photos/gallery), it cleanly preserves
+ *   essential above-the-fold media (hero photo, first rooms, medical programs) so startup has 0ms flicker.
  */
 export function saveFastStorageData(data: any): void {
   if (typeof window === 'undefined' || !data) return;
 
-  // 1. Always extract and save lightweight media overrides (guaranteed to fit in localStorage)
+  const trySet = (key: string, val: string): boolean => {
+    try {
+      localStorage.setItem(key, val);
+      return true;
+    } catch {
+      return false;
+    }
+  };
+
+  // Tier 1: Try saving full data if under ~2.5MB
   try {
-    const overrides: any = {};
-    if (data.rooms && Array.isArray(data.rooms)) {
-      overrides.rooms = data.rooms.map((r: any) => ({
+    const fullJson = JSON.stringify(data);
+    if (fullJson.length < 2.5 * 1024 * 1024) {
+      if (trySet(FAST_CACHE_KEY, fullJson)) {
+        return;
+      }
+    }
+  } catch {}
+
+  // Tier 2: Save essential above-the-fold visual overrides (hero, primary rooms, medical programs)
+  try {
+    // Clear old heavy keys if any to free quota space
+    try { localStorage.removeItem(LEGACY_STORAGE_KEY); } catch {}
+
+    const essential: any = {
+      resortInfo: data.resortInfo,
+      hero: {
+        badge: data.hero?.badge,
+        titleFirstPart: data.hero?.titleFirstPart,
+        titleSecondPart: data.hero?.titleSecondPart,
+        subtitle: data.hero?.subtitle,
+        ctaText: data.hero?.ctaText,
+        defaultBackgroundMode: data.hero?.defaultBackgroundMode,
+        // Limit fast cache to first 2 slides to guarantee it fits under quota
+        slides: Array.isArray(data.hero?.slides) ? data.hero.slides.slice(0, 2) : []
+      },
+      rooms: Array.isArray(data.rooms) ? data.rooms.map((r: any) => ({
         id: r.id,
         name: r.name,
         category: r.category,
-        image: r.image,
-        images: r.images
-      }));
-    }
-    if (data.medicalPrograms && Array.isArray(data.medicalPrograms)) {
-      overrides.medicalPrograms = data.medicalPrograms.map((m: any) => ({
+        image: r.image
+      })) : [],
+      medicalPrograms: Array.isArray(data.medicalPrograms) ? data.medicalPrograms.map((m: any) => ({
         id: m.id,
         title: m.title,
-        image: m.image
-      }));
-    }
-    if (data.hero) {
-      overrides.hero = {
-        slides: data.hero.slides,
-        defaultBackgroundMode: data.hero.defaultBackgroundMode
-      };
-    }
-    if (data.images) overrides.images = data.images;
-    if (data.extraImages) overrides.extraImages = data.extraImages;
-    if (data.gallery && Array.isArray(data.gallery)) overrides.gallery = data.gallery;
-    if (data.news && Array.isArray(data.news)) overrides.news = data.news;
+        image: m.image,
+        indications: Array.isArray(m.indications) ? m.indications : [],
+        procedures: Array.isArray(m.procedures) ? m.procedures : []
+      })) : [],
+      images: {
+        hero: data.images?.hero || '',
+        suite: data.images?.suite || '',
+        medical: data.images?.medical || '',
+        nature: data.images?.nature || ''
+      },
+      extraImages: {
+        standardRoom: data.extraImages?.standardRoom || '',
+        deluxeRoom: data.extraImages?.deluxeRoom || '',
+        pool: data.extraImages?.pool || '',
+        dining: data.extraImages?.dining || ''
+      },
+      _metadata: data._metadata
+    };
 
-    localStorage.setItem(FAST_OVERRIDES_KEY, JSON.stringify(overrides));
+    const essentialJson = JSON.stringify(essential);
+    if (trySet(FAST_CACHE_KEY, essentialJson)) {
+      trySet(FAST_OVERRIDES_KEY, essentialJson);
+      return;
+    }
+
+    // Tier 3: Ultra-lightweight fallback if individual base64 images are very large
+    const ultraLight: any = {
+      resortInfo: data.resortInfo,
+      hero: {
+        ...data.hero,
+        slides: Array.isArray(data.hero?.slides) ? data.hero.slides.map((s: any) => ({
+          ...s,
+          url: (s.url && s.url.startsWith('data:') && s.url.length > 400000) ? '' : s.url
+        })) : []
+      },
+      images: {
+        hero: (data.images?.hero && data.images.hero.length > 400000) ? '' : data.images?.hero,
+        suite: (data.images?.suite && data.images.suite.length > 400000) ? '' : data.images?.suite,
+        medical: (data.images?.medical && data.images.medical.length > 400000) ? '' : data.images?.medical,
+        nature: (data.images?.nature && data.images.nature.length > 400000) ? '' : data.images?.nature
+      }
+    };
+    trySet(FAST_CACHE_KEY, JSON.stringify(ultraLight));
   } catch (err) {
-    console.warn('Could not save fast media overrides:', err);
-  }
-
-  // 2. Try saving the complete site data into FAST_CACHE_KEY
-  try {
-    localStorage.setItem(FAST_CACHE_KEY, JSON.stringify(data));
-  } catch (quotaErr) {
-    console.warn('Full site data exceeded localStorage quota, media overrides preserved:', quotaErr);
-    // If quota exceeded, clean legacy and rely on overrides + IndexedDB
-    try {
-      localStorage.removeItem(LEGACY_STORAGE_KEY);
-    } catch {}
+    console.warn('Could not save fast storage data:', err);
   }
 }
 

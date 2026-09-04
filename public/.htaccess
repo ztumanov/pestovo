@@ -1,0 +1,19 @@
+# Apache configuration for shared hosting (ISPmanager, cPanel, Beget, TimeWeb)
+<IfModule mod_headers.c>
+    # Strictly disable caching for JSON database files so updates appear immediately
+    <FilesMatch "^(site-data\.json|reviews_data\.json)$">
+        Header set Cache-Control "no-cache, no-store, must-revalidate, max-age=0"
+        Header set Pragma "no-cache"
+        Header set Expires "0"
+    </FilesMatch>
+
+    # Disable caching for PHP handlers
+    <FilesMatch "\.(php)$">
+        Header set Cache-Control "no-cache, no-store, must-revalidate, max-age=0"
+        Header set Pragma "no-cache"
+        Header set Expires "0"
+    </FilesMatch>
+</IfModule>
+
+# Ensure UTF-8 charset
+AddDefaultCharset UTF-8

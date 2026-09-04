@@ -82,23 +82,23 @@ export default function AdminPage({ onBackToHome }: { onBackToHome: () => void }
   } = useAdminData();
 
   // Temporary local states for editing
-  const [localResortInfo, setLocalResortInfo] = useState({ ...siteData.resortInfo });
-  const [localHero, setLocalHero] = useState({ ...siteData.hero });
-  const [localImages, setLocalImages] = useState({ ...siteData.images });
-  const [localVideos, setLocalVideos] = useState({ ...siteData.videos });
-  const [localExtraImages, setLocalExtraImages] = useState({ ...siteData.extraImages });
+  const [localResortInfo, setLocalResortInfo] = useState({ ...(siteData?.resortInfo || {}) });
+  const [localHero, setLocalHero] = useState({ ...(siteData?.hero || {}) });
+  const [localImages, setLocalImages] = useState({ ...(siteData?.images || {}) });
+  const [localVideos, setLocalVideos] = useState({ ...(siteData?.videos || {}) });
+  const [localExtraImages, setLocalExtraImages] = useState({ ...(siteData?.extraImages || {}) });
 
   // For managing lists
-  const [rooms, setRooms] = useState<Room[]>([...siteData.rooms]);
-  const [medPrograms, setMedPrograms] = useState<MedicalProgram[]>([...siteData.medicalPrograms]);
-  const [testimonials, setTestimonials] = useState<Testimonial[]>([...siteData.testimonials]);
-  const [faqs, setFaqs] = useState<FAQItem[]>([...siteData.faqs]);
-  const [news, setNews] = useState<NewsArticle[]>([...(siteData.news || [])]);
-  const [services, setServices] = useState<ServiceItem[]>([...(siteData.services || [])]);
-  const [galleryItems, setGalleryItems] = useState<GalleryItem[]>([...(siteData.gallery || [])]);
-  const [galleryCats, setGalleryCats] = useState<GalleryCategory[]>([...(siteData.galleryCategories || [])]);
-  const [usersList, setUsersList] = useState<AdminUser[]>([...(siteData.users || [])]);
-  const [documents, setDocuments] = useState<DocumentItem[]>([...(siteData.documents || [])]);
+  const [rooms, setRooms] = useState<Room[]>([...(siteData?.rooms || [])]);
+  const [medPrograms, setMedPrograms] = useState<MedicalProgram[]>([...(siteData?.medicalPrograms || [])]);
+  const [testimonials, setTestimonials] = useState<Testimonial[]>([...(siteData?.testimonials || [])]);
+  const [faqs, setFaqs] = useState<FAQItem[]>([...(siteData?.faqs || [])]);
+  const [news, setNews] = useState<NewsArticle[]>([...(siteData?.news || [])]);
+  const [services, setServices] = useState<ServiceItem[]>([...(siteData?.services || [])]);
+  const [galleryItems, setGalleryItems] = useState<GalleryItem[]>([...(siteData?.gallery || [])]);
+  const [galleryCats, setGalleryCats] = useState<GalleryCategory[]>([...(siteData?.galleryCategories || [])]);
+  const [usersList, setUsersList] = useState<AdminUser[]>([...(siteData?.users || [])]);
+  const [documents, setDocuments] = useState<DocumentItem[]>([...(siteData?.documents || [])]);
 
   // Selected sub-items being edited in forms
   const [editingRoomId, setEditingRoomId] = useState<string | null>(null);
@@ -183,20 +183,22 @@ export default function AdminPage({ onBackToHome }: { onBackToHome: () => void }
 
   // Sync local state when siteData changes (e.g. loaded dynamically from localStorage on mount)
   useEffect(() => {
-    setLocalResortInfo({ ...siteData.resortInfo });
-    setLocalHero({ ...siteData.hero });
-    setLocalImages({ ...siteData.images });
-    setLocalVideos({ ...siteData.videos });
-    setLocalExtraImages({ ...siteData.extraImages });
-    setRooms([...siteData.rooms]);
-    setMedPrograms([...siteData.medicalPrograms]);
-    setTestimonials([...siteData.testimonials]);
-    setFaqs([...siteData.faqs]);
+    if (!siteData) return;
+    setLocalResortInfo({ ...(siteData.resortInfo || {}) });
+    setLocalHero({ ...(siteData.hero || {}) });
+    setLocalImages({ ...(siteData.images || {}) });
+    setLocalVideos({ ...(siteData.videos || {}) });
+    setLocalExtraImages({ ...(siteData.extraImages || {}) });
+    setRooms([...(siteData.rooms || [])]);
+    setMedPrograms([...(siteData.medicalPrograms || [])]);
+    setTestimonials([...(siteData.testimonials || [])]);
+    setFaqs([...(siteData.faqs || [])]);
     setNews([...(siteData.news || [])]);
     setServices([...(siteData.services || [])]);
     setGalleryItems([...(siteData.gallery || [])]);
     setGalleryCats([...(siteData.galleryCategories || [])]);
     setDocuments([...(siteData.documents || [])]);
+    setUsersList([...(siteData.users || [])]);
   }, [siteData]);
 
   if (!isAdminMode) {
@@ -785,14 +787,14 @@ export default function AdminPage({ onBackToHome }: { onBackToHome: () => void }
   const tabs = [
     { id: 'hero', name: 'Главная', icon: Home },
     { id: 'general', name: 'Контакты & Инфо', icon: Phone },
-    { id: 'rooms', name: 'Каталог Номеров', icon: Building, badge: rooms.length },
-    { id: 'medical', name: 'Программы Лечения', icon: HeartHandshake, badge: medPrograms.length },
-    { id: 'testimonials', name: 'Отзывы Гостей', icon: MessageSquare, badge: testimonials.length },
-    { id: 'faq', name: 'Вопросы & Ответы', icon: HelpCircle, badge: faqs.length },
-    { id: 'news', name: 'Новости', icon: Newspaper, badge: news.length },
-    { id: 'documents', name: 'Реестр Документов', icon: FileText, badge: documents.length },
-    { id: 'media', name: 'Медиа & Ссылки', icon: Folder, badge: galleryItems.length },
-    { id: 'users', name: 'Пользователи', icon: Users, badge: usersList.length },
+    { id: 'rooms', name: 'Каталог Номеров', icon: Building, badge: rooms?.length || 0 },
+    { id: 'medical', name: 'Программы Лечения', icon: HeartHandshake, badge: medPrograms?.length || 0 },
+    { id: 'testimonials', name: 'Отзывы Гостей', icon: MessageSquare, badge: testimonials?.length || 0 },
+    { id: 'faq', name: 'Вопросы & Ответы', icon: HelpCircle, badge: faqs?.length || 0 },
+    { id: 'news', name: 'Новости', icon: Newspaper, badge: news?.length || 0 },
+    { id: 'documents', name: 'Реестр Документов', icon: FileText, badge: documents?.length || 0 },
+    { id: 'media', name: 'Медиа & Ссылки', icon: Folder, badge: galleryItems?.length || 0 },
+    { id: 'users', name: 'Пользователи', icon: Users, badge: usersList?.length || 0 },
     { id: 'publish', name: 'Сохранить на хостинг', icon: Database },
   ];
 
@@ -922,7 +924,7 @@ export default function AdminPage({ onBackToHome }: { onBackToHome: () => void }
               </div>
               <div>
                 <span className="text-[10px] text-stone-400 font-mono block uppercase">Категорий Номеров</span>
-                <span className="text-lg font-black block font-mono text-stone-800">{rooms.length}</span>
+                <span className="text-lg font-black block font-mono text-stone-800">{rooms?.length || 0}</span>
               </div>
             </div>
 
@@ -932,7 +934,7 @@ export default function AdminPage({ onBackToHome }: { onBackToHome: () => void }
               </div>
               <div>
                 <span className="text-[10px] text-stone-400 font-mono block uppercase">Программ Лечения</span>
-                <span className="text-lg font-black block font-mono text-stone-800">{medPrograms.length}</span>
+                <span className="text-lg font-black block font-mono text-stone-800">{medPrograms?.length || 0}</span>
               </div>
             </div>
 
@@ -942,7 +944,7 @@ export default function AdminPage({ onBackToHome }: { onBackToHome: () => void }
               </div>
               <div>
                 <span className="text-[10px] text-stone-400 font-mono block uppercase">Отзывов Гостей</span>
-                <span className="text-lg font-black block font-mono text-stone-800">{testimonials.length}</span>
+                <span className="text-lg font-black block font-mono text-stone-800">{testimonials?.length || 0}</span>
               </div>
             </div>
 
@@ -952,7 +954,7 @@ export default function AdminPage({ onBackToHome }: { onBackToHome: () => void }
               </div>
               <div>
                 <span className="text-[10px] text-stone-400 font-mono block uppercase">Частых Вопросов</span>
-                <span className="text-lg font-black block font-mono text-stone-800">{faqs.length}</span>
+                <span className="text-lg font-black block font-mono text-stone-800">{faqs?.length || 0}</span>
               </div>
             </div>
 
@@ -962,7 +964,7 @@ export default function AdminPage({ onBackToHome }: { onBackToHome: () => void }
               </div>
               <div>
                 <span className="text-[10px] text-stone-400 font-mono block uppercase">Реестр Документов</span>
-                <span className="text-lg font-black block font-mono text-stone-800">{documents.length}</span>
+                <span className="text-lg font-black block font-mono text-stone-800">{documents?.length || 0}</span>
               </div>
             </div>
 
@@ -1749,8 +1751,8 @@ export default function AdminPage({ onBackToHome }: { onBackToHome: () => void }
                             </span>
                           )}
                         </div>
-                        <p className="text-[10px] text-stone-400 font-mono mt-1">{test.role} • {test.date}</p>
-                        <p className="text-xs text-stone-600 mt-2.5 italic leading-relaxed">"{test.text}"</p>
+                        <p className="text-[10px] text-stone-400 font-mono mt-1">{test.role || (test as any).city || 'Отдыхающий'} • {test.date || ''}</p>
+                        <p className="text-xs text-stone-600 mt-2.5 italic leading-relaxed">"{test.text || (test as any).content || ''}"</p>
                       </div>
                       <div className="flex items-center space-x-2 self-end md:self-center">
                         {test.isApproved === false && (
@@ -1915,7 +1917,7 @@ export default function AdminPage({ onBackToHome }: { onBackToHome: () => void }
               {/* NEWS LIST */}
               {!showAddNews && (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {news.length === 0 && (
+                  {(news?.length || 0) === 0 && (
                     <div className="col-span-full py-8 text-center bg-white rounded-xl border border-dashed border-stone-300 text-stone-500 font-serif">
                       Новостей пока нет
                     </div>
@@ -2347,7 +2349,7 @@ export default function AdminPage({ onBackToHome }: { onBackToHome: () => void }
                     <p className="text-[11px] text-stone-400 mt-0.5">Добавляйте, загружайте и редактируйте фотографии на главной странице внизу.</p>
                   </div>
                   <span className="text-xs bg-[#FAF9F6] border border-stone-200 text-[#022C22] font-mono px-3 py-1 rounded-full font-bold">
-                    Всего кадров: {galleryItems.length}
+                    Всего кадров: {galleryItems?.length || 0}
                   </span>
                 </div>
 
@@ -2490,7 +2492,7 @@ export default function AdminPage({ onBackToHome }: { onBackToHome: () => void }
                       <Folder className="w-3.5 h-3.5 text-[#c5a880]" /> Редактирование разделов (вкладок) галереи
                     </h5>
                     <span className="text-[10px] bg-stone-200 border border-stone-300 text-stone-600 font-mono px-2 py-0.5 rounded-full font-bold">
-                      Вкладок: {galleryCats.length}
+                      Вкладок: {galleryCats?.length || 0}
                     </span>
                   </div>
 
@@ -2536,7 +2538,7 @@ export default function AdminPage({ onBackToHome }: { onBackToHome: () => void }
                   <div className="space-y-2">
                     <span className="text-[10px] font-bold text-stone-400 uppercase tracking-widest block">Существующие разделы</span>
                     
-                    {galleryCats.length === 0 ? (
+                    {(galleryCats?.length || 0) === 0 ? (
                       <p className="text-xs text-stone-400 italic">Нет разделов. Пожалуйста, создайте хотя бы один.</p>
                     ) : (
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -2608,9 +2610,9 @@ export default function AdminPage({ onBackToHome }: { onBackToHome: () => void }
 
                 {/* CURRENT GALLERY LIST IN GRID & EDITABLE */}
                 <div className="space-y-4">
-                  <h5 className="font-bold text-xs text-[#022C22] uppercase tracking-wider">Текущие фотографии в галерее ({galleryItems.length})</h5>
+                  <h5 className="font-bold text-xs text-[#022C22] uppercase tracking-wider">Текущие фотографии в галерее ({galleryItems?.length || 0})</h5>
 
-                  {galleryItems.length === 0 ? (
+                  {(galleryItems?.length || 0) === 0 ? (
                     <div className="p-8 text-center border border-dashed border-stone-200 rounded-xl bg-[#FAF9F6]">
                       <ImageIcon className="w-8 h-8 text-stone-300 mx-auto mb-2" />
                       <p className="text-xs text-stone-400 font-medium">Нет загруженных фотографий в галерее</p>
@@ -2708,7 +2710,7 @@ export default function AdminPage({ onBackToHome }: { onBackToHome: () => void }
                     className="bg-gradient-to-r from-emerald-800 to-[#022C22] text-[#FAF9F6] hover:bg-[#c5a880] hover:text-[#022C22] font-semibold text-xs py-3 px-8 rounded-xl transition-all uppercase tracking-wider flex items-center gap-2 border border-transparent shadow cursor-pointer active:scale-95"
                   >
                     <Save className="w-4 h-4" />
-                    Сохранить всю фотогалерею ({galleryItems.length} картинок)
+                    Сохранить всю фотогалерею ({galleryItems?.length || 0} картинок)
                   </button>
                 </div>
               </div>
@@ -2784,7 +2786,7 @@ export default function AdminPage({ onBackToHome }: { onBackToHome: () => void }
                 <div className="bg-white border border-stone-200/80 rounded-2xl shadow-sm overflow-hidden animate-fade-in">
                   <div className="p-4 border-b border-stone-100 bg-[#FAF9F6] flex flex-col md:flex-row gap-3 md:items-center md:justify-between">
                     <span className="text-xs font-black uppercase tracking-wider text-[#022C22] block font-mono">
-                      Список документов ({documents.length})
+                      Список документов ({documents?.length || 0})
                     </span>
                     <p className="text-[11px] text-stone-400">
                       Изменения вступают в силу после нажатия кнопки «Опубликовать» во вкладке сохранения.
@@ -2846,7 +2848,7 @@ export default function AdminPage({ onBackToHome }: { onBackToHome: () => void }
                       </div>
                     ))}
 
-                    {documents.length === 0 && (
+                    {(documents?.length || 0) === 0 && (
                       <div className="p-10 text-center text-stone-400">
                         <FileText className="w-8 h-8 mx-auto mb-2 text-stone-300" />
                         <span className="text-xs">В реестре еще нет ни одного документа. Создайте первый!</span>
@@ -3177,8 +3179,19 @@ export default function AdminPage({ onBackToHome }: { onBackToHome: () => void }
                               throw new Error('Некорректные учётные данные. Пожалуйста, выйдите из панели и войдите заново.');
                             }
                             
-                            const fullData = getConsolidatedSiteData();
+                            const baseData = getConsolidatedSiteData();
+                            const fullData = {
+                              ...baseData,
+                              _metadata: {
+                                updatedAt: new Date().toISOString(),
+                                version: Date.now(),
+                                source: 'admin-save'
+                              }
+                            };
                             updateSiteData(fullData);
+                            try {
+                              localStorage.setItem('yasnaya_server_data_fingerprint', String(fullData._metadata.updatedAt));
+                            } catch {}
 
                             const response = await fetch('/save_settings.php', {
                               method: 'POST',
@@ -3237,8 +3250,19 @@ export default function AdminPage({ onBackToHome }: { onBackToHome: () => void }
                       {/* Download JSON Button with File Size */}
                       <button
                         onClick={() => {
-                          const fullData = getConsolidatedSiteData();
+                          const baseData = getConsolidatedSiteData();
+                          const fullData = {
+                            ...baseData,
+                            _metadata: {
+                              updatedAt: new Date().toISOString(),
+                              version: Date.now(),
+                              source: 'admin-export'
+                            }
+                          };
                           updateSiteData(fullData);
+                          try {
+                            localStorage.setItem('yasnaya_server_data_fingerprint', String(fullData._metadata.updatedAt));
+                          } catch {}
                           const jsonString = JSON.stringify(fullData, null, 2);
                           const blob = new Blob([jsonString], { type: 'application/json;charset=utf-8' });
                           const blobUrl = URL.createObjectURL(blob);
@@ -3503,7 +3527,7 @@ function RoomForm({ initialData, onCancel, onSave }: RoomFormProps) {
   };
   
   const [newAmenity, setNewAmenity] = useState('');
-  const [amenities, setAmenities] = useState<string[]>([...initialData.amenities]);
+  const [amenities, setAmenities] = useState<string[]>([...(initialData?.amenities || [])]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -3786,7 +3810,7 @@ function RoomForm({ initialData, onCancel, onSave }: RoomFormProps) {
               <button type="button" onClick={() => handleRemoveAmenity(idx)} className="text-[#c5a880] hover:text-white font-bold ml-1.5 text-xs">×</button>
             </span>
           ))}
-          {amenities.length === 0 && <span className="text-xs text-stone-400 p-1">Список удобств пуст.</span>}
+          {(amenities?.length || 0) === 0 && <span className="text-xs text-stone-400 p-1">Список удобств пуст.</span>}
         </div>
         <div className="flex gap-2">
           <input 
@@ -3847,10 +3871,10 @@ function MedicalForm({ initialData, onCancel, onSave }: MedicalFormProps) {
   };
 
   const [newIndication, setNewIndication] = useState('');
-  const [indications, setIndications] = useState<string[]>([...initialData.indications]);
+  const [indications, setIndications] = useState<string[]>([...(initialData?.indications || [])]);
 
   const [newProcedure, setNewProcedure] = useState('');
-  const [procedures, setProcedures] = useState<string[]>([...initialData.procedures]);
+  const [procedures, setProcedures] = useState<string[]>([...(initialData?.procedures || [])]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -4065,7 +4089,7 @@ function MedicalForm({ initialData, onCancel, onSave }: MedicalFormProps) {
                 <button type="button" onClick={() => setIndications(indications.filter((_, i) => i !== idx))} className="text-red-500 font-bold px-1.5 hover:text-red-700">×</button>
               </div>
             ))}
-            {indications.length === 0 && <span className="text-[11px] text-stone-400 p-1 block">Добавьте хотя бы одно показание.</span>}
+            {(indications?.length || 0) === 0 && <span className="text-[11px] text-stone-400 p-1 block">Добавьте хотя бы одно показание.</span>}
           </div>
           <div className="flex gap-2">
             <input type="text" placeholder="Новое показание..." value={newIndication} onChange={e => setNewIndication(e.target.value)} className="border border-stone-300 rounded-xl px-3 py-1.5 text-xs flex-1 focus:outline-none focus:border-[#c5a880]" />
@@ -4082,7 +4106,7 @@ function MedicalForm({ initialData, onCancel, onSave }: MedicalFormProps) {
                 <button type="button" onClick={() => setProcedures(procedures.filter((_, i) => i !== idx))} className="text-red-500 font-bold px-1.5 hover:text-red-700">×</button>
               </div>
             ))}
-            {procedures.length === 0 && <span className="text-[11px] text-stone-400 p-1 block">Добавьте хотя бы одну процедуру.</span>}
+            {(procedures?.length || 0) === 0 && <span className="text-[11px] text-stone-400 p-1 block">Добавьте хотя бы одну процедуру.</span>}
           </div>
           <div className="flex gap-2">
             <input type="text" placeholder="Новая процедура..." value={newProcedure} onChange={e => setNewProcedure(e.target.value)} className="border border-stone-300 rounded-xl px-3 py-1.5 text-xs flex-1 focus:outline-none focus:border-[#c5a880]" />
@@ -4111,11 +4135,11 @@ interface TestimonialFormProps {
 }
 
 function TestimonialForm({ initialData, onCancel, onSave }: TestimonialFormProps) {
-  const [author, setAuthor] = useState(initialData.author);
-  const [role, setRole] = useState(initialData.role);
-  const [rating, setRating] = useState(initialData.rating);
-  const [text, setText] = useState(initialData.text);
-  const [date, setDate] = useState(initialData.date);
+  const [author, setAuthor] = useState(initialData?.author || '');
+  const [role, setRole] = useState(initialData?.role || (initialData as any)?.city || 'Гость');
+  const [rating, setRating] = useState(initialData?.rating || 5);
+  const [text, setText] = useState(initialData?.text || (initialData as any)?.content || '');
+  const [date, setDate] = useState(initialData?.date || '');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -4408,7 +4432,7 @@ function ServiceForm({ initialData, onCancel, onSave }: ServiceFormProps) {
                 <button type="button" onClick={() => setIndications(indications.filter((_, i) => i !== idx))} className="text-red-500 font-bold px-1.5 hover:text-red-700">×</button>
               </div>
             ))}
-            {indications.length === 0 && <span className="text-[11px] text-stone-400 p-1 block">Добавьте показания ниже</span>}
+            {(indications?.length || 0) === 0 && <span className="text-[11px] text-stone-400 p-1 block">Добавьте показания ниже</span>}
           </div>
           <div className="flex gap-2">
             <input type="text" placeholder="Новое показание..." value={newIndication} onChange={e => setNewIndication(e.target.value)} className="border border-stone-300 rounded-xl px-3 py-1.5 text-xs flex-1 focus:outline-none focus:border-[#c5a880]" />

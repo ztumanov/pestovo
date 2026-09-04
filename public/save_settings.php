@@ -14,6 +14,10 @@ header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
 header("Access-Control-Allow-Methods: GET, POST, OPTIONS");
 header("Content-Type: application/json; charset=UTF-8");
+header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
+header("Cache-Control: post-check=0, pre-check=0", false);
+header("Pragma: no-cache");
+header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
 
 // Handle preflight OPTIONS requests
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
@@ -144,6 +148,13 @@ if ($method === 'POST') {
             }
         }
     }
+
+    // Attach metadata timestamp so all browsers and devices immediately detect updated data
+    $siteData['_metadata'] = [
+        'updatedAt' => date('c'),
+        'version' => time(),
+        'source' => 'save_settings.php'
+    ];
 
     $encoded = json_encode($siteData, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
     if ($encoded === false) {
