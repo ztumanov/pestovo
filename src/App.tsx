@@ -136,17 +136,15 @@ export default function App() {
   
   // Slideshow state for automatic background rotation
   const rawSlides: Array<{ id: string; type: string; url: string }> = useMemo(() => {
-    let list: Array<{ id: string; type: string; url: string }> = [];
-    if (Array.isArray(HERO_DATA?.slides) && HERO_DATA.slides.length > 0) {
-      list = [...HERO_DATA.slides];
-    } else if (IMAGES?.hero) {
-      list = [{ id: 'hero-photo-1', type: 'photo', url: IMAGES.hero }];
+    // If HERO_DATA.slides is explicitly defined as an array, it is the user's primary source of truth
+    if (Array.isArray(HERO_DATA?.slides)) {
+      return HERO_DATA.slides.filter(slide => Boolean(slide && slide.url));
     }
-    // If IMAGES.hero is specifically configured and not in the slides array, prepend it
-    if (IMAGES?.hero && !list.some(s => s.url === IMAGES.hero)) {
-      list.unshift({ id: 'custom-hero-photo', type: 'photo', url: IMAGES.hero });
+    // Only fall back to IMAGES.hero if HERO_DATA.slides was completely undefined
+    if (IMAGES?.hero) {
+      return [{ id: 'hero-photo-1', type: 'photo', url: IMAGES.hero }];
     }
-    return list.filter(slide => Boolean(slide && slide.url));
+    return [];
   }, [HERO_DATA?.slides, IMAGES?.hero]);
 
   const bgMode = HERO_DATA?.defaultBackgroundMode || 'all';

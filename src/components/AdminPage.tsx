@@ -37,6 +37,7 @@ import {
   HardDrive,
   RefreshCw,
   Download,
+  Upload,
   UploadCloud,
   CheckCircle2,
   AlertTriangle
@@ -1290,14 +1291,22 @@ export default function AdminPage({ onBackToHome }: { onBackToHome: () => void }
                                   const remainingPhotos = nextSlides.filter((s: any) => s.type === 'photo');
                                   const newHeroPhoto = remainingPhotos.length > 0 ? remainingPhotos[0].url : '';
                                   
-                                  setLocalHero({
+                                  const updatedHero = {
                                     ...localHero,
                                     slides: nextSlides
-                                  });
+                                  };
+                                  setLocalHero(updatedHero);
                                   
-                                  if (localImages.hero === slide.url) {
-                                    setLocalImages(prev => ({ ...prev, hero: newHeroPhoto }));
+                                  let nextImages = localImages;
+                                  if (localImages.hero === slide.url || !remainingPhotos.some((p: any) => p.url === localImages.hero)) {
+                                    nextImages = { ...localImages, hero: newHeroPhoto };
+                                    setLocalImages(nextImages);
                                   }
+
+                                  updateSections({
+                                    hero: updatedHero,
+                                    images: nextImages
+                                  });
                                   triggerSuccess();
                                 }}
                                 className="text-[10px] text-red-600 hover:text-red-700 bg-red-50 hover:bg-red-100 py-1 px-2.5 rounded-lg transition-all font-semibold flex items-center gap-1 cursor-pointer"
@@ -2069,10 +2078,16 @@ export default function AdminPage({ onBackToHome }: { onBackToHome: () => void }
                               type="button"
                               onClick={() => {
                                 const oldHero = localImages.hero;
-                                setLocalImages({ ...localImages, hero: '' });
+                                const nextImages = { ...localImages, hero: '' };
+                                setLocalImages(nextImages);
                                 const currentSlides = (localHero as any).slides || [];
                                 const nextSlides = currentSlides.filter((s: any) => s.url !== oldHero && s.type !== 'photo');
-                                setLocalHero({ ...localHero, slides: nextSlides });
+                                const nextHero = { ...localHero, slides: nextSlides };
+                                setLocalHero(nextHero);
+                                updateSections({
+                                  images: nextImages,
+                                  hero: nextHero
+                                });
                                 triggerSuccess();
                               }}
                               className="text-[10px] text-red-600 hover:text-red-700 bg-red-50 hover:bg-red-100 py-1 px-2 rounded-lg font-semibold flex items-center gap-1 cursor-pointer transition-colors"
@@ -2089,12 +2104,18 @@ export default function AdminPage({ onBackToHome }: { onBackToHome: () => void }
                               onChange={e => {
                                 if (e.target.files?.[0]) {
                                   compressImage(e.target.files[0], 1400, 0.8, (b64) => {
-                                    setLocalImages({ ...localImages, hero: b64 });
+                                    const nextImages = { ...localImages, hero: b64 };
+                                    setLocalImages(nextImages);
                                     const currentSlides = (localHero as any).slides || [];
                                     const nonPhotoSlides = currentSlides.filter((s: any) => s.type !== 'photo');
-                                    setLocalHero({
+                                    const nextHero = {
                                       ...localHero,
                                       slides: [...nonPhotoSlides, { id: `photo-${Date.now()}`, type: 'photo', url: b64 }]
+                                    };
+                                    setLocalHero(nextHero);
+                                    updateSections({
+                                      images: nextImages,
+                                      hero: nextHero
                                     });
                                     triggerSuccess();
                                   });
@@ -2109,15 +2130,22 @@ export default function AdminPage({ onBackToHome }: { onBackToHome: () => void }
                         value={localImages.hero} 
                         onChange={e => {
                           const val = e.target.value;
-                          setLocalImages({ ...localImages, hero: val });
-                          if (val) {
-                            const currentSlides = (localHero as any).slides || [];
-                            const nonPhotoSlides = currentSlides.filter((s: any) => s.type !== 'photo');
-                            setLocalHero({
-                              ...localHero,
-                              slides: [...nonPhotoSlides, { id: `photo-${Date.now()}`, type: 'photo', url: val }]
-                            });
-                          }
+                          const nextImages = { ...localImages, hero: val };
+                          setLocalImages(nextImages);
+                          const currentSlides = (localHero as any).slides || [];
+                          const nonPhotoSlides = currentSlides.filter((s: any) => s.type !== 'photo');
+                          const nextHero = val ? {
+                            ...localHero,
+                            slides: [...nonPhotoSlides, { id: `photo-${Date.now()}`, type: 'photo', url: val }]
+                          } : {
+                            ...localHero,
+                            slides: nonPhotoSlides
+                          };
+                          setLocalHero(nextHero);
+                          updateSections({
+                            images: nextImages,
+                            hero: nextHero
+                          });
                         }}
                         className="w-full border border-stone-300 rounded-lg px-3 py-1.5 text-xs focus:outline-none focus:border-[#c5a880]/80 font-mono"
                         placeholder="URL или загрузите файл выше"
@@ -2145,7 +2173,10 @@ export default function AdminPage({ onBackToHome }: { onBackToHome: () => void }
                             onChange={e => {
                               if (e.target.files?.[0]) {
                                 compressImage(e.target.files[0], 1200, 0.8, (b64) => {
-                                  setLocalImages({ ...localImages, suite: b64 });
+                                  const nextImages = { ...localImages, suite: b64 };
+                                  setLocalImages(nextImages);
+                                  updateSections({ images: nextImages });
+                                  triggerSuccess();
                                 });
                               }
                             }} 
@@ -2155,7 +2186,11 @@ export default function AdminPage({ onBackToHome }: { onBackToHome: () => void }
                       <input 
                         type="text" 
                         value={localImages.suite} 
-                        onChange={e => setLocalImages({ ...localImages, suite: e.target.value })}
+                        onChange={e => {
+                          const nextImages = { ...localImages, suite: e.target.value };
+                          setLocalImages(nextImages);
+                          updateSections({ images: nextImages });
+                        }}
                         className="w-full border border-stone-300 rounded-lg px-3 py-1.5 text-xs focus:outline-none focus:border-[#c5a880]/80 font-mono"
                         placeholder="URL или загрузите файл выше"
                       />
@@ -2182,7 +2217,10 @@ export default function AdminPage({ onBackToHome }: { onBackToHome: () => void }
                             onChange={e => {
                               if (e.target.files?.[0]) {
                                 compressImage(e.target.files[0], 1200, 0.8, (b64) => {
-                                  setLocalImages({ ...localImages, medical: b64 });
+                                  const nextImages = { ...localImages, medical: b64 };
+                                  setLocalImages(nextImages);
+                                  updateSections({ images: nextImages });
+                                  triggerSuccess();
                                 });
                               }
                             }} 
@@ -2192,7 +2230,11 @@ export default function AdminPage({ onBackToHome }: { onBackToHome: () => void }
                       <input 
                         type="text" 
                         value={localImages.medical} 
-                        onChange={e => setLocalImages({ ...localImages, medical: e.target.value })}
+                        onChange={e => {
+                          const nextImages = { ...localImages, medical: e.target.value };
+                          setLocalImages(nextImages);
+                          updateSections({ images: nextImages });
+                        }}
                         className="w-full border border-stone-300 rounded-lg px-3 py-1.5 text-xs focus:outline-none focus:border-[#c5a880]/80 font-mono"
                         placeholder="URL или загрузите файл выше"
                       />
@@ -2219,7 +2261,10 @@ export default function AdminPage({ onBackToHome }: { onBackToHome: () => void }
                             onChange={e => {
                               if (e.target.files?.[0]) {
                                 compressImage(e.target.files[0], 1200, 0.8, (b64) => {
-                                  setLocalImages({ ...localImages, nature: b64 });
+                                  const nextImages = { ...localImages, nature: b64 };
+                                  setLocalImages(nextImages);
+                                  updateSections({ images: nextImages });
+                                  triggerSuccess();
                                 });
                               }
                             }} 
@@ -2229,7 +2274,11 @@ export default function AdminPage({ onBackToHome }: { onBackToHome: () => void }
                       <input 
                         type="text" 
                         value={localImages.nature} 
-                        onChange={e => setLocalImages({ ...localImages, nature: e.target.value })}
+                        onChange={e => {
+                          const nextImages = { ...localImages, nature: e.target.value };
+                          setLocalImages(nextImages);
+                          updateSections({ images: nextImages });
+                        }}
                         className="w-full border border-stone-300 rounded-lg px-3 py-1.5 text-xs focus:outline-none focus:border-[#c5a880]/80 font-mono"
                         placeholder="URL или загрузите файл выше"
                       />
@@ -4175,6 +4224,17 @@ function NewsForm({ initialData, onCancel, onSave }: NewsFormProps) {
   const [image, setImage] = useState(initialData.image);
   const [excerpt, setExcerpt] = useState(initialData.excerpt || '');
   const [content, setContent] = useState(initialData.content);
+  const [dragActive, setDragActive] = useState(false);
+
+  const handleNewsImageFile = (file: File) => {
+    if (!file.type.startsWith('image/')) {
+      alert('Пожалуйста, выберите файл изображения (png, jpg, jpeg, webp).');
+      return;
+    }
+    compressImage(file, 1200, 0.78, (base64) => {
+      setImage(base64);
+    });
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -4195,9 +4255,50 @@ function NewsForm({ initialData, onCancel, onSave }: NewsFormProps) {
         <label className="block text-[10px] font-bold uppercase tracking-wider text-stone-400 mb-1">Дата публикации</label>
         <input required type="text" value={date} onChange={e => setDate(e.target.value)} className="w-full bg-stone-50 border border-stone-200 rounded-xl px-4 py-2 text-sm text-[#022C22] focus:outline-none focus:border-[#c5a880]" placeholder="Например: 10.05.2026" />
       </div>
+
       <div>
-        <label className="block text-[10px] font-bold uppercase tracking-wider text-stone-400 mb-1">Ссылка на картинку</label>
-        <input required type="text" value={image} onChange={e => setImage(e.target.value)} className="w-full bg-stone-50 border border-stone-200 rounded-xl px-4 py-2 font-mono text-xs text-[#022C22] focus:outline-none focus:border-[#c5a880]" placeholder="https://..." />
+        <label className="block text-[10px] font-bold uppercase tracking-wider text-stone-400 mb-1">Изображение к новости</label>
+        <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
+          <input required type="text" value={image} onChange={e => setImage(e.target.value)} className="flex-1 bg-stone-50 border border-stone-200 rounded-xl px-4 py-2 font-mono text-xs text-[#022C22] focus:outline-none focus:border-[#c5a880]" placeholder="https://... или загрузите файл" />
+          
+          <label className="cursor-pointer bg-white hover:bg-stone-50 border border-[#c5a880] text-[#022C22] px-4 py-2 rounded-xl text-xs font-bold transition-all shadow-sm shrink-0 flex items-center gap-1.5">
+            <Upload className="w-3.5 h-3.5 text-[#c5a880]" />
+            <span>Загрузить фото</span>
+            <input 
+              type="file" 
+              accept="image/*" 
+              className="hidden" 
+              onChange={(e) => {
+                if (e.target.files?.[0]) {
+                  handleNewsImageFile(e.target.files[0]);
+                }
+              }} 
+            />
+          </label>
+        </div>
+
+        {/* Drag and Drop Zone */}
+        <div 
+          onDragOver={(e) => { e.preventDefault(); setDragActive(true); }}
+          onDragLeave={() => setDragActive(false)}
+          onDrop={(e) => {
+            e.preventDefault();
+            setDragActive(false);
+            if (e.dataTransfer.files?.[0]) {
+              handleNewsImageFile(e.dataTransfer.files[0]);
+            }
+          }}
+          className={`mt-2 border-2 border-dashed rounded-xl p-3 text-center transition-colors ${dragActive ? 'border-[#c5a880] bg-[#FAF9F6]' : 'border-stone-200 bg-stone-50/50'}`}
+        >
+          {image ? (
+            <div className="flex items-center justify-center gap-3">
+              <img src={image} alt="preview" className="w-16 h-12 object-cover rounded-lg border border-stone-200 shadow-sm" referrerPolicy="no-referrer" />
+              <span className="text-[11px] font-bold text-emerald-700">✓ Фотография успешно установлена</span>
+            </div>
+          ) : (
+            <span className="text-xs text-stone-500">Перетащите сюда фото или нажмите кнопку выше</span>
+          )}
+        </div>
       </div>
       <div>
         <label className="block text-[10px] font-bold uppercase tracking-wider text-stone-400 mb-1">Краткий анонс (опционально)</label>

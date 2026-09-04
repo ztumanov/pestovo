@@ -7,8 +7,10 @@
 const DB_NAME = 'YasnayaPolyanaDB';
 const DB_VERSION = 1;
 const STORE_NAME = 'site_config';
-const CONFIG_KEY = 'editable_site_data';
-const LEGACY_STORAGE_KEY = 'pestovo_resort_editable_data';
+export const CONFIG_KEY = 'editable_site_data';
+export const LEGACY_STORAGE_KEY = 'pestovo_resort_editable_data';
+export const FAST_CACHE_KEY = 'yasnaya_polyana_fast_site_data';
+export const FAST_OVERRIDES_KEY = 'yasnaya_polyana_media_overrides';
 
 export async function openDB(): Promise<IDBDatabase> {
   return new Promise((resolve, reject) => {
@@ -26,6 +28,99 @@ export async function openDB(): Promise<IDBDatabase> {
     request.onsuccess = () => resolve(request.result);
     request.onerror = () => reject(request.error);
   });
+}
+
+/**
+ * Synchronously retrieves fast-cached site data from localStorage (0ms latency, eliminates flash of default images)
+ */
+export function getFastStorageData<T>(): T | null {
+  if (typeof window === 'undefined') return null;
+  try {
+    const fast = localStorage.getItem(FAST_CACHE_KEY);
+    if (fast) {
+      const parsed = JSON.parse(fast) as T;
+      if (parsed && typeof parsed === 'object') return parsed;
+    }
+  } catch (e) {
+    console.warn('Fast cache read failed:', e);
+  }
+
+  try {
+    const legacy = localStorage.getItem(LEGACY_STORAGE_KEY);
+    if (legacy) {
+      const parsed = JSON.parse(legacy) as T;
+      if (parsed && typeof parsed === 'object') return parsed;
+    }
+  } catch (e) {}
+
+  return null;
+}
+
+/**
+ * Synchronously retrieves media and card overrides from localStorage
+ */
+export function getFastMediaOverrides(): any | null {
+  if (typeof window === 'undefined') return null;
+  try {
+    const raw = localStorage.getItem(FAST_OVERRIDES_KEY);
+    if (raw) {
+      return JSON.parse(raw);
+    }
+  } catch {}
+  return null;
+}
+
+/**
+ * Synchronously caches site data and visual assets to localStorage for instant startup display
+ */
+export function saveFastStorageData(data: any): void {
+  if (typeof window === 'undefined' || !data) return;
+
+  // 1. Always extract and save lightweight media overrides (guaranteed to fit in localStorage)
+  try {
+    const overrides: any = {};
+    if (data.rooms && Array.isArray(data.rooms)) {
+      overrides.rooms = data.rooms.map((r: any) => ({
+        id: r.id,
+        name: r.name,
+        category: r.category,
+        image: r.image,
+        images: r.images
+      }));
+    }
+    if (data.medicalPrograms && Array.isArray(data.medicalPrograms)) {
+      overrides.medicalPrograms = data.medicalPrograms.map((m: any) => ({
+        id: m.id,
+        title: m.title,
+        image: m.image
+      }));
+    }
+    if (data.hero) {
+      overrides.hero = {
+        slides: data.hero.slides,
+        defaultBackgroundMode: data.hero.defaultBackgroundMode
+      };
+    }
+    if (data.images) overrides.images = data.images;
+    if (data.extraImages) overrides.extraImages = data.extraImages;
+    if (data.gallery && Array.isArray(data.gallery)) overrides.gallery = data.gallery;
+    if (data.news && Array.isArray(data.news)) overrides.news = data.news;
+
+    localStorage.setItem(FAST_OVERRIDES_KEY, JSON.stringify(overrides));
+  } catch (err) {
+    console.warn('Could not save fast media overrides:', err);
+  }
+
+  // 2. Try saving the complete site data into FAST_CACHE_KEY
+  try {
+    localStorage.setItem(FAST_CACHE_KEY, JSON.stringify(data));
+  } catch (quotaErr) {
+    console.warn('Full site data exceeded localStorage quota, media overrides preserved:', quotaErr);
+    // If quota exceeded, clean legacy and rely on overrides + IndexedDB
+    try {
+      localStorage.removeItem(LEGACY_STORAGE_KEY);
+    } catch {}
+  }
 }
 
 /**
@@ -47,35 +142,33 @@ export async function getStorageData<T>(key: string = CONFIG_KEY): Promise<T | n
     });
 
     if (idbData) {
+      // Refresh fast cache with fresh IndexedDB content
+      saveFastStorageData(idbData);
       return idbData;
     }
   } catch (err) {
     console.warn('IndexedDB unavailable, checking localStorage fallback:', err);
   }
 
-  // Fallback: check legacy localStorage
-  try {
-    const legacy = localStorage.getItem(LEGACY_STORAGE_KEY);
-    if (legacy) {
-      const parsed = JSON.parse(legacy) as T;
-      // Auto-migrate to IndexedDB and clean up localStorage to prevent memory quota block
-      setStorageData(parsed, key).catch(() => {});
-      try {
-        localStorage.removeItem(LEGACY_STORAGE_KEY);
-      } catch {}
-      return parsed;
-    }
-  } catch (e) {
-    console.warn('Error reading fallback localStorage:', e);
+  // Fallback: check synchronous fast cache or legacy localStorage
+  const fast = getFastStorageData<T>();
+  if (fast) {
+    // Auto-migrate to IndexedDB
+    setStorageData(fast, key).catch(() => {});
+    return fast;
   }
 
   return null;
 }
 
 /**
- * Save data asynchronously to high-capacity IndexedDB
+ * Save data asynchronously to high-capacity IndexedDB AND synchronously to fast localStorage
  */
 export async function setStorageData<T>(data: T, key: string = CONFIG_KEY): Promise<boolean> {
+  // 1. Immediately write to fast synchronous cache for 0ms page reloads
+  saveFastStorageData(data);
+
+  // 2. Save full payload to high-capacity IndexedDB
   try {
     const db = await openDB();
     return new Promise((resolve) => {
@@ -89,14 +182,8 @@ export async function setStorageData<T>(data: T, key: string = CONFIG_KEY): Prom
       };
     });
   } catch (err) {
-    console.warn('IndexedDB write failed, trying localStorage fallback:', err);
-    try {
-      localStorage.setItem(LEGACY_STORAGE_KEY, JSON.stringify(data));
-      return true;
-    } catch (lsErr) {
-      console.error('LocalStorage also exceeded quota:', lsErr);
-      return false;
-    }
+    console.warn('IndexedDB write failed, relying on fast cache:', err);
+    return true;
   }
 }
 
@@ -114,6 +201,8 @@ export async function clearStorageData(key: string = CONFIG_KEY): Promise<void> 
   }
 
   try {
+    localStorage.removeItem(FAST_CACHE_KEY);
+    localStorage.removeItem(FAST_OVERRIDES_KEY);
     localStorage.removeItem(LEGACY_STORAGE_KEY);
   } catch {}
 }
@@ -146,6 +235,7 @@ export function compressImageFile(
     if (!file.type.startsWith('image/')) {
       const reader = new FileReader();
       reader.onload = (e) => resolve((e.target?.result as string) || '');
+      reader.onerror = () => resolve('');
       reader.readAsDataURL(file);
       return;
     }
@@ -174,15 +264,26 @@ export function compressImageFile(
         }
 
         const canvas = document.createElement('canvas');
-        canvas.width = width;
-        canvas.height = height;
+        canvas.width = Math.max(1, width);
+        canvas.height = Math.max(1, height);
         const ctx = canvas.getContext('2d');
 
         if (ctx) {
           ctx.imageSmoothingEnabled = true;
           ctx.imageSmoothingQuality = 'high';
+
+          // Try WebP first for optimal compression & transparency support
+          const supportsWebP = canvas.toDataURL('image/webp').indexOf('data:image/webp') === 0;
+          const mimeType = supportsWebP ? 'image/webp' : 'image/jpeg';
+
+          if (mimeType === 'image/jpeg') {
+            // Fill white background for JPEG so transparent PNGs don't get black boxes
+            ctx.fillStyle = '#FFFFFF';
+            ctx.fillRect(0, 0, width, height);
+          }
+
           ctx.drawImage(img, 0, 0, width, height);
-          const optimized = canvas.toDataURL('image/jpeg', quality);
+          const optimized = canvas.toDataURL(mimeType, quality);
           resolve(optimized);
         } else {
           resolve(originalResult);
@@ -191,6 +292,7 @@ export function compressImageFile(
       img.onerror = () => resolve(originalResult);
       img.src = originalResult;
     };
+    reader.onerror = () => resolve('');
     reader.readAsDataURL(file);
   });
 }

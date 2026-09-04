@@ -12,7 +12,16 @@ import {
 } from '../data/resortData';
 import { DEFAULT_SERVICES } from '../data/servicesData';
 import { INITIAL_DOCUMENTS } from '../data/documentsData';
-import { getStorageData, setStorageData, clearStorageData } from '../lib/storage';
+import { 
+  getStorageData, 
+  setStorageData, 
+  clearStorageData, 
+  getFastStorageData, 
+  getFastMediaOverrides, 
+  saveFastStorageData,
+  LEGACY_STORAGE_KEY,
+  FAST_CACHE_KEY
+} from '../lib/storage';
 
 export interface SiteData {
   resortInfo: {
@@ -177,6 +186,84 @@ const DEFAULT_SITE_DATA: SiteData = {
 const LOCAL_STORAGE_KEY = 'pestovo_resort_editable_data';
 const ADMIN_MODE_KEY = 'pestovo_resort_admin_active';
 
+/**
+ * Synchronously retrieves fast-cached site data or media overrides before initial render
+ * to guarantee 0ms latency and prevent any flicker of default images.
+ */
+function getInitialSynchronousSiteData(): SiteData {
+  try {
+    const fastData = getFastStorageData<SiteData>();
+    if (fastData && typeof fastData === 'object' && fastData.rooms && Array.isArray(fastData.rooms) && fastData.rooms.length > 0) {
+      return deepCleanAssetPaths(fastData);
+    }
+
+    const overrides = getFastMediaOverrides();
+    if (overrides) {
+      const merged: SiteData = JSON.parse(JSON.stringify(DEFAULT_SITE_DATA));
+      if (overrides.rooms && Array.isArray(overrides.rooms) && overrides.rooms.length > 0) {
+        merged.rooms = merged.rooms.map(defRoom => {
+          const match = overrides.rooms.find((o: any) => o.id === defRoom.id || o.name === defRoom.name);
+          if (match) {
+            return {
+              ...defRoom,
+              image: match.image || defRoom.image,
+              images: (match.images && match.images.length > 0) ? match.images : defRoom.images
+            };
+          }
+          return defRoom;
+        });
+
+        // Bidirectional sync: propagate custom room photos to extraImages and images
+        const std = merged.rooms.find(r => r.id === 'standard');
+        if (std && std.image) merged.extraImages.standardRoom = std.image;
+        const lux = merged.rooms.find(r => r.id === 'lux');
+        if (lux && lux.image) merged.images.suite = lux.image;
+      }
+
+      if (overrides.medicalPrograms && Array.isArray(overrides.medicalPrograms)) {
+        merged.medicalPrograms = merged.medicalPrograms.map(defMed => {
+          const match = overrides.medicalPrograms.find((o: any) => o.id === defMed.id);
+          if (match && match.image) {
+            return { ...defMed, image: match.image };
+          }
+          return defMed;
+        });
+      }
+
+      if (overrides.images) {
+        merged.images = { ...merged.images, ...overrides.images };
+      }
+      if (overrides.extraImages) {
+        merged.extraImages = { ...merged.extraImages, ...overrides.extraImages };
+      }
+      if (overrides.hero) {
+        if (Array.isArray(overrides.hero.slides)) {
+          merged.hero.slides = overrides.hero.slides;
+          const firstPhoto = overrides.hero.slides.find((s: any) => s.type === 'photo');
+          if (firstPhoto?.url) {
+            merged.images.hero = firstPhoto.url;
+          } else if (overrides.hero.slides.length === 0 || !firstPhoto) {
+            merged.images.hero = '';
+          }
+        }
+        if (overrides.hero.defaultBackgroundMode) {
+          merged.hero.defaultBackgroundMode = overrides.hero.defaultBackgroundMode;
+        }
+      }
+      if (overrides.gallery && Array.isArray(overrides.gallery)) {
+        merged.gallery = overrides.gallery;
+      }
+      if (overrides.news && Array.isArray(overrides.news) && overrides.news.length > 0) {
+        merged.news = overrides.news;
+      }
+      return deepCleanAssetPaths(merged);
+    }
+  } catch (err) {
+    console.warn('Initial synchronous data read error:', err);
+  }
+  return DEFAULT_SITE_DATA;
+}
+
 interface AdminDataContextProps {
   siteData: SiteData;
   isAdminMode: boolean;
@@ -196,53 +283,34 @@ interface AdminDataContextProps {
 const AdminDataContext = createContext<AdminDataContextProps | undefined>(undefined);
 
 export function AdminDataProvider({ children }: { children: React.ReactNode }) {
-  const [siteData, setSiteData] = useState<SiteData>(DEFAULT_SITE_DATA);
+  // Synchronous initialization from fast cache eliminates the flash of default images on page reload
+  const [siteData, setSiteData] = useState<SiteData>(getInitialSynchronousSiteData);
   const [isAdminMode, setIsAdminMode] = useState<boolean>(false);
   const [showAdminPanel, setShowAdminPanel] = useState<boolean>(false);
   const [activeSettingsTab, setActiveSettingsTab] = useState<string>('hero');
   const [currentPage, setCurrentPage] = useState<'home' | 'documents' | 'news' | 'medical' | 'admin' | 'testimonials' | 'login'>('home');
 
-  // Load from static file on hosting AND local storage on mount
+  // Load from local storage and remote sources on mount
   useEffect(() => {
+    let isCancelled = false;
+
     async function initializeData() {
-      let baseData = { ...DEFAULT_SITE_DATA };
-      
-      // 1. Try to load published data from the hosting root folder (site-data.json)
+      // 1. Immediately read persistent draft from high-capacity IndexedDB (fastest path to full fidelity)
+      let savedData: SiteData | null = null;
       try {
-        const response = await fetch('/site-data.json', { cache: 'no-store' });
-        if (response.ok) {
-          const published = await response.json();
-          if (published && typeof published === 'object') {
-            baseData = deepCleanAssetPaths({ ...baseData, ...published });
-            console.log('Successfully loaded published site-data.json from hosting root');
-          }
-        }
+        savedData = await getStorageData<SiteData>();
       } catch (err) {
-        console.log('No published site-data.json found on hosting root, falling back to bundled defaults.', err);
+        console.warn('IndexedDB read error:', err);
       }
 
-      // 1b. Try to load dynamic reviews from the reviews.php script
-      try {
-        const reviewsResponse = await fetch('/reviews.php', { cache: 'no-store' });
-        if (reviewsResponse.ok) {
-          const serverReviews = await reviewsResponse.json();
-          if (Array.isArray(serverReviews) && serverReviews.length > 0) {
-            baseData.testimonials = serverReviews;
-            console.log('Successfully loaded dynamic reviews from reviews.php on server:', serverReviews.length);
-          }
-        }
-      } catch (reviewsErr) {
-        console.log('No server reviews.php found or error loading, falling back to static testimonials.', reviewsErr);
-      }
+      if (isCancelled) return;
 
-      // 2. Check if this browser has an active local draft in high-capacity IndexedDB or localStorage
-      const savedData = await getStorageData<SiteData>();
       if (savedData) {
         try {
           const parsed = deepCleanAssetPaths(savedData);
-          
-          // Gentle migration: if the client is still pointing to old defaults, auto-update them to the uploaded images
           let morphed = false;
+
+          // Gentle migration for images
           if (parsed.images) {
             if (parsed.images.hero === '/src/assets/images/pestovo_hero_processed_1779778734060.png') {
               parsed.images.hero = '/src/assets/images/pestovo_palace_1779780890544.png';
@@ -269,18 +337,36 @@ export function AdminDataProvider({ children }: { children: React.ReactNode }) {
             morphed = true;
           }
 
-          // Force-merge fresh ROOMS if legacy room IDs or incorrect count is found
-          if (parsed.rooms) {
-            const hasLegacyRooms = parsed.rooms.some((r: any) => 
-              r.id === 'standard-improved' || 
-              r.id === 'junior-suite' || 
-              r.id === 'suite-luxury' || 
-              r.id === 'apartment-fts'
-            );
-            if (hasLegacyRooms || parsed.rooms.length !== 2) {
-              parsed.rooms = [...ROOMS];
-              morphed = true;
+          // Normalize room IDs without ever deleting custom rooms or photos
+          if (parsed.rooms && Array.isArray(parsed.rooms) && parsed.rooms.length > 0) {
+            parsed.rooms = parsed.rooms.map((r: any) => {
+              let normalizedId = r.id;
+              if (r.id === 'standard-improved') normalizedId = 'standard';
+              if (r.id === 'suite-luxury' || r.id === 'junior-suite') normalizedId = 'lux';
+              return {
+                ...r,
+                id: normalizedId
+              };
+            });
+
+            // Bidirectional synchronization: ensure room photos and media tab images stay in sync
+            const stdRoom = parsed.rooms.find((r: any) => r.id === 'standard');
+            if (stdRoom && stdRoom.image && parsed.extraImages) {
+              if (parsed.extraImages.standardRoom !== stdRoom.image) {
+                parsed.extraImages.standardRoom = stdRoom.image;
+                morphed = true;
+              }
             }
+            const luxRoom = parsed.rooms.find((r: any) => r.id === 'lux');
+            if (luxRoom && luxRoom.image && parsed.images) {
+              if (parsed.images.suite !== luxRoom.image) {
+                parsed.images.suite = luxRoom.image;
+                morphed = true;
+              }
+            }
+          } else {
+            parsed.rooms = [...ROOMS];
+            morphed = true;
           }
 
           // Safeguard and normalize medical programs
@@ -288,7 +374,6 @@ export function AdminDataProvider({ children }: { children: React.ReactNode }) {
             parsed.medicalPrograms = [...MEDICAL_PROGRAMS];
             morphed = true;
           } else {
-            // Fix any missing duration or fields in medical programs
             parsed.medicalPrograms = parsed.medicalPrograms.map((prog: any) => {
               const defaultImage = prog.id === 'respiratory' 
                 ? '/images/pestovo_medical_1779777676990.png' 
@@ -317,11 +402,10 @@ export function AdminDataProvider({ children }: { children: React.ReactNode }) {
 
           // Backfill and safeguard missing hero or hero properties
           if (!parsed.hero) {
-            parsed.hero = JSON.parse(JSON.stringify(baseData.hero));
+            parsed.hero = JSON.parse(JSON.stringify(DEFAULT_SITE_DATA.hero));
             morphed = true;
           } else {
-            // Guard against missing properties inside hero
-            const defaultHero = baseData.hero;
+            const defaultHero = DEFAULT_SITE_DATA.hero;
             if (!parsed.hero.badge) { 
               parsed.hero.badge = defaultHero.badge; 
               morphed = true; 
@@ -340,12 +424,6 @@ export function AdminDataProvider({ children }: { children: React.ReactNode }) {
             if (!parsed.hero.subtitle) { 
               parsed.hero.subtitle = defaultHero.subtitle; 
               morphed = true; 
-            } else if (
-              parsed.hero.subtitle === 'Элитное оздоровление, легендарный парк-арборетум и дворец графини Паниной в Гаспре. Микроклимат царского курорта для вашего оздоровления.' ||
-              parsed.hero.subtitle === 'Предоставляет оздоровления, лечения и реабилитации должностных лиц таможенных органов и членов их семей.'
-            ) {
-              parsed.hero.subtitle = defaultHero.subtitle;
-              morphed = true;
             }
             if (!parsed.hero.ctaText) { parsed.hero.ctaText = defaultHero.ctaText; morphed = true; }
             if (!parsed.hero.defaultBackgroundMode || parsed.hero.defaultBackgroundMode === 'video_nature' || parsed.hero.defaultBackgroundMode === 'video_palace') {
@@ -356,15 +434,6 @@ export function AdminDataProvider({ children }: { children: React.ReactNode }) {
             if (!parsed.hero.stats || !Array.isArray(parsed.hero.stats) || parsed.hero.stats.length === 0) {
               parsed.hero.stats = JSON.parse(JSON.stringify(defaultHero.stats));
               morphed = true;
-            } else {
-              // Auto-migrate legacy simulated/fake stats if present
-              const hasLegacyStats = parsed.hero.stats.some((s: any) => 
-                s.value === '8 га' || s.value === '120+' || s.value === '50 м' || s.label === 'Реликтовый Парк'
-              );
-              if (hasLegacyStats) {
-                parsed.hero.stats = JSON.parse(JSON.stringify(defaultHero.stats));
-                morphed = true;
-              }
             }
             if (parsed.hero.showStats === undefined) {
               parsed.hero.showStats = true;
@@ -374,7 +443,6 @@ export function AdminDataProvider({ children }: { children: React.ReactNode }) {
               parsed.hero.slides = JSON.parse(JSON.stringify(defaultHero.slides));
               morphed = true;
             } else {
-              // Migrating old Vimeo URLs to ultra-stable Mixkit URLs in loaded state
               parsed.hero.slides = parsed.hero.slides.map((slide: any) => {
                 if (slide.url && slide.url.includes('vimeo.com')) {
                   morphed = true;
@@ -390,71 +458,90 @@ export function AdminDataProvider({ children }: { children: React.ReactNode }) {
 
           // Backfill missing news
           if (!parsed.news || !Array.isArray(parsed.news)) {
-            parsed.news = [
-              {
-                id: 'news-1',
-                title: 'Открытие обновленного корпуса',
-                date: '10.05.2026',
-                image: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&q=80',
-                excerpt: 'После проведения капитального ремонта открыт спальный корпус...',
-                content: 'После проведения капитального ремонта открыт спальный корпус. Новые номера оборудованы всем необходимым для комфортного отдыха. Ждем вас!'
-              }
-            ];
+            parsed.news = [...DEFAULT_SITE_DATA.news];
             morphed = true;
           }
 
           // Backfill missing services
           if (!parsed.services || !Array.isArray(parsed.services)) {
-            parsed.services = [...baseData.services];
+            parsed.services = [...DEFAULT_SERVICES];
             morphed = true;
           }
 
           // Backfill missing gallery
           if (!parsed.gallery || !Array.isArray(parsed.gallery)) {
-            parsed.gallery = JSON.parse(JSON.stringify(baseData.gallery));
+            parsed.gallery = JSON.parse(JSON.stringify(DEFAULT_SITE_DATA.gallery));
             morphed = true;
           }
 
           // Backfill missing galleryCategories
           if (!parsed.galleryCategories || !Array.isArray(parsed.galleryCategories)) {
-            parsed.galleryCategories = JSON.parse(JSON.stringify(baseData.galleryCategories));
+            parsed.galleryCategories = JSON.parse(JSON.stringify(DEFAULT_SITE_DATA.galleryCategories));
             morphed = true;
           }
 
           // Backfill missing users
           if (!parsed.users || !Array.isArray(parsed.users)) {
-            parsed.users = JSON.parse(JSON.stringify(baseData.users || DEFAULT_SITE_DATA.users || []));
+            parsed.users = JSON.parse(JSON.stringify(DEFAULT_SITE_DATA.users || []));
             morphed = true;
           }
 
           // Backfill missing documents
           if (!parsed.documents || !Array.isArray(parsed.documents)) {
-            // Check if there is already a standalone local storage documents item, otherwise use INITIAL_DOCUMENTS
-            const savedDocsRaw = localStorage.getItem('pestovo_custom_documents');
-            if (savedDocsRaw) {
-              try {
-                parsed.documents = JSON.parse(savedDocsRaw);
-              } catch {
-                parsed.documents = JSON.parse(JSON.stringify(INITIAL_DOCUMENTS));
-              }
-            } else {
-              parsed.documents = JSON.parse(JSON.stringify(INITIAL_DOCUMENTS));
-            }
+            parsed.documents = JSON.parse(JSON.stringify(INITIAL_DOCUMENTS));
             morphed = true;
           }
 
-          if (morphed) {
-            localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(parsed));
-          }
+          // Keep fast cache up to date
+          saveFastStorageData(parsed);
 
-          setSiteData(parsed);
+          if (!isCancelled) {
+            setSiteData(parsed);
+          }
         } catch (e) {
-          console.error('Error parsing stored site data, falling back to hosting base data:', e);
-          setSiteData(baseData);
+          console.error('Error parsing stored site data:', e);
         }
-      } else {
-        // No local draft, use the base loaded from hosting
-        setSiteData(baseData);
+      }
+
+      // 2. Non-blocking parallel network fetch for server updates (site-data.json & reviews.php)
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 2000);
+
+        const [siteDataRes, reviewsRes] = await Promise.allSettled([
+          fetch('/site-data.json', { cache: 'no-store', signal: controller.signal }),
+          fetch('/reviews.php', { cache: 'no-store', signal: controller.signal })
+        ]);
+
+        clearTimeout(timeoutId);
+
+        if (isCancelled) return;
+
+        // If no saved draft existed in IndexedDB, use published site-data.json
+        if (!savedData && siteDataRes.status === 'fulfilled' && siteDataRes.value.ok) {
+          const published = await siteDataRes.value.json().catch(() => null);
+          if (published && typeof published === 'object') {
+            const cleaned = deepCleanAssetPaths({ ...DEFAULT_SITE_DATA, ...published });
+            saveFastStorageData(cleaned);
+            setSiteData(cleaned);
+            console.log('Applied published site-data.json from server');
+          }
+        }
+
+        // Apply server reviews if available
+        if (reviewsRes.status === 'fulfilled' && reviewsRes.value.ok) {
+          const serverReviews = await reviewsRes.value.json().catch(() => null);
+          if (Array.isArray(serverReviews) && serverReviews.length > 0) {
+            setSiteData(prev => {
+              const updated = { ...prev, testimonials: serverReviews };
+              saveFastStorageData(updated);
+              return updated;
+            });
+            console.log('Successfully updated testimonials from server reviews.php');
+          }
+        }
+      } catch (networkErr) {
+        console.log('Background network sync finished or timed out:', networkErr);
       }
     }
 
@@ -464,6 +551,10 @@ export function AdminDataProvider({ children }: { children: React.ReactNode }) {
     if (savedAdminMode === 'true') {
       setIsAdminMode(true);
     }
+
+    return () => {
+      isCancelled = true;
+    };
   }, []);
 
   const syncSettingsWithServer = async (data: SiteData) => {
@@ -517,14 +608,26 @@ export function AdminDataProvider({ children }: { children: React.ReactNode }) {
   };
 
   const updateSiteData = (newData: SiteData) => {
-    setSiteData(newData);
-    // Save to high-capacity IndexedDB (bypasses 5MB browser quota)
-    setStorageData(newData).catch(e => {
-      console.error('Failed to save to IndexedDB storage:', e);
+    // Ensure bidirectional synchronization between rooms and media images
+    const synchronized = { ...newData };
+    if (synchronized.rooms && Array.isArray(synchronized.rooms)) {
+      const stdRoom = synchronized.rooms.find(r => r.id === 'standard');
+      if (stdRoom && stdRoom.image) {
+        synchronized.extraImages = { ...synchronized.extraImages, standardRoom: stdRoom.image };
+      }
+      const luxRoom = synchronized.rooms.find(r => r.id === 'lux');
+      if (luxRoom && luxRoom.image) {
+        synchronized.images = { ...synchronized.images, suite: luxRoom.image };
+      }
+    }
+
+    setSiteData(synchronized);
+    setStorageData(synchronized).catch(e => {
+      console.error('Failed to save to storage:', e);
     });
 
     // Sync testimonials with PHP server if changed
-    if (newData.testimonials) {
+    if (synchronized.testimonials) {
       fetch('/reviews.php', {
         method: 'POST',
         headers: {
@@ -532,7 +635,7 @@ export function AdminDataProvider({ children }: { children: React.ReactNode }) {
         },
         body: JSON.stringify({
           action: 'save_all',
-          reviews: newData.testimonials
+          reviews: synchronized.testimonials
         })
       }).catch(err => {
         console.log('Skipping reviews.php sync in local development', err);
@@ -540,14 +643,44 @@ export function AdminDataProvider({ children }: { children: React.ReactNode }) {
     }
 
     // Securely sync all site settings to PHP server
-    syncSettingsWithServer(newData);
+    syncSettingsWithServer(synchronized);
   };
 
   const updateSections = (updates: Partial<SiteData>) => {
     setSiteData(prev => {
       const updated = { ...prev, ...updates };
+
+      // Bidirectional sync
+      if (updates.rooms && Array.isArray(updates.rooms)) {
+        const stdRoom = updates.rooms.find(r => r.id === 'standard');
+        if (stdRoom && stdRoom.image) {
+          updated.extraImages = { ...updated.extraImages, standardRoom: stdRoom.image };
+        }
+        const luxRoom = updates.rooms.find(r => r.id === 'lux');
+        if (luxRoom && luxRoom.image) {
+          updated.images = { ...updated.images, suite: luxRoom.image };
+        }
+      } else {
+        if (updates.extraImages?.standardRoom && updated.rooms) {
+          updated.rooms = updated.rooms.map(r => r.id === 'standard' ? { ...r, image: updates.extraImages!.standardRoom } : r);
+        }
+        if (updates.images?.suite && updated.rooms) {
+          updated.rooms = updated.rooms.map(r => r.id === 'lux' ? { ...r, image: updates.images!.suite } : r);
+        }
+      }
+
+      // Hero slides & hero image bidirectional sync
+      if (updates.hero?.slides && Array.isArray(updates.hero.slides)) {
+        const firstPhoto = updates.hero.slides.find((s: any) => s.type === 'photo');
+        if (firstPhoto) {
+          updated.images = { ...updated.images, hero: firstPhoto.url };
+        } else if (updates.hero.slides.length === 0 || !firstPhoto) {
+          updated.images = { ...updated.images, hero: '' };
+        }
+      }
+
       setStorageData(updated).catch(e => {
-        console.error('Failed to save to IndexedDB storage:', e);
+        console.error('Failed to save to storage:', e);
       });
       syncSettingsWithServer(updated);
       return updated;
@@ -557,15 +690,35 @@ export function AdminDataProvider({ children }: { children: React.ReactNode }) {
   const updateSection = <K extends keyof SiteData>(key: K, value: SiteData[K]) => {
     setSiteData(prev => {
       const updated = { ...prev, [key]: value };
+
+      // Bidirectional sync between room cards and media images
+      if (key === 'rooms' && Array.isArray(value)) {
+        const stdRoom = (value as Room[]).find(r => r.id === 'standard');
+        if (stdRoom && stdRoom.image) {
+          updated.extraImages = { ...updated.extraImages, standardRoom: stdRoom.image };
+        }
+        const luxRoom = (value as Room[]).find(r => r.id === 'lux');
+        if (luxRoom && luxRoom.image) {
+          updated.images = { ...updated.images, suite: luxRoom.image };
+        }
+      } else if (key === 'extraImages' && (value as any)?.standardRoom && updated.rooms) {
+        updated.rooms = updated.rooms.map(r => r.id === 'standard' ? { ...r, image: (value as any).standardRoom } : r);
+      } else if (key === 'images' && (value as any)?.suite && updated.rooms) {
+        updated.rooms = updated.rooms.map(r => r.id === 'lux' ? { ...r, image: (value as any).suite } : r);
+      } else if (key === 'hero' && (value as any)?.slides && Array.isArray((value as any).slides)) {
+        const firstPhoto = (value as any).slides.find((s: any) => s.type === 'photo');
+        if (firstPhoto) {
+          updated.images = { ...updated.images, hero: firstPhoto.url };
+        } else {
+          updated.images = { ...updated.images, hero: '' };
+        }
+      }
       
-      // Save to high-capacity IndexedDB (bypasses 5MB browser quota)
       setStorageData(updated).catch(e => {
-        console.error('Failed to save to IndexedDB storage:', e);
+        console.error('Failed to save to storage:', e);
       });
       
-      // Securely sync all site settings to PHP server
       syncSettingsWithServer(updated);
-      
       return updated;
     });
 
