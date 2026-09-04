@@ -3018,19 +3018,36 @@ export default function App() {
                 transition={{ duration: 0.7, delay: index * 0.15, ease: [0.16, 1, 0.3, 1] }}
                 className="bg-white rounded-sm border border-stone-200/60 overflow-hidden hover:shadow-xl transition-all duration-300 flex flex-col group justify-between"
               >
-                {/* Image Section */}
-                <div className="relative overflow-hidden h-56 shrink-0 border-b border-stone-100">
+                {/* Image Section - Clickable */}
+                <div 
+                  onClick={() => handleOpenRoomDetails(room)}
+                  className="relative overflow-hidden h-64 sm:h-72 shrink-0 border-b border-stone-100 cursor-pointer group/img"
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      handleOpenRoomDetails(room);
+                    }
+                  }}
+                  title={`Посмотреть описание и фотографии номера «${room.name}»`}
+                >
                   <img
                     src={room.image || undefined}
                     alt={room.name}
-                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    className="w-full h-full object-cover object-center transition-transform duration-500 group-hover:scale-105"
                     referrerPolicy="no-referrer"
                   />
-                  <div className="absolute top-3 left-3 bg-[#022C22] border border-[#c5a880]/30 text-white font-mono text-[10px] uppercase font-bold tracking-widest px-2.5 py-1 rounded-sm">
+                  <div className="absolute top-3 left-3 bg-[#022C22] border border-[#c5a880]/30 text-white font-mono text-[10px] uppercase font-bold tracking-widest px-2.5 py-1 rounded-sm shadow-sm">
                     {room.area} м²
                   </div>
-                  <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-black/60 to-transparent"></div>
-                  <div className="absolute bottom-3 left-3 text-white">
+                  {/* Visual hint on photo */}
+                  <div className="absolute top-3 right-3 bg-black/60 backdrop-blur-xs text-white text-[11px] font-medium px-2.5 py-1 rounded-sm opacity-90 group-hover:opacity-100 transition-all flex items-center gap-1.5 shadow-sm border border-white/10">
+                    <Eye className="w-3.5 h-3.5 text-[#c5a880]" />
+                    <span className="hidden sm:inline text-[10px] uppercase tracking-wider font-mono">Фото и детали</span>
+                  </div>
+                  <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-black/60 to-transparent pointer-events-none"></div>
+                  <div className="absolute bottom-3 left-3 text-white pointer-events-none">
                     <span className="block text-[11px] font-mono tracking-widest text-stone-200 uppercase leading-none">{room.category}</span>
                   </div>
                 </div>
@@ -3038,7 +3055,11 @@ export default function App() {
                 {/* Content Section */}
                 <div className="p-5 flex-1 flex flex-col justify-between">
                   <div>
-                    <h3 className="font-serif text-xl font-medium text-[#022C22] mb-2 leading-snug group-hover:text-[#c5a880] transition-colors">
+                    <h3 
+                      onClick={() => handleOpenRoomDetails(room)}
+                      className="font-serif text-xl font-medium text-[#022C22] mb-2 leading-snug hover:text-[#c5a880] cursor-pointer transition-colors"
+                      title={`Посмотреть описание номера «${room.name}»`}
+                    >
                       {room.name}
                     </h3>
                     <p className="text-xs text-stone-600 line-clamp-2 leading-relaxed mb-4">
@@ -3929,30 +3950,31 @@ export default function App() {
               initial={{ opacity: 0, scale: 0.95, y: 30 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 30 }}
-              className="bg-white rounded-sm max-w-2xl w-full border border-stone-200 shadow-2xl overflow-hidden relative z-10 flex flex-col max-h-[90vh]"
+              className="bg-white rounded-sm max-w-3xl w-full border border-stone-200 shadow-2xl overflow-hidden relative z-10 flex flex-col max-h-[92vh]"
             >
               
               {/* Header Visual */}
               {(() => {
                 const roomImages = roomModal.images && roomModal.images.length > 0 ? roomModal.images : [roomModal.image];
                 return (
-                  <div className="relative h-64 shrink-0 border-b border-stone-100 group">
+                  <div className="relative aspect-[16/10] sm:aspect-[16/10] w-full max-h-[460px] min-h-[300px] sm:min-h-[380px] shrink-0 border-b border-stone-100 bg-stone-900 group overflow-hidden">
                     <AnimatePresence mode="wait">
                       <motion.img
                         key={roomImages[activeRoomImageIndex] || 'default'}
                         src={roomImages[activeRoomImageIndex] || roomModal.image}
                         alt={roomModal.name}
-                        className="w-full h-full object-cover"
+                        className="w-full h-full object-cover object-center"
                         referrerPolicy="no-referrer"
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        transition={{ duration: 0.2 }}
+                        transition={{ duration: 0.25 }}
                       />
                     </AnimatePresence>
                     <button
                       onClick={() => setRoomModal(null)}
-                      className="absolute top-4 right-4 bg-black/50 hover:bg-black text-white p-2 rounded-full backdrop-blur-md transition-colors z-20 cursor-pointer"
+                      className="absolute top-4 right-4 bg-black/60 hover:bg-black text-white p-2.5 rounded-full backdrop-blur-md transition-all z-20 cursor-pointer shadow-lg border border-white/10 active:scale-95"
+                      aria-label="Закрыть"
                     >
                       <X className="w-5 h-5" />
                     </button>
@@ -3964,7 +3986,8 @@ export default function App() {
                             e.stopPropagation();
                             setActiveRoomImageIndex(prev => (prev - 1 + roomImages.length) % roomImages.length);
                           }}
-                          className="absolute left-3 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/75 text-white p-2 rounded-full backdrop-blur-sm transition-all shadow-md z-10 cursor-pointer flex items-center justify-center"
+                          className="absolute left-3.5 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/85 text-white p-2.5 rounded-full backdrop-blur-sm transition-all shadow-lg z-10 cursor-pointer flex items-center justify-center border border-white/10 active:scale-90"
+                          aria-label="Предыдущее фото"
                         >
                           <ChevronLeft className="w-5 h-5" />
                         </button>
@@ -3973,13 +3996,14 @@ export default function App() {
                             e.stopPropagation();
                             setActiveRoomImageIndex(prev => (prev + 1) % roomImages.length);
                           }}
-                          className="absolute right-3 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/75 text-white p-2 rounded-full backdrop-blur-sm transition-all shadow-md z-10 cursor-pointer flex items-center justify-center"
+                          className="absolute right-3.5 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/85 text-white p-2.5 rounded-full backdrop-blur-sm transition-all shadow-lg z-10 cursor-pointer flex items-center justify-center border border-white/10 active:scale-90"
+                          aria-label="Следующее фото"
                         >
                           <ChevronRight className="w-5 h-5" />
                         </button>
 
-                        {/* Pagination indicator dots */}
-                        <div className="absolute bottom-16 left-1/2 -translate-x-1/2 flex items-center gap-1.5 z-10 bg-black/35 px-2.5 py-1 rounded-full backdrop-blur-sm">
+                        {/* Pagination indicator dots & counter */}
+                        <div className="absolute bottom-4 right-4 sm:right-6 flex items-center gap-1.5 z-10 bg-black/50 px-3 py-1.5 rounded-full backdrop-blur-md border border-white/10 shadow-sm">
                           {roomImages.map((_, i) => (
                             <button
                               key={i}
@@ -3987,19 +4011,23 @@ export default function App() {
                                 e.stopPropagation();
                                 setActiveRoomImageIndex(i);
                               }}
-                              className={`w-2 h-2 rounded-full transition-all duration-300 cursor-pointer ${
-                                i === activeRoomImageIndex ? 'bg-[#c5a880] scale-125' : 'bg-white/60 hover:bg-white'
+                              className={`h-2 rounded-full transition-all duration-300 cursor-pointer ${
+                                i === activeRoomImageIndex ? 'bg-[#c5a880] w-5' : 'bg-white/50 hover:bg-white w-2'
                               }`}
+                              aria-label={`Фото ${i + 1}`}
                             />
                           ))}
+                          <span className="text-[10px] text-stone-200 font-mono font-bold ml-1.5 pl-1.5 border-l border-white/20">
+                            {activeRoomImageIndex + 1}/{roomImages.length}
+                          </span>
                         </div>
                       </>
                     )}
 
-                    <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/80 to-transparent"></div>
-                    <div className="absolute bottom-4 left-4 text-white z-10">
-                      <span className="text-[10px] tracking-widest font-mono text-[#c5a880] uppercase font-bold">{roomModal.category}</span>
-                      <h3 className="font-serif text-2xl font-semibold mt-1 tracking-tight">{roomModal.name}</h3>
+                    <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-black/85 via-black/35 to-transparent pointer-events-none"></div>
+                    <div className="absolute bottom-4 left-4 sm:left-6 text-white z-10 pointer-events-none pr-32 sm:pr-40">
+                      <span className="text-[11px] tracking-widest font-mono text-[#c5a880] uppercase font-bold drop-shadow-sm block">{roomModal.category}</span>
+                      <h3 className="font-serif text-2xl sm:text-3xl font-semibold mt-1 tracking-tight text-white drop-shadow-md leading-tight">{roomModal.name}</h3>
                     </div>
                   </div>
                 );

@@ -151,7 +151,7 @@ export default function LoginPage({ onBackToHome }: { onBackToHome: () => void }
                         type="text"
                         required
                         disabled={isLoading}
-                        placeholder="Например, admin"
+                        placeholder="Введите логин"
                         value={username}
                         onChange={(e) => {
                           setUsername(e.target.value);
@@ -228,17 +228,6 @@ export default function LoginPage({ onBackToHome }: { onBackToHome: () => void }
                   </button>
                 </form>
               )}
-
-              {/* Demo Hint Banner */}
-              <div className="bg-stone-50 border border-stone-200 rounded-xl p-4 space-y-1 text-xs">
-                <span className="font-mono text-[9px] uppercase tracking-wider font-bold text-[#c5a880]">Доступ администратора:</span>
-                <p className="text-stone-600 leading-relaxed font-mono text-[11px]">
-                  👤 Логин: <span className="font-bold text-stone-800">admin</span>
-                </p>
-                <p className="text-stone-600 leading-relaxed font-mono text-[11px]">
-                  🔑 Пароль: <span className="font-bold text-stone-800">admin2026</span>
-                </p>
-              </div>
             </div>
           </motion.div>
         </div>
