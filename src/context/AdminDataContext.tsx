@@ -251,7 +251,7 @@ const DEFAULT_SITE_DATA: SiteData = {
   ],
   users: [
     { id: 'user-1', username: 'admin', password: 'admin2026', role: 'Главный Администратор' },
-    { id: 'user-2', username: 'daniliv', password: 'admin', role: 'и.о. Начальника санатория' }
+    { id: 'user-2', username: 'director', password: 'admin', role: 'Руководство учреждения' }
   ],
   documents: [...INITIAL_DOCUMENTS]
 };
@@ -491,7 +491,7 @@ export function AdminDataProvider({ children }: { children: React.ReactNode }) {
                 ? '/images/pestovo_beach_1779780925661.png'
                 : '/images/pestovo_block_1779780908700.png';
 
-              const computedDuration = prog.duration || (prog.durationDays ? `от ${prog.durationDays} дней` : 'от 10 до 21 дня');
+              const computedDuration = prog.duration || (prog.durationDays ? `от ${prog.durationDays} дней` : 'По назначению врача');
               const computedIcon = prog.icon || 'Lungs';
               const computedImage = prog.image || defaultImage;
 

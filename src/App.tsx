@@ -122,6 +122,7 @@ export default function App() {
   // Navigation states
   const [activeSection, setActiveSection] = useState('hero');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [medicalInitialProgramId, setMedicalInitialProgramId] = useState<string | undefined>(undefined);
 
   // Scroll parallax values for Hero block with smooth physics spring
   const { scrollY } = useScroll();
@@ -1136,13 +1137,28 @@ export default function App() {
     const today = new Date();
     const dateStr = `${today.getDate()} ${months[today.getMonth()]} ${today.getFullYear()}`;
 
+    // 152-FZ safe anonymization: e.g. "Ольга Смирнова" -> "Ольга С.", "Иванов Иван Иванович" -> "Иван И."
+    const rawAuthor = reviewForm.author.trim();
+    const nameParts = rawAuthor.split(/\s+/);
+    let sanitizedAuthor = rawAuthor;
+    if (nameParts.length === 2) {
+      sanitizedAuthor = `${nameParts[0]} ${nameParts[1][0].toUpperCase()}.`;
+    } else if (nameParts.length >= 3) {
+      sanitizedAuthor = `${nameParts[1]} ${nameParts[0][0].toUpperCase()}.`;
+    }
+
+    // Mask accidental phone numbers or emails in review text
+    const sanitizedText = reviewForm.text.trim()
+      .replace(/\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b/g, '[скрыто]')
+      .replace(/(\+7|8)[\s(-]*\d{3}[\s)-]*\d{3}[\s-]*\d{2}[\s-]*\d{2}/g, '[номер скрыт]');
+
     // Create new testimonial item
     const newTestimonial = {
       id: `test-user-${Date.now()}`,
-      author: reviewForm.author.trim(),
+      author: sanitizedAuthor,
       role: reviewForm.role.trim() || 'Гость санатория',
       rating: reviewForm.rating,
-      text: reviewForm.text.trim(),
+      text: sanitizedText,
       date: dateStr,
       isApproved: false
     };
@@ -1156,10 +1172,10 @@ export default function App() {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            author: reviewForm.author.trim(),
+            author: sanitizedAuthor,
             role: reviewForm.role.trim(),
             rating: reviewForm.rating,
-            text: reviewForm.text.trim()
+            text: sanitizedText
           })
         });
 
@@ -1450,7 +1466,7 @@ export default function App() {
             </div>
 
             {/* Desktop Nav */}
-            <div className="hidden lg:flex items-center flex-grow mx-10 xl:mx-16 justify-between">
+            <div className="hidden lg:flex items-center space-x-5 xl:space-x-7">
               {/* Dropdown for About Sanatorium */}
               <div 
                 className="relative"
@@ -1558,19 +1574,20 @@ export default function App() {
               ))}
             </div>
 
-            {/* Action buttons Desktop */}
-            <div className="hidden lg:flex items-center">
-              <a href="tel:88005503240" className="flex items-center text-sm font-medium hover:text-[#c5a880] transition-colors py-1">
-                <Phone className="w-4 h-4 mr-2 text-[#c5a880]" />
-                <span>8 (800) 550-32-40</span>
+            {/* Action buttons Desktop: Phone */}
+            <div className="hidden lg:flex items-center space-x-3 xl:space-x-4">
+              <a href="tel:88005503240" className="flex items-center text-xs xl:text-sm font-medium hover:text-[#c5a880] transition-colors py-1 shrink-0">
+                <Phone className="w-4 h-4 mr-1.5 text-[#c5a880]" />
+                <span className="hidden xl:inline">8 (800) 550-32-40</span>
               </a>
             </div>
 
             {/* Mobile menu button */}
-            <div className="lg:hidden">
+            <div className="lg:hidden flex items-center space-x-2">
               <button
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                 className="p-2 text-stone-200 hover:text-[#c5a880] focus:outline-none"
+                aria-label="Меню навигации"
               >
                 {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
               </button>
@@ -1726,10 +1743,14 @@ export default function App() {
               window.scrollTo({ top: 0, behavior: 'smooth' });
             }} />
           ) : currentPage === 'medical' ? (
-            <MedicalPage onBackToHome={() => {
-              setCurrentPage('home');
-              window.scrollTo({ top: 0, behavior: 'smooth' });
-            }} />
+            <MedicalPage 
+              initialProgramId={medicalInitialProgramId}
+              onBackToHome={() => {
+                setMedicalInitialProgramId(undefined);
+                setCurrentPage('home');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }} 
+            />
           ) : currentPage === 'admin' ? (
             <AdminPage onBackToHome={() => {
               setCurrentPage('home');
@@ -2870,94 +2891,110 @@ export default function App() {
                 </button>
               </div>
             )}
-            <span className="text-[#c5a880] text-xs font-mono uppercase tracking-widest font-bold">Высокие стандарты ведомственного оздоровления</span>
+            <span className="text-[#c5a880] text-xs font-mono uppercase tracking-widest font-bold">Санаторно-курортный профиль</span>
             <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight mt-3">
-              Лечебная база и оздоровление
+              Оздоровительные направления
             </h2>
             <div className="h-1 w-20 bg-[#c5a880] mx-auto mt-6"></div>
             <p className="text-stone-300 text-sm sm:text-base leading-relaxed mt-4">
-              Санаторий «Ясная Поляна» имеет высшую медицинскую категорию и предлагает комплексные программы оздоровления с использованием современного оборудования и целительных природных факторов.
+              Ознакомительный перечень типовых оздоровительных направлений санатория. Конкретный перечень, объем и график процедур определяются лечащим врачом индивидуально в соответствии с медицинскими показаниями и санаторно-курортной картой.
             </p>
           </div>
 
           {/* Dynamic Responsive Grid for Medical Programs */}
-          <div className={`grid grid-cols-1 md:grid-cols-2 ${MEDICAL_PROGRAMS.length === 3 ? 'lg:grid-cols-3 max-w-6xl' : 'lg:grid-cols-4 max-w-7xl'} gap-6 mx-auto`}>
-            {MEDICAL_PROGRAMS.map((prog, index) => {
-              const progImg = prog.image || (
-                prog.id === 'respiratory' ? '/images/pestovo_medical_1779777676990.png' :
-                prog.id === 'cardio' ? '/images/pestovo_palace_1779780890544.png' :
-                (prog.id === 'antistress' || prog.id === 'nervous') ? '/images/pestovo_beach_1779780925661.png' :
-                '/images/pestovo_block_1779780908700.png'
-              );
-              const durationText = prog.duration || ((prog as any).durationDays ? `от ${(prog as any).durationDays} дней` : 'от 10 до 21 дня');
+          {(() => {
+            const displayedMedicalPrograms = (siteData.medicalPrograms && siteData.medicalPrograms.length > 0)
+              ? siteData.medicalPrograms
+              : MEDICAL_PROGRAMS;
 
-              return (
-                <motion.div 
-                  key={prog.id || index}
-                  initial={{ opacity: 0, y: 35 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, margin: "-50px" }}
-                  transition={{ duration: 0.65, delay: index * 0.1, ease: [0.16, 1, 0.3, 1] }}
-                  onClick={() => {
-                    setCurrentPage('medical');
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                  }}
-                  className="bg-[#02221A]/95 border border-emerald-900/70 rounded-2xl overflow-hidden hover:border-[#c5a880]/70 transition-all duration-300 hover:-translate-y-1.5 hover:shadow-2xl hover:shadow-[#c5a880]/15 cursor-pointer group flex flex-col justify-between h-full"
-                >
-                  <div>
-                    {/* Image Preview Header */}
-                    <div className="relative h-44 w-full overflow-hidden bg-[#011B14]">
-                      <img
-                        src={progImg}
-                        alt={prog.title}
-                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                        referrerPolicy="no-referrer"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-[#02221A] via-black/35 to-transparent"></div>
-                      
-                      {/* Floating Icon */}
-                      <div className="absolute bottom-3 left-4 w-10 h-10 rounded-xl bg-[#022C22]/95 text-[#c5a880] border border-[#c5a880]/40 flex items-center justify-center shadow-lg group-hover:bg-[#c5a880] group-hover:text-[#022C22] transition-colors duration-300">
-                        {getMedicalIcon(prog.icon)}
-                      </div>
+            return (
+              <div className={`grid grid-cols-1 md:grid-cols-2 ${displayedMedicalPrograms.length === 3 ? 'lg:grid-cols-3 max-w-6xl' : 'lg:grid-cols-4 max-w-7xl'} gap-6 mx-auto`}>
+                {displayedMedicalPrograms.map((prog, index) => {
+                  const progImg = prog.image || (
+                    prog.id === 'respiratory' ? '/images/pestovo_medical_1779777676990.png' :
+                    prog.id === 'cardio' ? '/images/pestovo_palace_1779780890544.png' :
+                    (prog.id === 'antistress' || prog.id === 'nervous') ? '/images/pestovo_beach_1779780925661.png' :
+                    '/images/pestovo_block_1779780908700.png'
+                  );
+                  const durationText = prog.duration || 'По назначению врача';
 
-                      {/* Floating Duration Badge */}
-                      <div className="absolute top-3 right-3 bg-[#022C22]/90 backdrop-blur-md border border-[#c5a880]/40 text-[#c5a880] font-mono text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-lg flex items-center gap-1 shadow-md">
-                        <Clock className="w-3 h-3 text-[#c5a880]" />
-                        <span>{durationText}</span>
-                      </div>
-                    </div>
+                  return (
+                    <motion.div 
+                      key={prog.id || index}
+                      initial={{ opacity: 0, y: 35 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true, margin: "-50px" }}
+                      transition={{ duration: 0.65, delay: index * 0.1, ease: [0.16, 1, 0.3, 1] }}
+                      onClick={() => {
+                        setCurrentPage('medical');
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                      }}
+                      className="bg-[#02221A]/95 border border-emerald-900/70 rounded-2xl overflow-hidden hover:border-[#c5a880]/70 transition-all duration-300 hover:-translate-y-1.5 hover:shadow-2xl hover:shadow-[#c5a880]/15 cursor-pointer group flex flex-col justify-between h-full"
+                    >
+                      <div>
+                        {/* Image Preview Header */}
+                        <div className="relative h-44 w-full overflow-hidden bg-[#011B14]">
+                          <img
+                            src={progImg}
+                            alt={prog.title}
+                            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                            referrerPolicy="no-referrer"
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-[#02221A] via-black/35 to-transparent"></div>
+                          
+                          {/* Floating Icon */}
+                          <div className="absolute bottom-3 left-4 w-10 h-10 rounded-xl bg-[#022C22]/95 text-[#c5a880] border border-[#c5a880]/40 flex items-center justify-center shadow-lg group-hover:bg-[#c5a880] group-hover:text-[#022C22] transition-colors duration-300">
+                            {getMedicalIcon(prog.icon)}
+                          </div>
 
-                    {/* Content Details */}
-                    <div className="p-6">
-                      <h3 className="font-serif font-bold text-lg text-white mb-2 leading-tight group-hover:text-[#c5a880] transition-colors">
-                        {prog.title}
-                      </h3>
-                      <p className="text-stone-300 text-xs leading-relaxed line-clamp-3 mb-4">
-                        {prog.shortDesc}
-                      </p>
-
-                      {/* Procedures / Indications Pill Preview */}
-                      {prog.procedures && prog.procedures.length > 0 && (
-                        <div className="pt-3 border-t border-emerald-900/50 flex items-center justify-between text-[11px] text-stone-400 font-mono">
-                          <span>Процедур в комплексе:</span>
-                          <span className="text-[#c5a880] font-bold">{prog.procedures.length}+</span>
+                          {/* Floating Duration Badge */}
+                          <div className="absolute top-3 right-3 bg-[#022C22]/90 backdrop-blur-md border border-[#c5a880]/40 text-[#c5a880] font-mono text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-lg flex items-center gap-1 shadow-md">
+                            <Clock className="w-3 h-3 text-[#c5a880]" />
+                            <span>{durationText}</span>
+                          </div>
                         </div>
-                      )}
-                    </div>
-                  </div>
-                  
-                  <div className="px-6 pb-6 pt-0">
-                    <div className="flex items-center space-x-1.5 text-xs text-[#c5a880] font-bold uppercase tracking-wider group-hover:translate-x-1 transition-transform">
-                      <span>Подробнее о программе</span>
-                      <ChevronRight className="w-3.5 h-3.5 text-[#c5a880]" />
-                    </div>
-                  </div>
-                </motion.div>
-              );
-            })}
+
+                        {/* Content Details */}
+                        <div className="p-6">
+                          <h3 className="font-serif font-bold text-lg text-white mb-2 leading-tight group-hover:text-[#c5a880] transition-colors">
+                            {prog.title}
+                          </h3>
+                          <p className="text-stone-300 text-xs leading-relaxed line-clamp-3 mb-4">
+                            {prog.shortDesc}
+                          </p>
+
+                          {/* Procedures / Indications Pill Preview */}
+                          <div className="pt-3 border-t border-emerald-900/50 flex items-center justify-between text-[11px] text-stone-400 font-mono">
+                            <span>Назначение процедур:</span>
+                            <span className="text-[#c5a880] font-bold">По показаниям врача</span>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div className="px-6 pb-6 pt-0">
+                        <div className="flex items-center space-x-1.5 text-xs text-[#c5a880] font-bold uppercase tracking-wider group-hover:translate-x-1 transition-transform">
+                          <span>Ознакомиться с направлением</span>
+                          <ChevronRight className="w-3.5 h-3.5 text-[#c5a880]" />
+                        </div>
+                      </div>
+                    </motion.div>
+                  );
+                })}
+              </div>
+            );
+          })()}
+
+          {/* Statutory Medical Disclaimer */}
+          <div className="mt-10 p-5 rounded-xl bg-black/30 border border-emerald-900/60 text-center max-w-4xl mx-auto">
+            <p className="font-semibold text-amber-200/90 uppercase tracking-widest text-[11px] mb-1 font-mono">
+              Имеются противопоказания. Необходима консультация специалиста
+            </p>
+            <p className="text-xs text-stone-300/80 leading-relaxed font-sans">
+              Информация о медицинских и оздоровительных программах носит ознакомительный характер и не является публичной офертой. Перечень, объем и график диагностических и лечебно-оздоровительных процедур определяются лечащим врачом индивидуально в соответствии с санаторно-курортной картой и стандартами санаторно-курортной помощи.
+            </p>
           </div>
 
-          <div className="flex justify-center mt-12">
+          <div className="flex justify-center mt-10">
             <button 
               onClick={() => {
                 setCurrentPage('medical');
@@ -2966,7 +3003,7 @@ export default function App() {
               className="bg-[#c5a880] text-[#022C22] hover:bg-white hover:text-[#022C22] border border-[#c5a880] px-8 py-3.5 text-xs font-bold uppercase tracking-widest rounded-lg transition-all duration-300 shadow-xl hover:scale-105 inline-flex items-center gap-2 cursor-pointer"
             >
               <Stethoscope className="w-4 h-4" />
-              <span>Все программы и процедуры в деталях</span>
+              <span>Ознакомиться со всеми направлениями</span>
             </button>
           </div>
 
@@ -3443,7 +3480,7 @@ export default function App() {
                       {/* Name input */}
                       <div>
                         <label className="block text-xs font-bold uppercase tracking-wider text-stone-700 mb-1.5" htmlFor="review-author">
-                          Ваше ФИО / Имя <span className="text-red-500">*</span>
+                          Имя (публикуется в обезличенном виде) <span className="text-red-500">*</span>
                         </label>
                         <input
                           type="text"
@@ -3456,17 +3493,20 @@ export default function App() {
                               ? 'border-red-500 bg-red-50/20 focus:ring-red-500' 
                               : 'border-stone-300 focus:border-[#022C22] focus:ring-[#022C22]'
                           }`}
-                          placeholder="Например: Смирнова Ольга Петровна"
+                          placeholder="Например: Ольга П."
                         />
                         {formErrors.author && (
                           <span className="text-red-500 text-xs mt-1 block font-medium">{formErrors.author}</span>
                         )}
+                        <span className="text-[11px] text-stone-400 mt-1 block font-sans">
+                          Для соблюдения 152-ФЗ персональные данные не публикуются
+                        </span>
                       </div>
 
                       {/* Role/Status input */}
                       <div>
                         <label className="block text-xs font-bold uppercase tracking-wider text-stone-700 mb-1.5" htmlFor="review-role">
-                          Статус / Роль или Город <span className="text-red-500">*</span>
+                          Статус или Город <span className="text-red-500">*</span>
                         </label>
                         <input
                           type="text"
@@ -3479,7 +3519,7 @@ export default function App() {
                               ? 'border-red-500 bg-red-50/20 focus:ring-red-500' 
                               : 'border-stone-300 focus:border-[#022C22] focus:ring-[#022C22]'
                           }`}
-                          placeholder="Например: Сотрудник ФТС России, г. Москва"
+                          placeholder="Например: Отдыхающий, г. Москва"
                         />
                         {formErrors.role && (
                           <span className="text-red-500 text-xs mt-1 block font-medium">{formErrors.role}</span>
@@ -3504,24 +3544,32 @@ export default function App() {
                             ? 'border-red-500 bg-red-50/20 focus:ring-red-500' 
                             : 'border-stone-300 focus:border-[#022C22] focus:ring-[#022C22]'
                         }`}
-                        placeholder="Пожалуйста, опишите ваши впечатления о процедурах, питании, медицинском корпусе, персонале санатория ФТС и вековом парке..."
+                        placeholder="Пожалуйста, опишите ваши впечатления о качестве оздоровительных программ, питании, медицинском корпусе, персонале санатория и парке..."
                       ></textarea>
                       {formErrors.text && (
                         <span className="text-red-500 text-xs mt-1 block font-medium">{formErrors.text}</span>
                       )}
                     </div>
 
-                    {/* Personal data agreement note */}
-                    <div className="text-xs text-stone-500 flex items-start space-x-3">
+                    {/* Personal data agreement note compliant with 152-FZ */}
+                    <div className="text-xs text-stone-500 flex items-start space-x-3 bg-stone-50 p-3 rounded-sm border border-stone-200">
                       <input
                         type="checkbox"
                         required
                         defaultChecked
                         id="privacy-reviews"
-                        className="w-4 h-4 rounded text-[#022C22] focus:ring-[#022C22] mt-0.5 cursor-pointer"
+                        className="w-4 h-4 rounded text-[#022C22] focus:ring-[#022C22] mt-0.5 cursor-pointer shrink-0"
                       />
-                      <label htmlFor="privacy-reviews" className="cursor-pointer select-none">
-                        Я подтверждаю подлинность оставленного отзыва и разрешаю публикацию моего отклика на официальном сайте {RESORT_INFO.name} ФТС России в рамках Общественного контроля за качеством услуг ведомственных здравниц.
+                      <label htmlFor="privacy-reviews" className="cursor-pointer select-none leading-relaxed text-[11px] text-stone-600">
+                        Я подтверждаю согласие на обработку персональных данных в соответствии с <strong>Федеральным законом от 27.07.2006 № 152-ФЗ «О персональных данных»</strong> и подтверждаю ознакомление с{' '}
+                        <button
+                          type="button"
+                          onClick={() => setIsPrivacyModalOpen(true)}
+                          className="text-emerald-800 underline hover:text-[#c5a880] font-semibold"
+                        >
+                          Политикой обработки персональных данных
+                        </button>
+                        . Уведомлен, что в целях защиты приватности отзыв публикуется исключительно в обезличенном формате.
                       </label>
                     </div>
 
@@ -3531,7 +3579,7 @@ export default function App() {
                       className="w-full bg-[#022C22] hover:bg-[#c5a880] text-white hover:text-[#022C22] py-4 rounded-sm font-bold text-sm uppercase tracking-widest transition-all duration-300 shadow-lg flex items-center justify-center space-x-2 cursor-pointer"
                     >
                       <Send className="w-4 h-4" />
-                      <span>Опубликовать мой отзыв</span>
+                      <span>Отправить отзыв</span>
                     </button>
 
                   </motion.form>

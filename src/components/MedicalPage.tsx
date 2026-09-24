@@ -72,13 +72,13 @@ export default function MedicalPage({ onBackToHome }: { onBackToHome: () => void
 
           <div className="flex items-center space-x-2 mb-3">
             <Stethoscope className="w-5 h-5 text-[#c5a880]" />
-            <span className="text-[#c5a880] text-xs font-mono uppercase tracking-widest font-bold">Высшая медицинская категория</span>
+            <span className="text-[#c5a880] text-xs font-mono uppercase tracking-widest font-bold">Ведомственное оздоровление • Раздел формируется</span>
           </div>
           <h1 className="font-serif text-3xl sm:text-5xl font-black tracking-tight">
             Медицинский центр и Лечение
           </h1>
           <p className="text-stone-300 text-sm sm:text-base mt-4 leading-relaxed max-w-3xl">
-            Комплексные лечебно-оздоровительные программы под наблюдением квалифицированных специалистов Федеральной таможенной службы России. Современная диагностика, бальнеотерапия и уникальный субтропический климат.
+            Информация о медицинских программах, процедурах и диагностической базе актуализируется и появится позже. Назначение лечебно-оздоровительного курса осуществляется лечащим врачом в строгом соответствии с санаторно-курортной картой.
           </p>
 
           {isAdminMode && (
@@ -94,7 +94,24 @@ export default function MedicalPage({ onBackToHome }: { onBackToHome: () => void
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+        
+        {/* Placeholder notice banner */}
+        <div className="bg-amber-50/80 border border-amber-200/80 rounded-2xl p-4 sm:p-5 mb-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 text-xs text-amber-900 shadow-sm">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-xl bg-amber-100 text-amber-800 flex items-center justify-center shrink-0 border border-amber-300">
+              <FileText className="w-4 h-4" />
+            </div>
+            <div>
+              <strong className="block font-bold text-amber-950">Раздел наполняется:</strong>
+              <span className="text-amber-850">Медицинские методики и перечни процедур находятся на этапе утверждения. Данные можно дополнить через панель управления.</span>
+            </div>
+          </div>
+          <span className="text-[10px] font-mono text-amber-800 uppercase tracking-wider bg-amber-100 border border-amber-300 px-3 py-1.5 rounded-lg font-bold shrink-0 self-start sm:self-center">
+            Появится позже
+          </span>
+        </div>
+
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           
           {/* LEFT COLUMN: PROGRAMS SELECTION / SEARCH */}
@@ -221,7 +238,7 @@ export default function MedicalPage({ onBackToHome }: { onBackToHome: () => void
                       </div>
                       <div className="bg-[#FAF9F6]/10 backdrop-blur-md border border-white/20 text-white font-mono text-xs uppercase px-4 py-2 rounded-lg shrink-0 flex items-center gap-2">
                         <Clock className="w-4 h-4 text-[#c5a880]" />
-                        <span>Курс: {prog.duration || ((prog as any).durationDays ? `от ${(prog as any).durationDays} дней` : 'от 10 до 21 дня')}</span>
+                        <span>Курс: {prog.duration || 'По назначению врача'}</span>
                       </div>
                     </div>
                   </div>

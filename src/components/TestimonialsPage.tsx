@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useAdminData } from '../context/AdminDataContext';
-import { Star, ArrowLeft, MessageSquare, Sparkles, Filter, Home, Check } from 'lucide-react';
+import { Star, ArrowLeft, MessageSquare, Sparkles, Filter, Home, Check, ShieldCheck } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
 export default function TestimonialsPage({ onBackToHome }: { onBackToHome: () => void }) {
@@ -44,6 +44,16 @@ export default function TestimonialsPage({ onBackToHome }: { onBackToHome: () =>
           <p className="text-stone-300 text-sm sm:text-base mt-4 leading-relaxed max-w-3xl">
             Искренние отзывы, слова благодарности, напутствия и очерки от отдыхающих, ветеранов и сотрудников Федеральной таможенной службы России о пребывании в санатории «Ясная Поляна» в Гаспре.
           </p>
+        </div>
+      </div>
+
+      {/* 152-FZ COMPLIANCE NOTICE */}
+      <div className="bg-emerald-900/10 border-b border-emerald-900/20 py-3 px-4">
+        <div className="max-w-7xl mx-auto flex items-center gap-2.5 text-xs text-emerald-950 font-sans">
+          <ShieldCheck className="w-4 h-4 text-emerald-700 shrink-0" />
+          <span>
+            <strong>Соблюдение 152-ФЗ:</strong> В соответствии с Федеральным законом от 27.07.2006 № 152-ФЗ «О персональных данных» и нормами врачебной тайны, все отзывы публикуются исключительно в обезличенном формате без раскрытия персональных сведений, номеров документов и деталей диагнозов.
+          </span>
         </div>
       </div>
 

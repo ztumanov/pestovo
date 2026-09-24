@@ -431,7 +431,6 @@ export default function DocumentsPage({ onBackToHome }: { onBackToHome: () => vo
   const documents = siteData.documents || INITIAL_DOCUMENTS;
 
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [viewingDoc, setViewingDoc] = useState<DocumentItem | null>(null);
   const [feedbackMsg, setFeedbackMsg] = useState<string | null>(null);
   const [isPassportOpen, setIsPassportOpen] = useState(true);
@@ -500,22 +499,15 @@ export default function DocumentsPage({ onBackToHome }: { onBackToHome: () => vo
   };
 
   const filteredDocs = documents.filter((doc) => {
-    const matchesSearch = doc.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                          (doc.code && doc.code.toLowerCase().includes(searchQuery.toLowerCase())) ||
-                          doc.summary.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesCategory = selectedCategory === 'all' || doc.category === selectedCategory;
-    return matchesSearch && matchesCategory;
+    const q = searchQuery.toLowerCase().trim();
+    if (!q) return true;
+    return (
+      doc.title.toLowerCase().includes(q) || 
+      (doc.code && doc.code.toLowerCase().includes(q)) ||
+      doc.summary.toLowerCase().includes(q) ||
+      doc.categoryLabel.toLowerCase().includes(q)
+    );
   });
-
-  const categories = [
-    { id: 'all', label: 'Все документы', icon: FileText },
-    { id: 'constituent', label: 'Учредительные и общие', icon: Building2 },
-    { id: 'medical', label: 'Лицензии и стандарты', icon: FileCheck },
-    { id: 'reception', label: 'Режим и обращения', icon: UserCheck },
-    { id: 'law', label: 'Нормативно-правовые акты', icon: Shield },
-    { id: 'finance', label: 'Финансовые гарантии', icon: Briefcase },
-    { id: 'modifications', label: 'Регламентные изменения', icon: Clock }
-  ];
 
   return (
     <div className="flex-1 bg-[#FAF9F6] text-[#1c2a22] font-sans">
@@ -565,77 +557,41 @@ export default function DocumentsPage({ onBackToHome }: { onBackToHome: () => vo
         )}
       </AnimatePresence>
 
-      {/* Main documents columns */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-          
-          {/* Left Navigation: Categories */}
-          <div className="lg:col-span-3 space-y-4">
-            <div className="bg-white p-5 rounded border border-stone-200 shadow-sm">
-              <h3 className="text-xs uppercase tracking-wider font-mono font-bold text-[#c5a880] mb-4">Разделы реестра</h3>
-              <div className="space-y-1">
-                {categories.map((cat) => {
-                  const Icon = cat.icon;
-                  const count = cat.id === 'all' 
-                    ? documents.length 
-                    : documents.filter((d) => d.category === cat.id).count || documents.filter((d) => d.category === cat.id).length;
-                  
-                  return (
-                    <button
-                      key={cat.id}
-                      onClick={() => {
-                        setSelectedCategory(cat.id);
-                        setViewingDoc(null);
-                      }}
-                      className={`w-full flex items-center justify-between px-3 py-2.5 rounded text-xs font-semibold uppercase tracking-wide transition-all cursor-pointer ${
-                        selectedCategory === cat.id
-                          ? 'bg-[#022C22] text-[#c5a880] border-l-4 border-[#c5a880]'
-                          : 'text-stone-600 hover:bg-stone-100 hover:text-stone-900'
-                      }`}
-                    >
-                      <div className="flex items-center space-x-2 text-left">
-                        <Icon className="w-4 h-4" />
-                        <span>{cat.label}</span>
-                      </div>
-                      <span className={`px-2 py-0.5 rounded-full text-[10px] font-mono font-bold ${selectedCategory === cat.id ? 'bg-[#c5a880]/20 text-[#c5a880]' : 'bg-stone-100 text-stone-500'}`}>
-                        {count}
-                      </span>
-                    </button>
-                  );
-                })}
+      {/* Main documents container - all documents on one page */}
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-6">
+        
+        {/* Admin status box */}
+        {isAdminMode && (
+          <div className="bg-amber-50 border border-amber-200 p-4 rounded-sm flex items-center justify-between gap-4">
+            <div className="flex items-center space-x-3 text-amber-850">
+              <Shield className="w-5 h-5 text-amber-750 shrink-0" />
+              <div className="text-xs">
+                <span className="font-mono uppercase tracking-wider font-bold block">Панель управления PDF (Администратор)</span>
+                <span className="text-amber-750">Возле каждого документа доступна кнопка замены и загрузки официального PDF-файла.</span>
               </div>
             </div>
-
-            {/* Admin status box */}
-            {isAdminMode && (
-              <div className="bg-amber-50 border border-amber-200 p-5 rounded-sm">
-                <div className="flex items-center space-x-2 text-amber-800 mb-2">
-                  <Shield className="w-4.5 h-4.5" />
-                  <span className="text-xs font-mono uppercase tracking-wider font-bold">Панель управления PDF</span>
-                </div>
-                <p className="text-xs text-amber-700 leading-relaxed">
-                  Вы зашли в режиме <strong>Администратора санатория</strong>. Возле каждого файла доступна кнопка загрузки PDF. Выберите и загрузите любой PDF-файл для активации полноэкранного режима чтения.
-                </p>
-              </div>
-            )}
           </div>
+        )}
 
-          {/* Right Navigation: Search & Document Grid */}
-          <div className="lg:col-span-9 space-y-6">
-            
-            {/* Search inputs */}
-            <div className="bg-white p-4 rounded border border-stone-200 shadow-sm flex flex-col sm:flex-row gap-4">
-              <div className="relative flex-1">
-                <Search className="absolute left-3.5 top-3.5 w-4 h-4 text-stone-400" />
-                <input
-                  type="text"
-                  placeholder="Быстрый поиск по названию уставного акта, закону или приказу..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full bg-stone-50 border border-stone-200 pl-10 pr-4 py-3 rounded text-sm focus:outline-none focus:border-[#022C22] font-sans placeholder-stone-400"
-                />
-              </div>
-            </div>
+        {/* Search input & Total document counter */}
+        <div className="bg-white p-4 rounded border border-stone-200 shadow-sm flex flex-col sm:flex-row items-center gap-4 justify-between">
+          <div className="relative flex-1 w-full">
+            <Search className="absolute left-3.5 top-3.5 w-4 h-4 text-stone-400" />
+            <input
+              type="text"
+              placeholder="Быстрый поиск по названию документа, номеру приказа, коду или ключевым словам..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full bg-stone-50 border border-stone-200 pl-10 pr-4 py-3 rounded text-sm focus:outline-none focus:border-[#022C22] font-sans placeholder-stone-400"
+            />
+          </div>
+          <div className="shrink-0 text-xs font-mono font-bold text-stone-600 bg-stone-100 px-4 py-3 rounded border border-stone-200 flex items-center gap-2">
+            <span>Всего документов:</span>
+            <span className="bg-[#022C22] text-[#c5a880] px-2 py-0.5 rounded font-black text-xs">
+              {filteredDocs.length}
+            </span>
+          </div>
+        </div>
 
             {/* OFFICIAL SANATORIUM PASSPORT */}
             <div className="bg-[#022C22] text-white rounded border border-[#c5a880]/30 shadow-lg overflow-hidden transition-all duration-300">
@@ -1068,8 +1024,8 @@ export default function DocumentsPage({ onBackToHome }: { onBackToHome: () => vo
                       <FileText className="w-12 h-12 text-stone-300 mx-auto mb-3" />
                       <p className="text-stone-500 text-sm font-semibold">Акты или федеральные законы не найдены.</p>
                       <button 
-                        onClick={() => { setSearchQuery(''); setSelectedCategory('all'); }} 
-                        className="mt-3 text-xs text-[#022C22] hover:text-[#c5a880] font-bold uppercase"
+                        onClick={() => setSearchQuery('')} 
+                        className="mt-3 text-xs text-[#022C22] hover:text-[#c5a880] font-bold uppercase cursor-pointer"
                       >
                         Сбросить фильтры поиска
                       </button>
@@ -1079,9 +1035,6 @@ export default function DocumentsPage({ onBackToHome }: { onBackToHome: () => vo
               )}
             </AnimatePresence>
 
-          </div>
-
-        </div>
       </div>
     </div>
   );

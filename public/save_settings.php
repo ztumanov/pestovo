@@ -40,9 +40,9 @@ $defaultUsers = [
     ],
     [
         "id" => "user-2",
-        "username" => "daniliv",
+        "username" => "director",
         "password" => "admin",
-        "role" => "и.о. Начальника санатория"
+        "role" => "Руководство учреждения"
     ]
 ];
 
