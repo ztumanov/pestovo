@@ -2785,12 +2785,50 @@ export default function AdminPage({ onBackToHome }: { onBackToHome: () => void }
               {!showAddDoc && !editingDocId && (
                 <div className="bg-white border border-stone-200/80 rounded-2xl shadow-sm overflow-hidden animate-fade-in">
                   <div className="p-4 border-b border-stone-100 bg-[#FAF9F6] flex flex-col md:flex-row gap-3 md:items-center md:justify-between">
-                    <span className="text-xs font-black uppercase tracking-wider text-[#022C22] block font-mono">
-                      Список документов ({documents?.length || 0})
-                    </span>
-                    <p className="text-[11px] text-stone-400">
-                      Изменения вступают в силу после нажатия кнопки «Опубликовать» во вкладке сохранения.
-                    </p>
+                    <div>
+                      <span className="text-xs font-black uppercase tracking-wider text-[#022C22] block font-mono">
+                        Список документов ({documents?.length || 0}) • PDF в базе: {documents?.filter(d => d.pdfUrl).length || 0}
+                      </span>
+                      <p className="text-[11px] text-stone-400">
+                        Все PDF документы встраиваются в файл <code className="font-mono text-stone-600 font-bold">site-data.json</code> для переноса на хостинг.
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const baseData = getConsolidatedSiteData();
+                          const fullData = {
+                            ...baseData,
+                            _metadata: {
+                              updatedAt: new Date().toISOString(),
+                              version: Date.now(),
+                              source: 'admin-export'
+                            }
+                          };
+                          updateSiteData(fullData);
+                          try {
+                            localStorage.setItem('yasnaya_server_data_fingerprint', String(fullData._metadata.updatedAt));
+                          } catch {}
+                          const jsonString = JSON.stringify(fullData, null, 2);
+                          const blob = new Blob([jsonString], { type: 'application/json;charset=utf-8' });
+                          const blobUrl = URL.createObjectURL(blob);
+                          const downloadAnchor = document.createElement('a');
+                          downloadAnchor.href = blobUrl;
+                          downloadAnchor.download = 'site-data.json';
+                          document.body.appendChild(downloadAnchor);
+                          downloadAnchor.click();
+                          downloadAnchor.remove();
+                          setTimeout(() => URL.revokeObjectURL(blobUrl), 1000);
+                          triggerSuccess();
+                        }}
+                        className="bg-[#022C22] hover:bg-[#c5a880] text-white hover:text-[#022C22] text-[11px] font-bold px-3.5 py-1.5 rounded-lg flex items-center gap-1.5 transition-all cursor-pointer uppercase tracking-wider"
+                        title="Скачать обновленный site-data.json со всеми PDF"
+                      >
+                        <Download className="w-3.5 h-3.5" />
+                        <span>Скачать site-data.json</span>
+                      </button>
+                    </div>
                   </div>
 
                   <div className="divide-y divide-stone-100">
@@ -2808,11 +2846,11 @@ export default function AdminPage({ onBackToHome }: { onBackToHome: () => void }
                             )}
                             {doc.pdfUrl ? (
                               <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-100 px-2 py-0.5 rounded flex items-center gap-1">
-                                📎 PDF ({doc.fileSize || 'Загружен'})
+                                📎 PDF ({doc.pdfUrl.startsWith('data:') ? `Встроен в JSON (${doc.fileSize || 'Загружен'})` : (doc.fileSize || 'Загружен')})
                               </span>
                             ) : (
                               <span className="text-[10px] font-bold text-stone-400 bg-stone-50 border border-stone-200/60 px-2 py-0.5 rounded">
-                                Без PDF (только текст)
+                                Без PDF (текст)
                               </span>
                             )}
                           </div>
@@ -3350,7 +3388,7 @@ export default function AdminPage({ onBackToHome }: { onBackToHome: () => void }
                     <span className="text-[10px] font-mono text-stone-400 block text-center uppercase tracking-wider">
                       Конфигурация содержит:
                     </span>
-                    <div className="grid grid-cols-2 gap-2 mt-2 text-center">
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mt-2 text-center">
                       <div className="bg-white p-2 rounded border border-stone-100 text-xs">
                         <strong className="text-emerald-700 block text-sm">{siteData.rooms?.length || 0}</strong>
                         <span className="text-[10px] text-stone-400">Номера</span>
@@ -3358,6 +3396,14 @@ export default function AdminPage({ onBackToHome }: { onBackToHome: () => void }
                       <div className="bg-white p-2 rounded border border-stone-100 text-xs">
                         <strong className="text-emerald-700 block text-sm">{siteData.services?.length || 0}</strong>
                         <span className="text-[10px] text-stone-400">Услуги</span>
+                      </div>
+                      <div className="bg-white p-2 rounded border border-stone-100 text-xs">
+                        <strong className="text-emerald-700 block text-sm">{siteData.documents?.length || 0}</strong>
+                        <span className="text-[10px] text-stone-400">Документы</span>
+                      </div>
+                      <div className="bg-white p-2 rounded border border-stone-100 text-xs">
+                        <strong className="text-emerald-700 block text-sm">{siteData.documents?.filter(d => d.pdfUrl).length || 0}</strong>
+                        <span className="text-[10px] text-stone-400">PDF в базе</span>
                       </div>
                     </div>
                   </div>

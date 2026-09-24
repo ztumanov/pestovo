@@ -11,7 +11,7 @@ import {
   VIDEOS 
 } from '../data/resortData';
 import { DEFAULT_SERVICES } from '../data/servicesData';
-import { INITIAL_DOCUMENTS } from '../data/documentsData';
+import { INITIAL_DOCUMENTS, DOCUMENT_CATEGORIES } from '../data/documentsData';
 import { 
   getStorageData, 
   setStorageData, 
@@ -99,6 +99,11 @@ export interface SiteData {
   galleryCategories: GalleryCategory[];
   users?: AdminUser[];
   documents?: DocumentItem[];
+  _metadata?: {
+    updatedAt?: string;
+    version?: number;
+    source?: string;
+  };
 }
 
 // Deep cleaner for asset paths ensuring all legacy /src/assets/images are converted to /images/
@@ -184,7 +189,42 @@ export function normalizeSiteData(data: Partial<SiteData> | any): SiteData {
     gallery: Array.isArray(data.gallery) ? data.gallery : (DEFAULT_SITE_DATA.gallery || []),
     galleryCategories: Array.isArray(data.galleryCategories) ? data.galleryCategories : (DEFAULT_SITE_DATA.galleryCategories || []),
     users: Array.isArray(data.users) ? data.users : (DEFAULT_SITE_DATA.users || []),
-    documents: Array.isArray(data.documents) ? data.documents : (DEFAULT_SITE_DATA.documents || []),
+    documents: (() => {
+      const rawDocs = Array.isArray(data.documents) && data.documents.length > 0 
+        ? data.documents 
+        : (DEFAULT_SITE_DATA.documents || INITIAL_DOCUMENTS);
+      return rawDocs.map((d: any, idx: number) => {
+        let category: DocumentItem['category'] = 'constituent';
+        if (['constituent', 'medical', 'law', 'reception', 'finance', 'modifications'].includes(d?.category)) {
+          category = d.category;
+        } else if (typeof d?.category === 'string') {
+          const catLower = d.category.toLowerCase();
+          if (catLower.includes('медицин') || catLower.includes('лиценз')) category = 'medical';
+          else if (catLower.includes('закон') || catLower.includes('право')) category = 'law';
+          else if (catLower.includes('прием') || catLower.includes('режим') || catLower.includes('обращен')) category = 'reception';
+          else if (catLower.includes('финанс') || catLower.includes('турист')) category = 'finance';
+          else if (catLower.includes('изменен') || catLower.includes('норм')) category = 'modifications';
+          else category = 'constituent';
+        }
+
+        const catObj = DOCUMENT_CATEGORIES.find(c => c.id === category);
+
+        return {
+          id: String(d?.id || `doc-${idx + 1}`),
+          title: String(d?.title || 'ОФИЦИАЛЬНЫЙ ДОКУМЕНТ'),
+          code: d?.code || (d?.number ? `Рег. № ${d.number}` : undefined),
+          category,
+          categoryLabel: d?.categoryLabel || catObj?.name || 'Документы',
+          summary: d?.summary || d?.description || d?.annotation || '',
+          pdfUrl: (typeof d?.pdfUrl === 'string' && d.pdfUrl.trim() !== '') 
+            ? d.pdfUrl 
+            : (typeof d?.url === 'string' && d.url !== '#' && d.url.trim() !== '' ? d.url : null),
+          fileSize: d?.fileSize || d?.size || '1.2 MB',
+          uploadDate: d?.uploadDate || d?.date || '2026',
+          originalText: d?.originalText || d?.fullText || d?.text || ''
+        };
+      });
+    })(),
     images: { ...DEFAULT_SITE_DATA.images, ...(data.images || {}) },
     extraImages: { ...DEFAULT_SITE_DATA.extraImages, ...(data.extraImages || {}) },
     videos: { ...DEFAULT_SITE_DATA.videos, ...(data.videos || {}) }
@@ -379,6 +419,8 @@ interface AdminDataContextProps {
   updateSiteData: (newData: SiteData) => void;
   updateSection: <K extends keyof SiteData>(key: K, value: SiteData[K]) => void;
   updateSections: (updates: Partial<SiteData>) => void;
+  downloadSiteDataJson: (customData?: SiteData) => void;
+  saveToServer: (customData?: SiteData) => Promise<{ success: boolean; message: string }>;
   resetToDefault: () => void;
   activeSettingsTab: string;
   setActiveSettingsTab: (tab: string) => void;
@@ -491,7 +533,7 @@ export function AdminDataProvider({ children }: { children: React.ReactNode }) {
                 ? '/images/pestovo_beach_1779780925661.png'
                 : '/images/pestovo_block_1779780908700.png';
 
-              const computedDuration = prog.duration || (prog.durationDays ? `от ${prog.durationDays} дней` : 'По назначению врача');
+              const computedDuration = prog.duration || (prog.durationDays ? `от ${prog.durationDays} дней` : 'от 10 до 21 дня');
               const computedIcon = prog.icon || 'Lungs';
               const computedImage = prog.image || defaultImage;
 
@@ -594,11 +636,33 @@ export function AdminDataProvider({ children }: { children: React.ReactNode }) {
             morphed = true;
           }
 
-          // Backfill missing documents
-          if (!parsed.documents || !Array.isArray(parsed.documents)) {
+          // Backfill missing documents and merge custom uploaded PDFs from localStorage if any
+          if (!parsed.documents || !Array.isArray(parsed.documents) || parsed.documents.length === 0) {
             parsed.documents = JSON.parse(JSON.stringify(INITIAL_DOCUMENTS));
             morphed = true;
           }
+
+          try {
+            const customDocsRaw = localStorage.getItem('pestovo_custom_documents');
+            if (customDocsRaw) {
+              const customDocs = JSON.parse(customDocsRaw);
+              if (Array.isArray(customDocs) && customDocs.length > 0) {
+                parsed.documents = parsed.documents.map((d: any) => {
+                  const match = customDocs.find((c: any) => c.id === d.id);
+                  if (match && match.pdfUrl && match.pdfUrl.startsWith('data:')) {
+                    return {
+                      ...d,
+                      pdfUrl: match.pdfUrl,
+                      fileSize: match.fileSize || d.fileSize,
+                      uploadDate: match.uploadDate || d.uploadDate
+                    };
+                  }
+                  return d;
+                });
+                morphed = true;
+              }
+            }
+          } catch {}
 
           const normalized = normalizeSiteData(deepCleanAssetPaths(parsed));
 
@@ -648,7 +712,29 @@ export function AdminDataProvider({ children }: { children: React.ReactNode }) {
         if (serverJson.status === 'fulfilled' && serverJson.value && typeof serverJson.value === 'object') {
           const published = serverJson.value;
           if (published.resortInfo || published.rooms || published.hero) {
-            const cleaned = normalizeSiteData(deepCleanAssetPaths({ ...DEFAULT_SITE_DATA, ...published }));
+            let cleaned = normalizeSiteData(deepCleanAssetPaths({ ...DEFAULT_SITE_DATA, ...published }));
+
+            // Critical safeguard: Never wipe out user-uploaded base64 PDF documents if server site-data.json is stale or lacks them
+            if (savedData?.documents && Array.isArray(savedData.documents)) {
+              cleaned.documents = cleaned.documents.map((pubDoc) => {
+                const localMatch = savedData.documents.find((loc: any) => loc.id === pubDoc.id);
+                if (localMatch && localMatch.pdfUrl && localMatch.pdfUrl.startsWith('data:')) {
+                  return {
+                    ...pubDoc,
+                    pdfUrl: localMatch.pdfUrl,
+                    fileSize: localMatch.fileSize || pubDoc.fileSize,
+                    uploadDate: localMatch.uploadDate || pubDoc.uploadDate
+                  };
+                }
+                return pubDoc;
+              });
+
+              // Also preserve any new documents created locally that do not exist on server
+              const localOnly = savedData.documents.filter((loc: any) => !cleaned.documents.some((pub: any) => pub.id === loc.id));
+              if (localOnly.length > 0) {
+                cleaned.documents = [...cleaned.documents, ...localOnly];
+              }
+            }
 
             // Generate content fingerprint to instantly detect server changes
             const calcFingerprint = (obj: any): string => {
@@ -659,7 +745,8 @@ export function AdminDataProvider({ children }: { children: React.ReactNode }) {
               const heroP = obj.hero?.slides?.[0]?.url || obj.images?.hero || '';
               const r1 = obj.rooms?.[0]?.image || '';
               const r2 = obj.rooms?.[1]?.image || '';
-              return `fp_${heroP.slice(0, 40)}_${r1.slice(0, 40)}_${r2.slice(0, 40)}_${JSON.stringify(obj.rooms || []).length}_${JSON.stringify(obj.hero?.slides || []).length}`;
+              const docCount = (obj.documents || []).length;
+              return `fp_${heroP.slice(0, 40)}_${r1.slice(0, 40)}_${r2.slice(0, 40)}_${docCount}_${JSON.stringify(obj.rooms || []).length}_${JSON.stringify(obj.hero?.slides || []).length}`;
             };
 
             const serverFp = calcFingerprint(published);
@@ -855,6 +942,9 @@ export function AdminDataProvider({ children }: { children: React.ReactNode }) {
       setStorageData(updated).catch(e => {
         console.error('Failed to save to storage:', e);
       });
+      try {
+        localStorage.setItem('yasnaya_server_data_fingerprint', String(updated._metadata?.updatedAt || Date.now()));
+      } catch {}
       syncSettingsWithServer(updated);
       return updated;
     });
@@ -890,7 +980,9 @@ export function AdminDataProvider({ children }: { children: React.ReactNode }) {
       setStorageData(updated).catch(e => {
         console.error('Failed to save to storage:', e);
       });
-      
+      try {
+        localStorage.setItem('yasnaya_server_data_fingerprint', String(updated._metadata?.updatedAt || Date.now()));
+      } catch {}
       syncSettingsWithServer(updated);
       return updated;
     });
@@ -913,6 +1005,76 @@ export function AdminDataProvider({ children }: { children: React.ReactNode }) {
       }).catch(err => {
         console.log('Skipping reviews.php sync in local development', err);
       });
+    }
+  };
+
+  const downloadSiteDataJson = (customData?: SiteData) => {
+    const baseData = customData || siteData;
+    const fullData = {
+      ...baseData,
+      _metadata: {
+        updatedAt: new Date().toISOString(),
+        version: Date.now(),
+        source: 'admin-export'
+      }
+    };
+    updateSiteData(fullData);
+    try {
+      localStorage.setItem('yasnaya_server_data_fingerprint', String(fullData._metadata.updatedAt));
+    } catch {}
+    const jsonString = JSON.stringify(fullData, null, 2);
+    const blob = new Blob([jsonString], { type: 'application/json;charset=utf-8' });
+    const blobUrl = URL.createObjectURL(blob);
+    const downloadAnchor = document.createElement('a');
+    downloadAnchor.href = blobUrl;
+    downloadAnchor.download = 'site-data.json';
+    document.body.appendChild(downloadAnchor);
+    downloadAnchor.click();
+    downloadAnchor.remove();
+    setTimeout(() => URL.revokeObjectURL(blobUrl), 1000);
+  };
+
+  const saveToServer = async (customData?: SiteData): Promise<{ success: boolean; message: string }> => {
+    const credsRaw = localStorage.getItem('pestovo_resort_admin_credentials');
+    let username = 'admin';
+    let password = '';
+    if (credsRaw) {
+      try {
+        const creds = JSON.parse(credsRaw);
+        if (creds && creds.username) username = creds.username;
+        if (creds && creds.password) password = creds.password;
+      } catch {}
+    }
+
+    const dataToSave = customData || siteData;
+    const fullData = {
+      ...dataToSave,
+      _metadata: {
+        updatedAt: new Date().toISOString(),
+        version: Date.now(),
+        source: 'admin-save'
+      }
+    };
+    updateSiteData(fullData);
+    try {
+      localStorage.setItem('yasnaya_server_data_fingerprint', String(fullData._metadata.updatedAt));
+    } catch {}
+
+    const response = await fetch('/save_settings.php', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        username,
+        password,
+        siteData: fullData
+      })
+    });
+
+    if (response.ok) {
+      return { success: true, message: 'Все настройки и PDF файлы успешно сохранены на сервере в site-data.json!' };
+    } else {
+      const resJson = await response.json().catch(() => ({}));
+      throw new Error(resJson.error || `Ошибка сервера: ${response.status}`);
     }
   };
 
@@ -944,6 +1106,8 @@ export function AdminDataProvider({ children }: { children: React.ReactNode }) {
       updateSiteData,
       updateSection,
       updateSections,
+      downloadSiteDataJson,
+      saveToServer,
       resetToDefault,
       activeSettingsTab,
       setActiveSettingsTab,

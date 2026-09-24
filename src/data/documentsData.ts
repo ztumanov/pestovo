@@ -1,5 +1,14 @@
 import { DocumentItem } from '../types';
 
+export const DOCUMENT_CATEGORIES = [
+  { id: 'constituent', name: 'Учредительные и общие' },
+  { id: 'medical', name: 'Лицензии и стандарты' },
+  { id: 'law', name: 'Законы и правовые акты' },
+  { id: 'reception', name: 'Лечебный regime и обращения' },
+  { id: 'finance', name: 'Финансовые и классификация' },
+  { id: 'modifications', name: 'Нормативы и изменения' },
+] as const;
+
 export const INITIAL_DOCUMENTS: DocumentItem[] = [
   {
     id: 'tourism-extract',

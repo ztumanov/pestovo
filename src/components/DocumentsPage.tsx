@@ -20,24 +20,14 @@ import {
   AlertCircle,
   Menu,
   X,
-  Plus
+  Plus,
+  Globe
 } from 'lucide-react';
 import { useAdminData } from '../context/AdminDataContext';
+import { DocumentItem } from '../types';
+import { calculateStorageSize } from '../lib/storage';
 import PdfViewer from './PdfViewer';
 import { getDocumentPdfUrl } from '../utils/pdfGenerator';
-
-interface DocumentItem {
-  id: string;
-  title: string;
-  code?: string;
-  category: 'constituent' | 'medical' | 'law' | 'reception' | 'finance' | 'modifications';
-  categoryLabel: string;
-  summary: string;
-  pdfUrl: string | null;
-  fileSize?: string;
-  uploadDate?: string;
-  originalText?: string;
-}
 
 const INITIAL_DOCUMENTS: DocumentItem[] = [
   {
@@ -427,8 +417,10 @@ const INITIAL_DOCUMENTS: DocumentItem[] = [
 ];
 
 export default function DocumentsPage({ onBackToHome }: { onBackToHome: () => void }) {
-  const { isAdminMode, siteData, updateSection } = useAdminData();
+  const { isAdminMode, siteData, updateSection, downloadSiteDataJson, saveToServer } = useAdminData();
   const documents = siteData.documents || INITIAL_DOCUMENTS;
+
+  const customPdfsCount = documents.filter(d => d.pdfUrl && d.pdfUrl.startsWith('data:')).length;
 
   const [searchQuery, setSearchQuery] = useState('');
   const [viewingDoc, setViewingDoc] = useState<DocumentItem | null>(null);
@@ -441,7 +433,9 @@ export default function DocumentsPage({ onBackToHome }: { onBackToHome: () => vo
   const [uploadProgress, setUploadProgress] = useState(0);
 
   const saveToLocalStorage = (newDocs: DocumentItem[]) => {
-    localStorage.setItem('pestovo_custom_documents', JSON.stringify(newDocs));
+    try {
+      localStorage.setItem('pestovo_custom_documents', JSON.stringify(newDocs));
+    } catch {}
     updateSection('documents', newDocs);
   };
 
@@ -464,6 +458,16 @@ export default function DocumentsPage({ onBackToHome }: { onBackToHome: () => vo
     const file = event.target.files?.[0];
     if (!file) return;
 
+    if (file.type !== 'application/pdf' && !file.name.toLowerCase().endsWith('.pdf')) {
+      alert('Пожалуйста, выберите файл в формате PDF (.pdf)');
+      return;
+    }
+
+    if (file.size > 25 * 1024 * 1024) {
+      alert('Размер файла превышает 25 МБ. Для быстрого сохранения и экспорта в site-data.json рекомендуется использовать документы размером до 25 МБ.');
+      return;
+    }
+
     setUploadingDocId(docId);
     setUploadProgress(25);
 
@@ -472,12 +476,16 @@ export default function DocumentsPage({ onBackToHome }: { onBackToHome: () => vo
       const dataUrl = e.target?.result as string;
       setUploadProgress(100);
       setTimeout(() => {
+        const sizeMb = (file.size / (1024 * 1024)).toFixed(2);
+        const sizeKb = (file.size / 1024).toFixed(0);
+        const formattedSize = file.size >= 1024 * 1024 ? `${sizeMb} MB` : `${sizeKb} KB`;
+
         const updated = documents.map((doc) => {
           if (doc.id === docId) {
             return {
               ...doc,
               pdfUrl: dataUrl,
-              fileSize: `${(file.size / (1024 * 1024)).toFixed(2)} MB`,
+              fileSize: formattedSize,
               uploadDate: new Date().toLocaleDateString('ru-RU')
             };
           }
@@ -485,8 +493,8 @@ export default function DocumentsPage({ onBackToHome }: { onBackToHome: () => vo
         });
         saveToLocalStorage(updated);
         setUploadingDocId(null);
-        setFeedbackMsg(`PDF файл «${file.name}» успешно загружен в систему и готов к просмотру.`);
-        setTimeout(() => setFeedbackMsg(null), 4000);
+        setFeedbackMsg(`✓ PDF «${file.name}» (${formattedSize}) успешно сохранен в базу и включен в структуру site-data.json!`);
+        setTimeout(() => setFeedbackMsg(null), 5000);
       }, 300);
     };
 
@@ -562,13 +570,57 @@ export default function DocumentsPage({ onBackToHome }: { onBackToHome: () => vo
         
         {/* Admin status box */}
         {isAdminMode && (
-          <div className="bg-amber-50 border border-amber-200 p-4 rounded-sm flex items-center justify-between gap-4">
-            <div className="flex items-center space-x-3 text-amber-850">
-              <Shield className="w-5 h-5 text-amber-750 shrink-0" />
-              <div className="text-xs">
-                <span className="font-mono uppercase tracking-wider font-bold block">Панель управления PDF (Администратор)</span>
-                <span className="text-amber-750">Возле каждого документа доступна кнопка замены и загрузки официального PDF-файла.</span>
+          <div className="bg-amber-50 border border-amber-250 p-4 sm:p-5 rounded-xl shadow-xs flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+            <div className="flex items-start sm:items-center space-x-3 text-amber-900">
+              <Shield className="w-6 h-6 text-amber-750 shrink-0 mt-0.5 sm:mt-0" />
+              <div>
+                <span className="font-mono uppercase tracking-wider font-bold text-xs block">
+                  Панель управления PDF документами (Администратор)
+                </span>
+                <p className="text-amber-800 text-xs mt-0.5">
+                  Загруженные PDF документы автоматически сохраняются в базу и файл <code className="bg-amber-100/80 font-bold px-1 py-0.5 rounded font-mono text-[11px]">site-data.json</code> для переноса на хостинг.
+                </p>
+                {customPdfsCount > 0 && (
+                  <span className="inline-flex items-center gap-1.5 text-emerald-800 font-bold text-xs mt-1 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded">
+                    <Check className="w-3 h-3 text-emerald-600" />
+                    В базе сохранено PDF файлов пользователя: {customPdfsCount} шт.
+                  </span>
+                )}
               </div>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-2.5 w-full md:w-auto">
+              <button
+                type="button"
+                onClick={() => {
+                  downloadSiteDataJson();
+                  setFeedbackMsg('Файл site-data.json с вашими PDF сформирован и скачан на компьютер!');
+                  setTimeout(() => setFeedbackMsg(null), 5000);
+                }}
+                className="bg-[#022C22] hover:bg-[#c5a880] text-[#FAF9F6] hover:text-[#022C22] text-xs font-bold px-4 py-2.5 rounded-xl uppercase tracking-wider transition-all flex items-center justify-center space-x-1.5 shadow-sm cursor-pointer flex-1 md:flex-initial"
+                title="Скачать файл site-data.json со всеми вашими PDF для загрузки на хостинг"
+              >
+                <Download className="w-3.5 h-3.5" />
+                <span>Скачать site-data.json ({calculateStorageSize(siteData).formatted})</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={async () => {
+                  try {
+                    const res = await saveToServer();
+                    setFeedbackMsg(res.message);
+                    setTimeout(() => setFeedbackMsg(null), 5000);
+                  } catch (err: any) {
+                    alert(`Сохранение на сервер: ${err.message || 'Сервер PHP недоступен. Скачайте site-data.json и загрузите его на хостинг вручную.'}`);
+                  }
+                }}
+                className="bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold px-3.5 py-2.5 rounded-xl uppercase tracking-wider transition-all flex items-center justify-center space-x-1.5 shadow-sm cursor-pointer flex-1 md:flex-initial"
+                title="Мгновенно обновить файл site-data.json на сервере через PHP"
+              >
+                <Globe className="w-3.5 h-3.5" />
+                <span>Сохранить на сервере</span>
+              </button>
             </div>
           </div>
         )}
@@ -945,10 +997,17 @@ export default function DocumentsPage({ onBackToHome }: { onBackToHome: () => vo
                                 • {doc.code}
                               </span>
                             )}
-                            <span className="text-emerald-700 text-[10px] font-mono font-bold flex items-center space-x-1 border border-emerald-200/50 bg-emerald-50 px-2 py-0.5 rounded">
-                              <FileCheck className="w-3.5 h-3.5" />
-                              <span>ОФИЦИАЛЬНЫЙ PDF</span>
-                            </span>
+                            {doc.pdfUrl?.startsWith('data:') ? (
+                              <span className="text-emerald-700 text-[10px] font-mono font-bold flex items-center space-x-1 border border-emerald-300 bg-emerald-100/70 px-2 py-0.5 rounded shadow-2xs">
+                                <FileCheck className="w-3.5 h-3.5 text-emerald-700" />
+                                <span>ВАШ ЗАГРУЖЕННЫЙ PDF (В SITE-DATA)</span>
+                              </span>
+                            ) : (
+                              <span className="text-emerald-700 text-[10px] font-mono font-bold flex items-center space-x-1 border border-emerald-200/50 bg-emerald-50 px-2 py-0.5 rounded">
+                                <FileCheck className="w-3.5 h-3.5" />
+                                <span>ОФИЦИАЛЬНЫЙ PDF</span>
+                              </span>
+                            )}
                           </div>
 
                           <h3 
@@ -1003,7 +1062,7 @@ export default function DocumentsPage({ onBackToHome }: { onBackToHome: () => vo
                                 ) : (
                                   <>
                                     <Upload className="w-3.5 h-3.5" />
-                                    <span>Заменить</span>
+                                    <span>{doc.pdfUrl?.startsWith('data:') ? 'Обновить PDF' : 'Загрузить PDF'}</span>
                                   </>
                                 )}
                                 <input
