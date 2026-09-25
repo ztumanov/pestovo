@@ -18,7 +18,8 @@ import {
   RotateCw,
   LayoutGrid,
   FileCheck,
-  AlertCircle
+  AlertCircle,
+  X
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import * as pdfjsLib from 'pdfjs-dist';
@@ -49,25 +50,48 @@ interface PdfViewerProps {
   };
   onBack: () => void;
   className?: string;
+  isModalFullscreen?: boolean;
 }
 
-export default function PdfViewer({ doc, onBack, className = '' }: PdfViewerProps) {
+export default function PdfViewer({ doc, onBack, className = '', isModalFullscreen = false }: PdfViewerProps) {
   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
+  const [isFullscreen, setIsFullscreen] = useState<boolean>(isModalFullscreen);
   
   // PDF.js Page Navigation & Zoom State
   const [pdfDoc, setPdfDoc] = useState<pdfjsLib.PDFDocumentProxy | null>(null);
   const [numPages, setNumPages] = useState<number>(0);
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const [scale, setScale] = useState<number>(1.25);
+  const [scale, setScale] = useState<number>(1.0);
   const [rotation, setRotation] = useState<number>(0);
   const [renderMode, setRenderMode] = useState<'canvas' | 'embed'>('canvas');
   const [pageRendering, setPageRendering] = useState<boolean>(false);
 
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const viewportRef = useRef<HTMLDivElement | null>(null);
+  const initialPageDim = useRef<{ width: number; height: number } | null>(null);
   const renderTaskRef = useRef<any>(null);
+
+  // Keyboard navigation & Esc listener
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onBack();
+      } else if (e.key === 'ArrowLeft') {
+        setCurrentPage(p => Math.max(p - 1, 1));
+      } else if (e.key === 'ArrowRight') {
+        setCurrentPage(p => (numPages > 0 ? Math.min(p + 1, numPages) : p));
+      } else if (e.key === '+' || e.key === '=') {
+        setScale(prev => Math.min(prev + 0.15, 3.0));
+      } else if (e.key === '-') {
+        setScale(prev => Math.max(prev - 0.15, 0.4));
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [onBack, numPages]);
 
   // 1. Resolve and get the valid Blob PDF URL
   useEffect(() => {
@@ -113,6 +137,33 @@ export default function PdfViewer({ doc, onBack, className = '' }: PdfViewerProp
       setPdfDoc(loadedPdf);
       setNumPages(loadedPdf.numPages);
       setCurrentPage(1);
+
+      // Measure page 1 unscaled dimensions and auto-scale for perfect proportions
+      try {
+        const page1 = await loadedPdf.getPage(1);
+        const unscaledViewport = page1.getViewport({ scale: 1.0 });
+        initialPageDim.current = {
+          width: unscaledViewport.width,
+          height: unscaledViewport.height
+        };
+
+        const container = viewportRef.current;
+        const cWidth = container?.clientWidth || window.innerWidth;
+        const cHeight = container?.clientHeight || (window.innerHeight - 130);
+
+        if (cWidth < 768) {
+          // Mobile: fit full width with comfortable padding
+          const s = (cWidth - 24) / unscaledViewport.width;
+          setScale(Math.min(Math.max(s, 0.5), 1.4));
+        } else {
+          // Desktop: fit whole page height into screen with comfortable margins
+          const s = (cHeight - 48) / unscaledViewport.height;
+          setScale(Math.min(Math.max(s, 0.65), 1.5));
+        }
+      } catch (measureErr) {
+        console.warn('Could not measure initial page dimensions:', measureErr);
+      }
+
       setLoading(false);
     } catch (err) {
       console.warn('PDF.js canvas engine fallback to standard embed:', err);
@@ -220,55 +271,80 @@ export default function PdfViewer({ doc, onBack, className = '' }: PdfViewerProp
     }
   };
 
-  const handleZoomIn = () => setScale(prev => Math.min(prev + 0.25, 3.0));
-  const handleZoomOut = () => setScale(prev => Math.max(prev - 0.25, 0.6));
+  const handleZoomIn = () => setScale(prev => Math.min(prev + 0.15, 3.0));
+  const handleZoomOut = () => setScale(prev => Math.max(prev - 0.15, 0.4));
   const handleRotate = () => setRotation(prev => (prev + 90) % 360);
 
+  const handleFitPage = () => {
+    if (!initialPageDim.current) {
+      setScale(0.95);
+      return;
+    }
+    const container = viewportRef.current;
+    const cHeight = container?.clientHeight || (window.innerHeight - 130);
+    const s = (cHeight - 48) / initialPageDim.current.height;
+    setScale(Math.min(Math.max(s, 0.4), 2.0));
+  };
+
+  const handleFitWidth = () => {
+    if (!initialPageDim.current) {
+      setScale(1.2);
+      return;
+    }
+    const container = viewportRef.current;
+    const cWidth = container?.clientWidth || window.innerWidth;
+    const padding = cWidth < 640 ? 20 : 48;
+    const s = (cWidth - padding) / initialPageDim.current.width;
+    setScale(Math.min(Math.max(s, 0.4), 2.5));
+  };
+
+  const handleResetZoom = () => {
+    setScale(1.0);
+  };
+
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -10 }}
-      className={`bg-stone-900 rounded-2xl border border-stone-700 shadow-2xl overflow-hidden flex flex-col ${
-        isFullscreen ? 'fixed inset-0 z-[9999] rounded-none' : 'h-[82vh]'
+    <div
+      className={`w-full h-full flex flex-col bg-stone-950 select-none overflow-hidden ${
+        isFullscreen ? 'fixed inset-0 z-[9999] rounded-none' : ''
       } ${className}`}
     >
       {/* 1. TOP HEADER TOOLBAR */}
-      <div className="bg-[#022C22] text-white px-4 py-3 border-b border-[#c5a880]/30 shrink-0 flex flex-wrap gap-3 items-center justify-between z-10">
+      <div className="bg-[#022C22] text-white px-4 sm:px-6 py-3 border-b border-[#c5a880]/30 shrink-0 flex items-center justify-between z-10 shadow-md">
         
-        {/* Left: Back button & Document Meta */}
-        <div className="flex items-center space-x-3 min-w-0">
+        {/* Left: Back/Close button & Document Title */}
+        <div className="flex items-center space-x-3.5 min-w-0 flex-1 mr-4">
           <button
             type="button"
             onClick={onBack}
-            className="flex items-center space-x-1.5 bg-white/10 hover:bg-[#c5a880] hover:text-[#022C22] text-white px-3 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all cursor-pointer shrink-0"
+            className="flex items-center space-x-2 bg-white/10 hover:bg-[#c5a880] hover:text-[#022C22] text-white px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold uppercase tracking-wider transition-all cursor-pointer shrink-0 shadow-xs active:scale-95"
+            title="Закрыть просмотр документа (Escape)"
           >
             <ArrowLeft className="w-4 h-4" />
-            <span className="hidden sm:inline">К списку документов</span>
+            <span className="hidden sm:inline">К списку документов (Esc)</span>
             <span className="sm:hidden">Назад</span>
           </button>
 
-          <div className="min-w-0">
+          <div className="min-w-0 flex-1">
             <div className="flex items-center space-x-2">
-              <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#c5a880] bg-white/5 px-2 py-0.5 rounded border border-white/10 shrink-0">
+              <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-[#c5a880] bg-white/10 px-2.5 py-0.5 rounded border border-white/15 shrink-0">
                 {doc.code || doc.number || 'PDF ДОКУМЕНТ'}
               </span>
-              <span className="text-xs text-stone-200 truncate font-serif font-semibold hidden md:inline">
+              <h3 className="text-xs sm:text-sm text-stone-100 font-sans font-bold truncate max-w-xl hidden md:block">
                 {doc.title}
-              </span>
+              </h3>
             </div>
           </div>
         </div>
 
-        {/* Right: Actions */}
-        <div className="flex items-center space-x-2">
+        {/* Right: Actions & Controls */}
+        <div className="flex items-center space-x-2 shrink-0">
           {pdfUrl && (
             <>
               {/* Toggle Canvas / Native Embed Mode */}
               <button
                 type="button"
                 onClick={() => setRenderMode(prev => prev === 'canvas' ? 'embed' : 'canvas')}
-                className="bg-white/10 hover:bg-white/20 text-stone-200 px-2.5 py-1.5 rounded-xl text-xs font-semibold flex items-center space-x-1.5 transition-all cursor-pointer hidden lg:inline-flex"
+                className="bg-white/10 hover:bg-white/20 text-stone-200 px-3 py-2 rounded-xl text-xs font-semibold flex items-center space-x-1.5 transition-all cursor-pointer hidden lg:inline-flex"
                 title="Переключить режим отображения"
               >
                 <LayoutGrid className="w-3.5 h-3.5 text-[#c5a880]" />
@@ -277,101 +353,119 @@ export default function PdfViewer({ doc, onBack, className = '' }: PdfViewerProp
 
               <button
                 type="button"
-                onClick={handleOpenNewTab}
-                className="bg-white/10 hover:bg-[#c5a880] hover:text-[#022C22] text-stone-100 px-3 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center space-x-1.5 transition-all cursor-pointer"
-                title="Открыть PDF в отдельной вкладке"
-              >
-                <ExternalLink className="w-3.5 h-3.5" />
-                <span className="hidden sm:inline">Во весь экран</span>
-              </button>
-
-              <button
-                type="button"
                 onClick={handlePrint}
-                className="bg-white/10 hover:bg-white/20 text-stone-100 p-1.5 sm:px-3 sm:py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center space-x-1.5 transition-all cursor-pointer"
+                className="bg-white/10 hover:bg-white/20 text-stone-100 p-2 sm:px-3 sm:py-2 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center space-x-1.5 transition-all cursor-pointer font-sans"
                 title="Распечатать PDF документ"
               >
-                <Printer className="w-3.5 h-3.5 text-[#c5a880]" />
+                <Printer className="w-4 h-4 text-[#c5a880]" />
                 <span className="hidden md:inline">Печать</span>
               </button>
 
               <button
                 type="button"
                 onClick={handleDownload}
-                className="bg-[#c5a880] hover:bg-[#FAF9F6] text-[#022C22] px-3.5 py-1.5 rounded-xl text-xs font-black uppercase tracking-wider flex items-center space-x-1.5 transition-all cursor-pointer shadow"
+                className="bg-[#c5a880] hover:bg-[#FAF9F6] text-[#022C22] px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center space-x-1.5 transition-all cursor-pointer shadow-md font-sans active:scale-95"
                 title="Скачать оригинальный PDF файл"
               >
-                <Download className="w-3.5 h-3.5" />
-                <span>Скачать PDF</span>
+                <Download className="w-4 h-4" />
+                <span className="hidden sm:inline">Скачать PDF</span>
+                <span className="sm:hidden">PDF</span>
               </button>
             </>
           )}
 
           <button
             type="button"
-            onClick={() => setIsFullscreen(!isFullscreen)}
-            className="p-1.5 hover:bg-white/10 text-stone-300 hover:text-white rounded-xl transition-colors cursor-pointer"
-            title={isFullscreen ? "Выйти из полноэкранного режима" : "Развернуть во весь экран"}
+            onClick={onBack}
+            className="p-2 hover:bg-white/10 text-stone-300 hover:text-white rounded-xl transition-colors cursor-pointer"
+            title="Закрыть документ (Esc)"
           >
-            {isFullscreen ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
+            <X className="w-5 h-5" />
           </button>
         </div>
       </div>
 
-      {/* 2. SUB-TOOLBAR: Navigation & Zoom Controls */}
+      {/* 2. SUB-TOOLBAR: Navigation & Smart Zoom Controls */}
       {renderMode === 'canvas' && numPages > 0 && !loading && (
-        <div className="bg-stone-800 text-stone-200 px-4 py-2 text-xs flex flex-wrap items-center justify-between gap-3 border-b border-stone-700 select-none shrink-0">
+        <div className="bg-stone-900/95 text-stone-200 px-4 sm:px-6 py-2 text-xs flex flex-wrap items-center justify-between gap-3 border-b border-stone-800 select-none shrink-0 backdrop-blur-sm">
           {/* Page Selector */}
           <div className="flex items-center space-x-2">
             <button
               type="button"
               disabled={currentPage <= 1}
               onClick={() => setCurrentPage(p => Math.max(p - 1, 1))}
-              className="p-1 rounded bg-stone-700 hover:bg-stone-600 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer transition-colors"
-              title="Предыдущая страница"
+              className="p-1.5 rounded-lg bg-stone-800 hover:bg-stone-700 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer transition-colors border border-stone-700"
+              title="Предыдущая страница (←)"
             >
               <ChevronLeft className="w-4 h-4" />
             </button>
-            <span className="font-mono text-xs font-bold text-[#c5a880] px-2 py-0.5 bg-stone-900 rounded border border-stone-700">
+            <span className="font-mono text-xs font-bold text-[#c5a880] px-3 py-1 bg-stone-950 rounded-lg border border-stone-800">
               Страница {currentPage} из {numPages}
             </span>
             <button
               type="button"
               disabled={currentPage >= numPages}
               onClick={() => setCurrentPage(p => Math.min(p + 1, numPages))}
-              className="p-1 rounded bg-stone-700 hover:bg-stone-600 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer transition-colors"
-              title="Следующая страница"
+              className="p-1.5 rounded-lg bg-stone-800 hover:bg-stone-700 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer transition-colors border border-stone-700"
+              title="Следующая страница (→)"
             >
               <ChevronRight className="w-4 h-4" />
             </button>
           </div>
 
-          {/* Zoom & Rotation Controls */}
-          <div className="flex items-center space-x-2">
+          {/* Smart Zoom & Proportion Controls */}
+          <div className="flex items-center space-x-1.5">
             <button
               type="button"
               onClick={handleZoomOut}
-              className="p-1.5 rounded bg-stone-700 hover:bg-stone-600 cursor-pointer transition-colors"
-              title="Уменьшить масштаб"
+              className="p-1.5 rounded-lg bg-stone-800 hover:bg-stone-700 cursor-pointer transition-colors text-stone-200 border border-stone-700"
+              title="Уменьшить масштаб (-)"
             >
               <ZoomOut className="w-3.5 h-3.5" />
             </button>
-            <span className="font-mono text-[11px] font-bold text-stone-300 w-12 text-center">
+            
+            <button
+              type="button"
+              onClick={handleResetZoom}
+              className="font-mono text-xs font-bold text-stone-200 px-2.5 py-1 bg-stone-950 hover:bg-stone-800 rounded-lg border border-stone-700 transition-colors cursor-pointer"
+              title="Сбросить на 100%"
+            >
               {Math.round(scale * 100)}%
-            </span>
+            </button>
+            
             <button
               type="button"
               onClick={handleZoomIn}
-              className="p-1.5 rounded bg-stone-700 hover:bg-stone-600 cursor-pointer transition-colors"
-              title="Увеличить масштаб"
+              className="p-1.5 rounded-lg bg-stone-800 hover:bg-stone-700 cursor-pointer transition-colors text-stone-200 border border-stone-700"
+              title="Увеличить масштаб (+)"
             >
               <ZoomIn className="w-3.5 h-3.5" />
             </button>
-            <div className="w-px h-4 bg-stone-600 mx-1"></div>
+
+            <div className="w-px h-4 bg-stone-700 mx-1"></div>
+
+            <button
+              type="button"
+              onClick={handleFitPage}
+              className="px-2.5 py-1 rounded-lg bg-stone-800 hover:bg-stone-700 text-stone-200 text-xs font-semibold cursor-pointer transition-colors border border-stone-700 hidden sm:inline-flex items-center gap-1"
+              title="Подогнать страницу целиком по высоте (стандарт А4)"
+            >
+              <span>Целиком (А4)</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={handleFitWidth}
+              className="px-2.5 py-1 rounded-lg bg-stone-800 hover:bg-stone-700 text-stone-200 text-xs font-semibold cursor-pointer transition-colors border border-stone-700 hidden sm:inline-flex items-center gap-1"
+              title="Подогнать под ширину экрана для чтения"
+            >
+              <span>По ширине</span>
+            </button>
+
             <button
               type="button"
               onClick={handleRotate}
-              className="p-1.5 rounded bg-stone-700 hover:bg-stone-600 cursor-pointer transition-colors flex items-center space-x-1"
+              className="p-1.5 rounded-lg bg-stone-800 hover:bg-stone-700 cursor-pointer transition-colors text-stone-200 border border-stone-700"
               title="Повернуть на 90°"
             >
               <RotateCw className="w-3.5 h-3.5" />
@@ -379,25 +473,28 @@ export default function PdfViewer({ doc, onBack, className = '' }: PdfViewerProp
           </div>
 
           {/* Document Status */}
-          <div className="hidden sm:flex items-center space-x-2 text-[11px] text-emerald-400 font-mono">
+          <div className="hidden lg:flex items-center space-x-2 text-[11px] text-emerald-400 font-mono">
             <Shield className="w-3.5 h-3.5" />
-            <span>Официальный ведомственный документ ФТС РФ</span>
+            <span>Официальный ведомственный документ ФТС России</span>
           </div>
         </div>
       )}
 
-      {/* 3. MAIN PDF VIEWPORT */}
-      <div className="flex-1 bg-stone-900 relative overflow-auto flex items-center justify-center p-4 min-h-0">
+      {/* 3. MAIN PDF VIEWPORT (Scrollable, centered with standard document margins) */}
+      <div 
+        ref={viewportRef}
+        className="flex-1 bg-stone-950 relative overflow-auto flex flex-col items-center p-4 sm:p-6 md:p-8 min-h-0"
+      >
         {loading && (
-          <div className="flex flex-col items-center justify-center p-8 text-center bg-stone-800/80 rounded-2xl border border-stone-700 backdrop-blur-sm shadow-xl">
+          <div className="flex flex-col items-center justify-center p-8 text-center bg-stone-900/90 rounded-2xl border border-stone-800 backdrop-blur-sm shadow-xl font-sans my-auto">
             <Loader2 className="w-10 h-10 text-[#c5a880] animate-spin mb-4" />
-            <span className="font-serif font-bold text-base text-stone-100">Загрузка и расшифровка PDF...</span>
+            <span className="font-sans font-bold text-base text-stone-100">Загрузка и расшифровка PDF...</span>
             <span className="text-xs text-stone-400 mt-1 font-mono">Формирование страниц документа высокой чёткости</span>
           </div>
         )}
 
         {error && !loading && (
-          <div className="flex flex-col items-center justify-center p-8 text-center max-w-md bg-stone-800 rounded-2xl border border-red-500/40 shadow-xl">
+          <div className="flex flex-col items-center justify-center p-8 text-center max-w-md bg-stone-900 rounded-2xl border border-red-500/40 shadow-xl my-auto">
             <AlertCircle className="w-12 h-12 text-red-400 mb-3" />
             <p className="text-sm font-semibold text-stone-100 mb-2">{error}</p>
             <div className="flex gap-2 mt-3">
@@ -430,23 +527,23 @@ export default function PdfViewer({ doc, onBack, className = '' }: PdfViewerProp
           </div>
         )}
 
-        {/* MODE A: High-Definition Canvas Rendering */}
+        {/* MODE A: High-Definition Canvas Rendering in standard natural A4 paper proportions */}
         {renderMode === 'canvas' && !loading && !error && (
-          <div className="flex flex-col items-center justify-center my-auto min-h-full transition-all">
-            <div className="relative shadow-2xl rounded bg-white overflow-hidden border border-stone-700">
+          <div className="my-auto transition-all duration-150 py-2">
+            <div className="relative shadow-[0_25px_60px_rgba(0,0,0,0.7)] rounded-sm bg-white overflow-hidden border border-stone-700/60 ring-1 ring-white/10">
               {pageRendering && (
                 <div className="absolute inset-0 bg-white/70 backdrop-blur-[1px] flex items-center justify-center z-10">
                   <Loader2 className="w-6 h-6 text-[#022C22] animate-spin" />
                 </div>
               )}
-              <canvas ref={canvasRef} className="block max-w-full" />
+              <canvas ref={canvasRef} className="block" />
             </div>
           </div>
         )}
 
         {/* MODE B: Native PDF Object / Embed */}
         {renderMode === 'embed' && pdfUrl && !loading && !error && (
-          <div className="w-full h-full relative bg-white rounded-xl overflow-hidden shadow-2xl">
+          <div className="w-full h-full max-w-6xl mx-auto relative bg-white rounded-xl overflow-hidden shadow-2xl">
             <object
               data={`${pdfUrl}#toolbar=1&navpanes=0&scrollbar=1`}
               type="application/pdf"
@@ -477,17 +574,17 @@ export default function PdfViewer({ doc, onBack, className = '' }: PdfViewerProp
       </div>
 
       {/* 4. BOTTOM FOOTER BAR */}
-      <div className="bg-stone-950 border-t border-stone-800 px-4 py-2.5 text-[11px] font-mono text-stone-400 flex flex-col sm:flex-row justify-between items-center gap-2 shrink-0">
+      <div className="bg-stone-950 border-t border-stone-800/80 px-4 sm:px-6 py-2.5 text-xs font-mono text-stone-400 flex flex-col sm:flex-row justify-between items-center gap-2 shrink-0">
         <div className="flex items-center space-x-2">
           <Check className="w-3.5 h-3.5 text-emerald-400" />
-          <span>ФГКУ «Санаторий «Ясная Поляна» ФТС России» • Лицензия № Л041-00110-91/00554225</span>
+          <span>ФГКУ «Санаторий «Ясная Поляна» ФТС России» • Реестр официальной документации</span>
         </div>
         <div className="flex items-center space-x-3 text-stone-300">
           <span>Размер: {doc.fileSize || '1.2 MB'}</span>
           <span>•</span>
-          <span>Утвержден: {doc.uploadDate || doc.date || '2026'}</span>
+          <span>Дата: {doc.uploadDate || doc.date || '2026'}</span>
         </div>
       </div>
-    </motion.div>
+    </div>
   );
 }

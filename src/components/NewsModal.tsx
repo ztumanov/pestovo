@@ -232,14 +232,14 @@ export default function NewsModal({ isOpen, onClose }: NewsModalProps) {
                           {/* Card body content with strict clamping */}
                           <div className="p-5 flex-1 flex flex-col justify-between">
                             <div className="space-y-2 mb-4">
-                              <div className="flex items-center space-x-3 text-[10px] text-stone-400 font-mono font-semibold">
+                              <div className="flex items-center space-x-3 text-xs text-stone-600 font-sans font-medium">
                                 <span className="flex items-center">
                                   <Calendar className="w-3.5 h-3.5 mr-1 text-[#c5a880]" />
-                                  {news.date}
+                                  <span className="font-mono tabular-nums">{news.date}</span>
                                 </span>
                                 <span className="flex items-center">
                                   <Clock className="w-3.5 h-3.5 mr-1 text-[#c5a880]" />
-                                  {news.readTime}
+                                  <span>{news.readTime}</span>
                                 </span>
                               </div>
 
@@ -247,14 +247,14 @@ export default function NewsModal({ isOpen, onClose }: NewsModalProps) {
                                 {news.title}
                               </h3>
 
-                              <p className="text-xs text-stone-500 leading-relaxed font-sans line-clamp-3">
+                              <p className="text-xs text-stone-700 leading-relaxed font-sans line-clamp-3">
                                 {news.summary}
                               </p>
                             </div>
 
                             <button
                               onClick={() => setViewingArticle(news)}
-                              className="w-full bg-[#022C22]/5 hover:bg-[#022C22] text-[#022C22] hover:text-[#c5a880] py-2 rounded-sm text-xs font-bold uppercase tracking-wider flex items-center justify-center space-x-1.5 transition-colors cursor-pointer"
+                              className="w-full bg-[#022C22]/5 hover:bg-[#022C22] text-[#022C22] hover:text-[#c5a880] py-2 rounded-sm text-xs font-bold uppercase tracking-wider flex items-center justify-center space-x-1.5 transition-colors cursor-pointer font-sans"
                             >
                               <span>Читать полностью</span>
                               <ChevronRight className="w-3.5 h-3.5" />
@@ -348,19 +348,19 @@ export default function NewsModal({ isOpen, onClose }: NewsModalProps) {
                   {/* Body textual typography layout wrapper */}
                   <div className="max-w-3xl mx-auto px-6 py-10 font-sans text-stone-850 leading-relaxed space-y-6">
                     {/* Authors metadata card */}
-                    <div className="flex flex-wrap items-center justify-between border-b pb-5 text-xs text-stone-400 font-mono gap-3 shrink-0">
+                    <div className="flex flex-wrap items-center justify-between border-b pb-5 text-xs text-stone-600 font-sans gap-3 shrink-0">
                       <div className="flex items-center space-x-2">
                         <User className="w-4 h-4 text-[#c5a880]" />
-                        <span className="text-stone-700 font-semibold">{viewingArticle.author}</span>
+                        <span className="text-stone-800 font-semibold">{viewingArticle.author}</span>
                       </div>
                       
-                      <div className="flex items-center space-x-3">
+                      <div className="flex items-center space-x-3 font-mono tabular-nums">
                         <span className="flex items-center">
-                          <Calendar className="w-3.5 h-3.5 mr-1" />
+                          <Calendar className="w-3.5 h-3.5 mr-1 text-[#c5a880]" />
                           {viewingArticle.date}
                         </span>
                         <span className="flex items-center">
-                          <BookOpen className="w-3.5 h-3.5 mr-1" />
+                          <Clock className="w-3.5 h-3.5 mr-1 text-[#c5a880]" />
                           {viewingArticle.readTime}
                         </span>
                       </div>
@@ -379,8 +379,8 @@ export default function NewsModal({ isOpen, onClose }: NewsModalProps) {
                     ))}
 
                     {/* Disclaimer annotation footer */}
-                    <div className="mt-10 p-5 bg-stone-100 rounded-sm border border-stone-200 text-xs text-stone-500 leading-relaxed font-sans">
-                      <strong>Примечание администрации:</strong> Данная публикация носит официальный уведомительный характер. Любые медицинские оздоровительные процедуры проводятся строго по согласованию с лечащим терапевтом санатория на основании данных вашей санаторно-курортной карты.
+                    <div className="mt-10 p-5 bg-stone-100 rounded-sm border border-stone-200 text-xs text-stone-600 leading-relaxed font-sans">
+                      <strong className="text-stone-900">Примечание администрации:</strong> Данная публикация носит официальный уведомительный характер. Любые медицинские оздоровительные процедуры проводятся строго по согласованию с лечащим терапевтом санатория на основании данных вашей санаторно-курортной карты.
                     </div>
                   </div>
                 </div>
@@ -390,9 +390,9 @@ export default function NewsModal({ isOpen, onClose }: NewsModalProps) {
         </div>
 
         {/* Bottom toolbar info bar */}
-        <div className="p-4 bg-stone-100 border-t border-stone-200/80 shrink-0 text-center text-stone-400 font-mono text-[10px] uppercase tracking-wider flex flex-col sm:flex-row justify-between items-center gap-2">
+        <div className="p-4 bg-stone-100 border-t border-stone-200/80 shrink-0 text-center text-stone-600 font-sans text-xs flex flex-col sm:flex-row justify-between items-center gap-2">
           <span>Служба общественных связей ФГКУ «Санаторий «Ясная Поляна» ФТС РФ</span>
-          <span className="text-[#c5a880] font-bold">Ялта • Гаспра • Крым</span>
+          <span className="text-[#9b7b51] font-bold">Ялта • Гаспра • Крым</span>
         </div>
       </motion.div>
     </div>

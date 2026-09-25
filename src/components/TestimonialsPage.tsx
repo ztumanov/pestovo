@@ -37,8 +37,8 @@ export default function TestimonialsPage({ onBackToHome }: { onBackToHome: () =>
             <span>Вернуться на главную</span>
           </button>
 
-          <span className="text-[#c5a880] text-xs font-mono uppercase tracking-widest font-bold block">Полная книга отзывов</span>
-          <h1 className="font-serif text-3xl sm:text-5xl font-black mt-3 tracking-tight">
+          <span className="text-[#c5a880] text-xs font-sans uppercase tracking-wider font-semibold block">Полная книга отзывов</span>
+          <h1 className="font-serif text-3xl sm:text-5xl font-extrabold mt-3 tracking-tight">
             Истории наших гостей
           </h1>
           <p className="text-stone-300 text-sm sm:text-base mt-4 leading-relaxed max-w-3xl">
@@ -169,10 +169,10 @@ export default function TestimonialsPage({ onBackToHome }: { onBackToHome: () =>
 
                   {/* Author line */}
                   <div className="border-t border-stone-100 pt-4 mt-auto">
-                    <h4 className="font-serif font-bold text-sm text-[#022C22]">{t.author}</h4>
-                    <div className="flex justify-between items-center text-[10px] text-stone-400 font-mono tracking-wider mt-1.5 uppercase">
+                    <h4 className="font-serif font-bold text-sm sm:text-base text-[#022C22]">{t.author}</h4>
+                    <div className="flex justify-between items-center text-xs text-stone-600 font-sans tracking-wide mt-1.5">
                       <span>{t.role}</span>
-                      <span>{t.date}</span>
+                      <span className="font-mono tabular-nums">{t.date}</span>
                     </div>
                   </div>
                 </motion.div>
@@ -182,11 +182,11 @@ export default function TestimonialsPage({ onBackToHome }: { onBackToHome: () =>
             <motion.div 
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              className="text-center py-16 bg-white rounded border border-stone-200 max-w-xl mx-auto shadow-inner"
+              className="text-center py-16 bg-white rounded-xl border border-stone-200 max-w-xl mx-auto shadow-sm"
             >
               <MessageSquare className="w-12 h-12 text-stone-300 mx-auto mb-4" />
-              <h3 className="font-serif font-semibold text-lg text-stone-700">Отзывы не найдены</h3>
-              <p className="text-xs text-stone-400 mt-2">
+              <h3 className="font-serif font-semibold text-lg text-stone-800">Отзывы не найдены</h3>
+              <p className="text-xs text-stone-600 mt-2 font-sans">
                 Попробуйте изменить параметры фильтрации или поисковый запрос.
               </p>
               <button
@@ -194,7 +194,7 @@ export default function TestimonialsPage({ onBackToHome }: { onBackToHome: () =>
                   setRatingFilter('all');
                   setSearchQuery('');
                 }}
-                className="mt-4 text-xs font-bold uppercase tracking-wider text-[#c5a880] border border-stone-200 bg-white hover:bg-stone-50 py-2 px-4 rounded-sm transition-all shadow-sm cursor-pointer"
+                className="mt-4 text-xs font-bold uppercase tracking-wider text-[#c5a880] border border-stone-200 bg-white hover:bg-stone-50 py-2 px-4 rounded-lg transition-all shadow-sm cursor-pointer font-sans"
               >
                 Сбросить поиск
               </button>
@@ -207,8 +207,8 @@ export default function TestimonialsPage({ onBackToHome }: { onBackToHome: () =>
           <div className="w-12 h-12 bg-[#c5a880]/15 border border-[#c5a880] rounded-full flex items-center justify-center text-[#c5a880] mx-auto text-lg mb-4">
             ✍️
           </div>
-          <h3 className="font-serif font-black text-xl text-[#022C22]">Добавить свой отзыв</h3>
-          <p className="text-xs sm:text-sm text-stone-500 mt-2 mb-6 leading-relaxed">
+          <h3 className="font-serif font-extrabold text-2xl text-[#022C22]">Добавить свой отзыв</h3>
+          <p className="text-xs sm:text-sm text-stone-600 mt-2 mb-6 leading-relaxed font-sans">
             Ваши отзывы помогают делать лечение и гостеприимство в санатории еще качественнее. Нажмите кнопку ниже, чтобы вернуться на главную страницу и заполнить форму обратной связи.
           </p>
           <button

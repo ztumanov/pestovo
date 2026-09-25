@@ -91,10 +91,10 @@ export default function AdminFloatBar() {
             <div className="flex items-center space-x-3 text-center sm:text-left">
               <div className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></div>
               <div>
-                <span className="font-serif font-bold text-xs tracking-wider uppercase text-[#c5a880] flex items-center gap-1">
+                <span className="font-sans font-bold text-xs tracking-wider uppercase text-[#c5a880] flex items-center gap-1.5">
                   <Shield className="w-3.5 h-3.5" /> Редактор Ясной Поляны Активен
                 </span>
-                <p className="text-[10px] text-stone-300 font-mono mt-0.5">Вам доступны кнопки «Редактировать» у каждого блока и разделов на сайте.</p>
+                <p className="text-xs text-stone-200 font-sans mt-0.5">Вам доступны кнопки «Редактировать» у каждого блока и разделов на сайте.</p>
               </div>
             </div>
 

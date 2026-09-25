@@ -1030,7 +1030,7 @@ export default function AdminPage({ onBackToHome }: { onBackToHome: () => void }
                       type="text" 
                       value={localHero.titleFirstPart} 
                       onChange={e => setLocalHero({ ...localHero, titleFirstPart: e.target.value })}
-                      className="w-full border border-stone-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#c5a880]/80 focus:ring-1 focus:ring-[#c5a880]/80 font-serif font-bold text-stone-850"
+                      className="w-full border border-stone-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#c5a880]/80 focus:ring-1 focus:ring-[#c5a880]/80 font-sans font-semibold text-stone-850"
                     />
                   </div>
                   <div>
@@ -1039,7 +1039,7 @@ export default function AdminPage({ onBackToHome }: { onBackToHome: () => void }
                       type="text" 
                       value={localHero.titleSecondPart} 
                       onChange={e => setLocalHero({ ...localHero, titleSecondPart: e.target.value })}
-                      className="w-full border border-stone-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#c5a880]/80 focus:ring-1 focus:ring-[#c5a880]/80 font-serif font-bold text-[#b0936b]"
+                      className="w-full border border-stone-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#c5a880]/80 focus:ring-1 focus:ring-[#c5a880]/80 font-sans font-semibold text-[#b0936b]"
                     />
                   </div>
                 </div>
@@ -1326,7 +1326,7 @@ export default function AdminPage({ onBackToHome }: { onBackToHome: () => void }
                     <div className="bg-[#FAF9F6] p-5 rounded-2xl border border-stone-200/80 space-y-4">
                       <div>
                         <label className="block text-xs font-bold text-[#022C22] flex items-center justify-between">
-                          <span className="flex items-center gap-1.5 font-serif text-[#022C22]">
+                          <span className="flex items-center gap-1.5 font-sans font-bold text-[#022C22]">
                             <Plus className="w-4 h-4 text-[#c5a880]" /> Загрузить новый слайд (Фото или .MOV/.MP4 Видео)
                           </span>
                         </label>
@@ -2576,7 +2576,7 @@ export default function AdminPage({ onBackToHome }: { onBackToHome: () => void }
                                   <span className="text-[10px] font-mono font-bold bg-stone-100 text-stone-500 px-2 py-0.5 rounded border border-stone-200">
                                     {cat.id}
                                   </span>
-                                  <span className="text-xs font-semibold text-stone-700 font-serif">
+                                  <span className="text-xs font-semibold text-stone-800 font-sans">
                                     {cat.name}
                                   </span>
                                 </div>
@@ -4318,12 +4318,12 @@ function NewsForm({ initialData, onCancel, onSave }: NewsFormProps) {
   return (
     <form onSubmit={handleSubmit} className="p-4 sm:p-6 space-y-4">
       <div>
-        <label className="block text-[10px] font-bold uppercase tracking-wider text-stone-400 mb-1">Заголовок новости</label>
-        <input required type="text" value={title} onChange={e => setTitle(e.target.value)} className="w-full bg-stone-50 border border-stone-200 rounded-xl px-4 py-2 font-serif text-[#022C22] focus:outline-none focus:border-[#c5a880]" placeholder="Например: Открытие нового корпуса" />
+        <label className="block text-xs font-bold uppercase tracking-wider text-stone-600 mb-1 font-sans">Заголовок новости</label>
+        <input required type="text" value={title} onChange={e => setTitle(e.target.value)} className="w-full bg-stone-50 border border-stone-200 rounded-xl px-4 py-2 font-sans font-semibold text-sm text-[#022C22] focus:outline-none focus:border-[#c5a880]" placeholder="Например: Открытие нового корпуса" />
       </div>
       <div>
-        <label className="block text-[10px] font-bold uppercase tracking-wider text-stone-400 mb-1">Дата публикации</label>
-        <input required type="text" value={date} onChange={e => setDate(e.target.value)} className="w-full bg-stone-50 border border-stone-200 rounded-xl px-4 py-2 text-sm text-[#022C22] focus:outline-none focus:border-[#c5a880]" placeholder="Например: 10.05.2026" />
+        <label className="block text-xs font-bold uppercase tracking-wider text-stone-600 mb-1 font-sans">Дата публикации</label>
+        <input required type="text" value={date} onChange={e => setDate(e.target.value)} className="w-full bg-stone-50 border border-stone-200 rounded-xl px-4 py-2 text-sm text-[#022C22] focus:outline-none focus:border-[#c5a880] font-sans" placeholder="Например: 10.05.2026" />
       </div>
 
       <div>

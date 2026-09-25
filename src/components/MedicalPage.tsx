@@ -78,12 +78,12 @@ export default function MedicalPage({
 
           <div className="flex items-center space-x-2 mb-3">
             <Stethoscope className="w-5 h-5 text-[#c5a880]" />
-            <span className="text-[#c5a880] text-xs font-mono uppercase tracking-widest font-bold">Ведомственное оздоровление • Раздел формируется</span>
+            <span className="text-[#c5a880] text-xs font-sans uppercase tracking-wider font-semibold">Ведомственное оздоровление • Раздел формируется</span>
           </div>
-          <h1 className="font-serif text-3xl sm:text-5xl font-black tracking-tight">
+          <h1 className="font-serif text-3xl sm:text-5xl font-extrabold tracking-tight">
             Медицинский центр и Лечение
           </h1>
-          <p className="text-stone-300 text-sm sm:text-base mt-4 leading-relaxed max-w-3xl">
+          <p className="text-stone-200 text-sm sm:text-base mt-4 leading-relaxed max-w-3xl">
             Информация о медицинских программах, процедурах и диагностической базе актуализируется и появится позже. Назначение лечебно-оздоровительного курса осуществляется лечащим врачом в строгом соответствии с санаторно-курортной картой.
           </p>
 
@@ -252,10 +252,10 @@ export default function MedicalPage({
                   {/* Program Description */}
                   <div className="p-6 sm:p-8 space-y-8">
                     <div>
-                      <h4 className="font-serif text-lg font-bold text-[#022C22] mb-3">
+                      <h4 className="font-serif text-xl font-bold text-[#022C22] mb-3">
                         Описание оздоровительного направления
                       </h4>
-                      <p className="text-stone-600 text-sm sm:text-base leading-relaxed">
+                      <p className="text-stone-700 text-sm sm:text-base leading-relaxed">
                         {prog.fullDesc}
                       </p>
                     </div>
@@ -265,33 +265,33 @@ export default function MedicalPage({
                       
                       {/* Indications */}
                       <div className="bg-[#FAF9F6] p-5 rounded-xl border border-stone-200/60">
-                        <h4 className="text-[#022C22] font-serif text-sm uppercase tracking-wider font-bold mb-3 pb-1.5 border-b border-[#022C22]/10 flex items-center">
+                        <h4 className="text-[#022C22] font-sans text-xs uppercase tracking-wider font-bold mb-3 pb-1.5 border-b border-[#022C22]/10 flex items-center">
                           <Check className="w-4 h-4 text-emerald-700 mr-2 shrink-0" />
                           Показания к лечению:
                         </h4>
                         <ul className="space-y-2.5">
                           {prog.indications?.map((ind, i) => (
-                            <li key={i} className="text-xs text-stone-600 flex items-start leading-relaxed">
+                            <li key={i} className="text-xs sm:text-[13px] text-stone-700 flex items-start leading-relaxed font-sans">
                               <span className="inline-block w-1.5 h-1.5 rounded-full bg-[#c5a880] mt-1.5 mr-2 shrink-0"></span>
                               <span>{ind}</span>
                             </li>
-                          )) || <li className="text-xs text-stone-400 font-serif">Показания уточняются</li>}
+                          )) || <li className="text-xs text-stone-500 font-sans">Показания уточняются</li>}
                         </ul>
                       </div>
 
                       {/* Procedures */}
                       <div className="bg-[#022C22]/5 p-5 rounded-xl border border-[#022C22]/10">
-                        <h4 className="text-[#022C22] font-serif text-sm uppercase tracking-wider font-bold mb-3 pb-1.5 border-b border-[#022C22]/10 flex items-center">
+                        <h4 className="text-[#022C22] font-sans text-xs uppercase tracking-wider font-bold mb-3 pb-1.5 border-b border-[#022C22]/10 flex items-center">
                           <Check className="w-4 h-4 text-[#c5a880] mr-2 shrink-0" />
                           Комплекс процедур:
                         </h4>
                         <ul className="space-y-2.5">
                           {prog.procedures?.map((proc, i) => (
-                            <li key={i} className="text-xs text-stone-600 flex items-start leading-relaxed">
+                            <li key={i} className="text-xs sm:text-[13px] text-stone-700 flex items-start leading-relaxed font-sans">
                               <span className="inline-block w-1.5 h-1.5 rounded-full bg-[#022C22] mt-1.5 mr-2 shrink-0"></span>
                               <span>{proc}</span>
                             </li>
-                          )) || <li className="text-xs text-stone-400 font-serif">Процедуры уточняются</li>}
+                          )) || <li className="text-xs text-stone-500 font-sans">Процедуры уточняются</li>}
                         </ul>
                       </div>
 

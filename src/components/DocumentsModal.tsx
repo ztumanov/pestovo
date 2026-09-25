@@ -311,17 +311,17 @@ export default function DocumentsModal({ isOpen, onClose }: DocumentsModalProps)
                     filteredDocs.map((doc) => (
                       <div 
                         key={doc.id}
-                        className="bg-stone-50 rounded-sm border border-stone-200/80 p-5 hover:border-[#c5a880]/50 hover:bg-[#022C22]/[0.01] transition-all flex flex-col md:flex-row justify-between items-start md:items-center gap-4"
+                        className="bg-stone-50 rounded-xl border border-stone-200 p-5 hover:border-[#c5a880] hover:bg-[#022C22]/[0.02] transition-all flex flex-col md:flex-row justify-between items-start md:items-center gap-4"
                       >
-                        <div className="space-y-1.5 max-w-2xl">
+                        <div className="space-y-2 max-w-2xl">
                           <div className="flex flex-wrap items-center gap-2">
-                            <span className="text-[10px] tracking-wider uppercase font-mono font-bold text-[#c5a880] bg-[#022C22]/5 px-2 py-0.5 rounded">
+                            <span className="text-xs tracking-wider uppercase font-sans font-bold text-[#9b7b51] bg-[#c5a880]/15 border border-[#c5a880]/30 px-2.5 py-0.5 rounded-md">
                               {doc.categoryLabel}
                             </span>
-                            <span className="text-stone-400 text-xs font-semibold font-mono">
+                            <span className="text-stone-700 text-xs font-semibold font-mono tabular-nums bg-white px-2 py-0.5 rounded border border-stone-200">
                               от {doc.date} | Рег. № {doc.number}
                             </span>
-                            <span className="text-emerald-700 text-[10px] font-mono font-bold flex items-center space-x-1 border border-emerald-200/50 bg-emerald-50 px-2 py-0.5 rounded">
+                            <span className="text-emerald-700 text-xs font-sans font-bold flex items-center space-x-1 border border-emerald-200/80 bg-emerald-50 px-2.5 py-0.5 rounded-md">
                               <FileCheck className="w-3.5 h-3.5" />
                               <span>ОФИЦИАЛЬНЫЙ PDF</span>
                             </span>
@@ -329,21 +329,21 @@ export default function DocumentsModal({ isOpen, onClose }: DocumentsModalProps)
                           
                           <h4 
                             onClick={() => setViewingDoc(doc)}
-                            className="font-serif text-sm sm:text-base font-bold text-[#022C22] hover:text-[#c5a880] transition-colors cursor-pointer"
+                            className="font-sans text-base sm:text-lg font-bold text-[#022C22] hover:text-[#9b7b51] transition-colors cursor-pointer leading-snug"
                           >
                             {doc.title}
                           </h4>
                           
-                          <p className="text-xs text-stone-500 leading-relaxed font-sans">
+                          <p className="text-sm text-stone-800 leading-relaxed font-sans">
                             {doc.summary}
                           </p>
                         </div>
 
-                        <div className="flex items-center space-x-2 shrink-0 w-full md:w-auto mt-2 md:mt-0 pt-3 md:pt-0 border-t md:border-0 border-stone-100">
+                        <div className="flex items-center space-x-2 shrink-0 w-full md:w-auto mt-2 md:mt-0 pt-3 md:pt-0 border-t md:border-0 border-stone-200">
                           <button
                             type="button"
                             onClick={() => setViewingDoc(doc)}
-                            className="bg-[#022C22] hover:bg-[#c5a880] text-white hover:text-[#022C22] px-3.5 py-2 rounded-sm text-xs font-bold uppercase tracking-wider flex items-center space-x-1.5 transition-colors cursor-pointer flex-1 md:flex-initial justify-center shadow-sm"
+                            className="bg-[#022C22] hover:bg-[#c5a880] text-white hover:text-[#022C22] px-4 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center space-x-1.5 transition-colors cursor-pointer flex-1 md:flex-initial justify-center shadow-sm font-sans"
                             title="Открыть и читать официальный PDF документ"
                           >
                             <Eye className="w-4 h-4 text-[#c5a880]" />
@@ -353,11 +353,11 @@ export default function DocumentsModal({ isOpen, onClose }: DocumentsModalProps)
                           <button
                             type="button"
                             onClick={() => handleDownload(doc)}
-                            className="bg-stone-100 hover:bg-stone-200 text-stone-700 hover:text-[#022C22] px-3.5 py-2 rounded-sm text-xs font-bold uppercase tracking-wider flex items-center space-x-1.5 transition-all cursor-pointer flex-1 md:flex-initial justify-center border border-stone-200/50"
+                            className="bg-stone-100 hover:bg-stone-200 text-stone-800 hover:text-[#022C22] px-3.5 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center space-x-1.5 transition-all cursor-pointer flex-1 md:flex-initial justify-center border border-stone-300 font-sans"
                             disabled={downloadingId === doc.id}
                             title="Скачать PDF файл"
                           >
-                            <Download className={`w-4 h-4 text-stone-500 ${downloadingId === doc.id ? 'animate-bounce' : ''}`} />
+                            <Download className={`w-4 h-4 text-stone-600 ${downloadingId === doc.id ? 'animate-bounce' : ''}`} />
                             <span>{downloadingId === doc.id ? 'Загрузка...' : 'PDF'}</span>
                           </button>
                         </div>
@@ -393,6 +393,7 @@ export default function DocumentsModal({ isOpen, onClose }: DocumentsModalProps)
                     fullText: viewingDoc.fullText
                   }}
                   onBack={() => setViewingDoc(null)}
+                  isModalFullscreen={true}
                   className="h-full border-0 rounded-none shadow-none"
                 />
               </div>
@@ -401,9 +402,9 @@ export default function DocumentsModal({ isOpen, onClose }: DocumentsModalProps)
         </div>
 
         {/* Bottom bar */}
-        <div className="p-3.5 bg-stone-100 border-t border-stone-200/80 shrink-0 text-center text-stone-400 font-mono text-[10px] uppercase tracking-wider flex flex-col sm:flex-row justify-between items-center gap-2">
+        <div className="p-3.5 bg-stone-100 border-t border-stone-200/80 shrink-0 text-center text-stone-600 font-sans text-xs flex flex-col sm:flex-row justify-between items-center gap-2">
           <span>Реестр официальной документации ФГКУ «Санаторий «Ясная Поляна» ФТС России</span>
-          <span className="text-[#c5a880] font-bold">Лицензия № Л041-00110-91/00554225</span>
+          <span className="text-[#9b7b51] font-bold font-mono tabular-nums">Лицензия № Л041-00110-91/00554225</span>
         </div>
       </motion.div>
     </div>

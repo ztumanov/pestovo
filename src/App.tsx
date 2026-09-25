@@ -1276,11 +1276,11 @@ export default function App() {
 
       {/* TOP NOTIFICATION / ACCESSIBILITY PRE-HEADER BAR */}
       {!isAccessMode ? (
-        <div className="bg-[#021f18] text-stone-300 text-[10px] sm:text-xs py-2 border-b border-emerald-950 px-4">
+        <div className="bg-[#021f18] text-stone-200 text-xs py-2 border-b border-emerald-950 px-4">
           <div className="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-2">
             <div className="flex items-center space-x-2">
               <span className="w-1.5 h-1.5 rounded-full bg-[#c5a880]"></span>
-              <span className="font-mono tracking-wider font-semibold uppercase text-stone-400 text-center sm:text-left">
+              <span className="font-sans tracking-wide font-medium text-stone-200 text-center sm:text-left text-xs sm:text-[11px]">
                 Федеральное государственное казенное учреждение «Санаторий «Ясная Поляна» ФТС России»
               </span>
             </div>
@@ -1293,10 +1293,10 @@ export default function App() {
                   window.speechSynthesis.speak(welcome);
                 }
               }}
-              className="flex items-center space-x-1.5 text-stone-300 hover:text-white transition-colors bg-emerald-950 hover:bg-emerald-900 border border-[#c5a880]/20 rounded px-2.5 py-0.5 text-[10px] sm:text-[11px] select-none cursor-pointer"
+              className="flex items-center space-x-1.5 text-stone-200 hover:text-white transition-colors bg-emerald-950 hover:bg-emerald-900 border border-[#c5a880]/30 rounded-md px-3 py-1 text-xs select-none cursor-pointer font-sans"
             >
               <Eye className="w-3.5 h-3.5 text-[#c5a880]" />
-              <span className="font-medium">Версия для слабовидящих</span>
+              <span className="font-semibold">Версия для слабовидящих</span>
             </button>
           </div>
         </div>
@@ -1576,7 +1576,7 @@ export default function App() {
 
             {/* Action buttons Desktop: Phone */}
             <div className="hidden lg:flex items-center space-x-3 xl:space-x-4">
-              <a href="tel:88005503240" className="flex items-center text-xs xl:text-sm font-medium hover:text-[#c5a880] transition-colors py-1 shrink-0">
+              <a href="tel:88005503240" className="flex items-center text-xs xl:text-sm font-semibold hover:text-[#c5a880] transition-colors py-1 shrink-0 font-mono tabular-nums tracking-normal">
                 <Phone className="w-4 h-4 mr-1.5 text-[#c5a880]" />
                 <span className="hidden xl:inline">8 (800) 550-32-40</span>
               </a>
@@ -1854,7 +1854,7 @@ export default function App() {
             className="inline-flex items-center space-x-2 bg-emerald-900/80 backdrop-blur-md border border-[#c5a880]/30 px-4 py-2 rounded-full mb-6"
           >
             <TreePine className="w-4 h-4 text-[#c5a880]" />
-            <span className="text-xs font-mono uppercase tracking-widest text-[#FAF9F6]">{HERO_DATA.badge}</span>
+            <span className="text-xs font-sans font-semibold uppercase tracking-wider text-[#FAF9F6]">{HERO_DATA.badge}</span>
           </motion.div>
 
           <motion.h1 
@@ -1868,22 +1868,22 @@ export default function App() {
               if (text.toUpperCase().includes('САНАТОРИЙ') && (text.toUpperCase().includes('ЯСНАЯ ПОЛЯНА') || text.toUpperCase().includes('«ЯСНАЯ ПОЛЯНА»'))) {
                 return (
                   <>
-                    <span className="block text-stone-200 font-sans font-semibold text-xl sm:text-2xl md:text-3xl lg:text-4xl tracking-[0.2em] uppercase opacity-95 mb-2 sm:mb-3 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
+                    <span className="block text-stone-200 font-sans font-bold text-lg sm:text-xl md:text-2xl lg:text-3xl tracking-[0.2em] uppercase opacity-95 mb-2 sm:mb-3 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
                       САНАТОРИЙ
                     </span>
-                    <span className="block text-white font-serif font-black tracking-tight text-5xl sm:text-6xl md:text-7xl lg:text-8xl drop-shadow-[0_4px_12px_rgba(0,0,0,0.9)] leading-tight">
+                    <span className="block text-white font-serif font-bold tracking-tight text-5xl sm:text-6xl md:text-7xl lg:text-8xl drop-shadow-[0_4px_16px_rgba(0,0,0,0.95)] leading-tight">
                       «ЯСНАЯ ПОЛЯНА»
                     </span>
                   </>
                 );
               }
               return (
-                <span className="block text-white font-serif font-black tracking-tight text-4xl sm:text-5xl md:text-6xl lg:text-7xl drop-shadow-[0_4px_12px_rgba(0,0,0,0.9)]">
+                <span className="block text-white font-serif font-bold tracking-tight text-4xl sm:text-5xl md:text-6xl lg:text-7xl drop-shadow-[0_4px_16px_rgba(0,0,0,0.95)]">
                   {text}
                 </span>
               );
             })()}
-            <span className="italic text-[#c5a880] font-semibold font-serif text-xl sm:text-2xl md:text-3xl lg:text-4xl block mt-4 sm:mt-5 tracking-wide drop-shadow-[0_2px_6px_rgba(0,0,0,0.85)]">
+            <span className="italic text-[#c5a880] font-medium font-serif text-xl sm:text-2xl md:text-3xl lg:text-4xl block mt-4 sm:mt-5 tracking-wide drop-shadow-[0_2px_6px_rgba(0,0,0,0.85)]">
               {HERO_DATA.titleSecondPart}
             </span>
           </motion.h1>
@@ -1892,7 +1892,7 @@ export default function App() {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.3 }}
-            className="mt-6 text-sm sm:text-lg md:text-xl text-white font-sans max-w-3xl leading-relaxed drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)] font-medium"
+            className="mt-6 text-sm sm:text-lg md:text-xl text-stone-100 font-sans max-w-3xl leading-relaxed drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)] font-normal"
           >
             {HERO_DATA.subtitle}
           </motion.p>
@@ -1905,7 +1905,7 @@ export default function App() {
           >
             <a
               href="#about"
-              className="w-full sm:w-auto bg-[#c5a880] hover:bg-[#bca075] text-[#022C22] px-8 py-4 rounded-sm font-bold text-sm uppercase tracking-widest text-center transition-all duration-300 shadow-xl hover:-translate-y-0.5"
+              className="w-full sm:w-auto bg-[#c5a880] hover:bg-[#bca075] text-[#022C22] px-8 py-4 rounded-lg font-bold text-xs sm:text-sm uppercase tracking-widest text-center transition-all duration-300 shadow-xl hover:-translate-y-0.5 font-sans"
             >
               Узнать о санатории
             </a>
@@ -1919,7 +1919,7 @@ export default function App() {
               transition={{ duration: 0.8, delay: 0.55 }}
               className="mt-14 sm:mt-16 w-full max-w-5xl"
             >
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5 sm:gap-4 bg-[#011a14]/75 backdrop-blur-xl p-4 sm:p-5 rounded-2xl border border-[#c5a880]/30 shadow-[0_20px_50px_rgba(0,0,0,0.6)]">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5 sm:gap-4 bg-[#011a14]/85 backdrop-blur-xl p-4 sm:p-5 rounded-2xl border border-[#c5a880]/30 shadow-[0_20px_50px_rgba(0,0,0,0.6)]">
                 {HERO_DATA.stats.map((stat, idx) => (
                   <div 
                     key={idx} 
@@ -1937,14 +1937,14 @@ export default function App() {
                       )}
                     </div>
                     
-                    <span className="block font-serif text-sm sm:text-base font-bold text-white tracking-tight group-hover:text-[#c5a880] transition-colors leading-snug">
+                    <span className="block font-sans text-sm sm:text-base font-bold text-white tracking-tight group-hover:text-[#c5a880] transition-colors leading-snug">
                       {stat.value}
                     </span>
-                    <span className="block text-[#c5a880] text-[10px] sm:text-[11px] font-mono font-semibold uppercase tracking-wider mt-1 leading-tight">
+                    <span className="block text-[#c5a880] text-xs font-sans font-semibold uppercase tracking-wider mt-1.5 leading-tight">
                       {stat.label}
                     </span>
                     {stat.description && (
-                      <span className="block text-stone-300/80 text-[10px] font-sans mt-1 leading-tight">
+                      <span className="block text-stone-200 text-xs font-sans mt-1 leading-snug">
                         {stat.description}
                       </span>
                     )}
@@ -2065,12 +2065,12 @@ export default function App() {
                         <h3 className="font-serif text-lg sm:text-xl font-bold tracking-wide text-white">
                           Фито-Барометр
                         </h3>
-                        <div className="flex items-center space-x-1.5 bg-emerald-950/80 border border-emerald-500/40 px-2 py-0.5 rounded-full text-[10px] text-emerald-300 font-mono font-semibold shadow-sm">
+                        <div className="flex items-center space-x-1.5 bg-emerald-950/80 border border-emerald-500/40 px-2.5 py-0.5 rounded-full text-xs text-emerald-300 font-sans font-semibold shadow-sm">
                           <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span>
                           <span>LIVE</span>
                         </div>
                       </div>
-                      <p className="text-[10px] text-[#c5a880] font-mono tracking-wider uppercase mt-0.5">
+                      <p className="text-xs text-[#c5a880] font-sans font-medium tracking-wide uppercase mt-1">
                         Гаспра, ЮБК • Курортная климатотерапия
                       </p>
                     </div>
@@ -2088,10 +2088,10 @@ export default function App() {
                             key={tab.id}
                             type="button"
                             onClick={() => setClimateTime(tab.id as 'morning' | 'day' | 'evening')}
-                            className={`flex items-center space-x-1 py-1 px-2.5 rounded-lg text-xs font-serif font-bold transition-all duration-300 cursor-pointer ${
+                            className={`flex items-center space-x-1.5 py-1.5 px-3 rounded-lg text-xs font-sans font-semibold transition-all duration-300 cursor-pointer ${
                               isActive
                                 ? 'bg-gradient-to-r from-[#d1b58f] via-[#c5a880] to-[#b4936a] text-[#022C22] shadow-[0_2px_8px_rgba(197,168,128,0.4)] scale-105'
-                                : 'text-stone-300 hover:text-white hover:bg-white/[0.08]'
+                                : 'text-stone-200 hover:text-white hover:bg-white/[0.08]'
                             }`}
                           >
                             <span className={isActive ? 'text-[#022C22]' : 'text-[#c5a880]'}>{tab.icon}</span>
@@ -2106,12 +2106,12 @@ export default function App() {
                   {weatherLoading ? (
                     <div className="py-12 flex flex-col items-center justify-center space-y-2">
                       <div className="w-6 h-6 rounded-full border-2 border-[#c5a880] border-t-transparent animate-spin"></div>
-                      <span className="text-stone-300 text-xs font-mono">Синхронизация с метеостанцией...</span>
+                      <span className="text-stone-200 text-xs font-sans">Синхронизация с метеостанцией...</span>
                     </div>
                   ) : weatherError || !realWeather ? (
-                    <div className="py-6 text-center text-xs text-stone-300 space-y-1 bg-emerald-950/40 rounded-xl border border-emerald-900/60 p-3 shadow-inner">
+                    <div className="py-6 text-center text-xs text-stone-200 space-y-1 bg-emerald-950/40 rounded-xl border border-emerald-900/60 p-3 shadow-inner">
                       <p className="font-serif font-semibold text-[#c5a880]">Метеостанция Гаспры в сети</p>
-                      <p className="text-stone-400">Погода: +22°C, Черное море: +19°C</p>
+                      <p className="text-stone-300">Погода: +22°C, Черное море: +19°C</p>
                     </div>
                   ) : (
                     <div className="space-y-3">
@@ -2133,25 +2133,25 @@ export default function App() {
                               </div>
                               <div>
                                 <div className="flex items-baseline space-x-2">
-                                  <span className="text-2xl sm:text-3xl font-serif font-black text-white leading-none tracking-tight">
+                                  <span className="text-2xl sm:text-3xl font-sans font-extrabold text-white leading-none tracking-tight tabular-nums">
                                     {climateDetails[climateTime].temp}
                                   </span>
-                                  <span className="text-[11px] text-stone-200 font-sans font-medium">
+                                  <span className="text-xs sm:text-sm text-stone-200 font-sans font-medium">
                                     {climateDetails[climateTime].weatherName}
                                   </span>
                                 </div>
-                                <div className="flex items-center space-x-1.5 mt-1 text-[11px] text-[#c5a880] font-mono">
+                                <div className="flex items-center space-x-1.5 mt-1 text-xs text-[#c5a880] font-sans">
                                   <Waves className="w-3.5 h-3.5 shrink-0" />
-                                  <span>Море: <strong className="text-white font-semibold">{climateDetails[climateTime].seaTemp}</strong></span>
+                                  <span>Море: <strong className="text-white font-semibold font-mono tabular-nums">{climateDetails[climateTime].seaTemp}</strong></span>
                                 </div>
                               </div>
                             </div>
 
-                            <div className="text-right max-w-[180px] hidden sm:block border-l border-[#c5a880]/20 pl-3">
-                              <span className="text-[9px] text-[#c5a880] uppercase tracking-wider font-mono font-bold block">
+                            <div className="text-right max-w-[200px] hidden sm:block border-l border-[#c5a880]/20 pl-3">
+                              <span className="text-[10px] text-[#c5a880] uppercase tracking-wider font-sans font-bold block">
                                 Рекомендация врача
                               </span>
-                              <div className="text-[10px] font-serif italic text-stone-200 line-clamp-2 leading-tight mt-0.5">
+                              <div className="text-xs font-sans text-stone-100 line-clamp-2 leading-snug mt-1">
                                 «{climateDetails[climateTime].recommendation}»
                               </div>
                             </div>
@@ -2162,36 +2162,36 @@ export default function App() {
                       {/* Extended Live Parameters (Sleek 3-Column Rounded Cards with Soft Glow) */}
                       <div className="grid grid-cols-3 gap-2">
                         <div className="bg-gradient-to-b from-white/[0.06] to-white/[0.02] hover:from-white/[0.1] hover:to-white/[0.04] p-2.5 rounded-xl border border-white/[0.08] hover:border-[#c5a880]/35 transition-all duration-300 text-center flex flex-col justify-center shadow-[0_4px_12px_rgba(0,0,0,0.15)] hover:shadow-[0_6px_16px_rgba(0,0,0,0.25)] group">
-                          <span className="text-[8px] uppercase tracking-wider font-mono text-stone-400 group-hover:text-stone-300 font-semibold block">
+                          <span className="text-[10px] uppercase tracking-wider font-sans text-stone-300 group-hover:text-white font-semibold block">
                             Ветер
                           </span>
-                          <div className="flex items-center justify-center space-x-1 mt-0.5">
+                          <div className="flex items-center justify-center space-x-1 mt-1">
                             <Wind className="w-3.5 h-3.5 text-[#c5a880] shrink-0 group-hover:rotate-12 transition-transform duration-300" />
-                            <span className="text-xs font-bold text-white font-mono">
+                            <span className="text-xs sm:text-sm font-bold text-white font-mono tabular-nums">
                               {climateDetails[climateTime].windSpeed}
                             </span>
                           </div>
                         </div>
 
                         <div className="bg-gradient-to-b from-white/[0.06] to-white/[0.02] hover:from-white/[0.1] hover:to-white/[0.04] p-2.5 rounded-xl border border-white/[0.08] hover:border-[#c5a880]/35 transition-all duration-300 text-center flex flex-col justify-center shadow-[0_4px_12px_rgba(0,0,0,0.15)] hover:shadow-[0_6px_16px_rgba(0,0,0,0.25)] group">
-                          <span className="text-[8px] uppercase tracking-wider font-mono text-stone-400 group-hover:text-stone-300 font-semibold block">
+                          <span className="text-[10px] uppercase tracking-wider font-sans text-stone-300 group-hover:text-white font-semibold block">
                             Влажность
                           </span>
-                          <div className="flex items-center justify-center space-x-1 mt-0.5">
+                          <div className="flex items-center justify-center space-x-1 mt-1">
                             <Droplet className="w-3.5 h-3.5 text-[#c5a880] shrink-0 group-hover:scale-110 transition-transform duration-300" />
-                            <span className="text-xs font-bold text-white font-mono">
+                            <span className="text-xs sm:text-sm font-bold text-white font-mono tabular-nums">
                               {climateDetails[climateTime].humidity}
                             </span>
                           </div>
                         </div>
 
                         <div className="bg-gradient-to-b from-[#c5a880]/15 to-emerald-950/40 hover:from-[#c5a880]/25 hover:to-emerald-900/40 p-2.5 rounded-xl border border-[#c5a880]/30 hover:border-[#c5a880]/50 transition-all duration-300 text-center flex flex-col justify-center shadow-[0_4px_12px_rgba(0,0,0,0.15)] hover:shadow-[0_6px_16px_rgba(197,168,128,0.15)] group">
-                          <span className="text-[8px] uppercase tracking-wider font-mono text-emerald-300 font-semibold block">
+                          <span className="text-[10px] uppercase tracking-wider font-sans text-emerald-300 font-semibold block">
                             Черное море
                           </span>
-                          <div className="flex items-center justify-center space-x-1 mt-0.5">
+                          <div className="flex items-center justify-center space-x-1 mt-1">
                             <Waves className="w-3.5 h-3.5 text-[#c5a880] shrink-0 group-hover:translate-x-0.5 transition-transform duration-300" />
-                            <span className="text-xs font-bold text-[#c5a880] font-mono">
+                            <span className="text-xs sm:text-sm font-bold text-[#c5a880] font-mono tabular-nums">
                               {climateDetails[climateTime].seaTemp}
                             </span>
                           </div>
@@ -2201,9 +2201,9 @@ export default function App() {
                       {/* Phyto-Barometer Indicators (Compact Rounded Bars) */}
                       <div className="bg-gradient-to-b from-white/[0.04] to-black/20 p-3 rounded-xl border border-[#c5a880]/20 space-y-2.5 shadow-[inset_0_1px_2px_rgba(0,0,0,0.2)]">
                         <div className="space-y-1">
-                          <div className="flex justify-between items-center text-[11px]">
-                            <span className="text-stone-300 font-medium truncate">Фитонциды хвои (кедр, можжевельник):</span>
-                            <span className="font-bold text-emerald-300 font-mono text-[9px] bg-emerald-950/90 px-1.5 py-0.5 rounded-md border border-emerald-700/60 shrink-0 ml-1 shadow-sm">
+                          <div className="flex justify-between items-center text-xs">
+                            <span className="text-stone-200 font-medium truncate">Фитонциды хвои (кедр, можжевельник):</span>
+                            <span className="font-bold text-emerald-300 font-mono text-[10px] bg-emerald-950/90 px-2 py-0.5 rounded-md border border-emerald-700/60 shrink-0 ml-1.5 shadow-sm tabular-nums">
                               {climateDetails[climateTime].phytoncides}
                             </span>
                           </div>
@@ -2218,9 +2218,9 @@ export default function App() {
                         </div>
 
                         <div className="space-y-1">
-                          <div className="flex justify-between items-center text-[11px]">
-                            <span className="text-stone-300 font-medium truncate">Морские аэроионы и соли:</span>
-                            <span className="font-bold text-[#c5a880] font-mono text-[9px] bg-emerald-950/90 px-1.5 py-0.5 rounded-md border border-[#c5a880]/40 shrink-0 ml-1 shadow-sm">
+                          <div className="flex justify-between items-center text-xs">
+                            <span className="text-stone-200 font-medium truncate">Морские аэроионы и соли:</span>
+                            <span className="font-bold text-[#c5a880] font-mono text-[10px] bg-emerald-950/90 px-2 py-0.5 rounded-md border border-[#c5a880]/40 shrink-0 ml-1.5 shadow-sm tabular-nums">
                               {climateDetails[climateTime].aerosols}
                             </span>
                           </div>
@@ -2238,8 +2238,8 @@ export default function App() {
                       {/* 3 Days Forecast Grid (Compact Rounded Cards) */}
                       <div className="border-t border-[#c5a880]/15 pt-2">
                         <div className="flex items-center justify-between mb-1.5">
-                          <span className="text-[9px] uppercase tracking-widest font-mono text-stone-300 font-bold flex items-center gap-1">
-                            <Calendar className="w-3 h-3 text-[#c5a880]" />
+                          <span className="text-[10px] uppercase tracking-wider font-sans text-stone-200 font-bold flex items-center gap-1.5">
+                            <Calendar className="w-3.5 h-3.5 text-[#c5a880]" />
                             Прогноз на 3 дня (Гаспра):
                           </span>
                         </div>
@@ -2247,13 +2247,13 @@ export default function App() {
                           {realWeather.forecast.map((f, index) => (
                             <div 
                               key={index} 
-                              className="bg-gradient-to-b from-white/[0.05] to-white/[0.02] hover:from-white/[0.09] hover:to-white/[0.04] transition-all duration-300 p-1.5 rounded-xl border border-white/[0.07] hover:border-[#c5a880]/40 text-center flex items-center justify-between px-2.5 group shadow-[0_2px_8px_rgba(0,0,0,0.1)] hover:shadow-[0_4px_12px_rgba(0,0,0,0.2)]"
+                              className="bg-gradient-to-b from-white/[0.05] to-white/[0.02] hover:from-white/[0.09] hover:to-white/[0.04] transition-all duration-300 p-2 rounded-xl border border-white/[0.07] hover:border-[#c5a880]/40 text-center flex items-center justify-between px-2.5 group shadow-[0_2px_8px_rgba(0,0,0,0.1)] hover:shadow-[0_4px_12px_rgba(0,0,0,0.2)]"
                             >
                               <div className="text-left">
-                                <span className="block text-[10px] font-bold text-stone-200 leading-none group-hover:text-white transition-colors">
+                                <span className="block text-[11px] font-bold text-stone-100 leading-none group-hover:text-white transition-colors">
                                   {formatForecastDate(f.date)}
                                 </span>
-                                <span className="block text-[8px] text-[#c5a880] truncate max-w-[55px] mt-0.5">
+                                <span className="block text-[10px] text-[#c5a880] font-medium truncate max-w-[65px] mt-0.5">
                                   {getWeatherName(f.weatherCode)}
                                 </span>
                               </div>
@@ -2261,7 +2261,7 @@ export default function App() {
                                 <div className="group-hover:scale-110 transition-transform duration-300">
                                   {getWeatherIcon(f.weatherCode, "w-4 h-4")}
                                 </div>
-                                <span className="text-[11px] font-bold text-white font-mono">
+                                <span className="text-xs font-bold text-white font-mono tabular-nums">
                                   {f.tempMax}°
                                 </span>
                               </div>
@@ -2374,12 +2374,12 @@ export default function App() {
                           <IconComp className="w-4 h-4" />
                         </div>
                         <div className="min-w-0 flex-1">
-                          <span className={`block text-xs sm:text-sm font-serif font-bold tracking-tight truncate leading-tight ${
+                          <span className={`block text-xs sm:text-sm font-sans font-bold tracking-normal truncate leading-tight ${
                             isActive ? 'text-white' : 'text-[#022C22]'
                           }`}>
                             {t.label}
                           </span>
-                          <span className={`block text-[10px] font-mono tracking-tight mt-0.5 truncate ${
+                          <span className={`block text-xs font-sans mt-0.5 truncate ${
                             isActive ? 'text-[#c5a880] font-medium' : 'text-stone-500 group-hover:text-stone-700'
                           }`}>
                             {t.sub}
@@ -2410,15 +2410,15 @@ export default function App() {
                       <div className="lg:col-span-7 space-y-4">
                         <div className="bg-white p-5 sm:p-6 rounded-xl border border-stone-200 shadow-sm relative overflow-hidden">
                           <div className="absolute top-0 left-0 bottom-0 w-1.5 bg-[#022C22]"></div>
-                          <span className="block text-[11px] uppercase tracking-wider font-mono text-[#c5a880] font-bold">
+                          <span className="block text-xs uppercase tracking-wider font-sans text-[#c5a880] font-bold">
                             Полное официальное наименование
                           </span>
                           <h4 className="font-serif text-base sm:text-lg md:text-xl text-[#022C22] font-bold mt-1.5 leading-snug">
                             Федеральное государственное казенное учреждение «Санаторий «Ясная Поляна» Федеральной таможенной службы»
                           </h4>
                           <div className="mt-3 pt-3 border-t border-stone-100 flex flex-wrap items-center gap-2">
-                            <span className="text-xs text-stone-500 font-medium">Сокращенное наименование:</span>
-                            <span className="font-semibold text-[#022C22] text-xs bg-stone-100/90 px-2.5 py-1 rounded-md border border-stone-200">
+                            <span className="text-xs text-stone-600 font-medium">Сокращенное наименование:</span>
+                            <span className="font-semibold text-[#022C22] text-xs sm:text-sm bg-stone-100 px-3 py-1 rounded-md border border-stone-200">
                               ФГКУ «Санаторий «Ясная Поляна» ФТС России»
                             </span>
                           </div>
@@ -2427,21 +2427,21 @@ export default function App() {
                         {/* Tax & Legal IDs Grid */}
                         <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                           <div className="bg-white p-4 rounded-xl border border-stone-200 shadow-sm">
-                            <span className="block text-[11px] uppercase tracking-wider font-mono text-stone-500 font-bold">ИНН</span>
-                            <p className="font-mono text-[#022C22] font-bold text-base sm:text-lg mt-1">7713778678</p>
+                            <span className="block text-xs uppercase tracking-wider font-sans text-stone-600 font-bold">ИНН</span>
+                            <p className="font-mono tabular-nums text-[#022C22] font-bold text-base sm:text-lg mt-1">7713778678</p>
                           </div>
                           <div className="bg-white p-4 rounded-xl border border-stone-200 shadow-sm">
-                            <span className="block text-[11px] uppercase tracking-wider font-mono text-stone-500 font-bold">КПП</span>
-                            <p className="font-mono text-[#022C22] font-bold text-base sm:text-lg mt-1">910301001</p>
+                            <span className="block text-xs uppercase tracking-wider font-sans text-stone-600 font-bold">КПП</span>
+                            <p className="font-mono tabular-nums text-[#022C22] font-bold text-base sm:text-lg mt-1">910301001</p>
                           </div>
                           <div className="bg-white p-4 rounded-xl border border-stone-200 shadow-sm col-span-2 sm:col-span-1">
-                            <span className="block text-[11px] uppercase tracking-wider font-mono text-stone-500 font-bold">ОГРН</span>
-                            <p className="font-mono text-[#022C22] font-bold text-xs sm:text-sm mt-1.5">5137746004787</p>
+                            <span className="block text-xs uppercase tracking-wider font-sans text-stone-600 font-bold">ОГРН</span>
+                            <p className="font-mono tabular-nums text-[#022C22] font-bold text-xs sm:text-sm mt-1.5">5137746004787</p>
                           </div>
                         </div>
 
                         <div className="bg-white p-4 rounded-xl border border-stone-200 shadow-sm">
-                          <span className="block text-[11px] uppercase tracking-wider font-mono text-stone-500 font-bold">Организационно-правовая форма (ОПФ)</span>
+                          <span className="block text-xs uppercase tracking-wider font-sans text-stone-600 font-bold">Организационно-правовая форма (ОПФ)</span>
                           <p className="text-[#022C22] font-semibold text-sm sm:text-base mt-1">Федеральные государственные казенные учреждения</p>
                         </div>
                       </div>
@@ -2453,7 +2453,7 @@ export default function App() {
                             <div className="p-1.5 rounded-lg bg-emerald-50 text-[#022C22] border border-emerald-100">
                               <MapPin className="w-4 h-4 text-[#c5a880]" />
                             </div>
-                            <span className="block text-xs uppercase tracking-wider font-mono text-[#022C22] font-bold">
+                            <span className="block text-xs uppercase tracking-wider font-sans text-[#022C22] font-bold">
                               Адрес и локация
                             </span>
                           </div>
@@ -2463,7 +2463,7 @@ export default function App() {
                         </div>
 
                         <div className="bg-white p-5 rounded-xl border border-stone-200 shadow-sm space-y-3">
-                          <span className="block text-[11px] uppercase tracking-wider font-mono text-stone-500 font-bold border-b border-stone-100 pb-2">
+                          <span className="block text-xs uppercase tracking-wider font-sans text-stone-600 font-bold border-b border-stone-100 pb-2">
                             Параметры и принадлежность
                           </span>
                           <div className="space-y-2 text-xs sm:text-[13px]">
@@ -2559,14 +2559,14 @@ export default function App() {
                             </h5>
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                               <div className="bg-emerald-50/70 p-4 rounded-xl border border-emerald-200/80">
-                                <h6 className="font-serif text-xs font-bold text-[#022C22] uppercase tracking-wider font-mono">Клиническая лаборатория</h6>
-                                <p className="text-stone-700 mt-1.5 text-xs leading-relaxed">
+                                <h6 className="font-sans text-xs font-bold text-[#022C22] uppercase tracking-wider">Клиническая лаборатория</h6>
+                                <p className="text-stone-700 mt-1.5 text-xs leading-relaxed font-sans">
                                   Биохимические и общеклинические исследования крови и мочи на автоматических анализаторах.
                                 </p>
                               </div>
                               <div className="bg-amber-50/70 p-4 rounded-xl border border-amber-200/80">
-                                <h6 className="font-serif text-xs font-bold text-[#022C22] uppercase tracking-wider font-mono">Функциональная база</h6>
-                                <p className="text-stone-700 mt-1.5 text-xs leading-relaxed">
+                                <h6 className="font-sans text-xs font-bold text-[#022C22] uppercase tracking-wider">Функциональная база</h6>
+                                <p className="text-stone-700 mt-1.5 text-xs leading-relaxed font-sans">
                                   Спирография (диагностика внешнего дыхания), ЭКГ-исследования и суточный мониторинг.
                                 </p>
                               </div>
@@ -2581,11 +2581,11 @@ export default function App() {
                             <span>Основные лечебные профили санатория</span>
                           </h5>
                           
-                          <div className="space-y-3.5 text-xs text-stone-700">
+                          <div className="space-y-3.5 text-xs text-stone-700 font-sans">
                             <div className="bg-stone-50/80 p-4 rounded-xl border border-stone-200 space-y-1.5">
                               <div className="flex items-center space-x-2">
                                 <span className="w-2.5 h-2.5 rounded-full bg-red-600 shrink-0"></span>
-                                <span className="text-[11px] font-bold uppercase tracking-wider text-red-800 font-mono">
+                                <span className="text-xs font-bold uppercase tracking-wider text-red-800 font-sans">
                                   Кардиологический профиль
                                 </span>
                               </div>
@@ -2600,7 +2600,7 @@ export default function App() {
                             <div className="bg-stone-50/80 p-4 rounded-xl border border-stone-200 space-y-1.5">
                               <div className="flex items-center space-x-2">
                                 <span className="w-2.5 h-2.5 rounded-full bg-sky-600 shrink-0"></span>
-                                <span className="text-[11px] font-bold uppercase tracking-wider text-sky-800 font-mono">
+                                <span className="text-xs font-bold uppercase tracking-wider text-sky-800 font-sans">
                                   Пульмонологический профиль
                                 </span>
                               </div>
@@ -2615,7 +2615,7 @@ export default function App() {
                             <div className="bg-stone-50/80 p-4 rounded-xl border border-stone-200 space-y-1.5">
                               <div className="flex items-center space-x-2">
                                 <span className="w-2.5 h-2.5 rounded-full bg-amber-600 shrink-0"></span>
-                                <span className="text-[11px] font-bold uppercase tracking-wider text-amber-800 font-mono">
+                                <span className="text-xs font-bold uppercase tracking-wider text-amber-800 font-sans">
                                   Опорно-двигательный профиль
                                 </span>
                               </div>
@@ -2765,17 +2765,17 @@ export default function App() {
                       {/* Management and Contacts */}
                       <div className="space-y-4 bg-white p-5 sm:p-6 rounded-2xl border border-stone-200 flex flex-col justify-between shadow-sm">
                         <div>
-                          <h4 className="font-serif text-base font-bold text-[#022C22] border-b border-stone-100 pb-2.5 flex items-center space-x-2">
+                          <h4 className="font-sans text-base font-bold text-[#022C22] border-b border-stone-100 pb-2.5 flex items-center space-x-2">
                             <UserCheck className="w-4 h-4 text-[#c5a880]" />
                             <span>Руководство учреждения</span>
                           </h4>
                           <div className="space-y-2 text-xs sm:text-[13px] mt-3.5">
                             <div>
-                              <span className="block text-stone-500 font-mono text-[10px] uppercase tracking-wider font-bold">Начальник санатория</span>
+                              <span className="block text-stone-600 font-sans text-xs uppercase tracking-wider font-semibold">Начальник санатория</span>
                               <strong className="block text-base sm:text-lg text-[#022C22] font-serif font-bold mt-1">
                                 {RESORT_INFO.directorName || 'Данилив Алексей Иванович'}
                               </strong>
-                              <span className="text-[#c5a880] font-bold uppercase text-[10px] font-mono tracking-wider mt-0.5 block">
+                              <span className="text-[#c5a880] font-bold uppercase text-xs font-sans tracking-wider mt-0.5 block">
                                 {RESORT_INFO.directorRole || 'и.о. начальника санатория'}
                               </span>
                             </div>
@@ -2783,19 +2783,19 @@ export default function App() {
                         </div>
 
                         <div className="pt-3 border-t border-stone-100 space-y-2">
-                          <span className="block text-stone-500 font-mono text-[10px] uppercase tracking-wider font-bold">Приемная и связь</span>
+                          <span className="block text-stone-600 font-sans text-xs uppercase tracking-wider font-semibold">Приемная и связь</span>
                           <div className="space-y-2 bg-stone-50/80 p-3 rounded-xl border border-stone-200/80 text-xs sm:text-[13px]">
                             <p className="flex justify-between items-center">
                               <span className="text-stone-600 font-medium">Телефон:</span>
-                              <a href="tel:+73654239376" className="font-mono font-bold text-[#022C22] hover:text-[#c5a880] transition-all">+7(3654)23-93-76</a>
+                              <a href="tel:+73654239376" className="font-mono tabular-nums font-bold text-[#022C22] hover:text-[#c5a880] transition-all">+7(3654)23-93-76</a>
                             </p>
                             <p className="flex justify-between items-center">
                               <span className="text-stone-600 font-medium">Факс:</span>
-                              <span className="font-mono text-stone-900 font-semibold">+7(3654)23-93-76</span>
+                              <span className="font-mono tabular-nums text-stone-900 font-semibold">+7(3654)23-93-76</span>
                             </p>
                             <p className="flex justify-between items-center">
                               <span className="text-stone-600 font-medium">Email:</span>
-                              <a href={`mailto:${RESORT_INFO.email}`} className="font-mono font-bold text-[#022C22] hover:text-[#c5a880] hover:underline">{RESORT_INFO.email}</a>
+                              <a href={`mailto:${RESORT_INFO.email}`} className="font-mono text-[#022C22] font-semibold hover:text-[#c5a880] hover:underline">{RESORT_INFO.email}</a>
                             </p>
                           </div>
                         </div>
@@ -2804,14 +2804,14 @@ export default function App() {
                       {/* Registry details */}
                       <div className="space-y-4 bg-white p-5 sm:p-6 rounded-2xl border border-stone-200 flex flex-col justify-between shadow-sm">
                         <div>
-                          <h4 className="font-serif text-base font-bold text-[#022C22] border-b border-stone-100 pb-2.5 flex items-center space-x-2">
+                          <h4 className="font-sans text-base font-bold text-[#022C22] border-b border-stone-100 pb-2.5 flex items-center space-x-2">
                             <FileText className="w-4 h-4 text-[#c5a880]" />
                             <span>Гос. регистрация</span>
                           </h4>
                           <div className="space-y-2 text-xs sm:text-[13px] mt-3.5">
                             <div>
-                              <span className="block text-stone-500 font-mono text-[10px] uppercase tracking-wider font-bold">Регистрирующий орган</span>
-                              <p className="font-semibold text-stone-900 mt-1 leading-snug">
+                              <span className="block text-stone-600 font-sans text-xs uppercase tracking-wider font-semibold">Регистрирующий орган</span>
+                              <p className="font-semibold text-stone-900 mt-1 leading-snug font-sans">
                                 Межрайонная инспекция Федеральной налоговой службы №46 по г. Москве
                               </p>
                             </div>
@@ -2820,16 +2820,16 @@ export default function App() {
 
                         <div className="border-t border-stone-100 pt-3 grid grid-cols-2 gap-2 text-xs">
                           <div className="bg-stone-50/80 p-2.5 rounded-xl border border-stone-200">
-                            <span className="block text-stone-500 font-mono text-[10px] uppercase tracking-wider font-bold">Серия</span>
-                            <span className="font-mono font-extrabold text-[#022C22] text-sm">77</span>
+                            <span className="block text-stone-600 font-sans text-xs uppercase tracking-wider font-semibold">Серия</span>
+                            <span className="font-mono tabular-nums font-extrabold text-[#022C22] text-sm">77</span>
                           </div>
                           <div className="bg-stone-50/80 p-2.5 rounded-xl border border-stone-200">
-                            <span className="block text-stone-500 font-mono text-[10px] uppercase tracking-wider font-bold">Свидетельство</span>
-                            <span className="font-mono font-extrabold text-[#022C22] text-xs">015463944</span>
+                            <span className="block text-stone-600 font-sans text-xs uppercase tracking-wider font-semibold">Свидетельство</span>
+                            <span className="font-mono tabular-nums font-extrabold text-[#022C22] text-xs sm:text-sm">015463944</span>
                           </div>
                           <div className="bg-stone-50/80 p-2.5 rounded-xl border border-stone-200 col-span-2">
-                            <span className="block text-stone-500 font-mono text-[10px] uppercase tracking-wider font-bold">Дата регистрации</span>
-                            <span className="font-mono font-bold text-[#022C22]">29 октября 2013 г.</span>
+                            <span className="block text-stone-600 font-sans text-xs uppercase tracking-wider font-semibold">Дата регистрации</span>
+                            <span className="font-mono tabular-nums font-bold text-[#022C22]">29 октября 2013 г.</span>
                           </div>
                         </div>
                       </div>
@@ -2837,13 +2837,13 @@ export default function App() {
                       {/* Creation foundation */}
                       <div className="space-y-4 bg-white p-5 sm:p-6 rounded-2xl border border-stone-200 flex flex-col justify-between shadow-sm md:col-span-2 lg:col-span-1">
                         <div>
-                          <h4 className="font-serif text-base font-bold text-[#022C22] border-b border-stone-100 pb-2.5 flex items-center space-x-2">
+                          <h4 className="font-sans text-base font-bold text-[#022C22] border-b border-stone-100 pb-2.5 flex items-center space-x-2">
                             <Shield className="w-4 h-4 text-[#c5a880]" />
                             <span>Создание учреждения</span>
                           </h4>
-                          <div className="space-y-2 text-xs sm:text-[13px] mt-3.5 leading-relaxed">
+                          <div className="space-y-2 text-xs sm:text-[13px] mt-3.5 leading-relaxed font-sans">
                             <div>
-                              <span className="block text-stone-500 font-mono text-[10px] uppercase tracking-wider font-bold">Основание внесения</span>
+                              <span className="block text-stone-600 font-sans text-xs uppercase tracking-wider font-semibold">Основание внесения</span>
                               <p className="text-stone-900 font-semibold mt-1">Внесение в ЕГРЮЛ сведений о юридическом лице</p>
                             </div>
                           </div>
@@ -2851,12 +2851,12 @@ export default function App() {
 
                         <div className="border-t border-stone-100 pt-3 grid grid-cols-2 gap-2 text-xs">
                           <div className="bg-stone-50/80 p-2.5 rounded-xl border border-stone-200">
-                            <span className="block text-stone-500 font-mono text-[10px] uppercase tracking-wider font-bold">Дата создания</span>
-                            <p className="font-bold text-[#022C22] mt-0.5">29.10.2013</p>
+                            <span className="block text-stone-600 font-sans text-xs uppercase tracking-wider font-semibold">Дата создания</span>
+                            <p className="font-bold text-[#022C22] mt-0.5 font-mono tabular-nums">29.10.2013</p>
                           </div>
                           <div className="bg-stone-50/80 p-2.5 rounded-xl border border-stone-200">
-                            <span className="block text-stone-500 font-mono text-[10px] uppercase tracking-wider font-bold">ОГРН</span>
-                            <strong className="font-mono text-[#022C22] text-xs mt-0.5 block">5137746004787</strong>
+                            <span className="block text-stone-600 font-sans text-xs uppercase tracking-wider font-semibold">ОГРН</span>
+                            <strong className="font-mono tabular-nums text-[#022C22] text-xs sm:text-sm mt-0.5 block">5137746004787</strong>
                           </div>
                         </div>
                       </div>
@@ -3075,17 +3075,17 @@ export default function App() {
                     className="w-full h-full object-cover object-center transition-transform duration-500 group-hover:scale-105"
                     referrerPolicy="no-referrer"
                   />
-                  <div className="absolute top-3 left-3 bg-[#022C22] border border-[#c5a880]/30 text-white font-mono text-[10px] uppercase font-bold tracking-widest px-2.5 py-1 rounded-sm shadow-sm">
+                  <div className="absolute top-3 left-3 bg-[#022C22] border border-[#c5a880]/30 text-white font-mono text-xs uppercase font-bold tracking-wider px-2.5 py-1 rounded-md shadow-sm tabular-nums">
                     {room.area} м²
                   </div>
                   {/* Visual hint on photo */}
-                  <div className="absolute top-3 right-3 bg-black/60 backdrop-blur-xs text-white text-[11px] font-medium px-2.5 py-1 rounded-sm opacity-90 group-hover:opacity-100 transition-all flex items-center gap-1.5 shadow-sm border border-white/10">
+                  <div className="absolute top-3 right-3 bg-black/60 backdrop-blur-xs text-white text-xs font-medium px-2.5 py-1 rounded-md opacity-90 group-hover:opacity-100 transition-all flex items-center gap-1.5 shadow-sm border border-white/10 font-sans">
                     <Eye className="w-3.5 h-3.5 text-[#c5a880]" />
-                    <span className="hidden sm:inline text-[10px] uppercase tracking-wider font-mono">Фото и детали</span>
+                    <span className="hidden sm:inline text-xs uppercase tracking-wider font-semibold">Фото и детали</span>
                   </div>
                   <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-black/60 to-transparent pointer-events-none"></div>
                   <div className="absolute bottom-3 left-3 text-white pointer-events-none">
-                    <span className="block text-[11px] font-mono tracking-widest text-stone-200 uppercase leading-none">{room.category}</span>
+                    <span className="block text-xs font-sans tracking-wider text-stone-200 uppercase leading-none font-semibold">{room.category}</span>
                   </div>
                 </div>
 
@@ -3094,24 +3094,24 @@ export default function App() {
                   <div>
                     <h3 
                       onClick={() => handleOpenRoomDetails(room)}
-                      className="font-serif text-xl font-medium text-[#022C22] mb-2 leading-snug hover:text-[#c5a880] cursor-pointer transition-colors"
+                      className="font-serif text-xl sm:text-2xl font-bold text-[#022C22] mb-2 leading-snug hover:text-[#c5a880] cursor-pointer transition-colors"
                       title={`Посмотреть описание номера «${room.name}»`}
                     >
                       {room.name}
                     </h3>
-                    <p className="text-xs text-stone-600 line-clamp-2 leading-relaxed mb-4">
+                    <p className="text-xs sm:text-sm text-stone-600 line-clamp-2 leading-relaxed mb-4">
                       {room.description}
                     </p>
 
                     {/* Short highlights */}
-                    <div className="space-y-1.5 border-t border-b border-stone-100 py-3 mb-4 text-xs text-stone-700">
+                    <div className="space-y-1.5 border-t border-b border-stone-100 py-3 mb-4 text-xs sm:text-sm text-stone-700 font-sans">
                       <div className="flex justify-between">
-                        <span className="text-stone-400">Вид из окон:</span>
-                        <span className="font-medium text-[#022C22] truncate max-w-[150px]">{room.view}</span>
+                        <span className="text-stone-600 font-medium">Вид из окон:</span>
+                        <span className="font-semibold text-[#022C22] truncate max-w-[150px]">{room.view}</span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-stone-400">Размещение:</span>
-                        <span className="font-medium text-[#022C22] truncate max-w-[150px]">{room.capacity}</span>
+                        <span className="text-stone-600 font-medium">Размещение:</span>
+                        <span className="font-semibold text-[#022C22] truncate max-w-[150px]">{room.capacity}</span>
                       </div>
                     </div>
                   </div>
@@ -3120,9 +3120,9 @@ export default function App() {
                     <div className="flex justify-center pt-2">
                       <button
                         onClick={() => handleOpenRoomDetails(room)}
-                        className="w-full bg-[#022C22] hover:bg-[#c5a880] text-white hover:text-[#022C22] text-xs font-bold py-2.5 rounded-sm uppercase tracking-wider text-center transition-all duration-300 cursor-pointer shadow-sm"
+                        className="w-full bg-[#022C22] hover:bg-[#c5a880] text-white hover:text-[#022C22] text-xs font-bold py-3 rounded-lg uppercase tracking-wider text-center transition-all duration-300 cursor-pointer shadow-sm font-sans"
                       >
-                        Описание
+                        Описание и фото
                       </button>
                     </div>
                   </div>
@@ -3286,7 +3286,7 @@ export default function App() {
                         setIsGalleryExpanded(true);
                       }
                     }}
-                    className="group relative inline-flex items-center gap-3 px-8 py-4 bg-[#022C22] hover:bg-[#c5a880] text-white hover:text-[#022C22] rounded-xl font-serif font-bold text-xs sm:text-sm tracking-wider uppercase shadow-lg hover:shadow-2xl hover:shadow-[#c5a880]/20 transition-all duration-300 transform hover:-translate-y-0.5 cursor-pointer border border-[#c5a880]/40"
+                    className="group relative inline-flex items-center gap-3 px-8 py-4 bg-[#022C22] hover:bg-[#c5a880] text-white hover:text-[#022C22] rounded-xl font-sans font-bold text-xs sm:text-sm tracking-wider uppercase shadow-lg hover:shadow-2xl hover:shadow-[#c5a880]/20 transition-all duration-300 transform hover:-translate-y-0.5 cursor-pointer border border-[#c5a880]/40"
                   >
                     <div className="w-7 h-7 rounded-lg bg-white/10 group-hover:bg-[#022C22]/10 flex items-center justify-center transition-colors">
                       {isGalleryExpanded ? (
@@ -3303,12 +3303,12 @@ export default function App() {
                       }
                     </span>
                     
-                    <span className="bg-[#c5a880]/20 group-hover:bg-[#022C22]/20 text-[#c5a880] group-hover:text-[#022C22] text-[11px] font-mono font-bold px-2 py-0.5 rounded-md transition-colors">
+                    <span className="bg-[#c5a880]/20 group-hover:bg-[#022C22]/20 text-[#c5a880] group-hover:text-[#022C22] text-xs font-mono font-bold px-2.5 py-0.5 rounded-md transition-colors tabular-nums">
                       {filteredGallery.length} фото
                     </span>
                   </button>
 
-                  <p className="text-stone-500 text-xs font-mono mt-3">
+                  <p className="text-stone-500 text-xs font-sans mt-3">
                     {isGalleryExpanded
                       ? `Показаны все ${filteredGallery.length} кадров`
                       : `Отображаются первые 9 фото (3 ряда) из ${filteredGallery.length}`
@@ -3343,7 +3343,7 @@ export default function App() {
                 </button>
               </div>
             )}
-            <span className="text-[#c5a880] text-xs font-mono uppercase tracking-widest font-bold">обратная связь от наших гостей</span>
+            <span className="text-[#c5a880] text-xs font-sans uppercase tracking-wider font-semibold">обратная связь от наших гостей</span>
             <h2 className="font-serif text-3xl sm:text-4xl font-extrabold tracking-tight mt-3">
               Отзывы отдыхающих
             </h2>
@@ -3354,7 +3354,7 @@ export default function App() {
             {siteData.testimonials.filter(t => t.isApproved !== false).slice(0, 3).map((t) => (
               <div 
                 key={t.id} 
-                className="bg-emerald-950 border border-[#c5a880]/20 p-6 sm:p-8 rounded-sm relative flex flex-col justify-between shadow-xl"
+                className="bg-emerald-950 border border-[#c5a880]/20 p-6 sm:p-8 rounded-xl relative flex flex-col justify-between shadow-xl font-sans"
               >
                 <div>
                   {/* Visual stars and absolute quote symbol */}
@@ -3364,16 +3364,16 @@ export default function App() {
                       <Star key={i} className="w-4 h-4 fill-amber-400 text-amber-400" />
                     ))}
                   </div>
-                  <p className="text-stone-200 text-xs sm:text-sm leading-relaxed italic mb-6">
+                  <p className="text-stone-200 text-xs sm:text-sm leading-relaxed mb-6 font-sans">
                     «{t.text}»
                   </p>
                 </div>
 
-                <div className="border-t border-white/5 pt-4 mt-auto">
-                  <h4 className="font-serif font-semibold text-sm text-white">{t.text.length > 200 ? `${t.author}` : t.author}</h4>
-                  <div className="flex justify-between items-center text-[10px] text-stone-400 font-mono tracking-wider mt-1.5 uppercase">
+                <div className="border-t border-white/10 pt-4 mt-auto">
+                  <h4 className="font-serif font-bold text-base text-white">{t.text.length > 200 ? `${t.author}` : t.author}</h4>
+                  <div className="flex justify-between items-center text-xs text-stone-300 font-sans tracking-wide mt-1.5">
                     <span>{t.role}</span>
-                    <span>{t.date}</span>
+                    <span className="font-mono tabular-nums">{t.date}</span>
                   </div>
                 </div>
               </div>
@@ -3386,7 +3386,7 @@ export default function App() {
                 setCurrentPage('testimonials');
                 window.scrollTo({ top: 0, behavior: 'smooth' });
               }}
-              className="bg-[#c5a880] hover:bg-[#FAF9F6] text-[#022C22] font-black text-xs px-6 py-3.5 rounded-sm uppercase tracking-widest transition-all shadow-sm cursor-pointer active:scale-95"
+              className="bg-[#c5a880] hover:bg-[#FAF9F6] text-[#022C22] font-bold text-xs px-6 py-3.5 rounded-lg uppercase tracking-wider transition-all shadow-sm cursor-pointer active:scale-95 font-sans"
             >
               Посмотреть все отзывы
             </button>
@@ -3417,11 +3417,11 @@ export default function App() {
               <div className="absolute inset-0 opacity-10">
                 <div className="w-full h-full bg-[radial-gradient(#c5a880_1px,transparent_1px)] [background-size:16px_16px]"></div>
               </div>
-              <span className="relative z-10 text-[#c5a880] text-xs font-mono uppercase tracking-widest font-bold">обратная связь отдыхающих</span>
+              <span className="relative z-10 text-[#c5a880] text-xs font-sans uppercase tracking-wider font-semibold">обратная связь отдыхающих</span>
               <h2 className="relative z-10 font-serif text-2xl sm:text-3xl font-extrabold tracking-tight mt-2">
                 Поделитесь своими впечатлениями
               </h2>
-              <p className="relative z-10 text-stone-300 text-xs mt-3 leading-relaxed max-w-2xl mx-auto">
+              <p className="relative z-10 text-stone-200 text-xs sm:text-sm mt-3 leading-relaxed max-w-2xl mx-auto font-sans">
                 Ваше честное мнение помогает нам улучшать медицинские программы, сервис, развивать парк-арборетум и делать проживание в санатории ФТС России «Ясная Поляна» совершенным.
               </p>
             </div>
@@ -3440,11 +3440,11 @@ export default function App() {
                   >
                     
                     {/* Star Rating Selector */}
-                    <div className="space-y-2 bg-[#FAF9F6] p-4 sm:p-5 rounded border border-stone-200/80">
+                    <div className="space-y-2 bg-[#FAF9F6] p-4 sm:p-5 rounded-xl border border-stone-200/80 font-sans">
                       <label className="block text-xs font-bold uppercase tracking-wider text-[#022C22]">
                         Ваша оценка пребывания в санатории <span className="text-red-500">*</span>
                       </label>
-                      <p className="text-[11px] text-stone-500 leading-normal mb-3">Оцените в комплексе проживание, лечение, питание и атмосферу курорта.</p>
+                      <p className="text-xs text-stone-600 leading-normal mb-3 font-sans">Оцените в комплексе проживание, лечение, питание и атмосферу курорта.</p>
                       <div className="flex flex-wrap items-center gap-3">
                         <div className="flex items-center space-x-1.5">
                           {[1, 2, 3, 4, 5].map((star) => (
@@ -3465,7 +3465,7 @@ export default function App() {
                             </button>
                           ))}
                         </div>
-                        <span className="text-xs font-serif font-bold italic text-emerald-800 bg-emerald-50 border border-emerald-100 px-3 py-1.5 rounded-sm">
+                        <span className="text-xs font-sans font-semibold text-emerald-800 bg-emerald-50 border border-emerald-200 px-3 py-1.5 rounded-lg">
                           {reviewForm.rating === 5 && 'Идеально — Превзошло ожидания!'}
                           {reviewForm.rating === 4 && 'Очень хорошо — Качественный отдых'}
                           {reviewForm.rating === 3 && 'Удовлетворительно — Есть над чем поработать'}
@@ -3475,7 +3475,7 @@ export default function App() {
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 font-sans">
                       
                       {/* Name input */}
                       <div>
@@ -3488,7 +3488,7 @@ export default function App() {
                           name="author"
                           value={reviewForm.author}
                           onChange={handleReviewInputChange}
-                          className={`w-full px-4 py-3 rounded-sm border focus:outline-none focus:ring-1 text-sm ${
+                          className={`w-full px-4 py-3 rounded-lg border focus:outline-none focus:ring-1 text-sm font-sans ${
                             formErrors.author 
                               ? 'border-red-500 bg-red-50/20 focus:ring-red-500' 
                               : 'border-stone-300 focus:border-[#022C22] focus:ring-[#022C22]'
@@ -3498,7 +3498,7 @@ export default function App() {
                         {formErrors.author && (
                           <span className="text-red-500 text-xs mt-1 block font-medium">{formErrors.author}</span>
                         )}
-                        <span className="text-[11px] text-stone-400 mt-1 block font-sans">
+                        <span className="text-xs text-stone-500 mt-1 block font-sans">
                           Для соблюдения 152-ФЗ персональные данные не публикуются
                         </span>
                       </div>
@@ -3514,7 +3514,7 @@ export default function App() {
                           name="role"
                           value={reviewForm.role}
                           onChange={handleReviewInputChange}
-                          className={`w-full px-4 py-3 rounded-sm border focus:outline-none focus:ring-1 text-sm ${
+                          className={`w-full px-4 py-3 rounded-lg border focus:outline-none focus:ring-1 text-sm font-sans ${
                             formErrors.role 
                               ? 'border-red-500 bg-red-50/20 focus:ring-red-500' 
                               : 'border-stone-300 focus:border-[#022C22] focus:ring-[#022C22]'
@@ -3704,15 +3704,15 @@ export default function App() {
             {FAQS.map((faq) => (
               <details 
                 key={faq.id} 
-                className="group border border-stone-200/80 rounded-sm bg-[#FAF9F6] p-4 [&_summary::-webkit-details-marker]:hidden cursor-pointer hover:border-stone-300"
+                className="group border border-stone-200/80 rounded-xl bg-[#FAF9F6] p-4 [&_summary::-webkit-details-marker]:hidden cursor-pointer hover:border-stone-300 font-sans"
               >
-                <summary className="flex items-center justify-between font-serif font-semibold text-[#022C22] text-sm sm:text-base selection:bg-transparent">
+                <summary className="flex items-center justify-between font-sans font-semibold text-[#022C22] text-sm sm:text-base selection:bg-transparent">
                   <span>{faq.question}</span>
                   <span className="transition duration-300 group-open:-rotate-180 text-[#c5a880]">
                     <ChevronLeft className="w-5 h-5 -rotate-90" />
                   </span>
                 </summary>
-                <div className="mt-4 pt-3 border-t border-stone-200/50 text-xs sm:text-sm text-stone-600 leading-relaxed">
+                <div className="mt-4 pt-3 border-t border-stone-200/60 text-xs sm:text-sm text-stone-700 leading-relaxed font-sans">
                   {faq.answer}
                 </div>
               </details>
@@ -3739,12 +3739,12 @@ export default function App() {
               <div>
                 <div className="flex items-center space-x-2">
                   <span className="h-[1px] w-8 bg-[#c5a880]"></span>
-                  <span className="text-[11px] tracking-widest font-mono uppercase text-[#c5a880] font-bold">Контакты и адрес</span>
+                  <span className="text-xs tracking-wider font-sans uppercase text-[#c5a880] font-semibold">Контакты и адрес</span>
                 </div>
                 <h2 className="font-serif text-3xl sm:text-4xl font-extrabold tracking-tight text-[#022C22] mt-3">
                   Связаться с нами
                 </h2>
-                <p className="text-stone-600 text-xs sm:text-sm mt-3 leading-relaxed">
+                <p className="text-stone-700 text-xs sm:text-sm mt-3 leading-relaxed font-sans">
                   Будем рады подробно ответить на любые ваши вопросы касательно стоимости, оформления документов, бронирования, трансфера и медицинского профиля.
                 </p>
               </div>
@@ -3753,12 +3753,12 @@ export default function App() {
                 
                 {/* MapPin / Address */}
                 <div className="flex items-start space-x-3.5">
-                  <div className="bg-[#022C22] text-[#c5a880] p-2.5 rounded-sm mt-1 shrink-0">
+                  <div className="bg-[#022C22] text-[#c5a880] p-2.5 rounded-lg mt-1 shrink-0">
                     <MapPin className="w-5 h-5" />
                   </div>
                   <div>
-                    <span className="text-[10px] uppercase tracking-wider text-stone-400 font-mono">Адрес санатория:</span>
-                    <p className="text-sm font-semibold text-[#022C22] mt-0.5 leading-relaxed">
+                    <span className="text-xs uppercase tracking-wider text-stone-600 font-sans font-semibold">Адрес санатория:</span>
+                    <p className="text-sm font-semibold text-[#022C22] mt-0.5 leading-relaxed font-sans">
                       {RESORT_INFO.address}
                     </p>
                   </div>
@@ -3766,12 +3766,12 @@ export default function App() {
 
                 {/* Phone detail */}
                 <div className="flex items-start space-x-3.5">
-                  <div className="bg-[#022C22] text-[#c5a880] p-2.5 rounded-sm mt-1 shrink-0">
+                  <div className="bg-[#022C22] text-[#c5a880] p-2.5 rounded-lg mt-1 shrink-0">
                     <Phone className="w-5 h-5" />
                   </div>
                   <div>
-                    <span className="text-[10px] uppercase tracking-wider text-stone-400 font-mono">Телефоны отдела бронирования:</span>
-                    <p className="text-sm font-semibold text-[#022C22] mt-0.5 flex flex-col sm:flex-row sm:space-x-4">
+                    <span className="text-xs uppercase tracking-wider text-stone-600 font-sans font-semibold">Телефоны отдела бронирования:</span>
+                    <p className="text-sm font-semibold text-[#022C22] mt-0.5 flex flex-col sm:flex-row sm:space-x-4 font-mono tabular-nums">
                       <a href={`tel:${RESORT_INFO.phone}`} className="hover:text-[#c5a880]">Тел: {RESORT_INFO.phone}</a>
                       {RESORT_INFO.fax && <a href={`tel:${RESORT_INFO.fax}`} className="hover:text-[#c5a880]">Факс: {RESORT_INFO.fax}</a>}
                     </p>
@@ -3780,12 +3780,12 @@ export default function App() {
 
                 {/* Email detail */}
                 <div className="flex items-start space-x-3.5">
-                  <div className="bg-[#022C22] text-[#c5a880] p-2.5 rounded-sm mt-1 shrink-0">
+                  <div className="bg-[#022C22] text-[#c5a880] p-2.5 rounded-lg mt-1 shrink-0">
                     <Mail className="w-5 h-5" />
                   </div>
                   <div>
-                    <span className="text-[10px] uppercase tracking-wider text-stone-400 font-mono">Электронная почта:</span>
-                    <p className="text-sm font-semibold text-[#022C22] mt-0.5">
+                    <span className="text-xs uppercase tracking-wider text-stone-600 font-sans font-semibold">Электронная почта:</span>
+                    <p className="text-sm font-semibold text-[#022C22] mt-0.5 font-mono">
                       <a href={`mailto:${RESORT_INFO.email}`} className="hover:text-[#c5a880] underline">{RESORT_INFO.email}</a>
                     </p>
                   </div>
@@ -3793,12 +3793,12 @@ export default function App() {
 
                 {/* Working hours */}
                 <div className="flex items-start space-x-3.5">
-                  <div className="bg-[#022C22] text-[#c5a880] p-2.5 rounded-sm mt-1 shrink-0">
+                  <div className="bg-[#022C22] text-[#c5a880] p-2.5 rounded-lg mt-1 shrink-0">
                     <Clock className="w-5 h-5" />
                   </div>
                   <div>
-                    <span className="text-[10px] uppercase tracking-wider text-stone-400 font-mono">Часы приема граждан:</span>
-                    <p className="text-sm text-stone-700 mt-0.5">
+                    <span className="text-xs uppercase tracking-wider text-stone-600 font-sans font-semibold">Часы приема граждан:</span>
+                    <p className="text-sm text-stone-700 mt-0.5 font-sans leading-relaxed">
                       {RESORT_INFO.workingHours}
                     </p>
                   </div>
@@ -3806,8 +3806,8 @@ export default function App() {
 
               </div>
 
-              <div className="bg-stone-100 p-4 rounded-sm border-l-4 border-[#022C22] text-xs text-stone-600">
-                <strong>Важное уведомление:</strong> На территории санатория действует пропускной режим. При посещении лечебного корпуса или заселении обязательно предъявление удостоверения личности (паспорта/служебного).
+              <div className="bg-stone-100 p-4 rounded-xl border-l-4 border-[#022C22] text-xs text-stone-700 font-sans leading-relaxed">
+                <strong className="text-stone-900">Важное уведомление:</strong> На территории санатория действует пропускной режим. При посещении лечебного корпуса или заселении обязательно предъявление удостоверения личности (паспорта/служебного).
               </div>
 
             </div>
@@ -3838,8 +3838,8 @@ export default function App() {
                   </div>
                   
                   <div className="shrink-0 flex flex-col items-start sm:items-end gap-1">
-                    <span className="text-[10px] text-stone-400 font-mono uppercase">Координаты GPS</span>
-                    <span className="text-xs font-mono font-bold text-[#c5a880]">44.4308° N, 34.1256° E</span>
+                    <span className="text-xs text-stone-300 font-sans font-medium uppercase tracking-wider">Координаты GPS</span>
+                    <span className="text-xs font-mono font-bold text-[#c5a880] tabular-nums">44.4308° N, 34.1256° E</span>
                   </div>
                 </div>
 
@@ -3894,15 +3894,15 @@ export default function App() {
               <p className="text-xs text-stone-300 leading-relaxed">
                 Высокоэффективное санаторно-курортное лечение в уникальном оазисе крымской природы под патронатом Федеральной Таможенной Службы Российской Федерации.
               </p>
-              <div className="text-[10px] text-stone-400 font-mono tracking-wide uppercase">
+              <div className="text-xs text-stone-300 font-sans tracking-wide">
                 Лицензия на осуществление медицинской деятельности ЛО-82-01-001240
               </div>
             </div>
 
             {/* Quick links columns */}
             <div>
-              <h4 className="font-serif text-sm font-semibold text-white tracking-wider uppercase mb-4 border-b border-white/5 pb-1 select-none">Лечебный профиль</h4>
-              <ul className="space-y-2 text-xs text-stone-300">
+              <h4 className="font-serif text-sm font-semibold text-white tracking-wider uppercase mb-4 border-b border-white/10 pb-1 select-none">Лечебный профиль</h4>
+              <ul className="space-y-2 text-xs text-stone-300 font-sans">
                 <li>Органы дыхания</li>
                 <li>Сердечно-сосудистая система</li>
                 <li>Нервная система</li>
@@ -3913,30 +3913,30 @@ export default function App() {
 
             {/* Quick links columns */}
             <div>
-              <h4 className="font-serif text-sm font-semibold text-white tracking-wider uppercase mb-4 border-b border-white/5 pb-1 select-none font-bold text-[#c5a880]">Размещение</h4>
-              <ul className="space-y-2 text-xs text-stone-300">
-                <li><a href="#rooms" className="hover:text-[#c5a880]">Стандарт Улучшенный</a></li>
-                <li><a href="#rooms" className="hover:text-[#c5a880]">Полулюкс Комфорт</a></li>
-                <li><a href="#rooms" className="hover:text-[#c5a880]">Двухкомнатный Люкс</a></li>
-                <li><a href="#rooms" className="hover:text-[#c5a880]">VIP Апартаменты ФТС</a></li>
-                <li><a href="#booking" className="hover:text-[#c5a880]">Акции & Скидки</a></li>
+              <h4 className="font-serif text-sm font-semibold text-white tracking-wider uppercase mb-4 border-b border-white/10 pb-1 select-none font-bold text-[#c5a880]">Размещение</h4>
+              <ul className="space-y-2 text-xs text-stone-300 font-sans">
+                <li><a href="#rooms" className="hover:text-[#c5a880] transition-colors">Стандарт Улучшенный</a></li>
+                <li><a href="#rooms" className="hover:text-[#c5a880] transition-colors">Полулюкс Комфорт</a></li>
+                <li><a href="#rooms" className="hover:text-[#c5a880] transition-colors">Двухкомнатный Люкс</a></li>
+                <li><a href="#rooms" className="hover:text-[#c5a880] transition-colors">VIP Апартаменты ФТС</a></li>
+                <li><a href="#booking" className="hover:text-[#c5a880] transition-colors">Акции & Скидки</a></li>
               </ul>
             </div>
 
             {/* Contacts column */}
             <div>
-              <h4 className="font-serif text-sm font-semibold text-white tracking-wider uppercase mb-4 border-b border-white/5 pb-1 select-none text-stone-200">Бронирование</h4>
-              <ul className="space-y-2 text-xs text-stone-300">
-                <li>Телефон: <a href={`tel:${RESORT_INFO.phone}`} className="hover:underline">{RESORT_INFO.phone}</a></li>
-                {RESORT_INFO.fax && <li>Факс: <a href={`tel:${RESORT_INFO.fax}`} className="hover:underline">{RESORT_INFO.fax}</a></li>}
-                <li>Приемная: <a href={`mailto:${RESORT_INFO.email}`} className="hover:underline">{RESORT_INFO.email}</a></li>
+              <h4 className="font-serif text-sm font-semibold text-white tracking-wider uppercase mb-4 border-b border-white/10 pb-1 select-none text-stone-200">Бронирование</h4>
+              <ul className="space-y-2 text-xs text-stone-300 font-sans">
+                <li>Телефон: <a href={`tel:${RESORT_INFO.phone}`} className="hover:underline font-mono tabular-nums">{RESORT_INFO.phone}</a></li>
+                {RESORT_INFO.fax && <li>Факс: <a href={`tel:${RESORT_INFO.fax}`} className="hover:underline font-mono tabular-nums">{RESORT_INFO.fax}</a></li>}
+                <li>Приемная: <a href={`mailto:${RESORT_INFO.email}`} className="hover:underline font-mono">{RESORT_INFO.email}</a></li>
                 <li>Адрес: {RESORT_INFO.address}</li>
               </ul>
             </div>
 
           </div>
 
-          <div className="border-t border-white/5 pt-8 text-center md:flex md:items-center md:justify-between text-xs text-stone-400">
+          <div className="border-t border-white/10 pt-8 text-center md:flex md:items-center md:justify-between text-xs text-stone-300 font-sans">
             <p>
               &copy; {new Date().getFullYear()} Санаторий «Ясная Поляна» ФТС России. Официальное представительство. Все права защищены.
             </p>
@@ -4091,22 +4091,22 @@ export default function App() {
                 </div>
 
                 {/* Key specifics */}
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 bg-[#FAF9F6] p-4 rounded-sm border border-stone-100">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 bg-[#FAF9F6] p-4 rounded-xl border border-stone-200">
                   <div className="text-center md:border-r border-stone-200 last:border-0 p-1">
-                    <span className="block text-[10px] font-mono tracking-wider text-stone-400 uppercase">Площадь</span>
-                    <strong className="block text-sm text-[#022C22] mt-1 pr-1">{roomModal.area} м²</strong>
+                    <span className="block text-xs font-sans tracking-wider text-stone-600 font-semibold uppercase">Площадь</span>
+                    <strong className="block text-sm text-[#022C22] mt-1 pr-1 font-mono tabular-nums">{roomModal.area} м²</strong>
                   </div>
                   <div className="text-center md:border-r border-stone-200 last:border-0 p-1">
-                    <span className="block text-[10px] font-mono tracking-wider text-stone-400 uppercase">Вместимость</span>
-                    <strong className="block text-sm text-[#022C22] mt-1 pr-1">{roomModal.capacity.split('(')[0]}</strong>
+                    <span className="block text-xs font-sans tracking-wider text-stone-600 font-semibold uppercase">Вместимость</span>
+                    <strong className="block text-sm text-[#022C22] mt-1 pr-1 font-sans">{roomModal.capacity.split('(')[0]}</strong>
                   </div>
                   <div className="text-center md:border-r border-stone-200 last:border-0 p-1">
-                    <span className="block text-[10px] font-mono tracking-wider text-stone-400 uppercase font-bold text-[#c5a880]">Кровати</span>
-                    <strong className="block text-xs text-[#022C22] mt-1 truncate pr-1" title={roomModal.beds}>{roomModal.beds.split(',')[0]}</strong>
+                    <span className="block text-xs font-sans tracking-wider text-[#9b7b51] font-bold uppercase">Кровати</span>
+                    <strong className="block text-xs text-[#022C22] mt-1 truncate pr-1 font-sans" title={roomModal.beds}>{roomModal.beds.split(',')[0]}</strong>
                   </div>
                   <div className="text-center last:border-0 p-1">
-                    <span className="block text-[10px] font-mono tracking-wider text-stone-400 uppercase">Вид из окон</span>
-                    <strong className="block text-xs text-[#022C22] mt-1 truncate pr-1" title={roomModal.view}>{roomModal.view}</strong>
+                    <span className="block text-xs font-sans tracking-wider text-stone-600 font-semibold uppercase">Вид из окон</span>
+                    <strong className="block text-xs text-[#022C22] mt-1 truncate pr-1 font-sans" title={roomModal.view}>{roomModal.view}</strong>
                   </div>
                 </div>
 
@@ -4115,7 +4115,7 @@ export default function App() {
                   <h4 className="font-serif font-bold text-stone-800 text-sm uppercase tracking-wide">Удобства в номере:</h4>
                   <div className="grid grid-cols-2 gap-2.5 text-stone-700">
                     {roomModal.amenities.map((amen, idx) => (
-                      <div key={idx} className="flex items-center text-xs">
+                      <div key={idx} className="flex items-center text-xs font-sans">
                         <Check className="w-4 h-4 text-emerald-600 mr-2 shrink-0" />
                         <span>{amen}</span>
                       </div>
@@ -4124,8 +4124,8 @@ export default function App() {
                 </div>
 
                 {/* Important notices */}
-                <div className="bg-amber-50 rounded-sm border-l-4 border-[#c5a880] p-4 text-xs text-stone-600 leading-relaxed">
-                  <strong>Информация о заезде:</strong> Расчетный час — 12:00 (заезд с 14:00, выезд до 12:00 на следующий день). В стоимость включено полноценное медицинское или оздоровительное сопровождение.
+                <div className="bg-amber-50 rounded-xl border-l-4 border-[#c5a880] p-4 text-xs text-stone-700 leading-relaxed font-sans">
+                  <strong className="text-stone-900">Информация о заезде:</strong> Расчетный час — 12:00 (заезд с 14:00, выезд до 12:00 на следующий день). В стоимость включено полноценное медицинское или оздоровительное сопровождение.
                 </div>
 
               </div>
@@ -4133,11 +4133,11 @@ export default function App() {
               {/* Bottom bar */}
               <div className="p-4 bg-stone-50 border-t border-stone-100 flex items-center justify-between">
                 <div>
-                  <span className="text-[10px] tracking-wider text-stone-400 uppercase font-mono block">Цена за сутки</span>
+                  <span className="text-xs tracking-wider text-stone-600 uppercase font-sans font-semibold block">Цена за сутки</span>
                   {(!roomModal.price || roomModal.price <= 0) ? (
-                    <span className="text-sm font-bold text-[#c5a880] uppercase tracking-wide">Уточняйте у менеджера!</span>
+                    <span className="text-sm font-bold text-[#c5a880] uppercase tracking-wide font-sans">Уточняйте у менеджера!</span>
                   ) : (
-                    <span className="text-lg font-bold text-[#022C22]">от <span className="text-xl font-serif font-bold text-[#c5a880]">{roomModal.price.toLocaleString('ru')} ₽</span></span>
+                    <span className="text-lg font-bold text-[#022C22] font-sans">от <span className="text-xl font-serif font-bold text-[#c5a880] font-mono tabular-nums">{roomModal.price.toLocaleString('ru')} ₽</span></span>
                   )}
                 </div>
                 <div className="flex space-x-2">

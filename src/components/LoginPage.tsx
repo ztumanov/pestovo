@@ -139,8 +139,8 @@ export default function LoginPage({ onBackToHome }: { onBackToHome: () => void }
               ) : (
                 <form onSubmit={handleSubmit} className="space-y-4">
                   {/* Login Field */}
-                  <div className="space-y-1.5">
-                    <label className="block text-[10px] font-mono uppercase tracking-wider text-stone-500 font-bold">
+                  <div className="space-y-1.5 font-sans">
+                    <label className="block text-xs font-sans uppercase tracking-wider text-stone-700 font-semibold">
                       Имя пользователя / Логин
                     </label>
                     <div className="relative">
@@ -157,16 +157,16 @@ export default function LoginPage({ onBackToHome }: { onBackToHome: () => void }
                           setUsername(e.target.value);
                           if (error) setError('');
                         }}
-                        className="w-full bg-stone-50 border border-stone-200 rounded-xl pl-10 pr-4 py-3 text-sm text-stone-800 placeholder-stone-400 focus:outline-none focus:border-[#c5a880] focus:bg-white transition-all focus:ring-1 focus:ring-[#c5a880] disabled:opacity-50"
+                        className="w-full bg-stone-50 border border-stone-200 rounded-xl pl-10 pr-4 py-3 text-sm text-stone-800 placeholder-stone-400 focus:outline-none focus:border-[#c5a880] focus:bg-white transition-all focus:ring-1 focus:ring-[#c5a880] disabled:opacity-50 font-sans"
                         autoFocus
                       />
                     </div>
                   </div>
 
                   {/* Password Field */}
-                  <div className="space-y-1.5">
+                  <div className="space-y-1.5 font-sans">
                     <div className="flex justify-between items-center">
-                      <label className="block text-[10px] font-mono uppercase tracking-wider text-stone-500 font-bold">
+                      <label className="block text-xs font-sans uppercase tracking-wider text-stone-700 font-semibold">
                         Пароль сотрудника
                       </label>
                     </div>
@@ -190,7 +190,7 @@ export default function LoginPage({ onBackToHome }: { onBackToHome: () => void }
                         type="button"
                         onClick={() => setShowPassword(!showPassword)}
                         disabled={isLoading}
-                        className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-stone-400 hover:text-stone-600 transition-colors"
+                        className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-stone-400 hover:text-stone-600 transition-colors cursor-pointer"
                       >
                         {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                       </button>
@@ -201,7 +201,7 @@ export default function LoginPage({ onBackToHome }: { onBackToHome: () => void }
                     <motion.div
                       initial={{ opacity: 0, y: -5 }}
                       animate={{ opacity: 1, y: 0 }}
-                      className="text-xs text-red-700 bg-red-50 border border-red-200 p-3 rounded-xl flex items-start gap-2"
+                      className="text-xs text-red-700 bg-red-50 border border-red-200 p-3 rounded-xl flex items-start gap-2 font-sans"
                     >
                       <span>⚠️</span>
                       <span className="leading-normal">{error}</span>
@@ -212,7 +212,7 @@ export default function LoginPage({ onBackToHome }: { onBackToHome: () => void }
                   <button
                     type="submit"
                     disabled={isLoading}
-                    className="w-full bg-[#022C22] hover:bg-[#034D3C] text-white font-bold text-xs py-3.5 rounded-xl uppercase tracking-widest transition-all shadow-lg hover:shadow-xl active:scale-[0.98] disabled:opacity-60 disabled:pointer-events-none relative flex items-center justify-center font-mono"
+                    className="w-full bg-[#022C22] hover:bg-[#034D3C] text-white font-bold text-xs py-3.5 rounded-xl uppercase tracking-widest transition-all shadow-lg hover:shadow-xl active:scale-[0.98] disabled:opacity-60 disabled:pointer-events-none relative flex items-center justify-center font-sans cursor-pointer"
                   >
                     {isLoading ? (
                       <div className="flex items-center gap-2">

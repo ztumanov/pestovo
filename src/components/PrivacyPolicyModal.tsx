@@ -329,14 +329,14 @@ export default function PrivacyPolicyModal({ isOpen, onClose }: PrivacyPolicyMod
         <div className="flex-1 flex overflow-hidden bg-stone-100">
           {/* Navigation Sidebar (Desktop) */}
           <div className="w-72 shrink-0 bg-white border-r border-stone-200 overflow-y-auto hidden lg:block p-4 space-y-1">
-            <span className="block text-[10px] font-mono font-bold uppercase tracking-wider text-stone-400 mb-2 px-2">
+            <span className="block text-xs font-sans font-bold uppercase tracking-wider text-stone-600 mb-2 px-2">
               Оглавление документа
             </span>
             {PRIVACY_SECTIONS.map((sec) => (
               <button
                 key={sec.id}
                 onClick={() => scrollToSection(sec.id)}
-                className={`w-full text-left px-3 py-2 rounded-lg text-xs transition-all flex items-start space-x-2.5 cursor-pointer ${
+                className={`w-full text-left px-3 py-2 rounded-lg text-xs transition-all flex items-start space-x-2.5 cursor-pointer font-sans ${
                   activeSectionId === sec.id
                     ? 'bg-[#022C22] text-white font-bold shadow-sm'
                     : 'text-stone-700 hover:bg-stone-100 hover:text-[#022C22]'
@@ -352,15 +352,15 @@ export default function PrivacyPolicyModal({ isOpen, onClose }: PrivacyPolicyMod
             ))}
 
             <div className="pt-4 mt-4 border-t border-stone-200 px-2 space-y-2">
-              <div className="bg-[#FAF9F6] p-3 rounded-lg border border-stone-200 text-[11px] text-stone-600 space-y-1.5">
+              <div className="bg-[#FAF9F6] p-3 rounded-lg border border-stone-200 text-xs text-stone-700 space-y-1.5 font-sans">
                 <div className="flex items-center space-x-1.5 font-bold text-[#022C22]">
                   <Scale className="w-3.5 h-3.5 text-[#c5a880]" />
                   <span>Ведомственный орган:</span>
                 </div>
-                <p className="leading-tight text-stone-500">
+                <p className="leading-tight text-stone-600">
                   Федеральная таможенная служба Российской Федерации (ФТС России)
                 </p>
-                <p className="font-mono text-[10px] text-stone-400 pt-1">
+                <p className="font-mono text-xs text-stone-600 pt-1">
                   Email: {RESORT_INFO.email}
                 </p>
               </div>
@@ -376,7 +376,7 @@ export default function PrivacyPolicyModal({ isOpen, onClose }: PrivacyPolicyMod
                 <div className="w-12 h-12 rounded-full bg-emerald-50 border border-emerald-200 mx-auto flex items-center justify-center text-[#022C22] mb-3">
                   <Building className="w-6 h-6 text-[#022C22]" />
                 </div>
-                <p className="text-[11px] font-mono uppercase tracking-widest text-stone-500 font-bold">
+                <p className="text-xs font-sans uppercase tracking-wider text-stone-600 font-bold">
                   Федеральная таможенная служба Российской Федерации
                 </p>
                 <p className="text-xs font-serif font-bold text-[#022C22] mt-1">
@@ -385,7 +385,7 @@ export default function PrivacyPolicyModal({ isOpen, onClose }: PrivacyPolicyMod
                 <h1 className="font-serif text-lg sm:text-xl md:text-2xl font-bold text-[#022C22] mt-4 leading-snug">
                   ПОЛИТИКА В ОТНОШЕНИИ ОБРАБОТКИ И ЗАЩИТЫ ПЕРСОНАЛЬНЫХ ДАННЫХ
                 </h1>
-                <p className="text-xs text-stone-400 font-mono mt-2">
+                <p className="text-xs text-stone-600 font-sans mt-2">
                   г. Ялта, пгт. Гаспра • Введена в действие приказом начальника санатория
                 </p>
               </div>
@@ -437,25 +437,25 @@ export default function PrivacyPolicyModal({ isOpen, onClose }: PrivacyPolicyMod
               </div>
 
               {/* Official Seal / Signature Simulation Box */}
-              <div className="mt-12 pt-8 border-t border-stone-200 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-stone-50 p-5 rounded-lg border">
+              <div className="mt-12 pt-8 border-t border-stone-200 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-stone-50 p-5 rounded-lg border font-sans">
                 <div>
-                  <span className="block text-stone-400 uppercase tracking-widest font-mono text-[9px]">
+                  <span className="block text-stone-500 uppercase tracking-wider font-sans text-xs font-semibold">
                     Оператор персональных данных
                   </span>
-                  <p className="font-serif font-bold text-[#022C22] text-sm mt-0.5">
+                  <p className="font-serif font-bold text-[#022C22] text-sm sm:text-base mt-0.5">
                     ФГКУ «Санаторий «Ясная Поляна» ФТС России»
                   </p>
-                  <p className="text-[11px] text-stone-500 font-mono mt-0.5">
+                  <p className="text-xs text-stone-600 font-mono tabular-nums mt-0.5">
                     ИНН 7713778678 • Лицензия № Л041-00110-91/00554225
                   </p>
                 </div>
 
                 <div className="flex items-center space-x-3 bg-white px-4 py-2.5 rounded-lg border border-stone-200 shadow-sm shrink-0">
                   <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" />
-                  <div className="text-[10px] font-mono leading-tight">
-                    <span className="block font-bold text-emerald-800 font-sans">ЭЛЕКТРОННАЯ ПОДПИСЬ УЧРЕЖДЕНИЯ</span>
-                    <span className="text-stone-500 block font-serif">Данилив А. И. (и.о. Начальника)</span>
-                    <span className="text-stone-400 text-[9px] block">Сертификат ФТС России активен</span>
+                  <div className="text-xs font-sans leading-tight">
+                    <span className="block font-bold text-emerald-800 uppercase text-[11px] tracking-wider">ЭЛЕКТРОННАЯ ПОДПИСЬ УЧРЕЖДЕНИЯ</span>
+                    <span className="text-stone-700 block font-serif font-medium mt-0.5">Данилив А. И. (и.о. Начальника)</span>
+                    <span className="text-stone-500 text-[10px] block font-mono">Сертификат ФТС России активен</span>
                   </div>
                 </div>
               </div>
