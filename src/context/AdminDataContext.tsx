@@ -229,6 +229,27 @@ export function normalizeSiteData(data: Partial<SiteData> | any): SiteData {
     extraImages: { ...DEFAULT_SITE_DATA.extraImages, ...(data.extraImages || {}) },
     videos: { ...DEFAULT_SITE_DATA.videos, ...(data.videos || {}) }
   };
+
+  // Synchronize hero image with first photo slide
+  if (Array.isArray(merged.hero?.slides)) {
+    const firstPhoto = merged.hero.slides.find((s: any) => s.type === 'photo');
+    if (firstPhoto?.url) {
+      merged.images.hero = firstPhoto.url;
+    }
+  }
+
+  // Synchronize room photos with extraImages and images
+  if (Array.isArray(merged.rooms)) {
+    const stdRoom = merged.rooms.find(r => r.id === 'standard');
+    if (stdRoom?.image) {
+      merged.extraImages.standardRoom = stdRoom.image;
+    }
+    const luxRoom = merged.rooms.find(r => r.id === 'lux');
+    if (luxRoom?.image) {
+      merged.images.suite = luxRoom.image;
+    }
+  }
+
   return merged;
 }
 
@@ -305,6 +326,48 @@ const ADMIN_MODE_KEY = 'pestovo_resort_admin_active';
  */
 function getInitialSynchronousSiteData(): SiteData {
   try {
+    // 0. Primary path for incognito & fresh visits: check early server data fetched by HTML / bootstrap
+    const earlyServer = (typeof window !== 'undefined' && ((window as any).__EARLY_SITE_DATA__ || (window as any).__SITE_DATA_EARLY__)) || null;
+    if (earlyServer && typeof earlyServer === 'object' && (earlyServer.resortInfo || earlyServer.rooms || earlyServer.hero)) {
+      const merged: SiteData = deepCleanAssetPaths({
+        ...DEFAULT_SITE_DATA,
+        ...earlyServer,
+        hero: {
+          ...DEFAULT_SITE_DATA.hero,
+          ...(earlyServer.hero || {}),
+          slides: (earlyServer.hero?.slides && Array.isArray(earlyServer.hero.slides) && earlyServer.hero.slides.length > 0)
+            ? earlyServer.hero.slides
+            : DEFAULT_SITE_DATA.hero.slides
+        },
+        images: {
+          ...DEFAULT_SITE_DATA.images,
+          ...(earlyServer.images || {})
+        },
+        extraImages: {
+          ...DEFAULT_SITE_DATA.extraImages,
+          ...(earlyServer.extraImages || {})
+        },
+        rooms: (Array.isArray(earlyServer.rooms) && earlyServer.rooms.length > 0)
+          ? earlyServer.rooms
+          : DEFAULT_SITE_DATA.rooms
+      });
+
+      if (Array.isArray(merged.hero.slides)) {
+        const firstPhoto = merged.hero.slides.find((s: any) => s.type === 'photo');
+        if (firstPhoto?.url) {
+          merged.images.hero = firstPhoto.url;
+        }
+      }
+
+      // Also persist to fast storage for instant subsequent re-renders
+      try {
+        saveFastStorageData(merged);
+      } catch {}
+
+      return normalizeSiteData(merged);
+    }
+
+    // 1. Fast cached data from localStorage or sessionStorage
     const fastData = getFastStorageData<Partial<SiteData>>();
     if (fastData && typeof fastData === 'object' && (fastData.resortInfo || fastData.rooms)) {
       const merged: SiteData = deepCleanAssetPaths({
@@ -326,10 +389,7 @@ function getInitialSynchronousSiteData(): SiteData {
           ...(fastData.extraImages || {})
         },
         rooms: (Array.isArray(fastData.rooms) && fastData.rooms.length > 0)
-          ? DEFAULT_SITE_DATA.rooms.map(defRoom => {
-              const f = fastData.rooms?.find(r => r.id === defRoom.id || r.name === defRoom.name);
-              return f ? { ...defRoom, ...f } : defRoom;
-            })
+          ? fastData.rooms
           : DEFAULT_SITE_DATA.rooms
       });
 
@@ -750,12 +810,17 @@ export function AdminDataProvider({ children }: { children: React.ReactNode }) {
             };
 
             const serverFp = calcFingerprint(published);
-            const lastSyncedFp = localStorage.getItem('yasnaya_server_data_fingerprint');
+            let lastSyncedFp: string | null = null;
+            try {
+              lastSyncedFp = localStorage.getItem('yasnaya_server_data_fingerprint');
+            } catch {}
 
             // Overwrite local state if server has changed or if there was no saved local data
             if (serverFp !== lastSyncedFp || !savedData) {
               console.log('[Sync] Server site-data.json has changed or is new! Updating state immediately.');
-              localStorage.setItem('yasnaya_server_data_fingerprint', serverFp);
+              try {
+                localStorage.setItem('yasnaya_server_data_fingerprint', serverFp);
+              } catch {}
               saveFastStorageData(cleaned);
               await setStorageData(cleaned);
               if (!isCancelled) {

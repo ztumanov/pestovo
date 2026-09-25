@@ -31,10 +31,21 @@ export async function openDB(): Promise<IDBDatabase> {
 }
 
 /**
- * Synchronously retrieves fast-cached site data from localStorage (0ms latency, eliminates flash of default images)
+ * Synchronously retrieves fast-cached site data from early server load, localStorage, or sessionStorage
+ * (0ms latency, eliminates flash of default images in both normal and incognito browsing)
  */
 export function getFastStorageData<T>(): T | null {
   if (typeof window === 'undefined') return null;
+
+  // Priority 1: Early server data preloaded by HTML/bootstrap
+  try {
+    const early = (window as any).__EARLY_SITE_DATA__;
+    if (early && typeof early === 'object') {
+      return early as T;
+    }
+  } catch {}
+
+  // Priority 2: localStorage (standard browsing)
   try {
     const fast = localStorage.getItem(FAST_CACHE_KEY);
     if (fast) {
@@ -45,13 +56,23 @@ export function getFastStorageData<T>(): T | null {
     console.warn('Fast cache read failed:', e);
   }
 
+  // Priority 3: sessionStorage (persists across reloads within the same incognito tab)
   try {
-    const legacy = localStorage.getItem(LEGACY_STORAGE_KEY);
+    const sessionFast = sessionStorage.getItem(FAST_CACHE_KEY);
+    if (sessionFast) {
+      const parsed = JSON.parse(sessionFast) as T;
+      if (parsed && typeof parsed === 'object') return parsed;
+    }
+  } catch {}
+
+  // Priority 4: Legacy storage keys
+  try {
+    const legacy = localStorage.getItem(LEGACY_STORAGE_KEY) || sessionStorage.getItem(LEGACY_STORAGE_KEY);
     if (legacy) {
       const parsed = JSON.parse(legacy) as T;
       if (parsed && typeof parsed === 'object') return parsed;
     }
-  } catch (e) {}
+  } catch {}
 
   return null;
 }
@@ -81,12 +102,16 @@ export function saveFastStorageData(data: any): void {
   if (typeof window === 'undefined' || !data) return;
 
   const trySet = (key: string, val: string): boolean => {
+    let ok = false;
     try {
       localStorage.setItem(key, val);
-      return true;
-    } catch {
-      return false;
-    }
+      ok = true;
+    } catch {}
+    try {
+      sessionStorage.setItem(key, val);
+      ok = true;
+    } catch {}
+    return ok;
   };
 
   // Tier 1: Try saving full data if under ~2.5MB

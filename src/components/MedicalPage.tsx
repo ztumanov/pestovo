@@ -19,12 +19,18 @@ import {
 import { motion, AnimatePresence } from 'motion/react';
 import { MedicalProgram } from '../types';
 
-export default function MedicalPage({ onBackToHome }: { onBackToHome: () => void }) {
+export default function MedicalPage({ 
+  onBackToHome,
+  initialProgramId 
+}: { 
+  onBackToHome: () => void;
+  initialProgramId?: string;
+}) {
   const { siteData, isAdminMode, setCurrentPage, setActiveSettingsTab } = useAdminData();
   const medicalPrograms = siteData.medicalPrograms || [];
   const images = siteData.images || {};
 
-  const [activeTab, setActiveTab] = useState<string>(medicalPrograms[0]?.id || '');
+  const [activeTab, setActiveTab] = useState<string>(initialProgramId || medicalPrograms[0]?.id || '');
   const [searchTerm, setSearchTerm] = useState<string>('');
 
   const getMedicalIcon = (iconName: string) => {
