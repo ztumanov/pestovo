@@ -166,7 +166,7 @@ export const PRIVACY_SECTIONS = [
 • Юридический и почтовый адрес: 298660, Российская Федерация, Республика Крым, г. Ялта, пгт. Гаспра, Севастопольское шоссе, д. 52
 • Телефон приемной / факс: +7 (3654) 23-93-76
 • Официальный адрес электронной почты: sanatoriy@ya-polyana.ru
-• И.о. Начальника санатория: Данилив Алексей Иванович`
+• Начальник санатория: Шапортов Станислав Владимирович`
   }
 ];
 
@@ -454,7 +454,7 @@ export default function PrivacyPolicyModal({ isOpen, onClose }: PrivacyPolicyMod
                   <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" />
                   <div className="text-xs font-sans leading-tight">
                     <span className="block font-bold text-emerald-800 uppercase text-[11px] tracking-wider">ЭЛЕКТРОННАЯ ПОДПИСЬ УЧРЕЖДЕНИЯ</span>
-                    <span className="text-stone-700 block font-serif font-medium mt-0.5">Данилив А. И. (и.о. Начальника)</span>
+                    <span className="text-stone-700 block font-serif font-medium mt-0.5">Шапортов С. В. (Начальник санатория)</span>
                     <span className="text-stone-500 text-[10px] block font-mono">Сертификат ФТС России активен</span>
                   </div>
                 </div>

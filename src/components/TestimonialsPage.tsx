@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useAdminData } from '../context/AdminDataContext';
-import { Star, ArrowLeft, MessageSquare, Sparkles, Filter, Home, Check, ShieldCheck } from 'lucide-react';
+import { Star, ArrowLeft, MessageSquare, Sparkles, Filter, Home, ChevronRight, ShieldCheck } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
 export default function TestimonialsPage({ onBackToHome }: { onBackToHome: () => void }) {
@@ -24,73 +24,89 @@ export default function TestimonialsPage({ onBackToHome }: { onBackToHome: () =>
     <div className="min-h-screen bg-[#FAF9F6] text-stone-800 font-sans selection:bg-[#c5a880]/30">
       
       {/* HEADER HERO */}
-      <div className="bg-[#022C22] text-white py-16 px-4 relative overflow-hidden border-b border-[#c5a880]/30 shadow-lg">
-        <div className="absolute inset-0 opacity-10">
-          <div className="w-full h-full bg-[radial-gradient(#c5a880_1px,transparent_1px)] [background-size:20px_20px]"></div>
-        </div>
+      <div className="bg-[#022C22] text-white pt-28 pb-16 px-4 sm:px-6 relative overflow-hidden border-b border-[#c5a880]/30">
         <div className="max-w-7xl mx-auto relative z-10">
-          <button 
-            onClick={onBackToHome}
-            className="group flex items-center space-x-2 border border-white/10 hover:border-[#c5a880]/40 bg-white/5 hover:bg-white/10 px-4 py-2 rounded-sm text-xs font-bold uppercase tracking-widest transition-all text-[#c5a880] mb-8 cursor-pointer"
-          >
-            <ArrowLeft className="w-4 h-4 text-[#c5a880] group-hover:-translate-x-1 transition-transform" />
-            <span>Вернуться на главную</span>
-          </button>
+          {/* Unified Breadcrumbs & Back Button */}
+          <div className="flex flex-wrap items-center justify-between gap-4 mb-8 pb-4 border-b border-white/10">
+            <nav aria-label="Breadcrumb" className="flex items-center flex-wrap gap-2 text-xs font-sans text-stone-300">
+              <button
+                onClick={onBackToHome}
+                className="hover:text-[#c5a880] transition-colors flex items-center gap-1.5 cursor-pointer"
+              >
+                <Home className="w-3.5 h-3.5 text-[#c5a880]" />
+                <span>Главная</span>
+              </button>
+              <ChevronRight className="w-3.5 h-3.5 text-stone-500" />
+              <span className="text-stone-400">О санатории</span>
+              <ChevronRight className="w-3.5 h-3.5 text-stone-500" />
+              <span className="text-[#c5a880] font-semibold">Книга отзывов отдыхающих</span>
+            </nav>
 
-          <span className="text-[#c5a880] text-xs font-sans uppercase tracking-wider font-semibold block">Полная книга отзывов</span>
-          <h1 className="font-serif text-3xl sm:text-5xl font-extrabold mt-3 tracking-tight">
-            Истории наших гостей
+            <button 
+              onClick={onBackToHome}
+              className="group inline-flex items-center space-x-2 border border-[#c5a880]/40 hover:border-[#c5a880] px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-widest transition-all text-[#c5a880] hover:text-white cursor-pointer"
+            >
+              <ArrowLeft className="w-3.5 h-3.5 text-[#c5a880] group-hover:-translate-x-1 transition-transform" />
+              <span>На главную</span>
+            </button>
+          </div>
+
+          <span className="text-[#c5a880] text-xs font-mono uppercase tracking-[0.2em] font-semibold block">
+            Официальная книга отзывов • ФГКУ «Санаторий «Ясная Поляна» ФТС России»
+          </span>
+          <h1 className="font-serif text-3xl sm:text-5xl font-bold mt-3 tracking-tight leading-[1.12]">
+            Истории и впечатления наших гостей
           </h1>
-          <p className="text-stone-300 text-sm sm:text-base mt-4 leading-relaxed max-w-3xl">
-            Искренние отзывы, слова благодарности, напутствия и очерки от отдыхающих, ветеранов и сотрудников Федеральной таможенной службы России о пребывании в санатории «Ясная Поляна» в Гаспре.
+          <p className="text-stone-300 text-sm sm:text-base mt-4 leading-relaxed max-w-[65ch]">
+            Искренние отзывы, слова благодарности и очерки от отдыхающих, ветеранов и сотрудников Федеральной таможенной службы России о лечении и пребывании в санатории «Ясная Поляна» в Гаспре.
           </p>
         </div>
       </div>
 
       {/* 152-FZ COMPLIANCE NOTICE */}
-      <div className="bg-emerald-900/10 border-b border-emerald-900/20 py-3 px-4">
-        <div className="max-w-7xl mx-auto flex items-center gap-2.5 text-xs text-emerald-950 font-sans">
-          <ShieldCheck className="w-4 h-4 text-emerald-700 shrink-0" />
+      <div className="bg-emerald-950/5 border-b border-stone-200 py-3.5 px-4">
+        <div className="max-w-7xl mx-auto flex items-center gap-3 text-xs text-stone-700 font-sans">
+          <ShieldCheck className="w-4 h-4 text-[#022C22] shrink-0" />
           <span>
-            <strong>Соблюдение 152-ФЗ:</strong> В соответствии с Федеральным законом от 27.07.2006 № 152-ФЗ «О персональных данных» и нормами врачебной тайны, все отзывы публикуются исключительно в обезличенном формате без раскрытия персональных сведений, номеров документов и деталей диагнозов.
+            <strong className="text-[#022C22]">Соблюдение № 152-ФЗ:</strong> В соответствии с Федеральным законом от 27.07.2006 № 152-ФЗ «О персональных данных» и нормами врачебной тайны, все отзывы публикуются исключительно в обезличенном формате без раскрытия персональных сведений и деталей диагнозов.
           </span>
         </div>
       </div>
 
       {/* FILTER & TOOLS BAR */}
       <div className="bg-white border-b border-stone-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4">
           
           {/* Rating Filters */}
-          <div className="flex flex-wrap items-center gap-2">
-            <span className="text-xs font-bold uppercase tracking-wider text-stone-500 mr-2 flex items-center gap-1">
+          <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
+            <span className="text-xs font-bold uppercase tracking-wider text-stone-500 mr-2 flex items-center gap-1.5 shrink-0">
               <Filter className="w-3.5 h-3.5 text-[#c5a880]" />
-              Фильтр:
+              Оценка:
             </span>
             <button
               onClick={() => setRatingFilter('all')}
-              className={`px-3.5 py-1.5 rounded-sm text-xs font-semibold uppercase tracking-wider transition-all border cursor-pointer ${
+              className={`px-4 py-2 rounded-lg text-xs font-semibold uppercase tracking-wider transition-all border cursor-pointer whitespace-nowrap font-mono tabular-nums ${
                 ratingFilter === 'all'
-                  ? 'bg-[#022C22] text-[#FAF9F6] border-[#022C22]'
-                  : 'bg-transparent text-stone-600 border-stone-200 hover:border-stone-300 hover:bg-stone-50'
+                  ? 'bg-[#022C22] text-[#c5a880] border-[#022C22]'
+                  : 'bg-transparent text-stone-600 border-stone-200 hover:border-[#c5a880]/60 hover:bg-stone-50'
               }`}
             >
-              Все отзывы ({testimonials.length})
+              Все отзывы ({publishedTestimonials.length})
             </button>
             {[5, 4, 3].map((star) => {
-              const count = testimonials.filter(t => t.rating === star).length;
+              const count = publishedTestimonials.filter(t => t.rating === star).length;
               return (
                 <button
                   key={star}
                   onClick={() => setRatingFilter(star)}
-                  className={`px-3.5 py-1.5 rounded-sm text-xs font-semibold uppercase tracking-wider transition-all border flex items-center gap-1 cursor-pointer ${
+                  className={`px-4 py-2 rounded-lg text-xs font-semibold uppercase tracking-wider transition-all border flex items-center gap-1.5 cursor-pointer whitespace-nowrap font-mono tabular-nums ${
                     ratingFilter === star
-                      ? 'bg-amber-500 text-stone-950 border-amber-500 font-bold'
-                      : 'bg-transparent text-stone-600 border-stone-200 hover:border-stone-300 hover:bg-stone-50'
+                      ? 'bg-[#022C22] text-[#c5a880] border-[#022C22] font-bold'
+                      : 'bg-transparent text-stone-600 border-stone-200 hover:border-[#c5a880]/60 hover:bg-stone-50'
                   }`}
                 >
                   <span>{star} ★</span>
-                  <span className="text-[10px] opacity-70">({count})</span>
+                  <span className="text-[11px] opacity-75">({count})</span>
                 </button>
               );
             })}
@@ -103,7 +119,7 @@ export default function TestimonialsPage({ onBackToHome }: { onBackToHome: () =>
               placeholder="Поиск по отзывам..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full border border-stone-300 rounded-sm px-4 py-2 text-sm focus:outline-none focus:border-[#c5a880]/80 focus:ring-1 focus:ring-[#c5a880]/80"
+              className="w-full bg-stone-50 border border-stone-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-[#022C22] transition-colors"
             />
           </div>
 
@@ -111,21 +127,21 @@ export default function TestimonialsPage({ onBackToHome }: { onBackToHome: () =>
       </div>
 
       {/* REVIEWS GRID AREA */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14 sm:py-16">
         
         {/* Admin Float Helper */}
         {isAdminMode && (
-          <div className="bg-amber-50 border border-amber-300 text-amber-950 p-4 rounded-sm flex items-center justify-between gap-4 mb-8">
+          <div className="bg-amber-50 border border-amber-300 text-amber-950 p-4 rounded-xl flex items-center justify-between gap-4 mb-8">
             <div className="flex items-center space-x-2 text-sm">
-              <span className="p-1 bg-amber-400 rounded text-stone-900 font-bold text-[10px] uppercase font-mono shadow-sm">ADMIN</span>
-              <span>Вы находитесь в режиме администратора. Вы можете удалять или дополнять отзывы.</span>
+              <span className="px-2 py-0.5 bg-amber-400 rounded text-stone-900 font-bold text-[10px] uppercase font-mono">ADMIN</span>
+              <span>Вы находитесь в режиме администратора. Вы можете модерировать, удалять или дополнять отзывы.</span>
             </div>
             <button 
               onClick={() => {
                 setActiveSettingsTab('testimonials');
                 setCurrentPage('admin');
               }}
-              className="bg-amber-500 hover:bg-amber-600 text-stone-900 border border-amber-500 font-bold text-xs uppercase tracking-wider py-2 px-4 rounded transition-all shadow-sm shrink-0 cursor-pointer"
+              className="bg-amber-500 hover:bg-amber-600 text-stone-900 border border-amber-500 font-bold text-xs uppercase tracking-wider py-2 px-4 rounded-lg transition-all shadow-sm shrink-0 cursor-pointer"
             >
               Редактировать в админке
             </button>
@@ -136,43 +152,45 @@ export default function TestimonialsPage({ onBackToHome }: { onBackToHome: () =>
           {filteredTestimonials.length > 0 ? (
             <motion.div 
               layout
-              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 items-stretch"
             >
               {filteredTestimonials.map((t, index) => (
                 <motion.div
                   layout
-                  initial={{ opacity: 0, y: 30 }}
+                  initial={{ opacity: 0, y: 24 }}
                   animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, scale: 0.95 }}
+                  exit={{ opacity: 0, scale: 0.96 }}
                   transition={{ duration: 0.4, delay: Math.min(index * 0.05, 0.3) }}
                   key={t.id}
-                  className="bg-white border border-stone-200/80 p-6 sm:p-8 rounded-sm relative flex flex-col justify-between shadow-md hover:shadow-xl transition-all duration-300"
+                  className="bg-white border border-stone-200/90 hover:border-[#c5a880]/60 p-7 sm:p-8 rounded-xl relative flex flex-col justify-between h-full shadow-sm hover:shadow-xl transition-all duration-300"
                 >
                   <div>
-                    {/* Quotation mark decoration */}
-                    <span className="absolute top-6 right-8 font-serif text-6xl text-stone-100 leading-none select-none select-none">“</span>
-                    
-                    {/* Stars */}
-                    <div className="flex items-center space-x-1 mb-4">
-                      {[...Array(t.rating)].map((_, i) => (
-                        <Star key={i} className="w-4 h-4 fill-amber-400 text-amber-400" />
-                      ))}
-                      {[...Array(5 - t.rating)].map((_, i) => (
-                        <Star key={i} className="w-4 h-4 text-stone-200" />
-                      ))}
+                    <div className="flex items-center justify-between mb-5 pb-3 border-b border-stone-100">
+                      {/* Stars */}
+                      <div className="flex items-center space-x-1">
+                        {[...Array(t.rating)].map((_, i) => (
+                          <Star key={i} className="w-4 h-4 fill-[#c5a880] text-[#c5a880]" />
+                        ))}
+                        {[...Array(5 - t.rating)].map((_, i) => (
+                          <Star key={i} className="w-4 h-4 text-stone-200" />
+                        ))}
+                      </div>
+                      <span className="font-mono text-[11px] tabular-nums text-stone-400">
+                        № {String(index + 1).padStart(2, '0')}
+                      </span>
                     </div>
 
-                    <p className="text-stone-700 text-xs sm:text-sm leading-relaxed italic mb-6">
+                    <p className="text-stone-700 text-sm leading-relaxed italic mb-6">
                       «{t.text}»
                     </p>
                   </div>
 
                   {/* Author line */}
                   <div className="border-t border-stone-100 pt-4 mt-auto">
-                    <h4 className="font-serif font-bold text-sm sm:text-base text-[#022C22]">{t.author}</h4>
-                    <div className="flex justify-between items-center text-xs text-stone-600 font-sans tracking-wide mt-1.5">
+                    <h4 className="font-serif font-bold text-base text-[#022C22]">{t.author}</h4>
+                    <div className="flex justify-between items-center text-xs text-stone-500 font-sans mt-1.5 gap-2">
                       <span>{t.role}</span>
-                      <span className="font-mono tabular-nums">{t.date}</span>
+                      <span className="font-mono tabular-nums text-stone-600 shrink-0">{t.date}</span>
                     </div>
                   </div>
                 </motion.div>
@@ -185,7 +203,7 @@ export default function TestimonialsPage({ onBackToHome }: { onBackToHome: () =>
               className="text-center py-16 bg-white rounded-xl border border-stone-200 max-w-xl mx-auto shadow-sm"
             >
               <MessageSquare className="w-12 h-12 text-stone-300 mx-auto mb-4" />
-              <h3 className="font-serif font-semibold text-lg text-stone-800">Отзывы не найдены</h3>
+              <h3 className="font-serif font-semibold text-lg text-[#022C22]">Отзывы не найдены</h3>
               <p className="text-xs text-stone-600 mt-2 font-sans">
                 Попробуйте изменить параметры фильтрации или поисковый запрос.
               </p>
@@ -194,9 +212,9 @@ export default function TestimonialsPage({ onBackToHome }: { onBackToHome: () =>
                   setRatingFilter('all');
                   setSearchQuery('');
                 }}
-                className="mt-4 text-xs font-bold uppercase tracking-wider text-[#c5a880] border border-stone-200 bg-white hover:bg-stone-50 py-2 px-4 rounded-lg transition-all shadow-sm cursor-pointer font-sans"
+                className="mt-4 text-xs font-bold uppercase tracking-wider text-[#022C22] border border-[#c5a880] bg-white hover:bg-[#FAF9F6] py-2.5 px-5 rounded-lg transition-all cursor-pointer font-sans"
               >
-                Сбросить поиск
+                Сбросить фильтр
               </button>
             </motion.div>
           )}
@@ -204,17 +222,16 @@ export default function TestimonialsPage({ onBackToHome }: { onBackToHome: () =>
 
         {/* BOTTOM CALL TO ACTION */}
         <div className="mt-20 border-t border-stone-200 pt-16 text-center max-w-2xl mx-auto">
-          <div className="w-12 h-12 bg-[#c5a880]/15 border border-[#c5a880] rounded-full flex items-center justify-center text-[#c5a880] mx-auto text-lg mb-4">
-            ✍️
+          <div className="w-12 h-12 bg-[#022C22] border border-[#c5a880]/40 rounded-xl flex items-center justify-center text-[#c5a880] mx-auto mb-5">
+            <MessageSquare className="w-5 h-5" />
           </div>
-          <h3 className="font-serif font-extrabold text-2xl text-[#022C22]">Добавить свой отзыв</h3>
-          <p className="text-xs sm:text-sm text-stone-600 mt-2 mb-6 leading-relaxed font-sans">
-            Ваши отзывы помогают делать лечение и гостеприимство в санатории еще качественнее. Нажмите кнопку ниже, чтобы вернуться на главную страницу и заполнить форму обратной связи.
+          <h3 className="font-serif font-bold text-2xl sm:text-3xl text-[#022C22]">Оставить отзыв о пребывании</h3>
+          <p className="text-sm text-stone-600 mt-3 mb-8 leading-relaxed font-sans max-w-[60ch] mx-auto">
+            Ваши отзывы помогают нам поддерживать высокий стандарт санаторно-курортного лечения и гостеприимства. Нажмите кнопку ниже, чтобы перейти к форме отправки отзыва.
           </p>
           <button
             onClick={() => {
               onBackToHome();
-              // Scroll to review form after back to home
               setTimeout(() => {
                 const element = document.getElementById('booking');
                 if (element) {
@@ -222,10 +239,10 @@ export default function TestimonialsPage({ onBackToHome }: { onBackToHome: () =>
                 }
               }, 400);
             }}
-            className="bg-[#022C22] hover:bg-[#c5a880] text-white hover:text-[#022C22] p-4 text-xs font-bold uppercase tracking-widest transition-all rounded-sm shadow-md cursor-pointer inline-flex items-center gap-2"
+            className="bg-[#022C22] hover:bg-[#033E31] text-white border border-[#c5a880]/40 px-7 py-4 text-xs font-bold uppercase tracking-widest transition-all rounded-lg shadow-md cursor-pointer inline-flex items-center gap-2.5"
           >
             <Sparkles className="w-4 h-4 text-[#c5a880]" />
-            Поделиться своими впечатлениями
+            <span>Поделиться впечатлениями</span>
           </button>
         </div>
 
@@ -233,8 +250,8 @@ export default function TestimonialsPage({ onBackToHome }: { onBackToHome: () =>
 
       {/* FOOTER BAR */}
       <footer className="bg-stone-100 border-t border-stone-200 py-6 text-center">
-        <p className="text-[10px] text-stone-400 font-mono tracking-wide uppercase">
-          Санаторий ФТС России «Ясная Поляна» • Гаспра 2026
+        <p className="text-[11px] text-stone-500 font-mono tabular-nums tracking-wider uppercase">
+          ФГКУ «Санаторий «Ясная Поляна» ФТС России» • ПГТ Гаспра • 2026
         </p>
       </footer>
 

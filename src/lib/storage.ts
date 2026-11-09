@@ -371,3 +371,19 @@ export function compressImageFile(
     reader.readAsDataURL(file);
   });
 }
+
+/**
+ * Backward-compatible compressImage supporting callback signature or promise
+ */
+export function compressImage(
+  file: File,
+  maxDim: number = 1200,
+  quality: number = 0.78,
+  callback?: (base64: string) => void
+): Promise<string> {
+  const p = compressImageFile(file, maxDim, quality);
+  if (callback) {
+    p.then(callback);
+  }
+  return p;
+}

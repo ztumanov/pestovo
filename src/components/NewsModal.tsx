@@ -13,6 +13,8 @@ import {
   CheckCircle2,
   Share2
 } from 'lucide-react';
+import { useAdminData } from '../context/AdminDataContext';
+import NewsArticleContent from './NewsArticleContent';
 
 interface NewsModalProps {
   isOpen: boolean;
@@ -28,7 +30,7 @@ interface NewsItem {
   author: string;
   readTime: string;
   summary: string;
-  content: string[];
+  content: string[] | string;
   image: string;
 }
 
@@ -100,6 +102,7 @@ const NEWS_REGISTRY: NewsItem[] = [
 ];
 
 export default function NewsModal({ isOpen, onClose }: NewsModalProps) {
+  const { siteData } = useAdminData();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [viewingArticle, setViewingArticle] = useState<NewsItem | null>(null);
@@ -107,11 +110,32 @@ export default function NewsModal({ isOpen, onClose }: NewsModalProps) {
 
   if (!isOpen) return null;
 
-  const filteredNews = NEWS_REGISTRY.filter((item) => {
+  // Convert siteData.news to NewsItem format and prepend/merge with NEWS_REGISTRY
+  const siteNewsFormatted: NewsItem[] = (siteData.news || []).map((n) => ({
+    id: n.id,
+    title: n.title,
+    date: n.date,
+    category: 'event' as const,
+    categoryLabel: n.categoryLabel || 'События',
+    author: n.author || 'Пресс-служба санатория',
+    readTime: n.readTime || '3 мин читать',
+    summary: n.excerpt || (typeof n.content === 'string' ? n.content.replace(/<[^>]*>?/gm, '').slice(0, 160) + '...' : ''),
+    content: n.content,
+    image: n.image
+  }));
+
+  const allNewsList: NewsItem[] = [
+    ...siteNewsFormatted,
+    ...NEWS_REGISTRY.filter(r => !siteNewsFormatted.some(s => s.id === r.id))
+  ];
+
+  const filteredNews = allNewsList.filter((item) => {
+    const summaryText = typeof item.summary === 'string' ? item.summary : '';
+    const authorText = typeof item.author === 'string' ? item.author : '';
     const matchesSearch = item.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                          item.summary.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                          item.author.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesCategory = selectedCategory === 'all' || item.category === selectedCategory;
+                          summaryText.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                          authorText.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesCategory = selectedCategory === 'all' || item.category === selectedCategory || item.categoryLabel.toLowerCase() === selectedCategory;
     return matchesSearch && matchesCategory;
   });
 
@@ -367,16 +391,16 @@ export default function NewsModal({ isOpen, onClose }: NewsModalProps) {
                     </div>
 
                     {/* Leading highlight paragraph */}
-                    <p className="text-base sm:text-lg font-serif font-semibold text-[#022C22] italic leading-relaxed border-l-4 border-[#c5a880] pl-4">
-                      {viewingArticle.summary}
-                    </p>
-
-                    {/* Rest of full textual fragments of content */}
-                    {viewingArticle.content.map((paragraph, idx) => (
-                      <p key={idx} className="text-stone-700 text-sm sm:text-base leading-relaxed">
-                        {paragraph}
+                    {viewingArticle.summary && (
+                      <p className="text-base sm:text-lg font-serif font-semibold text-[#022C22] italic leading-relaxed border-l-4 border-[#c5a880] pl-4 bg-amber-50/40 py-2 rounded-r-lg">
+                        {viewingArticle.summary}
                       </p>
-                    ))}
+                    )}
+
+                    {/* Rest of full textual fragments of content rendered with support for docx tables & images */}
+                    <NewsArticleContent 
+                      content={Array.isArray(viewingArticle.content) ? viewingArticle.content.join('\n\n') : viewingArticle.content} 
+                    />
 
                     {/* Disclaimer annotation footer */}
                     <div className="mt-10 p-5 bg-stone-100 rounded-sm border border-stone-200 text-xs text-stone-600 leading-relaxed font-sans">

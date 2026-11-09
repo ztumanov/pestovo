@@ -227,7 +227,7 @@ export async function generateDocumentPdfBlobUrl(doc: Partial<DocumentItem> & { 
   ctx.textAlign = 'left';
   ctx.font = 'bold 14px "Times New Roman", Georgia, serif';
   ctx.fillStyle = '#111827';
-  ctx.fillText('и.о. Начальника санатория', width - 480, bottomY + 30);
+  ctx.fillText('Начальник санатория', width - 480, bottomY + 30);
   
   // Simulated handwritten signature
   ctx.strokeStyle = '#1E3A8A';
@@ -240,7 +240,7 @@ export async function generateDocumentPdfBlobUrl(doc: Partial<DocumentItem> & { 
 
   ctx.font = '14px "Times New Roman", Georgia, serif';
   ctx.fillStyle = '#374151';
-  ctx.fillText('А. И. Данилив', width - 220, bottomY + 48);
+  ctx.fillText('С. В. Шапортов', width - 220, bottomY + 48);
 
   ctx.strokeStyle = '#9CA3AF';
   ctx.lineWidth = 1;

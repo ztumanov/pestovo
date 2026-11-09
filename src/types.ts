@@ -48,6 +48,10 @@ export interface NewsArticle {
   image: string;
   content: string;
   excerpt?: string;
+  categoryLabel?: string;
+  author?: string;
+  readTime?: string;
+  summary?: string;
 }
 
 export interface ServiceItem {

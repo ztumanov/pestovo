@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useAdminData, SiteData, deepCleanAssetPaths } from '../context/AdminDataContext';
 import { 
   X, 
@@ -28,6 +28,7 @@ import {
   Newspaper,
   Check,
   Edit2,
+  Edit3,
   Users,
   Shield,
   Key,
@@ -40,11 +41,24 @@ import {
   Upload,
   UploadCloud,
   CheckCircle2,
-  AlertTriangle
+  AlertTriangle,
+  FileSpreadsheet,
+  Bold,
+  Italic,
+  Heading,
+  List,
+  Quote,
+  Minus,
+  Clipboard,
+  Tag,
+  User
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Room, MedicalProgram, Testimonial, FAQItem, NewsArticle, ServiceItem, GalleryItem, GalleryCategory, AdminUser, DocumentItem } from '../types';
 import { calculateStorageSize, clearStorageData, compressImageFile } from '../lib/storage';
+import NewsDocxTableModal from './NewsDocxTableModal';
+import NewsImageInsertModal from './NewsImageInsertModal';
+import NewsArticleContent from './NewsArticleContent';
 
 /**
  * High-efficiency compression utility that downscales and optimizes images
@@ -1900,97 +1914,202 @@ export default function AdminPage({ onBackToHome }: { onBackToHome: () => void }
             <div className="space-y-6">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-stone-200 pb-3">
                 <div>
-                  <h3 className="font-serif font-black text-xl text-[#022C22]">Новости и события</h3>
-                  <p className="text-xs text-stone-400 mt-1">Публикация новостей, акций и важных событий санатория.</p>
+                  <h3 className="font-serif font-black text-xl text-[#022C22]">Новости и публикации</h3>
+                  <p className="text-xs text-stone-500 mt-1">
+                    Управление новостями, статьями, вставка таблиц из Word (.docx) и иллюстраций в текст статей.
+                  </p>
                 </div>
-                {!showAddNews && (
+                {!showAddNews && !editingNewsId && (
                   <button 
-                    onClick={() => setShowAddNews(true)}
-                    className="bg-[#022C22] text-[#FAF9F6] border border-stone-900 px-4 py-2 rounded-lg text-xs font-bold font-mono tracking-wider hover:bg-[#c5a880] hover:text-[#022C22] hover:border-transparent transition-all flex items-center space-x-2 shrink-0 shadow-sm"
+                    onClick={() => {
+                      setShowAddNews(true);
+                      setEditingNewsId(null);
+                    }}
+                    className="bg-[#022C22] text-[#FAF9F6] border border-stone-900 px-4 py-2.5 rounded-xl text-xs font-bold font-mono tracking-wider hover:bg-[#c5a880] hover:text-[#022C22] hover:border-transparent transition-all flex items-center space-x-2 shrink-0 shadow-sm cursor-pointer"
                   >
-                    <Plus className="w-3.5 h-3.5" />
+                    <Plus className="w-4 h-4" />
                     <span>Добавить новость</span>
                   </button>
                 )}
               </div>
 
-              {/* NEWS LIST */}
-              {!showAddNews && (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {(news?.length || 0) === 0 && (
-                    <div className="col-span-full py-8 text-center bg-white rounded-xl border border-dashed border-stone-300 text-stone-500 font-serif">
-                      Новостей пока нет
-                    </div>
-                  )}
-                  {news.map(n => (
-                    <div key={n.id} className="bg-white rounded-xl p-0 overflow-hidden shadow-sm border border-stone-200 flex flex-col relative group">
-                      {editingNewsId === n.id ? (
-                        <div className="p-1 border-b-4 border-amber-500">
-                          <h4 className="font-bold text-xs uppercase tracking-wider text-amber-700 bg-amber-50 px-3 py-2 mb-2 rounded-md flex items-center gap-2">
-                            <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
-                            ⚙️ Редактирование новости:
+              {/* DEDICATED FULL-WIDTH EDIT FORM */}
+              {editingNewsId && (() => {
+                const currentNews = news.find(n => n.id === editingNewsId);
+                if (!currentNews) return null;
+                return (
+                  <div className="bg-white rounded-2xl shadow-xl border border-stone-200 overflow-hidden border-t-4 border-t-amber-500 mb-8 animate-fadeIn">
+                    <div className="bg-gradient-to-r from-amber-50 via-white to-amber-50/40 px-6 py-4 border-b border-amber-200 flex items-center justify-between">
+                      <div className="flex items-center space-x-3">
+                        <span className="w-3 h-3 rounded-full bg-amber-500 animate-pulse"></span>
+                        <div>
+                          <h4 className="font-bold text-sm sm:text-base font-serif text-[#022C22]">
+                            Редактирование новости: «{currentNews.title || 'Без названия'}»
                           </h4>
-                          <NewsForm 
-                            initialData={n}
-                            onCancel={() => setEditingNewsId(null)}
-                            onSave={(data) => handleUpdateNews(n.id, { ...data, id: n.id })}
-                          />
+                          <p className="text-xs text-stone-500 font-sans">
+                            Используйте кнопки редактора для вставки таблиц из Word (.docx) и фотографий в текст
+                          </p>
                         </div>
-                      ) : (
-                        <div className="flex flex-col h-full">
-                          <div className="h-40 bg-stone-100 relative">
-                            <img src={n.image} alt={n.title} className="w-full h-full object-cover" />
-                            <div className="absolute top-2 left-2 bg-black/60 text-white px-2 py-0.5 rounded text-[10px] font-mono backdrop-blur-sm">
-                              {n.date}
-                            </div>
-                          </div>
-                          <div className="p-4 flex flex-col flex-grow">
-                            <h4 className="font-serif font-bold text-[#022C22] text-sm mb-1 leading-snug line-clamp-2">{n.title}</h4>
-                            <p className="text-xs text-stone-500 leading-relaxed line-clamp-3 mb-4">{n.excerpt || n.content}</p>
-                            <div className="mt-auto flex justify-end gap-2 pt-2 border-t border-stone-100">
-                              <button 
-                                onClick={() => setEditingNewsId(n.id)}
-                                className="p-1.5 text-stone-400 hover:text-[#022C22] hover:bg-stone-100 rounded transition-colors bg-white outline outline-1 outline-stone-200"
-                                title="Редактировать"
-                              >
-                                <Settings className="w-4 h-4" />
-                              </button>
-                              <button 
-                                onClick={() => handleDeleteNews(n.id)}
-                                className="p-1.5 text-stone-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors bg-white outline outline-1 outline-stone-200"
-                                title="Удалить"
-                              >
-                                <Trash2 className="w-4 h-4" />
-                              </button>
-                            </div>
-                          </div>
-                        </div>
-                      )}
+                      </div>
+                      <button 
+                        onClick={() => setEditingNewsId(null)}
+                        className="text-stone-400 hover:text-stone-700 p-2 hover:bg-stone-100 rounded-xl transition-colors cursor-pointer"
+                        title="Закрыть редактор"
+                      >
+                        <X className="w-5 h-5" />
+                      </button>
                     </div>
-                  ))}
-                </div>
-              )}
+                    <NewsForm 
+                      initialData={currentNews}
+                      onCancel={() => setEditingNewsId(null)}
+                      onSave={(data) => handleUpdateNews(currentNews.id, { ...data, id: currentNews.id })}
+                    />
+                  </div>
+                );
+              })()}
 
-              {/* ADD NEWS FORM */}
+              {/* DEDICATED FULL-WIDTH CREATE FORM */}
               {showAddNews && (
-                <div className="bg-white rounded-xl shadow-lg border border-stone-200 p-2 border-l-4 border-l-[#022C22]">
-                  <h4 className="font-bold text-xs uppercase tracking-wider text-[#022C22] bg-[#022C22]/5 px-4 py-3 mb-2 rounded-md flex items-center gap-2">
-                    <Plus className="w-4 h-4 text-[#022C22]" />
-                    Создание новой записи
-                  </h4>
+                <div className="bg-white rounded-2xl shadow-xl border border-stone-200 overflow-hidden border-t-4 border-t-[#022C22] mb-8 animate-fadeIn">
+                  <div className="bg-[#022C22]/5 px-6 py-4 border-b border-stone-200 flex items-center justify-between">
+                    <div className="flex items-center space-x-3">
+                      <div className="w-8 h-8 rounded-lg bg-[#022C22] text-[#c5a880] flex items-center justify-center font-bold">
+                        <Plus className="w-4 h-4" />
+                      </div>
+                      <div>
+                        <h4 className="font-bold text-sm sm:text-base font-serif text-[#022C22]">
+                          Создание новой новости или публикации
+                        </h4>
+                        <p className="text-xs text-stone-500 font-sans">
+                          Заполните поля и используйте встроенный редактор с поддержкой таблиц Word и фото
+                        </p>
+                      </div>
+                    </div>
+                    <button 
+                      onClick={() => setShowAddNews(false)}
+                      className="text-stone-400 hover:text-stone-700 p-2 hover:bg-stone-100 rounded-xl transition-colors cursor-pointer"
+                      title="Отмена"
+                    >
+                      <X className="w-5 h-5" />
+                    </button>
+                  </div>
                   <NewsForm 
                     initialData={{
                       title: '',
                       date: new Date().toLocaleDateString('ru-RU'),
                       image: '',
                       excerpt: '',
-                      content: ''
+                      content: '',
+                      categoryLabel: 'События',
+                      author: 'Пресс-служба санатория',
+                      readTime: '3 мин читать'
                     }}
                     onCancel={() => setShowAddNews(false)}
                     onSave={handleAddNews}
                   />
                 </div>
               )}
+
+              {/* NEWS LIST CARDS */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                {(news?.length || 0) === 0 && (
+                  <div className="col-span-full py-12 text-center bg-white rounded-2xl border border-dashed border-stone-300 text-stone-500 font-serif">
+                    <Newspaper className="w-12 h-12 mx-auto text-stone-300 mb-3" />
+                    <p className="text-lg">Новостей пока нет</p>
+                    <p className="text-xs text-stone-400 mt-1">Нажмите «Добавить новость», чтобы опубликовать первую запись</p>
+                  </div>
+                )}
+                {news.map(n => {
+                  const hasTable = n.content.includes('<table') || n.content.includes('| --- |');
+                  const hasEmbeddedImg = n.content.includes('<figure') || n.content.includes('![');
+                  const isEditingThis = editingNewsId === n.id;
+
+                  return (
+                    <div 
+                      key={n.id} 
+                      className={`bg-white rounded-2xl overflow-hidden shadow-sm border transition-all flex flex-col relative group ${
+                        isEditingThis 
+                          ? 'ring-2 ring-amber-500 border-amber-500 bg-amber-50/10' 
+                          : 'border-stone-200 hover:border-[#c5a880]/60 hover:shadow-md'
+                      }`}
+                    >
+                      <div className="h-44 bg-stone-100 relative overflow-hidden">
+                        <img 
+                          src={n.image} 
+                          alt={n.title} 
+                          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" 
+                          referrerPolicy="no-referrer"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent pointer-events-none" />
+                        
+                        <div className="absolute top-3 left-3 flex flex-wrap gap-1.5">
+                          {n.categoryLabel && (
+                            <span className="bg-[#022C22]/90 text-[#c5a880] text-[10px] font-bold px-2.5 py-0.5 rounded backdrop-blur-sm uppercase tracking-wider border border-[#c5a880]/30 font-mono">
+                              {n.categoryLabel}
+                            </span>
+                          )}
+                        </div>
+
+                        <div className="absolute bottom-3 left-3 text-white flex items-center space-x-2 text-xs font-mono">
+                          <span className="bg-black/60 px-2 py-0.5 rounded backdrop-blur-sm font-bold">{n.date}</span>
+                          {n.author && (
+                            <span className="text-stone-300 text-[11px] truncate max-w-[150px] hidden sm:inline">
+                              · {n.author}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+
+                      <div className="p-5 flex flex-col flex-grow">
+                        <h4 className="font-serif font-bold text-[#022C22] text-base mb-2 leading-snug line-clamp-2">
+                          {n.title}
+                        </h4>
+                        <p className="text-xs text-stone-500 leading-relaxed line-clamp-3 mb-4 flex-grow">
+                          {n.excerpt || n.content.replace(/<[^>]*>?/gm, '').slice(0, 160) + '...'}
+                        </p>
+
+                        {/* Content features indicators */}
+                        <div className="flex flex-wrap gap-2 mb-4 pt-2 border-t border-stone-100">
+                          {hasTable && (
+                            <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-50 text-emerald-800 border border-emerald-200 font-mono">
+                              <FileSpreadsheet className="w-3 h-3 text-emerald-600" />
+                              Встроена таблица
+                            </span>
+                          )}
+                          {hasEmbeddedImg && (
+                            <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded bg-blue-50 text-blue-800 border border-blue-200 font-mono">
+                              <ImageIcon className="w-3 h-3 text-blue-600" />
+                              Фото в тексте
+                            </span>
+                          )}
+                        </div>
+
+                        <div className="mt-auto flex items-center justify-between gap-2 pt-3 border-t border-stone-100">
+                          <button 
+                            onClick={() => {
+                              setEditingNewsId(n.id);
+                              setShowAddNews(false);
+                            }}
+                            className="flex items-center space-x-1.5 px-3.5 py-1.5 bg-[#022C22] text-[#FAF9F6] hover:bg-[#c5a880] hover:text-[#022C22] rounded-lg text-xs font-bold transition-all shadow-xs cursor-pointer"
+                            title="Редактировать новость"
+                          >
+                            <Edit3 className="w-3.5 h-3.5" />
+                            <span>Редактировать</span>
+                          </button>
+
+                          <button 
+                            onClick={() => handleDeleteNews(n.id)}
+                            className="p-1.5 text-stone-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors border border-stone-200 cursor-pointer"
+                            title="Удалить новость"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
           )}
 
@@ -4289,12 +4408,27 @@ interface NewsFormProps {
 }
 
 function NewsForm({ initialData, onCancel, onSave }: NewsFormProps) {
-  const [title, setTitle] = useState(initialData.title);
-  const [date, setDate] = useState(initialData.date);
-  const [image, setImage] = useState(initialData.image);
+  const [title, setTitle] = useState(initialData.title || '');
+  const [date, setDate] = useState(initialData.date || new Date().toLocaleDateString('ru-RU'));
+  const [image, setImage] = useState(initialData.image || '');
   const [excerpt, setExcerpt] = useState(initialData.excerpt || '');
-  const [content, setContent] = useState(initialData.content);
-  const [dragActive, setDragActive] = useState(false);
+  const [content, setContent] = useState(initialData.content || '');
+  const [categoryLabel, setCategoryLabel] = useState(initialData.categoryLabel || 'События');
+  const [author, setAuthor] = useState(initialData.author || 'Пресс-служба санатория');
+  const [readTime, setReadTime] = useState(initialData.readTime || '3 мин читать');
+
+  // Modals & Rich Editor States
+  const [isDocxModalOpen, setIsDocxModalOpen] = useState(false);
+  const [docxInitialFile, setDocxInitialFile] = useState<File | null>(null);
+  const [docxInitialTab, setDocxInitialTab] = useState<'docx' | 'paste' | 'builder'>('docx');
+
+  const [isImageModalOpen, setIsImageModalOpen] = useState(false);
+  const [imageInitialFile, setImageInitialFile] = useState<File | null>(null);
+
+  const [activeEditorTab, setActiveEditorTab] = useState<'edit' | 'preview'>('edit');
+  const [coverDragActive, setCoverDragActive] = useState(false);
+  const [contentDragActive, setContentDragActive] = useState(false);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const handleNewsImageFile = (file: File) => {
     if (!file.type.startsWith('image/')) {
@@ -4306,34 +4440,186 @@ function NewsForm({ initialData, onCancel, onSave }: NewsFormProps) {
     });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!title || !date || !image || !content) {
-      alert("Пожалуйста, заполните основные поля (заголовок, дата, картинка, текст).");
+  const insertAtCursor = (textToInsert: string) => {
+    const textarea = textareaRef.current;
+    if (!textarea) {
+      setContent(prev => (prev ? prev + '\n\n' + textToInsert : textToInsert));
       return;
     }
-    onSave({ title, date, image, excerpt, content });
+    const start = textarea.selectionStart ?? content.length;
+    const end = textarea.selectionEnd ?? content.length;
+    const before = content.substring(0, start);
+    const after = content.substring(end);
+    const newContent = before + textToInsert + after;
+    setContent(newContent);
+    setTimeout(() => {
+      textarea.focus();
+      const newPos = start + textToInsert.length;
+      textarea.setSelectionRange(newPos, newPos);
+    }, 50);
   };
 
+  const wrapSelection = (prefix: string, suffix: string, defaultText: string) => {
+    const textarea = textareaRef.current;
+    if (!textarea) return;
+    const start = textarea.selectionStart ?? 0;
+    const end = textarea.selectionEnd ?? 0;
+    const selected = content.substring(start, end) || defaultText;
+    const replacement = prefix + selected + suffix;
+    const newContent = content.substring(0, start) + replacement + content.substring(end);
+    setContent(newContent);
+    setTimeout(() => {
+      textarea.focus();
+      textarea.setSelectionRange(start + prefix.length, start + prefix.length + selected.length);
+    }, 50);
+  };
+
+  const handleContentDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setContentDragActive(false);
+    const file = e.dataTransfer.files?.[0];
+    if (!file) return;
+
+    if (file.name.toLowerCase().endsWith('.docx') || file.name.toLowerCase().endsWith('.doc')) {
+      setDocxInitialFile(file);
+      setDocxInitialTab('docx');
+      setIsDocxModalOpen(true);
+    } else if (file.type.startsWith('image/')) {
+      setImageInitialFile(file);
+      setIsImageModalOpen(true);
+    }
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!title.trim() || !date.trim() || !image.trim() || !content.trim()) {
+      alert("Пожалуйста, заполните основные поля: заголовок, дату публикации, фото обложки и текст статьи.");
+      return;
+    }
+    onSave({ 
+      title: title.trim(), 
+      date: date.trim(), 
+      image: image.trim(), 
+      excerpt: excerpt.trim(), 
+      content: content.trim(),
+      categoryLabel: categoryLabel.trim(),
+      author: author.trim(),
+      readTime: readTime.trim(),
+      summary: excerpt.trim()
+    });
+  };
+
+  // Detect embedded features count for preview badge
+  const tableCount = (content.match(/<table/gi) || []).length + (content.match(/\|\s*---/g) || []).length;
+  const imageCount = (content.match(/<figure/gi) || []).length + (content.match(/!\[/g) || []).length;
+
   return (
-    <form onSubmit={handleSubmit} className="p-4 sm:p-6 space-y-4">
-      <div>
-        <label className="block text-xs font-bold uppercase tracking-wider text-stone-600 mb-1 font-sans">Заголовок новости</label>
-        <input required type="text" value={title} onChange={e => setTitle(e.target.value)} className="w-full bg-stone-50 border border-stone-200 rounded-xl px-4 py-2 font-sans font-semibold text-sm text-[#022C22] focus:outline-none focus:border-[#c5a880]" placeholder="Например: Открытие нового корпуса" />
-      </div>
-      <div>
-        <label className="block text-xs font-bold uppercase tracking-wider text-stone-600 mb-1 font-sans">Дата публикации</label>
-        <input required type="text" value={date} onChange={e => setDate(e.target.value)} className="w-full bg-stone-50 border border-stone-200 rounded-xl px-4 py-2 text-sm text-[#022C22] focus:outline-none focus:border-[#c5a880] font-sans" placeholder="Например: 10.05.2026" />
+    <form onSubmit={handleSubmit} className="p-4 sm:p-6 space-y-6">
+      {/* 1. TOP METADATA ROW */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 bg-stone-50/80 p-4 rounded-2xl border border-stone-200">
+        <div className="md:col-span-2">
+          <label className="block text-xs font-bold uppercase tracking-wider text-stone-700 mb-1.5 font-sans">
+            Заголовок новости <span className="text-red-500">*</span>
+          </label>
+          <input 
+            required 
+            type="text" 
+            value={title} 
+            onChange={e => setTitle(e.target.value)} 
+            className="w-full bg-white border border-stone-300 rounded-xl px-4 py-2.5 font-sans font-semibold text-sm text-[#022C22] focus:outline-none focus:border-[#c5a880] shadow-2xs" 
+            placeholder="Например: Открытие нового лечебного корпуса в Гаспре" 
+          />
+        </div>
+
+        <div>
+          <label className="block text-xs font-bold uppercase tracking-wider text-stone-700 mb-1.5 font-sans">
+            Категория
+          </label>
+          <select
+            value={categoryLabel}
+            onChange={e => setCategoryLabel(e.target.value)}
+            className="w-full bg-white border border-stone-300 rounded-xl px-3 py-2.5 text-xs sm:text-sm text-[#022C22] font-semibold focus:outline-none focus:border-[#c5a880] shadow-2xs"
+          >
+            <option value="События">События</option>
+            <option value="Оборудование">Оборудование</option>
+            <option value="Объявления">Объявления</option>
+            <option value="Статьи">Статьи</option>
+            <option value="Лечение">Лечение и оздоровление</option>
+            <option value="Акции">Сезонные акции</option>
+          </select>
+        </div>
+
+        <div>
+          <label className="block text-xs font-bold uppercase tracking-wider text-stone-700 mb-1.5 font-sans">
+            Дата публикации <span className="text-red-500">*</span>
+          </label>
+          <div className="flex gap-1.5">
+            <input 
+              required 
+              type="text" 
+              value={date} 
+              onChange={e => setDate(e.target.value)} 
+              className="w-full bg-white border border-stone-300 rounded-xl px-3 py-2.5 text-xs sm:text-sm text-[#022C22] focus:outline-none focus:border-[#c5a880] font-mono shadow-2xs" 
+              placeholder="ДД.ММ.ГГГГ" 
+            />
+            <button
+              type="button"
+              onClick={() => setDate(new Date().toLocaleDateString('ru-RU'))}
+              className="px-2.5 py-1 bg-stone-200 hover:bg-stone-300 text-stone-700 rounded-lg text-[10px] font-bold shrink-0 transition-colors"
+              title="Сегодня"
+            >
+              Сегодня
+            </button>
+          </div>
+        </div>
       </div>
 
+      {/* 2. AUTHOR & READ TIME ROW */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div>
+          <label className="block text-xs font-bold uppercase tracking-wider text-stone-600 mb-1.5 font-sans">
+            Автор / Служба
+          </label>
+          <input 
+            type="text" 
+            value={author} 
+            onChange={e => setAuthor(e.target.value)} 
+            className="w-full bg-stone-50 border border-stone-200 rounded-xl px-4 py-2 text-xs sm:text-sm text-[#022C22] focus:outline-none focus:border-[#c5a880]" 
+            placeholder="Например: Медицинская служба санатория" 
+          />
+        </div>
+        <div>
+          <label className="block text-xs font-bold uppercase tracking-wider text-stone-600 mb-1.5 font-sans">
+            Время чтения
+          </label>
+          <input 
+            type="text" 
+            value={readTime} 
+            onChange={e => setReadTime(e.target.value)} 
+            className="w-full bg-stone-50 border border-stone-200 rounded-xl px-4 py-2 text-xs sm:text-sm text-[#022C22] focus:outline-none focus:border-[#c5a880]" 
+            placeholder="Например: 3 мин читать" 
+          />
+        </div>
+      </div>
+
+      {/* 3. COVER IMAGE SECTION */}
       <div>
-        <label className="block text-[10px] font-bold uppercase tracking-wider text-stone-400 mb-1">Изображение к новости</label>
+        <label className="block text-xs font-bold uppercase tracking-wider text-stone-700 mb-1.5 font-sans">
+          Главная фотография обложки <span className="text-red-500">*</span>
+        </label>
         <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
-          <input required type="text" value={image} onChange={e => setImage(e.target.value)} className="flex-1 bg-stone-50 border border-stone-200 rounded-xl px-4 py-2 font-mono text-xs text-[#022C22] focus:outline-none focus:border-[#c5a880]" placeholder="https://... или загрузите файл" />
+          <input 
+            required 
+            type="text" 
+            value={image} 
+            onChange={e => setImage(e.target.value)} 
+            className="flex-1 w-full bg-stone-50 border border-stone-200 rounded-xl px-4 py-2.5 font-mono text-xs text-[#022C22] focus:outline-none focus:border-[#c5a880]" 
+            placeholder="https://... или загрузите файл с компьютера" 
+          />
           
-          <label className="cursor-pointer bg-white hover:bg-stone-50 border border-[#c5a880] text-[#022C22] px-4 py-2 rounded-xl text-xs font-bold transition-all shadow-sm shrink-0 flex items-center gap-1.5">
-            <Upload className="w-3.5 h-3.5 text-[#c5a880]" />
-            <span>Загрузить фото</span>
+          <label className="cursor-pointer bg-[#022C22] hover:bg-[#c5a880] text-[#FAF9F6] hover:text-[#022C22] px-4 py-2.5 rounded-xl text-xs font-bold transition-all shadow-sm shrink-0 flex items-center gap-1.5">
+            <Upload className="w-3.5 h-3.5 text-[#c5a880] group-hover:text-[#022C22]" />
+            <span>Загрузить фото обложки</span>
             <input 
               type="file" 
               accept="image/*" 
@@ -4347,46 +4633,305 @@ function NewsForm({ initialData, onCancel, onSave }: NewsFormProps) {
           </label>
         </div>
 
-        {/* Drag and Drop Zone */}
+        {/* Drag and Drop Zone for Cover */}
         <div 
-          onDragOver={(e) => { e.preventDefault(); setDragActive(true); }}
-          onDragLeave={() => setDragActive(false)}
+          onDragOver={(e) => { e.preventDefault(); setCoverDragActive(true); }}
+          onDragLeave={() => setCoverDragActive(false)}
           onDrop={(e) => {
             e.preventDefault();
-            setDragActive(false);
+            setCoverDragActive(false);
             if (e.dataTransfer.files?.[0]) {
               handleNewsImageFile(e.dataTransfer.files[0]);
             }
           }}
-          className={`mt-2 border-2 border-dashed rounded-xl p-3 text-center transition-colors ${dragActive ? 'border-[#c5a880] bg-[#FAF9F6]' : 'border-stone-200 bg-stone-50/50'}`}
+          className={`mt-2 border-2 border-dashed rounded-xl p-3 text-center transition-colors ${coverDragActive ? 'border-[#c5a880] bg-[#FAF9F6]' : 'border-stone-200 bg-stone-50/50'}`}
         >
           {image ? (
-            <div className="flex items-center justify-center gap-3">
-              <img src={image} alt="preview" className="w-16 h-12 object-cover rounded-lg border border-stone-200 shadow-sm" referrerPolicy="no-referrer" />
-              <span className="text-[11px] font-bold text-emerald-700">✓ Фотография успешно установлена</span>
+            <div className="flex items-center justify-center gap-4">
+              <img src={image} alt="preview" className="w-20 h-14 object-cover rounded-lg border border-stone-200 shadow-sm" referrerPolicy="no-referrer" />
+              <div className="text-left">
+                <span className="text-xs font-bold text-emerald-700 block">✓ Фотография обложки загружена</span>
+                <span className="text-[10px] text-stone-400">Изображение будет оптимизировано для быстрой загрузки</span>
+              </div>
             </div>
           ) : (
-            <span className="text-xs text-stone-500">Перетащите сюда фото или нажмите кнопку выше</span>
+            <span className="text-xs text-stone-500">Перетащите сюда файл фотографии обложки (JPG, PNG, WebP)</span>
           )}
         </div>
       </div>
+
+      {/* 4. EXCERPT */}
       <div>
-        <label className="block text-[10px] font-bold uppercase tracking-wider text-stone-400 mb-1">Краткий анонс (опционально)</label>
-        <textarea rows={2} value={excerpt} onChange={e => setExcerpt(e.target.value)} className="w-full bg-stone-50 border border-stone-200 rounded-xl px-4 py-3 text-sm text-stone-700 focus:outline-none focus:border-[#c5a880]" placeholder="Текст для предпросмотра на карточке" />
-      </div>
-      <div>
-        <label className="block text-[10px] font-bold uppercase tracking-wider text-stone-400 mb-1">Полный текст новости</label>
-        <textarea required rows={6} value={content} onChange={e => setContent(e.target.value)} className="w-full bg-stone-50 border border-stone-200 rounded-xl px-4 py-3 text-sm text-stone-700 focus:outline-none focus:border-[#c5a880] leading-relaxed" placeholder="Текст новости..." />
+        <label className="block text-xs font-bold uppercase tracking-wider text-stone-600 mb-1.5 font-sans">
+          Краткий анонс / Лид (отображается на карточке в ленте)
+        </label>
+        <textarea 
+          rows={2} 
+          value={excerpt} 
+          onChange={e => setExcerpt(e.target.value)} 
+          className="w-full bg-stone-50 border border-stone-200 rounded-xl px-4 py-2.5 text-xs sm:text-sm text-stone-700 focus:outline-none focus:border-[#c5a880]" 
+          placeholder="Краткое описание события в 1-2 предложениях для привлечения внимания отдыхающих..." 
+        />
       </div>
 
-      <div className="flex justify-end gap-2 border-t border-stone-100 pt-4">
-        <button type="button" onClick={onCancel} className="bg-stone-100 hover:bg-stone-200 text-stone-700 font-bold text-xs py-2.5 px-5 rounded-xl transition-all">
-          Отмена
-        </button>
-        <button type="submit" className="bg-[#022C22] text-[#FAF9F6] hover:bg-[#c5a880] hover:text-[#022C22] font-semibold text-xs py-2.5 px-6 rounded-xl transition-all">
-          Сохранить новость
-        </button>
+      {/* 5. FULL TEXT EDITOR WITH RICH TOOLBAR & DOCX/IMAGE INSERTION */}
+      <div className="space-y-2">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+          <label className="block text-xs font-bold uppercase tracking-wider text-stone-700 font-sans">
+            Текст новости и материалы статьи <span className="text-red-500">*</span>
+          </label>
+          
+          {/* Mode Switcher */}
+          <div className="flex items-center bg-stone-200 p-0.5 rounded-xl text-xs font-bold self-start sm:self-auto">
+            <button
+              type="button"
+              onClick={() => setActiveEditorTab('edit')}
+              className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
+                activeEditorTab === 'edit'
+                  ? 'bg-white text-[#022C22] shadow-xs'
+                  : 'text-stone-600 hover:text-[#022C22]'
+              }`}
+            >
+              <Edit3 className="w-3.5 h-3.5 text-[#c5a880]" />
+              <span>Редактор текста</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setActiveEditorTab('preview')}
+              className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
+                activeEditorTab === 'preview'
+                  ? 'bg-white text-[#022C22] shadow-xs'
+                  : 'text-stone-600 hover:text-[#022C22]'
+              }`}
+            >
+              <Eye className="w-3.5 h-3.5 text-[#c5a880]" />
+              <span>Предпросмотр</span>
+              {(tableCount > 0 || imageCount > 0) && (
+                <span className="ml-1 px-1.5 py-0.2 bg-emerald-100 text-emerald-800 rounded-full text-[10px] font-mono">
+                  {tableCount > 0 && `📊${tableCount} `}{imageCount > 0 && `🖼️${imageCount}`}
+                </span>
+              )}
+            </button>
+          </div>
+        </div>
+
+        {/* EDITOR TOOLBAR */}
+        <div className="bg-[#FAF9F6] border border-stone-300 rounded-xl p-2.5 flex flex-wrap items-center gap-2 shadow-2xs">
+          {/* Primary insertion tools */}
+          <button
+            type="button"
+            onClick={() => {
+              setDocxInitialFile(null);
+              setDocxInitialTab('docx');
+              setIsDocxModalOpen(true);
+            }}
+            className="flex items-center space-x-1.5 bg-[#022C22] hover:bg-[#c5a880] text-[#FAF9F6] hover:text-[#022C22] px-3.5 py-2 rounded-lg text-xs font-bold transition-all shadow-xs cursor-pointer"
+            title="Импорт таблицы из документа Microsoft Word (.docx)"
+          >
+            <FileSpreadsheet className="w-4 h-4 text-[#c5a880] group-hover:text-[#022C22]" />
+            <span>Вставить таблицу из DOCX</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => {
+              setImageInitialFile(null);
+              setIsImageModalOpen(true);
+            }}
+            className="flex items-center space-x-1.5 bg-amber-50 hover:bg-amber-100 border border-amber-300 text-amber-950 px-3 py-2 rounded-lg text-xs font-bold transition-all shadow-2xs cursor-pointer"
+            title="Вставить фото или иллюстрацию в текст"
+          >
+            <ImageIcon className="w-4 h-4 text-amber-700" />
+            <span>Вставить фото в текст</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => {
+              setDocxInitialFile(null);
+              setDocxInitialTab('paste');
+              setIsDocxModalOpen(true);
+            }}
+            className="flex items-center space-x-1 bg-white hover:bg-stone-100 border border-stone-300 text-stone-700 px-2.5 py-2 rounded-lg text-xs font-semibold transition-all cursor-pointer hidden md:flex"
+            title="Вставить скопированную таблицу из Excel или Word"
+          >
+            <Clipboard className="w-3.5 h-3.5 text-stone-500" />
+            <span>Из Excel / буфера</span>
+          </button>
+
+          <div className="h-6 w-px bg-stone-300 mx-1 hidden sm:block" />
+
+          {/* Quick Markdown formatting buttons */}
+          <div className="flex items-center gap-1">
+            <button
+              type="button"
+              onClick={() => wrapSelection('**', '**', 'жирный текст')}
+              className="p-2 hover:bg-stone-200 text-stone-700 rounded-lg transition-colors cursor-pointer text-xs font-black"
+              title="Жирный шрифт"
+            >
+              Ж
+            </button>
+            <button
+              type="button"
+              onClick={() => wrapSelection('*', '*', 'курсивный текст')}
+              className="p-2 hover:bg-stone-200 text-stone-700 rounded-lg transition-colors cursor-pointer text-xs italic font-serif font-bold"
+              title="Курсив"
+            >
+              К
+            </button>
+            <button
+              type="button"
+              onClick={() => insertAtCursor('\n\n## Заголовок раздела\n')}
+              className="px-2 py-1 hover:bg-stone-200 text-stone-700 rounded-lg transition-colors cursor-pointer text-xs font-bold font-mono"
+              title="Заголовок H2"
+            >
+              H2
+            </button>
+            <button
+              type="button"
+              onClick={() => insertAtCursor('\n\n### Подзаголовок\n')}
+              className="px-2 py-1 hover:bg-stone-200 text-stone-700 rounded-lg transition-colors cursor-pointer text-xs font-bold font-mono"
+              title="Заголовок H3"
+            >
+              H3
+            </button>
+            <button
+              type="button"
+              onClick={() => insertAtCursor('\n\n- Первый пункт\n- Второй пункт\n- Третий пункт\n')}
+              className="p-2 hover:bg-stone-200 text-stone-700 rounded-lg transition-colors cursor-pointer text-xs"
+              title="Маркированный список"
+            >
+              <List className="w-3.5 h-3.5" />
+            </button>
+            <button
+              type="button"
+              onClick={() => insertAtCursor('\n\n> Важная цитата или рекомендация врача\n')}
+              className="p-2 hover:bg-stone-200 text-stone-700 rounded-lg transition-colors cursor-pointer text-xs"
+              title="Цитата"
+            >
+              <Quote className="w-3.5 h-3.5" />
+            </button>
+            <button
+              type="button"
+              onClick={() => insertAtCursor('\n\n---\n\n')}
+              className="p-2 hover:bg-stone-200 text-stone-700 rounded-lg transition-colors cursor-pointer text-xs"
+              title="Горизонтальная линия"
+            >
+              <Minus className="w-3.5 h-3.5" />
+            </button>
+          </div>
+        </div>
+
+        {/* EDITOR TEXTAREA OR LIVE PREVIEW */}
+        {activeEditorTab === 'edit' ? (
+          <div 
+            onDragOver={(e) => { e.preventDefault(); setContentDragActive(true); }}
+            onDragLeave={() => setContentDragActive(false)}
+            onDrop={handleContentDrop}
+            className={`relative rounded-xl transition-all ${
+              contentDragActive 
+                ? 'ring-2 ring-[#c5a880] ring-offset-2 bg-amber-50/20' 
+                : ''
+            }`}
+          >
+            <textarea 
+              ref={textareaRef}
+              required 
+              rows={14} 
+              value={content} 
+              onChange={e => setContent(e.target.value)} 
+              className="w-full bg-white border border-stone-300 rounded-xl px-4 py-3.5 text-sm text-stone-800 focus:outline-none focus:border-[#c5a880] leading-relaxed font-mono shadow-inner" 
+              placeholder="Введите текст новости... Вы можете использовать кнопки выше для вставки таблиц из Word (.docx) или фотографий, либо перетащить файл прямо сюда." 
+            />
+
+            {contentDragActive && (
+              <div className="absolute inset-0 bg-[#022C22]/80 backdrop-blur-xs rounded-xl flex flex-col items-center justify-center text-white p-6 pointer-events-none">
+                <FileSpreadsheet className="w-12 h-12 text-[#c5a880] mb-2 animate-bounce" />
+                <span className="font-bold text-base">Отпустите файл .DOCX или изображение для вставки в статью</span>
+              </div>
+            )}
+          </div>
+        ) : (
+          <div className="bg-white border border-stone-300 rounded-xl p-6 min-h-[350px] max-h-[600px] overflow-y-auto shadow-inner">
+            <div className="border-b border-stone-200 pb-4 mb-6">
+              <span className="text-[10px] font-bold font-mono uppercase tracking-widest text-[#c5a880] bg-[#022C22] px-2.5 py-1 rounded inline-block mb-2">
+                {categoryLabel}
+              </span>
+              <h2 className="font-serif font-bold text-2xl text-[#022C22] mb-1">
+                {title || 'Заголовок статьи'}
+              </h2>
+              <div className="text-xs text-stone-500 font-mono flex items-center gap-3">
+                <span>{date}</span>
+                {author && <span>· {author}</span>}
+                {readTime && <span>· {readTime}</span>}
+              </div>
+            </div>
+
+            {excerpt && (
+              <p className="text-base font-serif font-semibold text-[#022C22] italic leading-relaxed border-l-4 border-[#c5a880] pl-4 mb-6 bg-amber-50/40 py-2 rounded-r-lg">
+                {excerpt}
+              </p>
+            )}
+
+            <NewsArticleContent content={content} />
+          </div>
+        )}
+
+        <p className="text-[11px] text-stone-500 flex items-center gap-1.5 pt-1">
+          <span className="font-bold text-stone-700">💡 Совет:</span> 
+          <span>
+            Чтобы вставить расписание, прайс или таблицу из Word, нажмите <strong>«Вставить таблицу из DOCX»</strong> или перетащите .docx файл в поле редактора.
+          </span>
+        </p>
       </div>
+
+      {/* 6. BOTTOM ACTION BUTTONS */}
+      <div className="flex flex-col sm:flex-row justify-between items-center gap-3 border-t border-stone-200 pt-5">
+        <div className="text-xs text-stone-500">
+          Символов: <span className="font-mono font-bold text-stone-700">{content.length}</span>
+          {tableCount > 0 && <span className="ml-3 text-emerald-700 font-bold">✓ Таблиц: {tableCount}</span>}
+          {imageCount > 0 && <span className="ml-3 text-blue-700 font-bold">✓ Фотографий: {imageCount}</span>}
+        </div>
+
+        <div className="flex items-center gap-3 w-full sm:w-auto justify-end">
+          <button 
+            type="button" 
+            onClick={onCancel} 
+            className="flex-1 sm:flex-initial bg-stone-100 hover:bg-stone-200 text-stone-700 font-bold text-xs py-2.5 px-5 rounded-xl transition-all cursor-pointer"
+          >
+            Отмена
+          </button>
+          <button 
+            type="submit" 
+            className="flex-1 sm:flex-initial bg-[#022C22] text-[#FAF9F6] hover:bg-[#c5a880] hover:text-[#022C22] font-semibold text-xs py-2.5 px-6 rounded-xl transition-all shadow-md cursor-pointer flex items-center justify-center space-x-2"
+          >
+            <Save className="w-4 h-4 text-[#c5a880]" />
+            <span>Сохранить новость</span>
+          </button>
+        </div>
+      </div>
+
+      {/* 7. MODALS FOR DOCX TABLE EXTRACTION & IN-TEXT IMAGES */}
+      <NewsDocxTableModal
+        isOpen={isDocxModalOpen}
+        onClose={() => {
+          setIsDocxModalOpen(false);
+          setDocxInitialFile(null);
+        }}
+        onInsertTable={(markup) => insertAtCursor(markup)}
+        initialFile={docxInitialFile}
+        initialTab={docxInitialTab}
+      />
+
+      <NewsImageInsertModal
+        isOpen={isImageModalOpen}
+        onClose={() => {
+          setIsImageModalOpen(false);
+          setImageInitialFile(null);
+        }}
+        onInsertImage={(markup) => insertAtCursor(markup)}
+        initialFile={imageInitialFile}
+      />
     </form>
   );
 }

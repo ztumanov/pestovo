@@ -49,3 +49,60 @@ h1, h2 {
 .tabular-nums {
   font-variant-numeric: tabular-nums;
 }
+
+/* Header & Navigation responsive layout protection */
+.site-header-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.site-header-menu {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+@media (max-width: 1023px) {
+  .site-header-container {
+    padding-left: 0.625rem;
+    padding-right: 0.625rem;
+  }
+
+  .site-header-bar {
+    gap: 0.375rem 0.5rem;
+    padding-top: 0.375rem;
+    padding-bottom: 0.375rem;
+  }
+
+  .site-header-menu {
+    gap: 0.25rem 0.5rem;
+    padding-top: 0.25rem;
+    padding-bottom: 0.25rem;
+    justify-content: center;
+    width: 100%;
+  }
+
+  .site-header-menu-item {
+    padding: 0.25rem 0.375rem;
+    font-size: 0.75rem;
+    line-height: 1.15;
+    white-space: nowrap;
+  }
+}
+
+/* Weather widget structural containment so inner items never overflow or overlap */
+.weather-widget-card {
+  position: relative;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  isolation: isolate;
+}
+
+.weather-widget-grid > * {
+  min-width: 0;
+  overflow: hidden;
+}
+

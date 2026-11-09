@@ -192,8 +192,19 @@ export default function App() {
     setIsGalleryExpanded(false);
   }, [galleryTab]);
 
-  // About Sanatorium interactive tabs
+  // About Sanatorium interactive tabs & quick copy feedback
   const [aboutTab, setAboutTab] = useState<'general' | 'medical' | 'treatment' | 'registry'>('general');
+  const [copiedPassportField, setCopiedPassportField] = useState<string | null>(null);
+
+  const handleCopyPassportValue = (key: string, value: string) => {
+    if (navigator?.clipboard?.writeText) {
+      navigator.clipboard.writeText(value).catch(() => {});
+    }
+    setCopiedPassportField(key);
+    setTimeout(() => {
+      setCopiedPassportField((prev) => (prev === key ? null : prev));
+    }, 2000);
+  };
 
   // Interactive review states
   const [reviewForm, setReviewForm] = useState({
@@ -2281,68 +2292,75 @@ export default function App() {
           </div>
 
           {/* OFFICIAL DETAILED INFORMATION REGISTRY */}
-          <div className="mt-14 sm:mt-16 bg-gradient-to-b from-stone-50/90 via-white to-stone-50/50 rounded-3xl border border-[#c5a880]/30 shadow-[0_20px_50px_-15px_rgba(2,44,34,0.07)] p-5 sm:p-7 md:p-9 relative overflow-hidden">
+          <div className="mt-14 sm:mt-16 bg-gradient-to-b from-[#EDE6D6] via-[#F3EFE4] to-[#E8DFCD] rounded-3xl border border-[#022C22]/15 ring-1 ring-[#c5a880]/40 shadow-[0_24px_60px_-15px_rgba(2,44,34,0.18)] p-4 sm:p-6 md:p-8 relative overflow-hidden">
             {/* Ambient luxury corner glow */}
-            <div className="absolute -top-16 -right-16 w-60 h-60 bg-[#c5a880]/8 rounded-full filter blur-3xl pointer-events-none"></div>
-            <div className="absolute -bottom-16 -left-16 w-60 h-60 bg-emerald-700/5 rounded-full filter blur-3xl pointer-events-none"></div>
+            <div className="absolute -top-16 -right-16 w-60 h-60 bg-[#c5a880]/15 rounded-full filter blur-3xl pointer-events-none"></div>
+            <div className="absolute -bottom-16 -left-16 w-60 h-60 bg-[#022C22]/10 rounded-full filter blur-3xl pointer-events-none"></div>
             
             <div className="relative z-10">
-              {/* Header Row */}
-              <div className="flex flex-col lg:flex-row lg:items-end justify-between mb-8 gap-4 pb-6 border-b border-stone-200/70">
+              {/* Architectural Dark Emerald Header Banner */}
+              <div className="bg-gradient-to-r from-[#022C22] via-[#04392C] to-[#022C22] text-white p-5 sm:p-7 rounded-2xl border border-[#c5a880]/35 shadow-lg flex flex-col lg:flex-row lg:items-center justify-between mb-6 gap-5">
                 <div className="max-w-3xl space-y-2">
-                  <div className="flex items-center space-x-2">
-                    <span className="h-[1px] w-6 bg-[#c5a880]"></span>
-                    <span className="text-[#c5a880] text-[11px] font-mono uppercase tracking-widest font-bold flex items-center gap-1.5">
-                      <Shield className="w-3.5 h-3.5" />
-                      Официальный реестр и медицинская лицензия
-                    </span>
+                  <div className="flex flex-wrap items-center gap-2 text-xs text-[#c5a880] font-sans font-semibold">
+                    <Shield className="w-4 h-4 shrink-0" />
+                    <span>Официальный паспорт учреждения</span>
+                    <span aria-hidden="true">·</span>
+                    <span className="font-mono tabular-nums">ИНН 7713778678</span>
+                    <span aria-hidden="true">·</span>
+                    <span>ФТС России</span>
                   </div>
-                  <h3 className="font-serif text-2xl sm:text-3xl md:text-4xl font-extrabold text-[#022C22] tracking-tight">
+                  <h3 className="font-serif text-2xl sm:text-3xl md:text-4xl font-bold text-white tracking-tight">
                     Общие данные и медицинская специализация
                   </h3>
-                  <p className="text-stone-600 text-sm leading-relaxed max-w-2xl">
-                    ФГКУ «Санаторий «Ясная Поляна» ФТС России». Полная ведомственная и нормативная информация с официального государственного реестра учреждения.
+                  <p className="text-stone-300 text-xs sm:text-sm leading-relaxed max-w-2xl">
+                    ФГКУ «Санаторий «Ясная Поляна» ФТС России». Проверенные ведомственные реквизиты, сведения о государственной медицинской лицензии и структуре лечебного отделения.
                   </p>
                 </div>
                 
-                {/* Official License Badge */}
-                <div className="flex items-center space-x-3 bg-gradient-to-r from-emerald-950/[0.04] to-[#c5a880]/10 border border-[#c5a880]/40 px-4 py-2.5 rounded-2xl shadow-sm self-start lg:self-auto shrink-0">
-                  <div className="w-8 h-8 rounded-xl bg-[#022C22] text-[#c5a880] flex items-center justify-center shrink-0 shadow-sm">
-                    <Award className="w-4 h-4" />
-                  </div>
-                  <div>
-                    <span className="block text-[9px] uppercase font-mono tracking-wider text-stone-500 font-semibold">Лицензия Минздрава РФ</span>
-                    <strong className="block text-xs font-mono font-bold text-[#022C22]">№ Л041-00110-91/00554225</strong>
+                {/* Right Control: Official License Badge */}
+                <div className="flex items-center shrink-0">
+                  <div className="flex items-center space-x-3.5 bg-white/[0.08] border border-[#c5a880]/40 px-4 py-3 rounded-xl backdrop-blur-sm">
+                    <div className="w-10 h-10 rounded-lg bg-[#c5a880] text-[#022C22] flex items-center justify-center shrink-0 shadow-sm">
+                      <Award className="w-5 h-5" />
+                    </div>
+                    <div className="text-left">
+                      <span className="block text-[11px] font-sans text-stone-300 leading-tight">Лицензия Минздрава РФ</span>
+                      <strong className="block text-xs sm:text-sm font-mono tabular-nums font-bold text-white mt-0.5">№ Л041-00110-91/00554225</strong>
+                    </div>
                   </div>
                 </div>
               </div>
 
               {/* Intuitive Modern Segmented Tab Switcher */}
               <div className="mb-6">
-                <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 p-1.5 bg-stone-200/50 rounded-2xl border border-stone-200/90 shadow-[inset_0_1px_3px_rgba(0,0,0,0.04)]">
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 p-2 bg-[#022C22]/[0.08] rounded-2xl border border-[#022C22]/15 shadow-inner">
                   {[
                     { 
                       id: 'general', 
+                      num: '01.',
                       label: 'Общие сведения', 
                       sub: 'Реквизиты и адрес', 
                       icon: Building2 
                     },
                     { 
                       id: 'medical', 
+                      num: '02.',
                       label: 'Медицинский профиль', 
-                      sub: 'Лицензия и показания', 
+                      sub: '24 вида работ и врачи', 
                       icon: Activity 
                     },
                     { 
                       id: 'treatment', 
+                      num: '03.',
                       label: 'Методы лечения', 
-                      sub: 'Комплекс процедур и кабинеты', 
-                      icon: FileText 
+                      sub: 'Процедуры и 12 кабинетов', 
+                      icon: Stethoscope 
                     },
                     { 
                       id: 'registry', 
-                      label: 'Контакты & Реестр', 
-                      sub: 'Руководство и ЕГРЮЛ', 
+                      num: '04.',
+                      label: 'Руководство и Реестр', 
+                      sub: 'Начальник санатория и ЕГРЮЛ', 
                       icon: UserCheck 
                     }
                   ].map((t) => {
@@ -2360,16 +2378,16 @@ export default function App() {
                             window.speechSynthesis.speak(switchVoice);
                           }
                         }}
-                        className={`group relative p-3 sm:p-3.5 rounded-xl text-left transition-all duration-300 cursor-pointer flex items-center space-x-3 select-none ${
+                        className={`group relative p-3.5 sm:p-4 rounded-xl text-left transition-all duration-200 cursor-pointer flex items-center space-x-3 select-none ${
                           isActive 
-                            ? 'bg-gradient-to-br from-[#022C22] via-[#02281e] to-[#011d16] text-white shadow-[0_8px_20px_-4px_rgba(2,44,34,0.4),0_0_0_1px_rgba(197,168,128,0.35)] scale-[1.01]' 
-                            : 'bg-white/80 hover:bg-white text-stone-700 hover:text-[#022C22] border border-stone-200/60 hover:border-stone-300 shadow-sm hover:shadow'
+                            ? 'bg-[#022C22] text-white shadow-[0_8px_20px_-4px_rgba(2,44,34,0.4)] ring-1 ring-[#c5a880]/60' 
+                            : 'bg-white/90 hover:bg-white text-[#022C22] border border-[#022C22]/10 hover:border-[#c5a880] shadow-xs'
                         }`}
                       >
-                        <div className={`p-2 rounded-lg shrink-0 transition-colors ${
+                        <div className={`p-2.5 rounded-lg shrink-0 transition-colors ${
                           isActive 
-                            ? 'bg-[#c5a880] text-[#022C22] shadow-[0_2px_8px_rgba(197,168,128,0.4)]' 
-                            : 'bg-stone-100 text-[#022C22] group-hover:bg-[#c5a880]/20 group-hover:text-[#022C22]'
+                            ? 'bg-[#c5a880] text-[#022C22]' 
+                            : 'bg-[#022C22]/5 text-[#022C22] group-hover:bg-[#c5a880]/25'
                         }`}>
                           <IconComp className="w-4 h-4" />
                         </div>
@@ -2377,492 +2395,569 @@ export default function App() {
                           <span className={`block text-xs sm:text-sm font-sans font-bold tracking-normal truncate leading-tight ${
                             isActive ? 'text-white' : 'text-[#022C22]'
                           }`}>
+                            <span className={`font-mono mr-1 ${isActive ? 'text-[#c5a880]' : 'text-stone-400'}`}>{t.num}</span>
                             {t.label}
                           </span>
                           <span className={`block text-xs font-sans mt-0.5 truncate ${
-                            isActive ? 'text-[#c5a880] font-medium' : 'text-stone-500 group-hover:text-stone-700'
+                            isActive ? 'text-[#c5a880]' : 'text-stone-600 group-hover:text-stone-800'
                           }`}>
                             {t.sub}
                           </span>
                         </div>
-                        {isActive && (
-                          <span className="w-1.5 h-1.5 rounded-full bg-[#c5a880] shadow-[0_0_6px_#c5a880] shrink-0 hidden sm:block"></span>
-                        )}
                       </button>
                     );
                   })}
                 </div>
               </div>
 
-              {/* Tab Content Box with Enhanced Contrast & Modern Hierarchy */}
-              <div className="bg-[#fcfbf9] rounded-2xl border border-stone-200/90 shadow-[0_12px_36px_-12px_rgba(2,44,34,0.07)] p-5 sm:p-7 md:p-8">
-                <AnimatePresence mode="wait">
-                  {aboutTab === 'general' && (
-                    <motion.div
-                      key="general"
-                      initial={{ opacity: 0, y: 8 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -8 }}
-                      transition={{ duration: 0.25 }}
-                      className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 text-sm text-stone-800 font-sans"
+              {/* Tab Content Box with High-Contrast Architectural Frame & Action Toolbar */}
+              <div className="bg-gradient-to-b from-[#022C22] via-[#033327] to-[#022C22] rounded-2xl p-1 sm:p-1.5 shadow-[0_18px_45px_-12px_rgba(2,44,34,0.28)] border border-[#022C22]">
+                {/* Top Interactive Context Strip inside the Frame */}
+                <div className="px-4 sm:px-6 py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs text-stone-200 border-b border-white/10">
+                  <div className="flex items-center gap-2 font-sans">
+                    <span className="font-mono font-bold text-[#c5a880]">
+                      {aboutTab === 'general' && '01 / Паспорт юридического лица'}
+                      {aboutTab === 'medical' && '02 / Лицензия и врачебный штат (39 специалистов)'}
+                      {aboutTab === 'treatment' && '03 / Лечебно-диагностическая база и кабинеты'}
+                      {aboutTab === 'registry' && '04 / Руководство учреждения и сведения ЕГРЮЛ'}
+                    </span>
+                    <span className="hidden md:inline text-white/30">·</span>
+                    <span className="hidden md:inline text-stone-300">Актуальные официальные сведения ФГКУ «Санаторий «Ясная Поляна» ФТС России»</span>
+                  </div>
+
+                  <div className="flex items-center gap-3 self-start sm:self-auto shrink-0">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setCurrentPage('medical');
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                      }}
+                      className="text-[#c5a880] hover:text-white font-sans font-semibold inline-flex items-center gap-1 transition-colors cursor-pointer whitespace-nowrap"
                     >
-                      {/* Left: Organization Credentials */}
-                      <div className="lg:col-span-7 space-y-4">
-                        <div className="bg-white p-5 sm:p-6 rounded-xl border border-stone-200 shadow-sm relative overflow-hidden">
-                          <div className="absolute top-0 left-0 bottom-0 w-1.5 bg-[#022C22]"></div>
-                          <span className="block text-xs uppercase tracking-wider font-sans text-[#c5a880] font-bold">
-                            Полное официальное наименование
-                          </span>
-                          <h4 className="font-serif text-base sm:text-lg md:text-xl text-[#022C22] font-bold mt-1.5 leading-snug">
-                            Федеральное государственное казенное учреждение «Санаторий «Ясная Поляна» Федеральной таможенной службы»
-                          </h4>
-                          <div className="mt-3 pt-3 border-t border-stone-100 flex flex-wrap items-center gap-2">
-                            <span className="text-xs text-stone-600 font-medium">Сокращенное наименование:</span>
-                            <span className="font-semibold text-[#022C22] text-xs sm:text-sm bg-stone-100 px-3 py-1 rounded-md border border-stone-200">
-                              ФГКУ «Санаторий «Ясная Поляна» ФТС России»
+                      <span>Страница лечения</span>
+                      <ChevronRight className="w-3.5 h-3.5" />
+                    </button>
+                    <span className="text-white/25" aria-hidden="true">·</span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setCurrentPage('documents');
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                      }}
+                      className="text-stone-200 hover:text-[#c5a880] font-sans font-semibold inline-flex items-center gap-1 transition-colors cursor-pointer whitespace-nowrap"
+                    >
+                      <span>Все документы (28)</span>
+                      <ChevronRight className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                </div>
+
+                {/* Inner Warm Sandstone Surface Holding Crisp White Content Cards */}
+                <div className="bg-[#F6F2E9] rounded-xl p-4 sm:p-6 md:p-7">
+                  <AnimatePresence mode="wait">
+                    {aboutTab === 'general' && (
+                      <motion.div
+                        key="general"
+                        initial={{ opacity: 0, y: 8 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -8 }}
+                        transition={{ duration: 0.2 }}
+                        className="grid grid-cols-1 lg:grid-cols-12 gap-5 lg:gap-6 text-sm text-stone-800 font-sans items-stretch"
+                      >
+                        {/* Left: Organization Credentials */}
+                        <div className="lg:col-span-7 flex flex-col justify-between gap-4">
+                          <div className="bg-white p-5 sm:p-6 rounded-xl border border-[#022C22]/15 shadow-sm text-left">
+                            <span className="block text-xs font-sans text-[#9b7b51] font-bold">
+                              Полное официальное наименование
                             </span>
-                          </div>
-                        </div>
-
-                        {/* Tax & Legal IDs Grid */}
-                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                          <div className="bg-white p-4 rounded-xl border border-stone-200 shadow-sm">
-                            <span className="block text-xs uppercase tracking-wider font-sans text-stone-600 font-bold">ИНН</span>
-                            <p className="font-mono tabular-nums text-[#022C22] font-bold text-base sm:text-lg mt-1">7713778678</p>
-                          </div>
-                          <div className="bg-white p-4 rounded-xl border border-stone-200 shadow-sm">
-                            <span className="block text-xs uppercase tracking-wider font-sans text-stone-600 font-bold">КПП</span>
-                            <p className="font-mono tabular-nums text-[#022C22] font-bold text-base sm:text-lg mt-1">910301001</p>
-                          </div>
-                          <div className="bg-white p-4 rounded-xl border border-stone-200 shadow-sm col-span-2 sm:col-span-1">
-                            <span className="block text-xs uppercase tracking-wider font-sans text-stone-600 font-bold">ОГРН</span>
-                            <p className="font-mono tabular-nums text-[#022C22] font-bold text-xs sm:text-sm mt-1.5">5137746004787</p>
-                          </div>
-                        </div>
-
-                        <div className="bg-white p-4 rounded-xl border border-stone-200 shadow-sm">
-                          <span className="block text-xs uppercase tracking-wider font-sans text-stone-600 font-bold">Организационно-правовая форма (ОПФ)</span>
-                          <p className="text-[#022C22] font-semibold text-sm sm:text-base mt-1">Федеральные государственные казенные учреждения</p>
-                        </div>
-                      </div>
-
-                      {/* Right: Geographic & Property details */}
-                      <div className="lg:col-span-5 space-y-4 border-t lg:border-t-0 lg:border-l border-stone-200 lg:pl-8 pt-4 lg:pt-0">
-                        <div className="bg-white p-5 rounded-xl border border-stone-200 shadow-sm space-y-2">
-                          <div className="flex items-center space-x-2 text-[#022C22]">
-                            <div className="p-1.5 rounded-lg bg-emerald-50 text-[#022C22] border border-emerald-100">
-                              <MapPin className="w-4 h-4 text-[#c5a880]" />
+                            <h4 className="font-serif text-base sm:text-lg md:text-xl text-[#022C22] font-bold mt-2 leading-snug">
+                              Федеральное государственное казенное учреждение «Санаторий «Ясная Поляна» Федеральной таможенной службы»
+                            </h4>
+                            <div className="mt-4 pt-4 border-t border-stone-200/80 grid grid-cols-1 sm:grid-cols-[190px_1fr] items-baseline gap-1.5 sm:gap-4">
+                              <span className="text-xs text-stone-500 font-semibold">Сокращенное наименование:</span>
+                              <span className="font-bold text-[#022C22] text-xs sm:text-sm">
+                                ФГКУ «Санаторий «Ясная Поляна» ФТС России»
+                              </span>
                             </div>
-                            <span className="block text-xs uppercase tracking-wider font-sans text-[#022C22] font-bold">
-                              Адрес и локация
-                            </span>
                           </div>
-                          <p className="text-stone-800 font-semibold text-sm leading-relaxed pt-1">
-                            298660, Россия, Республика Крым, г. Ялта, пгт Гаспра, шоссе Севастопольское, д. 52
-                          </p>
-                        </div>
 
-                        <div className="bg-white p-5 rounded-xl border border-stone-200 shadow-sm space-y-3">
-                          <span className="block text-xs uppercase tracking-wider font-sans text-stone-600 font-bold border-b border-stone-100 pb-2">
-                            Параметры и принадлежность
-                          </span>
-                          <div className="space-y-2 text-xs sm:text-[13px]">
+                          {/* Tax & Legal IDs Grid */}
+                          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
                             {[
-                              { label: 'Курортная зона', val: 'Большая Ялта (Южный берег Крыма)' },
-                              { label: 'Профиль помощи', val: 'Санаторно-курортное лечение взрослых' },
-                              { label: 'Ведомство', val: 'Федеральная таможенная служба (ФТС России)' },
-                              { label: 'Форма собственности', val: 'Федеральная государственная собственность' },
-                            ].map((item, idx) => (
-                              <div key={idx} className="flex items-center justify-between p-2 rounded-lg bg-stone-50/70 border border-stone-100">
-                                <span className="text-stone-600 font-medium">{item.label}:</span>
-                                <span className="font-bold text-[#022C22] text-right">{item.val}</span>
+                              { key: 'inn', label: 'ИНН учреждения', val: '7713778678' },
+                              { key: 'kpp', label: 'КПП учреждения', val: '910301001' },
+                              { key: 'ogrn', label: 'ОГРН в ЕГРЮЛ', val: '5137746004787' }
+                            ].map((idItem) => (
+                              <div
+                                key={idItem.key}
+                                className="text-left bg-white p-4 sm:p-5 rounded-xl border border-[#022C22]/15 shadow-sm flex flex-col justify-between"
+                              >
+                                <span className="block text-xs font-sans text-stone-500 font-semibold">
+                                  {idItem.label}
+                                </span>
+                                <p className="font-mono tabular-nums text-[#022C22] font-bold text-base sm:text-lg mt-1.5 tracking-tight">
+                                  {idItem.val}
+                                </p>
                               </div>
                             ))}
                           </div>
-                        </div>
-                      </div>
-                    </motion.div>
-                  )}
 
-                  {aboutTab === 'medical' && (
-                    <motion.div
-                      key="medical"
-                      initial={{ opacity: 0, y: 8 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -8 }}
-                      transition={{ duration: 0.25 }}
-                      className="space-y-6 text-sm text-stone-800 font-sans"
-                    >
-                      {/* License Details Header */}
-                      <div className="bg-white p-5 sm:p-6 rounded-2xl border border-[#c5a880]/40 shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                        <div className="space-y-1.5">
-                          <div className="flex items-center space-x-2 text-[#c5a880] text-[11px] font-mono uppercase tracking-wider font-bold">
-                            <Award className="w-4 h-4 text-[#c5a880]" />
-                            <span>Государственный реестр лицензий</span>
-                          </div>
-                          <h4 className="font-serif text-lg sm:text-xl font-bold text-[#022C22]">
-                            Медицинская лицензия № Л041-00110-91/00554225
-                          </h4>
-                          <p className="text-stone-600 text-xs sm:text-sm">
-                            Предоставлена на осуществление специализированной первичной и санаторно-курортной медицинской помощи.
-                          </p>
-                        </div>
-                        <div className="flex items-center gap-4 font-mono text-xs text-[#022C22] bg-stone-50 border border-stone-200/90 shadow-xs p-3.5 rounded-xl shrink-0">
-                          <div>
-                            <span className="block text-[10px] uppercase tracking-wider text-stone-500 font-semibold">Дата выдачи</span>
-                            <strong className="text-[#022C22] font-bold text-sm">22.06.2022</strong>
-                          </div>
-                          <div className="w-[1px] h-8 bg-stone-200"></div>
-                          <div>
-                            <span className="block text-[10px] uppercase tracking-wider text-stone-500 font-semibold">Срок действия</span>
-                            <strong className="text-emerald-700 flex items-center gap-1 font-bold text-sm">
-                              <Check className="w-4 h-4" /> Бессрочно
-                            </strong>
+                          <div className="bg-white p-5 rounded-xl border border-[#022C22]/15 shadow-sm text-left grid grid-cols-1 sm:grid-cols-[240px_1fr] items-baseline gap-1.5 sm:gap-4">
+                            <span className="text-xs font-sans text-stone-500 font-semibold">Организационно-правовая форма:</span>
+                            <p className="text-[#022C22] font-bold text-sm sm:text-base">Федеральные государственные казенные учреждения</p>
                           </div>
                         </div>
-                      </div>
 
-                      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 pt-2">
-                        {/* Left: Specializations & Labs */}
-                        <div className="lg:col-span-6 space-y-6">
-                          <div className="bg-white p-5 rounded-2xl border border-stone-200 shadow-sm space-y-4">
-                            <h5 className="font-serif text-base font-bold text-[#022C22] pb-2 flex items-center space-x-2 border-b border-stone-100">
-                              <Stethoscope className="w-4 h-4 text-[#c5a880]" />
-                              <span>Разрешенные медицинские специализации:</span>
-                            </h5>
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                        {/* Right: Geographic & Property details */}
+                        <div className="lg:col-span-5 flex flex-col justify-between gap-4">
+                          <div className="bg-[#022C22] text-white p-5 sm:p-6 rounded-xl border border-[#c5a880]/40 shadow-sm space-y-2 text-left">
+                            <div className="flex items-center space-x-2 text-[#c5a880]">
+                              <MapPin className="w-4 h-4 shrink-0" />
+                              <span className="text-xs font-sans font-bold">
+                                Юридический и фактический адрес
+                              </span>
+                            </div>
+                            <p className="text-white font-serif font-semibold text-sm sm:text-base leading-relaxed">
+                              298660, Российская Федерация, Республика Крым, г. Ялта, пгт. Гаспра, шоссе Севастопольское, д. 52
+                            </p>
+                          </div>
+
+                          <div className="bg-white p-5 sm:p-6 rounded-xl border border-[#022C22]/15 shadow-sm flex-1 flex flex-col justify-between text-left">
+                            <span className="block text-xs font-sans text-[#9b7b51] font-bold border-b border-stone-200 pb-2.5 mb-3">
+                              Ведомственная принадлежность и статус
+                            </span>
+                            <div className="divide-y divide-stone-200/80 text-xs sm:text-[13px]">
                               {[
-                                { name: 'Диетология', desc: 'Терапевтическое и лечебное питание' },
-                                { name: 'Лечебная физкультура', desc: 'Индивидуальные программы ЛФК' },
-                                { name: 'Медицинский массаж', desc: 'Профессиональный ручной массаж' },
-                                { name: 'Организация здравоохранения', desc: 'Стандарты качества ФТС' },
-                                { name: 'Сестринское дело', desc: 'Круглосуточный сестринский уход' },
-                                { name: 'Терапия', desc: 'Ведение личным врачом-терапевтом' },
-                                { name: 'Физиотерапия', desc: 'Комплекс аппаратного лечения' },
-                                { name: 'Функциональная диагностика', desc: 'ЭКГ и спирометрия на месте' }
-                              ].map((item, id) => (
-                                <div key={id} className="bg-stone-50/80 hover:bg-stone-100/70 border border-stone-200/80 p-3 rounded-xl transition-all">
-                                  <span className="font-serif font-bold text-xs sm:text-[13px] text-[#022C22] block">
-                                    {item.name}
-                                  </span>
-                                  <span className="text-[11px] text-stone-600 block mt-0.5 leading-snug">{item.desc}</span>
+                                { label: 'Начальник санатория', val: siteData?.resortInfo?.directorName || RESORT_INFO.directorName || 'Шапортов Станислав Владимирович' },
+                                { label: 'Ведомство', val: 'Федеральная таможенная служба (ФТС России)' },
+                                { label: 'Курортная зона', val: 'Большая Ялта (Южный берег Крыма)' },
+                                { label: 'Форма собственности', val: 'Федеральная государственная собственность' },
+                              ].map((item, idx) => (
+                                <div key={idx} className="py-2.5 first:pt-0 last:pb-0 grid grid-cols-1 sm:grid-cols-[155px_1fr] items-baseline gap-1 sm:gap-3">
+                                  <span className="text-stone-500 font-medium">{item.label}:</span>
+                                  <span className="font-bold text-[#022C22] text-left leading-snug">{item.val}</span>
                                 </div>
                               ))}
                             </div>
                           </div>
+                        </div>
+                      </motion.div>
+                    )}
 
-                          {/* Diagnostics */}
-                          <div className="bg-white p-5 rounded-2xl border border-stone-200 shadow-sm space-y-4">
-                            <h5 className="font-serif text-base font-bold text-[#022C22] pb-2 flex items-center space-x-2 border-b border-stone-100">
-                              <Activity className="w-4 h-4 text-[#c5a880]" />
-                              <span>Диагностическая и лабораторная база:</span>
-                            </h5>
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                              <div className="bg-emerald-50/70 p-4 rounded-xl border border-emerald-200/80">
-                                <h6 className="font-sans text-xs font-bold text-[#022C22] uppercase tracking-wider">Клиническая лаборатория</h6>
-                                <p className="text-stone-700 mt-1.5 text-xs leading-relaxed font-sans">
-                                  Биохимические и общеклинические исследования крови и мочи на автоматических анализаторах.
-                                </p>
-                              </div>
-                              <div className="bg-amber-50/70 p-4 rounded-xl border border-amber-200/80">
-                                <h6 className="font-sans text-xs font-bold text-[#022C22] uppercase tracking-wider">Функциональная база</h6>
-                                <p className="text-stone-700 mt-1.5 text-xs leading-relaxed font-sans">
-                                  Спирография (диагностика внешнего дыхания), ЭКГ-исследования и суточный мониторинг.
-                                </p>
-                              </div>
+                    {aboutTab === 'medical' && (
+                      <motion.div
+                        key="medical"
+                        initial={{ opacity: 0, y: 8 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -8 }}
+                        transition={{ duration: 0.2 }}
+                        className="space-y-5 text-sm text-stone-800 font-sans"
+                      >
+                        {/* License & Medical Leadership Header */}
+                        <div className="bg-[#022C22] text-white p-5 sm:p-6 rounded-xl border border-[#c5a880]/40 shadow-sm flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
+                          <div className="space-y-1.5">
+                            <div className="flex items-center space-x-2 text-[#c5a880] text-xs font-sans font-bold">
+                              <Award className="w-4 h-4 text-[#c5a880]" />
+                              <span>Государственный реестр лицензий · 24 вида работ (услуг)</span>
+                            </div>
+                            <h4 className="font-serif text-lg sm:text-xl font-bold text-white">
+                              Медицинская лицензия № Л041-00110-91/00554225
+                            </h4>
+                            <p className="text-stone-200 text-xs sm:text-sm leading-relaxed">
+                              В медицинском отделении работают <strong className="text-[#c5a880]">39 сотрудников</strong> (аккредитованы <strong className="text-[#c5a880]">100%</strong> среднего и высшего медперсонала, в т.ч. <strong className="text-[#c5a880]">5 опытных врачей</strong>). С января 2025 г. медицину возглавляет <strong className="text-white">Душкин Игорь Фёдорович</strong> — врач высшей категории, к.м.н., Заслуженный врач Республики Крым, доцент по специальности «Восстановительная медицина», ветеран боевых действий СВО.
+                            </p>
+                          </div>
+                          <div className="flex items-center gap-4 font-mono tabular-nums text-xs text-white bg-white/10 border border-[#c5a880]/30 p-3.5 rounded-xl shrink-0">
+                            <div>
+                              <span className="block text-[10px] text-stone-300 font-sans">Дата выдачи</span>
+                              <strong className="text-white font-bold text-sm">22.06.2022</strong>
+                            </div>
+                            <div className="w-[1px] h-8 bg-white/20"></div>
+                            <div>
+                              <span className="block text-[10px] text-stone-300 font-sans">Срок действия</span>
+                              <strong className="text-[#c5a880] flex items-center gap-1 font-bold text-sm font-sans">
+                                <Check className="w-4 h-4" /> Бессрочно
+                              </strong>
                             </div>
                           </div>
                         </div>
 
-                        {/* Right: Pathologies & Basic Illness Profiles */}
-                        <div className="lg:col-span-6 bg-white p-5 sm:p-6 rounded-2xl border border-stone-200 shadow-sm space-y-4">
-                          <h5 className="font-serif text-lg font-bold text-[#022C22] flex items-center space-x-2 border-b border-stone-100 pb-3">
-                            <Shield className="w-5 h-5 text-[#c5a880]" />
-                            <span>Основные лечебные профили санатория</span>
-                          </h5>
-                          
-                          <div className="space-y-3.5 text-xs text-stone-700 font-sans">
-                            <div className="bg-stone-50/80 p-4 rounded-xl border border-stone-200 space-y-1.5">
-                              <div className="flex items-center space-x-2">
-                                <span className="w-2.5 h-2.5 rounded-full bg-red-600 shrink-0"></span>
-                                <span className="text-xs font-bold uppercase tracking-wider text-red-800 font-sans">
-                                  Кардиологический профиль
-                                </span>
-                              </div>
-                              <strong className="block text-stone-900 font-bold text-sm text-[#022C22]">
-                                Болезни системы кровообращения:
-                              </strong>
-                              <p className="leading-relaxed text-stone-700 text-xs sm:text-[13px]">
-                                Гипертоническая болезнь, ишемическая болезнь сердца без тяжелых нарушений ритма, вегетососудистая дистония, постинфарктное долечивание.
-                              </p>
-                            </div>
-
-                            <div className="bg-stone-50/80 p-4 rounded-xl border border-stone-200 space-y-1.5">
-                              <div className="flex items-center space-x-2">
-                                <span className="w-2.5 h-2.5 rounded-full bg-sky-600 shrink-0"></span>
-                                <span className="text-xs font-bold uppercase tracking-wider text-sky-800 font-sans">
-                                  Пульмонологический профиль
-                                </span>
-                              </div>
-                              <strong className="block text-stone-900 font-bold text-sm text-[#022C22]">
-                                Болезни органов дыхания нетуберкулезного характера:
-                              </strong>
-                              <p className="leading-relaxed text-stone-700 text-xs sm:text-[13px]">
-                                Хронические бронхиты, трахеиты, бронхиальная астма в стадии ремиссии, респираторная реабилитация после пневмоний.
-                              </p>
-                            </div>
-
-                            <div className="bg-stone-50/80 p-4 rounded-xl border border-stone-200 space-y-1.5">
-                              <div className="flex items-center space-x-2">
-                                <span className="w-2.5 h-2.5 rounded-full bg-amber-600 shrink-0"></span>
-                                <span className="text-xs font-bold uppercase tracking-wider text-amber-800 font-sans">
-                                  Опорно-двигательный профиль
-                                </span>
-                              </div>
-                              <strong className="block text-stone-900 font-bold text-sm text-[#022C22]">
-                                Болезни костно-мышечной системы и суставов:
-                              </strong>
-                              <p className="leading-relaxed text-stone-700 text-xs sm:text-[13px]">
-                                Деформирующие артрозы, коксартроз, гонартроз, остеохондроз позвоночника, спондилез, миозиты и последствия травм.
-                              </p>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </motion.div>
-                  )}
-
-                  {aboutTab === 'treatment' && (
-                    <motion.div
-                      key="treatment"
-                      initial={{ opacity: 0, y: 8 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -8 }}
-                      transition={{ duration: 0.25 }}
-                      className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 text-sm text-stone-800 font-sans"
-                    >
-                      {/* Treatment list */}
-                      <div className="lg:col-span-8 space-y-5">
-                        <div className="bg-white p-5 rounded-2xl border border-stone-200 shadow-sm">
-                          <h4 className="font-serif text-lg sm:text-xl font-bold text-[#022C22] flex items-center">
-                            <Stethoscope className="w-5 h-5 text-[#c5a880] mr-2.5" />
-                            Применяемые терапевтические методики
-                          </h4>
-                          <p className="text-xs sm:text-sm text-stone-600 mt-1.5">
-                            Комплексный перечень процедур, проводимых квалифицированными врачами на современном лицензированном оборудовании.
-                          </p>
-                        </div>
-
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                          {[
-                            {
-                              category: 'Аппаратная электро- и магнитотерапия',
-                              color: 'bg-emerald-600',
-                              items: [
-                                { name: 'Электрофорез лекарственных средств', desc: 'Чрескожное введение препаратов токами.' },
-                                { name: 'УВЧ-терапия', desc: 'Снятие глубоких воспалений электрополем.' },
-                                { name: 'Магнитотерапия', desc: 'Улучшение трофики импульсными полями.' },
-                                { name: 'СМТ-терапия (Амплипульс)', desc: 'Стимуляция тканей модулированными токами.' }
-                              ]
-                            },
-                            {
-                              category: 'Светолечение & Лазеротерапия',
-                              color: 'bg-amber-500',
-                              items: [
-                                { name: 'Лазеротерапия', desc: 'Активация клеточного метаболизма.' },
-                                { name: 'Ультразвуковая терапия', desc: 'Микромассаж тканей звуковыми волнами.' },
-                                { name: 'Инфракрасное излучение', desc: 'Глубокий тепловой прогрев суставов.' },
-                                { name: 'УФО-тубус терапия', desc: 'Местная санация носоглотки и дыхания.' }
-                              ]
-                            },
-                            {
-                              category: 'Бальнеология & Массаж',
-                              color: 'bg-blue-500',
-                              items: [
-                                { name: 'Подводный душ-массаж', desc: 'Гидромассаж струей высокого давления.' },
-                                { name: 'Лечебные аромаванны', desc: 'Хвойные, солевые и йодобромные ванны.' },
-                                { name: 'Классический массаж', desc: 'Ручной медицинский массаж отделов тела.' },
-                                { name: 'Лечебная физкультура (ЛФК)', desc: 'Занятия в залах кинезотерапии.' }
-                              ]
-                            },
-                            {
-                              category: 'Климатотерапия & Оксигенация',
-                              color: 'bg-teal-600',
-                              items: [
-                                { name: 'Аэро- и гелиотерапия', desc: 'Лечение морским бризом и солнцем.' },
-                                { name: 'Терренкур по парку', desc: 'Дозированная лечебная ходьба по хвое.' },
-                                { name: 'Ингаляционная терапия', desc: 'Небулайзерные ингаляции фитосборами.' },
-                                { name: 'Кислородные коктейли', desc: 'Энтеральная оксигенотерапия.' }
-                              ]
-                            }
-                          ].map((cat, groupIdx) => (
-                            <div key={groupIdx} className="bg-white border border-stone-200 p-4 sm:p-5 rounded-2xl space-y-3.5 shadow-sm hover:shadow-md transition-all">
-                              <div className="flex items-center space-x-2 border-b border-stone-100 pb-2.5">
-                                <span className={`w-2.5 h-2.5 rounded-full ${cat.color}`} />
-                                <h5 className="font-serif text-xs sm:text-[13px] font-bold text-[#022C22] tracking-wide uppercase">{cat.category}</h5>
-                              </div>
-                              <div className="space-y-3">
-                                {cat.items.map((item, itemIdx) => (
-                                  <div key={itemIdx} className="flex items-start space-x-2.5">
-                                    <div className="p-0.5 rounded bg-emerald-50 text-emerald-800 shrink-0 mt-0.5">
-                                      <Check className="w-3.5 h-3.5" />
-                                    </div>
-                                    <div>
-                                      <span className="text-xs sm:text-[13px] font-bold text-[#022C22] block leading-tight">{item.name}</span>
-                                      <span className="text-[11px] text-stone-600 block mt-0.5">{item.desc}</span>
-                                    </div>
+                        <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 lg:gap-6">
+                          {/* Left: Specializations & Labs */}
+                          <div className="lg:col-span-6 space-y-5">
+                            <div className="bg-white p-5 rounded-xl border border-[#022C22]/15 shadow-sm space-y-4">
+                              <h5 className="font-serif text-base font-bold text-[#022C22] pb-2.5 flex items-center space-x-2 border-b border-stone-200">
+                                <Stethoscope className="w-4 h-4 text-[#9b7b51]" />
+                                <span>Лицензированные медицинские направления (24 вида работ):</span>
+                              </h5>
+                              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                                {[
+                                  { name: 'Терапия и лечебное дело', desc: 'Коды 1000.1.7, 1000.2.5, 1040.44' },
+                                  { name: 'Педиатрия', desc: 'Код 1040.28 · Санаторное лечение детей' },
+                                  { name: 'Физиотерапия', desc: 'Коды 1000.1.23, 1000.4.67, 1040.48' },
+                                  { name: 'Ультразвуковая диагностика', desc: 'Код 1040.46 · Аппарат «РуСкан»' },
+                                  { name: 'Функциональная диагностика', desc: 'Коды 1000.1.24, 1000.4.69, 1040.50' },
+                                  { name: 'Лабораторная диагностика', desc: 'Код 1000.1.5 · Клиника, биохимия, ИФА' },
+                                  { name: 'Лечебная физкультура (ЛФК)', desc: 'Коды 1000.1.6, 1000.4.27, 1040.16' },
+                                  { name: 'Медицинский массаж', desc: 'Коды 1000.1.12, 1040.20 · Ручной и «Ормед»' },
+                                  { name: 'Диетология', desc: 'Коды 1000.4.18, 1040.11 · 22-дневное меню' },
+                                  { name: 'Сестринское дело', desc: 'Код 1040.35 · Курация и процедуры' },
+                                  { name: 'Организация здравоохранения и эпидемиология', desc: 'Коды 1000.2.3, 1000.4.36, 1040.24' },
+                                  { name: 'Экспертиза качества медпомощи', desc: 'Код 1070.8 · Медицинские экспертизы' }
+                                ].map((item, id) => (
+                                  <div key={id} className="bg-[#F6F2E9]/80 hover:bg-[#EDE6D6] border border-stone-200/90 p-3 rounded-lg transition-colors">
+                                    <span className="font-serif font-bold text-xs sm:text-[13px] text-[#022C22] block">
+                                      {item.name}
+                                    </span>
+                                    <span className="text-[11px] text-stone-600 font-mono block mt-0.5 leading-snug">{item.desc}</span>
                                   </div>
                                 ))}
                               </div>
                             </div>
-                          ))}
-                        </div>
-                      </div>
 
-                      {/* Cabinets Structure */}
-                      <div className="lg:col-span-4 bg-white p-5 sm:p-6 rounded-2xl border border-stone-200 shadow-sm space-y-4">
-                        <div>
-                          <h4 className="font-serif text-base sm:text-lg font-bold text-[#022C22] border-b border-stone-100 pb-2.5 flex items-center space-x-2">
-                            <Building2 className="w-4 h-4 text-[#c5a880]" />
-                            <span>Структура медицинских кабинетов</span>
-                          </h4>
-                          <p className="text-xs text-stone-600 mt-2 leading-relaxed">
-                            Лечебно-диагностические подразделения Санатория «Ясная Поляна»:
-                          </p>
-                        </div>
-                        
-                        <div className="space-y-2 text-xs sm:text-[13px] text-stone-800">
-                          {[
-                            'Кабинет функциональной диагностики',
-                            'Отделение аппаратной физиотерапии',
-                            'Отделение водолечения (бальнеотерапия)',
-                            'Специализированный зал ЛФК',
-                            'Кабинеты медицинского массажа',
-                            'Ингаляторий и кислородный пункт',
-                            'Изолятор и процедурные кабинеты',
-                            'Клинико-диагностическая лаборатория',
-                            'Круглосуточный медицинский пост'
-                          ].map((cab, idx) => (
-                            <div key={idx} className="flex items-center space-x-2.5 bg-stone-50/80 p-2.5 border border-stone-200/80 rounded-xl hover:bg-stone-100/80 transition-all">
-                              <Check className="w-4 h-4 text-[#022C22] flex-shrink-0" />
-                              <span className="font-sans text-stone-900 font-semibold text-xs sm:text-[12px]">{cab}</span>
+                            {/* Diagnostics */}
+                            <div className="bg-white p-5 rounded-xl border border-[#022C22]/15 shadow-sm space-y-3.5">
+                              <h5 className="font-serif text-base font-bold text-[#022C22] pb-2 flex items-center space-x-2 border-b border-stone-200">
+                                <Activity className="w-4 h-4 text-[#9b7b51]" />
+                                <span>Диагностическая и лабораторная база:</span>
+                              </h5>
+                              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                                <div className="bg-[#F6F2E9] p-3.5 rounded-lg border border-stone-200/90">
+                                  <h6 className="font-sans text-xs font-bold text-[#022C22]">Лаборатория</h6>
+                                  <p className="text-stone-700 mt-1 text-xs leading-relaxed font-sans">
+                                    Клинические, биохимические, иммуноферментные (ИФА) анализы крови, специфические ферменты.
+                                  </p>
+                                </div>
+                                <div className="bg-[#022C22] text-white p-3.5 rounded-lg border border-[#c5a880]/40">
+                                  <h6 className="font-sans text-xs font-bold text-[#c5a880]">УЗИ «РуСкан» (с 2026 г.)</h6>
+                                  <p className="text-stone-200 mt-1 text-xs leading-relaxed font-sans">
+                                    УЗИ щитовидной железы, печени, желчного пузыря, почек, простаты, сосудов головы, шеи и ног.
+                                  </p>
+                                </div>
+                                <div className="bg-[#F6F2E9] p-3.5 rounded-lg border border-stone-200/90">
+                                  <h6 className="font-sans text-xs font-bold text-[#022C22]">Функциональная база</h6>
+                                  <p className="text-stone-700 mt-1 text-xs leading-relaxed font-sans">
+                                    Электрокардиография (ЭКГ) и диагностика функции внешнего дыхания (ФВД / спирография).
+                                  </p>
+                                </div>
+                              </div>
                             </div>
-                          ))}
-                        </div>
-                      </div>
-                    </motion.div>
-                  )}
+                          </div>
 
-                  {aboutTab === 'registry' && (
-                    <motion.div
-                      key="registry"
-                      initial={{ opacity: 0, y: 8 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -8 }}
-                      transition={{ duration: 0.25 }}
-                      className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 text-sm text-stone-800 font-sans"
-                    >
-                      {/* Management and Contacts */}
-                      <div className="space-y-4 bg-white p-5 sm:p-6 rounded-2xl border border-stone-200 flex flex-col justify-between shadow-sm">
-                        <div>
-                          <h4 className="font-sans text-base font-bold text-[#022C22] border-b border-stone-100 pb-2.5 flex items-center space-x-2">
-                            <UserCheck className="w-4 h-4 text-[#c5a880]" />
-                            <span>Руководство учреждения</span>
-                          </h4>
-                          <div className="space-y-2 text-xs sm:text-[13px] mt-3.5">
-                            <div>
-                              <span className="block text-stone-600 font-sans text-xs uppercase tracking-wider font-semibold">Начальник санатория</span>
-                              <strong className="block text-base sm:text-lg text-[#022C22] font-serif font-bold mt-1">
-                                {RESORT_INFO.directorName || 'Данилив Алексей Иванович'}
+                          {/* Right: Pathologies & Basic Illness Profiles */}
+                          <div className="lg:col-span-6 bg-white p-5 sm:p-6 rounded-xl border border-[#022C22]/15 shadow-sm flex flex-col justify-between space-y-4">
+                            <div className="space-y-4">
+                              <h5 className="font-serif text-lg font-bold text-[#022C22] flex items-center space-x-2 border-b border-stone-200 pb-3">
+                                <Shield className="w-5 h-5 text-[#9b7b51]" />
+                                <span>Основные лечебные профили и консультации врачей</span>
+                              </h5>
+                              
+                              <div className="space-y-3.5 text-xs text-stone-700 font-sans">
+                                <div className="bg-[#F6F2E9]/80 p-4 rounded-xl border border-stone-200/90 space-y-1.5">
+                                  <span className="text-xs font-bold text-[#9b7b51] font-sans block">
+                                    01. Пульмонологический и ЛОР-профиль
+                                  </span>
+                                  <strong className="block font-bold text-sm text-[#022C22]">
+                                    Заболевания органов дыхания и ЛОР-органов:
+                                  </strong>
+                                  <p className="leading-relaxed text-stone-700 text-xs sm:text-[13px]">
+                                    Хронические и рецидивирующие бронхиты, бронхиальная астма с различными клинико-патогенетическими вариантами течения, патология ЛОР-органов (сочетание бальнеолечения, электрофизиопроцедур и лекарственных ингаляций).
+                                  </p>
+                                </div>
+
+                                <div className="bg-[#F6F2E9]/80 p-4 rounded-xl border border-stone-200/90 space-y-1.5">
+                                  <span className="text-xs font-bold text-[#9b7b51] font-sans block">
+                                    02. Опорно-двигательный профиль
+                                  </span>
+                                  <strong className="block font-bold text-sm text-[#022C22]">
+                                    Болезни костно-мышечной системы и позвоночника:
+                                  </strong>
+                                  <p className="leading-relaxed text-stone-700 text-xs sm:text-[13px]">
+                                    Грыжи позвоночника, остеохондроз, артрозы крупных суставов (аппликации сульфидных иловых грязей Сакского озера, индивидуальные комплексы ЛФК, вытяжение «Детензор», программный массаж на кушетке «Ормед»).
+                                  </p>
+                                </div>
+
+                                <div className="bg-[#F6F2E9]/80 p-4 rounded-xl border border-stone-200/90 space-y-1.5">
+                                  <span className="text-xs font-bold text-[#9b7b51] font-sans block">
+                                    03. Кардиологический и психосоматический профиль
+                                  </span>
+                                  <strong className="block font-bold text-sm text-[#022C22]">
+                                    Болезни сердца, кровообращения и антистресс-терапия:
+                                  </strong>
+                                  <p className="leading-relaxed text-stone-700 text-xs sm:text-[13px]">
+                                    Сухие углекислые и йодобромные ванны, кардиотренажеры, 3 режима терренкура, психоэмоциональная разгрузка на аппарате «Сенсориум». Консультации врачей: <strong>физиотерапевта, педиатра, врача функциональной диагностики</strong>; курация <strong>медицинской сестрой диетической</strong>.
+                                  </p>
+                                </div>
+                              </div>
+                            </div>
+
+                            <div className="pt-3 border-t border-stone-200 flex items-center justify-between gap-4">
+                              <span className="text-xs text-stone-600">Санаторно-курортная карта: форма 072/у (взрослые), 076/у (дети)</span>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setCurrentPage('medical');
+                                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                                }}
+                                className="px-4 py-2 rounded-lg bg-[#022C22] hover:bg-[#c5a880] text-white hover:text-[#022C22] font-sans font-bold text-xs transition-colors cursor-pointer whitespace-nowrap shrink-0"
+                              >
+                                Подробнее о лечении
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      </motion.div>
+                    )}
+
+                    {aboutTab === 'treatment' && (
+                      <motion.div
+                        key="treatment"
+                        initial={{ opacity: 0, y: 8 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -8 }}
+                        transition={{ duration: 0.2 }}
+                        className="grid grid-cols-1 lg:grid-cols-12 gap-5 lg:gap-6 text-sm text-stone-800 font-sans"
+                      >
+                        {/* Treatment list */}
+                        <div className="lg:col-span-8 space-y-4">
+                          <div className="bg-[#022C22] text-white p-5 rounded-xl border border-[#c5a880]/40 shadow-sm">
+                            <h4 className="font-serif text-lg sm:text-xl font-bold text-white flex items-center">
+                              <Stethoscope className="w-5 h-5 text-[#c5a880] mr-2.5 shrink-0" />
+                              Применяемые терапевтические методики санатория
+                            </h4>
+                            <p className="text-xs sm:text-sm text-stone-200 mt-1">
+                              После консультации с лечащим врачом и физиотерапевтом пациенты получают комплексное санаторно-курортное лечение основного и сопутствующих заболеваний.
+                            </p>
+                          </div>
+
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            {[
+                              {
+                                num: '01.',
+                                category: 'Бальнеология, души и Сакские грязи',
+                                items: [
+                                  { name: 'Грязелечение (Сакское озеро)', desc: 'Аппликации сульфидных иловых грязей при болезнях суставов и внутренних органов.' },
+                                  { name: 'Лечебные ванны (7 видов)', desc: 'Хвойные, хвойно-жемчужные, йодобромные, лавандовые, с бишофитом, экстрактом пиявки, эфирными маслами и морским коллагеном.' },
+                                  { name: 'Сухие углекислые ванны', desc: 'Улучшение микроциркуляции и оксигенации тканей.' },
+                                  { name: 'Лечебные души', desc: 'Циркулярный, восходящий душ и подводный душ-массаж.' }
+                                ]
+                              },
+                              {
+                                num: '02.',
+                                category: 'Аппаратная физиотерапия',
+                                items: [
+                                  { name: 'Гальванизация и электрофорез', desc: 'Введение лекарственных препаратов постоянным током.' },
+                                  { name: 'Магнито- и инфитатерапия', desc: 'Кабинет современной магнитотерапии и импульсных полей.' },
+                                  { name: 'Ультразвук и ультрафонофорез', desc: 'УЗ-терапия лекарственными препаратами, дарсонвализация.' },
+                                  { name: 'Импульсные токи, УВЧ и СМВ', desc: 'Диадинамотерапия, амплипульстерапия, УВЧ, СМВ и лимфодренаж.' }
+                                ]
+                              },
+                              {
+                                num: '03.',
+                                category: 'ЛФК, массаж, «Ормед» и «Детензор»',
+                                items: [
+                                  { name: 'Зал ЛФК и механотерапии', desc: 'Кардиотренажеры, спортплощадка, комплексы при грыжах, остеохондрозе и артрозах.' },
+                                  { name: 'Система «Детензор»', desc: 'Щадящее вытяжение позвоночника, занятия с фитнес-мячами и снарядами.' },
+                                  { name: 'Массаж и кушетка «Ормед»', desc: 'Классический медицинский, программный на кушетке «Ормед», гидромассаж.' },
+                                  { name: 'Лимфодренажный массаж', desc: 'Кабинет лимфодренажного и электростатического массажа.' }
+                                ]
+                              },
+                              {
+                                num: '04.',
+                                category: 'Ингаляции, «Сенсориум» и Диетология',
+                                items: [
+                                  { name: 'Ингаляторий и терренкур', desc: 'Лекарственные ингаляции; 3 режима терренкура (щадящий, щадяще-тренирующий, тренирующий).' },
+                                  { name: 'Аппарат «Сенсориум»', desc: 'Кабинет психологической разгрузки для снятия стресса и профилактики психосоматики.' },
+                                  { name: 'Фитобар с бюветом и ИК-сауна', desc: 'Кислородный коктейль, лекарственные фитосборы, инфракрасная сауна.' },
+                                  { name: '22-дневное диетическое меню', desc: 'Заказная система питания под курацией медицинской сестры диетической.' }
+                                ]
+                              }
+                            ].map((cat, groupIdx) => (
+                              <div key={groupIdx} className="bg-white border border-[#022C22]/15 p-4 sm:p-5 rounded-xl space-y-3.5 shadow-sm">
+                                <div className="flex items-center space-x-2 border-b border-stone-200 pb-2.5">
+                                  <span className="font-mono text-xs font-bold text-[#9b7b51]">{cat.num}</span>
+                                  <h5 className="font-serif text-xs sm:text-sm font-bold text-[#022C22]">{cat.category}</h5>
+                                </div>
+                                <div className="space-y-3">
+                                  {cat.items.map((item, itemIdx) => (
+                                    <div key={itemIdx} className="flex items-start space-x-2.5">
+                                      <div className="p-0.5 rounded bg-[#022C22]/10 text-[#022C22] shrink-0 mt-0.5">
+                                        <Check className="w-3.5 h-3.5" />
+                                      </div>
+                                      <div>
+                                        <span className="text-xs sm:text-[13px] font-bold text-[#022C22] block leading-tight">{item.name}</span>
+                                        <span className="text-[11px] text-stone-600 block mt-0.5">{item.desc}</span>
+                                      </div>
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* Cabinets Structure */}
+                        <div className="lg:col-span-4 bg-white p-5 sm:p-6 rounded-xl border border-[#022C22]/15 shadow-sm space-y-4">
+                          <div>
+                            <h4 className="font-serif text-base sm:text-lg font-bold text-[#022C22] border-b border-stone-200 pb-2.5 flex items-center space-x-2">
+                              <Building2 className="w-4 h-4 text-[#9b7b51]" />
+                              <span>Структура медицинского отделения</span>
+                            </h4>
+                            <p className="text-xs text-stone-600 mt-2 leading-relaxed">
+                              Лечебно-диагностические кабинеты и подразделения санатория:
+                            </p>
+                          </div>
+                          
+                          <div className="space-y-2 text-xs sm:text-[13px] text-stone-800">
+                            {[
+                              'Кабинет грязелечения (Сакские грязи)',
+                              'Бальнеологический кабинет (ванны и души)',
+                              'Кабинет сухих углекислых ванн',
+                              'Кабинет физиотерапии и современной магнитотерапии',
+                              'Кабинеты ручного и механического массажа («Ормед»)',
+                              'Кабинет лимфодренажного и электростатического массажа',
+                              'Ингаляторий и инфракрасная сауна',
+                              'Зал ЛФК, кардиотренажеров, механотерапии и «Детензор»',
+                              'Кабинет психологической разгрузки («Сенсориум»)',
+                              'Фитобар с бюветом минеральных вод',
+                              'Кабинет УЗ-диагностики (аппарат «РуСкан»)',
+                              'Кабинет функциональной диагностики (ЭКГ, ФВД) и лаборатория'
+                            ].map((cab, idx) => (
+                              <div key={idx} className="flex items-center space-x-2.5 bg-[#F6F2E9]/80 p-2.5 border border-stone-200/90 rounded-lg">
+                                <Check className="w-4 h-4 text-[#022C22] flex-shrink-0" />
+                                <span className="font-sans text-[#022C22] font-semibold text-xs">{cab}</span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      </motion.div>
+                    )}
+
+                    {aboutTab === 'registry' && (
+                      <motion.div
+                        key="registry"
+                        initial={{ opacity: 0, y: 8 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -8 }}
+                        transition={{ duration: 0.2 }}
+                        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 text-sm text-stone-800 font-sans items-stretch"
+                      >
+                        {/* Management and Contacts */}
+                        <div className="space-y-4 bg-white p-5 sm:p-6 rounded-xl border border-[#022C22]/15 flex flex-col justify-between shadow-sm">
+                          <div className="space-y-4">
+                            <h4 className="font-serif text-base sm:text-lg font-bold text-[#022C22] border-b border-stone-200 pb-2.5 flex items-center space-x-2">
+                              <UserCheck className="w-4 h-4 text-[#9b7b51]" />
+                              <span>Руководство учреждения</span>
+                            </h4>
+                            <div className="bg-[#022C22] text-white p-4 rounded-xl border border-[#c5a880]/40">
+                              <span className="block text-[#c5a880] font-sans text-xs font-semibold">
+                                {siteData?.resortInfo?.directorRole || RESORT_INFO.directorRole || 'Начальник санатория'}
+                              </span>
+                              <strong className="block text-base sm:text-lg text-white font-serif font-bold mt-1">
+                                {siteData?.resortInfo?.directorName || RESORT_INFO.directorName || 'Шапортов Станислав Владимирович'}
                               </strong>
-                              <span className="text-[#c5a880] font-bold uppercase text-xs font-sans tracking-wider mt-0.5 block">
-                                {RESORT_INFO.directorRole || 'и.о. начальника санатория'}
+                            </div>
+                            <div className="bg-[#F6F2E9] p-3.5 rounded-xl border border-stone-200/90">
+                              <span className="block text-[#9b7b51] font-sans text-xs font-bold">
+                                Заведующий медицинским отделением (с января 2025 г.)
+                              </span>
+                              <strong className="block text-sm text-[#022C22] font-serif font-bold mt-0.5">
+                                Душкин Игорь Фёдорович
+                              </strong>
+                              <span className="block text-[11px] text-stone-600 mt-0.5">
+                                Врач высшей категории, к.м.н., Заслуженный врач Республики Крым, доцент
                               </span>
                             </div>
                           </div>
-                        </div>
 
-                        <div className="pt-3 border-t border-stone-100 space-y-2">
-                          <span className="block text-stone-600 font-sans text-xs uppercase tracking-wider font-semibold">Приемная и связь</span>
-                          <div className="space-y-2 bg-stone-50/80 p-3 rounded-xl border border-stone-200/80 text-xs sm:text-[13px]">
-                            <p className="flex justify-between items-center">
-                              <span className="text-stone-600 font-medium">Телефон:</span>
-                              <a href="tel:+73654239376" className="font-mono tabular-nums font-bold text-[#022C22] hover:text-[#c5a880] transition-all">+7(3654)23-93-76</a>
-                            </p>
-                            <p className="flex justify-between items-center">
-                              <span className="text-stone-600 font-medium">Факс:</span>
-                              <span className="font-mono tabular-nums text-stone-900 font-semibold">+7(3654)23-93-76</span>
-                            </p>
-                            <p className="flex justify-between items-center">
-                              <span className="text-stone-600 font-medium">Email:</span>
-                              <a href={`mailto:${RESORT_INFO.email}`} className="font-mono text-[#022C22] font-semibold hover:text-[#c5a880] hover:underline">{RESORT_INFO.email}</a>
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Registry details */}
-                      <div className="space-y-4 bg-white p-5 sm:p-6 rounded-2xl border border-stone-200 flex flex-col justify-between shadow-sm">
-                        <div>
-                          <h4 className="font-sans text-base font-bold text-[#022C22] border-b border-stone-100 pb-2.5 flex items-center space-x-2">
-                            <FileText className="w-4 h-4 text-[#c5a880]" />
-                            <span>Гос. регистрация</span>
-                          </h4>
-                          <div className="space-y-2 text-xs sm:text-[13px] mt-3.5">
-                            <div>
-                              <span className="block text-stone-600 font-sans text-xs uppercase tracking-wider font-semibold">Регистрирующий орган</span>
-                              <p className="font-semibold text-stone-900 mt-1 leading-snug font-sans">
-                                Межрайонная инспекция Федеральной налоговой службы №46 по г. Москве
+                          <div className="pt-3 border-t border-stone-200 space-y-2">
+                            <span className="block text-stone-600 font-sans text-xs font-semibold">Приемная и официальная связь</span>
+                            <div className="space-y-2 bg-[#F6F2E9]/80 p-3.5 rounded-xl border border-stone-200/90 text-xs sm:text-[13px]">
+                              <p className="flex justify-between items-center">
+                                <span className="text-stone-600 font-medium">Телефон / Факс:</span>
+                                <a href="tel:+73654239376" className="font-mono tabular-nums font-bold text-[#022C22] hover:text-[#9b7b51] transition-colors">+7 (3654) 23-93-76</a>
+                              </p>
+                              <p className="flex justify-between items-center">
+                                <span className="text-stone-600 font-medium">Email:</span>
+                                <a href={`mailto:${RESORT_INFO.email || 'sanatoriy@ya-polyana.ru'}`} className="font-mono text-[#022C22] font-semibold hover:text-[#9b7b51] hover:underline">{RESORT_INFO.email || 'sanatoriy@ya-polyana.ru'}</a>
                               </p>
                             </div>
                           </div>
                         </div>
 
-                        <div className="border-t border-stone-100 pt-3 grid grid-cols-2 gap-2 text-xs">
-                          <div className="bg-stone-50/80 p-2.5 rounded-xl border border-stone-200">
-                            <span className="block text-stone-600 font-sans text-xs uppercase tracking-wider font-semibold">Серия</span>
-                            <span className="font-mono tabular-nums font-extrabold text-[#022C22] text-sm">77</span>
+                        {/* Registry details */}
+                        <div className="space-y-4 bg-white p-5 sm:p-6 rounded-xl border border-[#022C22]/15 flex flex-col justify-between shadow-sm">
+                          <div>
+                            <h4 className="font-serif text-base sm:text-lg font-bold text-[#022C22] border-b border-stone-200 pb-2.5 flex items-center space-x-2">
+                              <FileText className="w-4 h-4 text-[#9b7b51]" />
+                              <span>Государственная регистрация</span>
+                            </h4>
+                            <div className="space-y-3 text-xs sm:text-[13px] mt-3.5">
+                              <div>
+                                <span className="block text-stone-500 font-sans text-xs font-semibold">Регистрирующий орган ФНС России</span>
+                                <p className="font-semibold text-[#022C22] mt-1 leading-snug font-sans">
+                                  Межрайонная инспекция Федеральной налоговой службы № 46 по г. Москве
+                                </p>
+                              </div>
+                              <div>
+                                <span className="block text-stone-500 font-sans text-xs font-semibold">Постановка на учет по месту нахождения</span>
+                                <p className="font-semibold text-[#022C22] mt-1 leading-snug font-sans">
+                                  УФНС России по Республике Крым (КПП 910301001)
+                                </p>
+                              </div>
+                            </div>
                           </div>
-                          <div className="bg-stone-50/80 p-2.5 rounded-xl border border-stone-200">
-                            <span className="block text-stone-600 font-sans text-xs uppercase tracking-wider font-semibold">Свидетельство</span>
-                            <span className="font-mono tabular-nums font-extrabold text-[#022C22] text-xs sm:text-sm">015463944</span>
-                          </div>
-                          <div className="bg-stone-50/80 p-2.5 rounded-xl border border-stone-200 col-span-2">
-                            <span className="block text-stone-600 font-sans text-xs uppercase tracking-wider font-semibold">Дата регистрации</span>
-                            <span className="font-mono tabular-nums font-bold text-[#022C22]">29 октября 2013 г.</span>
-                          </div>
-                        </div>
-                      </div>
 
-                      {/* Creation foundation */}
-                      <div className="space-y-4 bg-white p-5 sm:p-6 rounded-2xl border border-stone-200 flex flex-col justify-between shadow-sm md:col-span-2 lg:col-span-1">
-                        <div>
-                          <h4 className="font-sans text-base font-bold text-[#022C22] border-b border-stone-100 pb-2.5 flex items-center space-x-2">
-                            <Shield className="w-4 h-4 text-[#c5a880]" />
-                            <span>Создание учреждения</span>
-                          </h4>
-                          <div className="space-y-2 text-xs sm:text-[13px] mt-3.5 leading-relaxed font-sans">
-                            <div>
-                              <span className="block text-stone-600 font-sans text-xs uppercase tracking-wider font-semibold">Основание внесения</span>
-                              <p className="text-stone-900 font-semibold mt-1">Внесение в ЕГРЮЛ сведений о юридическом лице</p>
+                          <div className="border-t border-stone-200 pt-3 grid grid-cols-2 gap-2.5 text-xs">
+                            <div className="bg-[#F6F2E9]/80 p-3 rounded-xl border border-stone-200/90">
+                              <span className="block text-stone-500 font-sans text-xs font-semibold">Серия бланка</span>
+                              <span className="font-mono tabular-nums font-extrabold text-[#022C22] text-sm mt-0.5 block">77</span>
+                            </div>
+                            <div className="bg-[#F6F2E9]/80 p-3 rounded-xl border border-stone-200/90">
+                              <span className="block text-stone-500 font-sans text-xs font-semibold">№ Свидетельства</span>
+                              <span className="font-mono tabular-nums font-extrabold text-[#022C22] text-xs sm:text-sm mt-0.5 block">015463944</span>
+                            </div>
+                            <div className="bg-[#F6F2E9]/80 p-3 rounded-xl border border-stone-200/90 col-span-2">
+                              <span className="block text-stone-500 font-sans text-xs font-semibold">Дата государственной регистрации</span>
+                              <span className="font-mono tabular-nums font-bold text-[#022C22] mt-0.5 block">29 октября 2013 г.</span>
                             </div>
                           </div>
                         </div>
 
-                        <div className="border-t border-stone-100 pt-3 grid grid-cols-2 gap-2 text-xs">
-                          <div className="bg-stone-50/80 p-2.5 rounded-xl border border-stone-200">
-                            <span className="block text-stone-600 font-sans text-xs uppercase tracking-wider font-semibold">Дата создания</span>
-                            <p className="font-bold text-[#022C22] mt-0.5 font-mono tabular-nums">29.10.2013</p>
+                        {/* Creation foundation */}
+                        <div className="space-y-4 bg-white p-5 sm:p-6 rounded-xl border border-[#022C22]/15 flex flex-col justify-between shadow-sm md:col-span-2 lg:col-span-1">
+                          <div className="space-y-3">
+                            <h4 className="font-serif text-base sm:text-lg font-bold text-[#022C22] border-b border-stone-200 pb-2.5 flex items-center space-x-2">
+                              <Shield className="w-4 h-4 text-[#9b7b51]" />
+                              <span>Учредительные сведения</span>
+                            </h4>
+                            <div className="space-y-2.5 text-xs sm:text-[13px] mt-3 leading-relaxed font-sans">
+                              <div>
+                                <span className="block text-stone-500 font-sans text-xs font-semibold">Основание внесения в ЕГРЮЛ</span>
+                                <p className="text-[#022C22] font-semibold mt-1">Внесение в Единый государственный реестр юридических лиц сведений о федеральном казенном учреждении</p>
+                              </div>
+                              <div>
+                                <span className="block text-stone-500 font-sans text-xs font-semibold">Учредитель</span>
+                                <p className="text-[#022C22] font-semibold mt-1">Российская Федерация в лице Федеральной таможенной службы (ФТС России)</p>
+                              </div>
+                            </div>
                           </div>
-                          <div className="bg-stone-50/80 p-2.5 rounded-xl border border-stone-200">
-                            <span className="block text-stone-600 font-sans text-xs uppercase tracking-wider font-semibold">ОГРН</span>
-                            <strong className="font-mono tabular-nums text-[#022C22] text-xs sm:text-sm mt-0.5 block">5137746004787</strong>
+
+                          <div className="border-t border-stone-200 pt-3 grid grid-cols-2 gap-2.5 text-xs">
+                            <div className="bg-[#F6F2E9]/80 p-3 rounded-xl border border-stone-200/90">
+                              <span className="block text-stone-500 font-sans text-xs font-semibold">Дата создания</span>
+                              <p className="font-bold text-[#022C22] mt-0.5 font-mono tabular-nums">29.10.2013</p>
+                            </div>
+                            <div className="bg-[#F6F2E9]/80 p-3 rounded-xl border border-stone-200/90">
+                              <span className="block text-stone-500 font-sans text-xs font-semibold">ОГРН</span>
+                              <strong className="font-mono tabular-nums text-[#022C22] text-xs sm:text-sm mt-0.5 block">5137746004787</strong>
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
               </div>
             </div>
           </div>
@@ -2891,13 +2986,13 @@ export default function App() {
                 </button>
               </div>
             )}
-            <span className="text-[#c5a880] text-xs font-mono uppercase tracking-widest font-bold">Санаторно-курортный профиль</span>
+            <span className="text-[#c5a880] text-xs font-mono uppercase tracking-widest font-bold">Медицинское отделение санатория • Лицензия № Л041-00110-91/00554225</span>
             <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight mt-3">
-              Оздоровительные направления
+              Лечение и диагностика
             </h2>
             <div className="h-1 w-20 bg-[#c5a880] mx-auto mt-6"></div>
             <p className="text-stone-300 text-sm sm:text-base leading-relaxed mt-4">
-              Ознакомительный перечень типовых оздоровительных направлений санатория. Конкретный перечень, объем и график процедур определяются лечащим врачом индивидуально в соответствии с медицинскими показаниями и санаторно-курортной картой.
+              В медицинском отделении работают 39 специалистов (100% аккредитованный средний и высший медперсонал, 5 опытных врачей) под руководством к.м.н., Заслуженного врача Республики Крым И.Ф. Душкина. Функционируют кабинеты грязелечения Сакскими грязями, бальнеологии, аппаратной физиотерапии, УЗ-диагностики «РуСкан», клинико-биохимическая лаборатория и зал ЛФК.
             </p>
           </div>
 

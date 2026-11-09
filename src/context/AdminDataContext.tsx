@@ -156,7 +156,14 @@ export function normalizeSiteData(data: Partial<SiteData> | any): SiteData {
   }));
 
   const rawMed = Array.isArray(data.medicalPrograms) ? data.medicalPrograms : (DEFAULT_SITE_DATA.medicalPrograms || []);
-  const normalizedMed = rawMed.map((m: any) => {
+  const hasPlaceholderMed = rawMed.some((m: any) =>
+    m?.title === 'Общеоздоровительная программа' ||
+    m?.title === 'Климатотерапия и рекреация' ||
+    m?.title === 'Профилактический оздоровительный курс' ||
+    (typeof m?.shortDesc === 'string' && m.shortDesc.includes('Базовый ознакомительный комплекс'))
+  );
+  const sourceMed = hasPlaceholderMed ? DEFAULT_SITE_DATA.medicalPrograms : rawMed;
+  const normalizedMed = sourceMed.map((m: any) => {
     const def = DEFAULT_SITE_DATA.medicalPrograms.find(dm => dm.id === m?.id);
     return {
       ...(def || {}),
@@ -166,10 +173,35 @@ export function normalizeSiteData(data: Partial<SiteData> | any): SiteData {
     };
   });
 
+  const rawServices = Array.isArray(data.services) ? data.services : (DEFAULT_SERVICES || []);
+  const hasOldServices = rawServices.some((s: any) =>
+    s?.id === 'serv-1' ||
+    s?.title === 'Методы электромагнитного лечебного воздействия на органы и ткани' ||
+    s?.title === 'Лечение с помощью светового и лазерного воздействия'
+  );
+  const normalizedServices = hasOldServices ? DEFAULT_SERVICES : rawServices;
+
+  const rawResortInfo = data.resortInfo || {};
+  const hasOldClimatotherapy = typeof rawResortInfo.climatotherapyText === 'string' &&
+    rawResortInfo.climatotherapyText.startsWith('Мы предлагаем комплексный подход к здоровью');
+  const hasOldDirector = typeof rawResortInfo.directorName === 'string' &&
+    rawResortInfo.directorName.includes('Данилив');
+
   const merged: SiteData = {
     ...DEFAULT_SITE_DATA,
     ...data,
-    resortInfo: { ...DEFAULT_SITE_DATA.resortInfo, ...(data.resortInfo || {}) },
+    resortInfo: {
+      ...DEFAULT_SITE_DATA.resortInfo,
+      ...rawResortInfo,
+      ...(hasOldClimatotherapy ? {
+        climatotherapyText: DEFAULT_SITE_DATA.resortInfo.climatotherapyText,
+        historyText: DEFAULT_SITE_DATA.resortInfo.historyText
+      } : {}),
+      ...(hasOldDirector ? {
+        directorName: DEFAULT_SITE_DATA.resortInfo.directorName,
+        directorRole: DEFAULT_SITE_DATA.resortInfo.directorRole
+      } : {})
+    },
     hero: {
       ...DEFAULT_SITE_DATA.hero,
       ...(data.hero || {}),
@@ -183,9 +215,9 @@ export function normalizeSiteData(data: Partial<SiteData> | any): SiteData {
     rooms: normalizedRooms,
     medicalPrograms: normalizedMed,
     testimonials: normalizedTestimonials,
-    faqs: Array.isArray(data.faqs) ? data.faqs : (DEFAULT_SITE_DATA.faqs || []),
+    faqs: (Array.isArray(data.faqs) && data.faqs.length >= 6) ? data.faqs : (DEFAULT_SITE_DATA.faqs || []),
     news: Array.isArray(data.news) ? data.news : (DEFAULT_SITE_DATA.news || []),
-    services: Array.isArray(data.services) ? data.services : (DEFAULT_SERVICES || []),
+    services: normalizedServices,
     gallery: Array.isArray(data.gallery) ? data.gallery : (DEFAULT_SITE_DATA.gallery || []),
     galleryCategories: Array.isArray(data.galleryCategories) ? data.galleryCategories : (DEFAULT_SITE_DATA.galleryCategories || []),
     users: Array.isArray(data.users) ? data.users : (DEFAULT_SITE_DATA.users || []),
@@ -208,20 +240,30 @@ export function normalizeSiteData(data: Partial<SiteData> | any): SiteData {
         }
 
         const catObj = DOCUMENT_CATEGORIES.find(c => c.id === category);
+        const docId = String(d?.id || `doc-${idx + 1}`);
+        const initialDoc = INITIAL_DOCUMENTS.find(init => init.id === docId);
+        const isLegacyDoc = initialDoc && ['medical-care-types', 'general-license', 'structure-yasnayapolyana', 'medical-staff-list', 'director-order'].includes(docId) && (
+          !d?.originalText ||
+          !String(d.originalText).includes('1000.1.5') && docId === 'medical-care-types' ||
+          !String(d.originalText).includes('24 вида') && docId === 'general-license' ||
+          !String(d.originalText).includes('Сакского озера') && docId === 'structure-yasnayapolyana' ||
+          !String(d.originalText).includes('Душкин Игорь Фёдорович') && docId === 'medical-staff-list' ||
+          String(d.originalText).includes('Данилив') && docId === 'director-order'
+        );
 
         return {
-          id: String(d?.id || `doc-${idx + 1}`),
-          title: String(d?.title || 'ОФИЦИАЛЬНЫЙ ДОКУМЕНТ'),
-          code: d?.code || (d?.number ? `Рег. № ${d.number}` : undefined),
+          id: docId,
+          title: isLegacyDoc ? (initialDoc?.title || 'ОФИЦИАЛЬНЫЙ ДОКУМЕНТ') : String(d?.title || initialDoc?.title || 'ОФИЦИАЛЬНЫЙ ДОКУМЕНТ'),
+          code: isLegacyDoc ? initialDoc?.code : (d?.code || (d?.number ? `Рег. № ${d.number}` : undefined)),
           category,
           categoryLabel: d?.categoryLabel || catObj?.name || 'Документы',
-          summary: d?.summary || d?.description || d?.annotation || '',
+          summary: isLegacyDoc ? (initialDoc?.summary || '') : (d?.summary || d?.description || d?.annotation || ''),
           pdfUrl: (typeof d?.pdfUrl === 'string' && d.pdfUrl.trim() !== '') 
             ? d.pdfUrl 
             : (typeof d?.url === 'string' && d.url !== '#' && d.url.trim() !== '' ? d.url : null),
           fileSize: d?.fileSize || d?.size || '1.2 MB',
           uploadDate: d?.uploadDate || d?.date || '2026',
-          originalText: d?.originalText || d?.fullText || d?.text || ''
+          originalText: isLegacyDoc ? (initialDoc?.originalText || '') : (d?.originalText || d?.fullText || d?.text || '')
         };
       });
     })(),
