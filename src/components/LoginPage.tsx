@@ -72,8 +72,6 @@ export default function LoginPage({ onBackToHome }: { onBackToHome: () => void }
     <div className="min-h-screen bg-[#FAF9F6] text-stone-800 flex flex-col justify-between font-sans relative overflow-hidden selection:bg-[#c5a880]/30 selection:text-[#022C22]">
       {/* Elegantly styled top background graphic pattern */}
       <div className="absolute top-0 inset-x-0 h-96 bg-gradient-to-b from-[#022C22]/10 to-transparent pointer-events-none"></div>
-      <div className="absolute -top-40 -left-40 w-96 h-96 bg-[#c5a880]/10 rounded-full blur-3xl pointer-events-none"></div>
-      <div className="absolute top-1/2 -right-40 w-96 h-96 bg-[#022C22]/5 rounded-full blur-3xl pointer-events-none"></div>
 
       {/* Header Bar */}
       <header className="relative z-10 w-full max-w-7xl mx-auto px-4 py-6 sm:px-6 lg:px-8 flex items-center justify-between">
@@ -101,7 +99,7 @@ export default function LoginPage({ onBackToHome }: { onBackToHome: () => void }
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-            className="bg-white rounded-3xl border border-stone-200 shadow-xl overflow-hidden"
+            className="bg-white rounded-2xl border border-stone-200 shadow-xl overflow-hidden"
           >
             {/* Upper part of card with deep brand coloring */}
             <div className="bg-[#022C22] p-8 text-white relative overflow-hidden text-center">
@@ -128,7 +126,7 @@ export default function LoginPage({ onBackToHome }: { onBackToHome: () => void }
                   animate={{ opacity: 1, scale: 1 }}
                   className="flex flex-col items-center justify-center text-center py-8 space-y-4"
                 >
-                  <div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center text-emerald-600 shadow-sm animate-bounce">
+                  <div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center text-emerald-600 shadow-sm">
                     <CheckCircle2 className="w-10 h-10" />
                   </div>
                   <div>

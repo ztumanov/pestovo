@@ -20,7 +20,7 @@ export default function NewsPage({ onBackToHome }: { onBackToHome: () => void })
   return (
     <div className="min-h-screen bg-[#FAF9F6] text-[#022C22] font-sans selection:bg-[#c5a880]/30">
       {/* Institutional Hero Header */}
-      <div className="bg-[#022C22] text-white pt-28 pb-16 px-4 sm:px-6 relative overflow-hidden border-b border-[#c5a880]/30">
+      <div className="bg-[#022C22] text-white py-12 sm:py-16 px-4 sm:px-6 relative overflow-hidden border-b border-[#c5a880]/30">
         <div className="max-w-7xl mx-auto relative z-10">
           {/* Unified Breadcrumbs & Back Button */}
           <div className="flex flex-wrap items-center justify-between gap-4 mb-8 pb-4 border-b border-white/10">
@@ -234,7 +234,7 @@ export default function NewsPage({ onBackToHome }: { onBackToHome: () => void })
 
               <div className="p-6 sm:p-10 overflow-y-auto bg-[#FAF9F6]">
                 {selectedNews.summary && (
-                  <p className="text-base sm:text-lg font-serif font-medium text-[#022C22] italic leading-relaxed border border-[#c5a880]/40 bg-white p-5 rounded-xl mb-8">
+                  <p className="text-base sm:text-lg font-serif font-medium text-[#022C22] leading-relaxed border border-[#c5a880]/40 bg-white p-5 rounded-xl mb-8">
                     {selectedNews.summary}
                   </p>
                 )}

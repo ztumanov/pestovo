@@ -1589,7 +1589,7 @@ export default function App() {
             <div className="hidden lg:flex items-center space-x-3 xl:space-x-4">
               <a href="tel:88005503240" className="flex items-center text-xs xl:text-sm font-semibold hover:text-[#c5a880] transition-colors py-1 shrink-0 font-mono tabular-nums tracking-normal">
                 <Phone className="w-4 h-4 mr-1.5 text-[#c5a880]" />
-                <span className="hidden xl:inline">8 (800) 550-32-40</span>
+                <span className="hidden lg:inline">8 (800) 550-32-40</span>
               </a>
             </div>
 
@@ -1625,7 +1625,7 @@ export default function App() {
                     className="w-full flex items-center justify-between font-medium py-2 text-stone-200 border-b border-white/5 hover:text-[#c5a880] text-left cursor-pointer"
                   >
                     <span>О санатории</span>
-                    <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${isAboutDropdownOpen ? 'rotate-180 text-[#c5a880]' : 'text-stone-305'}`} />
+                    <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${isAboutDropdownOpen ? 'rotate-180 text-[#c5a880]' : 'text-stone-300'}`} />
                   </button>
                   <AnimatePresence>
                     {isAboutDropdownOpen && (
@@ -1634,7 +1634,7 @@ export default function App() {
                         animate={{ height: 'auto', opacity: 1 }}
                         exit={{ height: 0, opacity: 0 }}
                         transition={{ duration: 0.2 }}
-                        className="pl-4 bg-emerald-950/40 rounded border-l-2 border-[#c5a880]/30 my-1 space-y-1 py-1"
+                        className="pl-4 bg-emerald-950/40 rounded-lg border-l-2 border-[#c5a880]/30 my-1 space-y-1 py-1"
                       >
                         <a
                           href="#about"
@@ -1701,14 +1701,14 @@ export default function App() {
                 ))}
                 
                 <div className="pt-4 flex flex-col space-y-3">
-                  <a href="tel:88005503240" className="flex items-center font-medium text-stone-200">
+                  <a href="tel:88005503240" className="flex items-center font-medium text-stone-200 font-mono tabular-nums">
                     <Phone className="w-4.5 h-4.5 mr-3 text-[#c5a880]" />
                     8 (800) 550-32-40
                   </a>
                   <a
                     href="#booking"
                     onClick={() => setIsMobileMenuOpen(false)}
-                    className="block text-center bg-[#c5a880] text-[#022C22] py-3 rounded-sm font-bold uppercase tracking-wider text-sm"
+                    className="block text-center bg-[#c5a880] text-[#022C22] py-3 rounded-lg font-bold uppercase tracking-wider text-sm"
                   >
                     Забронировать путевку
                   </a>
@@ -1722,7 +1722,7 @@ export default function App() {
                         window.speechSynthesis.speak(welcome);
                       }
                     }}
-                    className="flex items-center justify-center space-x-2 border border-[#c5a880]/40 text-stone-200 py-3 rounded-sm font-bold text-sm w-full bg-emerald-950 hover:bg-emerald-900 transition-colors cursor-pointer"
+                    className="flex items-center justify-center space-x-2 border border-[#c5a880]/40 text-stone-200 py-3 rounded-lg font-bold text-sm w-full bg-emerald-950 hover:bg-emerald-900 transition-colors cursor-pointer"
                   >
                     <Eye className="w-4 h-4 text-[#c5a880]" />
                     <span>{isAccessMode ? 'Обычный вид сайта' : 'Версия для слабовидящих'}</span>
@@ -1826,15 +1826,10 @@ export default function App() {
             )}
           </AnimatePresence>
 
-          {/* Elegant geometric gradients imitating sunlight through pines with a warm golden sun overlay */}
-          {/* Elegant geometric gradients imitating sunlight through pines with a warm golden sun overlay */}
-          <div className="absolute inset-0 bg-gradient-to-t from-[#022C22]/40 via-[#011F19]/15 to-[#022C22]/20 z-1"></div>
-          {/* Warm sunset sun rays and ambient glowing effects */}
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-amber-400/50 via-amber-600/20 to-transparent mix-blend-screen z-1"></div>
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,_var(--tw-gradient-stops))] from-amber-200/20 via-transparent to-transparent mix-blend-screen z-1"></div>
-          {/* Subtle central radial gradient to keep text readable without making the background too dark */}
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-black/20 via-transparent to-black/10 z-1"></div>
-          <div className="absolute inset-l-0 inset-r-0 bottom-0 h-48 bg-gradient-to-t from-[#FAF9F6] to-transparent z-2"></div>
+          {/* Institutional emerald contrast overlay */}
+          <div className="absolute inset-0 bg-gradient-to-t from-[#022C22]/75 via-[#011F19]/45 to-[#022C22]/55 z-1"></div>
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-black/25 via-transparent to-black/20 z-1"></div>
+          <div className="absolute inset-x-0 bottom-0 h-36 bg-gradient-to-t from-[#FAF9F6] to-transparent z-2"></div>
         </motion.div>
 
         {/* Hero Content */}
@@ -1851,7 +1846,7 @@ export default function App() {
             >
               <button 
                 onClick={() => { setActiveSettingsTab('hero'); setCurrentPage('admin'); }}
-                className="bg-amber-500 hover:bg-amber-600 font-bold text-stone-900 border border-amber-300 text-xs px-4 py-2 rounded-full cursor-pointer shadow-lg flex items-center gap-1.5 transition-all transform hover:scale-105"
+                className="bg-amber-500 hover:bg-amber-600 font-bold text-stone-900 border border-amber-300 text-xs px-4 py-2 rounded-lg cursor-pointer shadow-lg flex items-center gap-1.5 transition-colors"
               >
                 <Edit className="w-4 h-4" /> Редактировать первый экран
               </button>
@@ -1862,7 +1857,7 @@ export default function App() {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
-            className="inline-flex items-center space-x-2 bg-emerald-900/80 backdrop-blur-md border border-[#c5a880]/30 px-4 py-2 rounded-full mb-6"
+            className="inline-flex items-center space-x-2 bg-[#022C22]/90 backdrop-blur-md border border-[#c5a880]/40 px-4 py-2 rounded-lg mb-6"
           >
             <TreePine className="w-4 h-4 text-[#c5a880]" />
             <span className="text-xs font-sans font-semibold uppercase tracking-wider text-[#FAF9F6]">{HERO_DATA.badge}</span>
@@ -1879,22 +1874,22 @@ export default function App() {
               if (text.toUpperCase().includes('САНАТОРИЙ') && (text.toUpperCase().includes('ЯСНАЯ ПОЛЯНА') || text.toUpperCase().includes('«ЯСНАЯ ПОЛЯНА»'))) {
                 return (
                   <>
-                    <span className="block text-stone-200 font-sans font-bold text-lg sm:text-xl md:text-2xl lg:text-3xl tracking-[0.2em] uppercase opacity-95 mb-2 sm:mb-3 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
+                    <span className="block text-stone-200 font-sans font-bold text-base sm:text-xl md:text-2xl tracking-[0.18em] uppercase opacity-95 mb-2 sm:mb-3 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
                       САНАТОРИЙ
                     </span>
-                    <span className="block text-white font-serif font-bold tracking-tight text-5xl sm:text-6xl md:text-7xl lg:text-8xl drop-shadow-[0_4px_16px_rgba(0,0,0,0.95)] leading-tight">
+                    <span className="block text-white font-serif font-bold tracking-tight text-3xl sm:text-5xl md:text-6xl lg:text-7xl drop-shadow-[0_4px_16px_rgba(0,0,0,0.95)] leading-tight">
                       «ЯСНАЯ ПОЛЯНА»
                     </span>
                   </>
                 );
               }
               return (
-                <span className="block text-white font-serif font-bold tracking-tight text-4xl sm:text-5xl md:text-6xl lg:text-7xl drop-shadow-[0_4px_16px_rgba(0,0,0,0.95)]">
+                <span className="block text-white font-serif font-bold tracking-tight text-3xl sm:text-5xl md:text-6xl lg:text-7xl drop-shadow-[0_4px_16px_rgba(0,0,0,0.95)]">
                   {text}
                 </span>
               );
             })()}
-            <span className="italic text-[#c5a880] font-medium font-serif text-xl sm:text-2xl md:text-3xl lg:text-4xl block mt-4 sm:mt-5 tracking-wide drop-shadow-[0_2px_6px_rgba(0,0,0,0.85)]">
+            <span className="text-[#c5a880] font-semibold font-serif text-lg sm:text-2xl md:text-3xl block mt-4 sm:mt-5 tracking-wide drop-shadow-[0_2px_6px_rgba(0,0,0,0.85)]">
               {HERO_DATA.titleSecondPart}
             </span>
           </motion.h1>
@@ -1916,7 +1911,7 @@ export default function App() {
           >
             <a
               href="#about"
-              className="w-full sm:w-auto bg-[#c5a880] hover:bg-[#bca075] text-[#022C22] px-8 py-4 rounded-lg font-bold text-xs sm:text-sm uppercase tracking-widest text-center transition-all duration-300 shadow-xl hover:-translate-y-0.5 font-sans"
+              className="w-full sm:w-auto bg-[#c5a880] hover:bg-[#bca075] text-[#022C22] px-8 py-4 rounded-lg font-bold text-xs sm:text-sm uppercase tracking-wider text-center transition-colors duration-200 shadow-lg font-sans"
             >
               Узнать о санатории
             </a>
@@ -1930,13 +1925,13 @@ export default function App() {
               transition={{ duration: 0.8, delay: 0.55 }}
               className="mt-14 sm:mt-16 w-full max-w-5xl"
             >
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5 sm:gap-4 bg-[#011a14]/85 backdrop-blur-xl p-4 sm:p-5 rounded-2xl border border-[#c5a880]/30 shadow-[0_20px_50px_rgba(0,0,0,0.6)]">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5 sm:gap-4 bg-[#011F18]/90 backdrop-blur-xl p-4 sm:p-5 rounded-2xl border border-[#c5a880]/30 shadow-2xl">
                 {HERO_DATA.stats.map((stat, idx) => (
                   <div 
                     key={idx} 
-                    className="relative flex flex-col items-center justify-center p-3.5 sm:p-4 rounded-xl bg-white/[0.04] border border-white/[0.08] hover:border-[#c5a880]/50 hover:bg-white/[0.07] transition-all duration-300 group text-center"
+                    className="relative flex flex-col items-center justify-center p-4 rounded-xl bg-white/[0.04] border border-white/[0.1] hover:border-[#c5a880]/50 hover:bg-white/[0.07] transition-colors duration-200 group text-center"
                   >
-                    <div className="w-8 h-8 rounded-lg bg-[#c5a880]/15 border border-[#c5a880]/30 flex items-center justify-center mb-2.5 text-[#c5a880] group-hover:scale-110 group-hover:bg-[#c5a880] group-hover:text-[#022C22] transition-all duration-300 shadow-sm shrink-0">
+                    <div className="w-8 h-8 rounded-lg bg-[#c5a880]/15 border border-[#c5a880]/30 flex items-center justify-center mb-2.5 text-[#c5a880] group-hover:bg-[#c5a880] group-hover:text-[#022C22] transition-colors duration-200 shadow-sm shrink-0">
                       {idx === 0 ? (
                         <Shield className="w-4 h-4" />
                       ) : idx === 1 ? (
@@ -2016,7 +2011,7 @@ export default function App() {
       </header>
 
       {/* ABOUT & MICROCLIMATE INTERACTIVE EXPERIENCE */}
-      <section id="about" className="py-14 sm:py-16 md:py-20 bg-[#FAF9F6]">
+      <section id="about" className="py-16 md:py-20 bg-[#FAF9F6]">
         <motion.div
           initial={{ opacity: 0, y: 35 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -2033,7 +2028,7 @@ export default function App() {
                 <div className="mb-2">
                   <button 
                     onClick={() => { setActiveSettingsTab('general'); setCurrentPage('admin'); }}
-                    className="bg-amber-500 hover:bg-amber-600 text-stone-900 border border-amber-300 font-bold text-[11px] px-3.5 py-1.5 rounded-lg flex items-center gap-1.5 transition-all shadow hover:scale-105"
+                    className="bg-amber-500 hover:bg-amber-600 text-stone-900 border border-amber-300 font-bold text-xs px-3.5 py-1.5 rounded-lg flex items-center gap-1.5 transition-colors shadow"
                   >
                     <Edit className="w-3.5 h-3.5" /> Редактировать инфо и историю
                   </button>
@@ -2041,14 +2036,14 @@ export default function App() {
               )}
 
               <div className="flex items-center space-x-2">
-                <span className="h-[1px] w-8 bg-[#c5a880]"></span>
-                <span className="text-[11px] tracking-widest font-mono uppercase text-[#c5a880] font-bold">Оазис Здоровья в Гаспре</span>
+                <span className="h-[1px] w-8 bg-[#7C5E38]"></span>
+                <span className="text-xs tracking-wider font-sans uppercase text-[#7C5E38] font-bold">Оазис Здоровья в Гаспре</span>
               </div>
-              <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl font-extrabold text-[#022C22] tracking-tight">
+              <h2 className="font-serif text-3xl sm:text-4xl font-bold text-[#022C22] tracking-tight leading-tight">
                 Южнобережный климат <br/>
-                <span className="italic text-[#c5a880] font-normal font-serif">и комплексное оздоровление</span>
+                <span className="text-[#7C5E38] font-semibold font-serif">и комплексное оздоровление</span>
               </h2>
-              <div className="text-stone-700 space-y-4 text-base md:text-lg leading-relaxed">
+              <div className="text-stone-700 space-y-4 text-base leading-relaxed">
                 <p>{RESORT_INFO.historyText}</p>
                 <p>{RESORT_INFO.climatotherapyText}</p>
               </div>
@@ -2058,26 +2053,22 @@ export default function App() {
             <div className="lg:col-span-5">
               
               {/* Фито-Барометр & Метео-Станция */}
-              <div className="bg-gradient-to-br from-[#062c23] via-[#03201a] to-[#011410] text-white p-4 sm:p-5 rounded-2xl shadow-[0_16px_40px_-12px_rgba(2,44,34,0.45),0_0_0_1px_rgba(197,168,128,0.25)] relative overflow-hidden backdrop-blur-md">
-                {/* Decorative ambient background glows and subtle golden luxury haze */}
-                <div className="absolute -top-12 -right-12 w-48 h-48 bg-[#c5a880]/12 rounded-full filter blur-3xl pointer-events-none"></div>
-                <div className="absolute -bottom-12 -left-12 w-48 h-48 bg-emerald-500/10 rounded-full filter blur-3xl pointer-events-none"></div>
-                <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(197,168,128,0.08),transparent_60%)] pointer-events-none"></div>
+              <div className="bg-[#022C22] text-white p-5 sm:p-6 rounded-2xl border border-[#c5a880]/30 shadow-xl relative overflow-hidden">
                 
-                <div className="relative z-10 space-y-3.5">
+                <div className="relative z-10 space-y-4">
                   
                   {/* Header Row with integrated Time-of-Day Switcher */}
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 border-b border-[#c5a880]/20 pb-3">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 border-b border-[#c5a880]/20 pb-3.5">
                     <div>
                       <div className="flex items-center space-x-2">
-                        <div className="p-1 rounded-lg bg-[#c5a880]/15 text-[#c5a880] shadow-[inset_0_1px_1px_rgba(255,255,255,0.15)]">
+                        <div className="p-1.5 rounded-lg bg-[#c5a880]/15 text-[#c5a880]">
                           <TreePine className="w-4 h-4" />
                         </div>
-                        <h3 className="font-serif text-lg sm:text-xl font-bold tracking-wide text-white">
+                        <h3 className="font-serif text-lg sm:text-xl font-bold tracking-tight text-white">
                           Фито-Барометр
                         </h3>
-                        <div className="flex items-center space-x-1.5 bg-emerald-950/80 border border-emerald-500/40 px-2.5 py-0.5 rounded-full text-xs text-emerald-300 font-sans font-semibold shadow-sm">
-                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span>
+                        <div className="flex items-center space-x-1.5 bg-[#04392C] border border-emerald-500/30 px-2.5 py-0.5 rounded-md text-xs text-emerald-300 font-sans font-semibold">
+                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
                           <span>LIVE</span>
                         </div>
                       </div>
@@ -2087,7 +2078,7 @@ export default function App() {
                     </div>
 
                     {/* Compact Segmented Pills Switcher */}
-                    <div className="flex items-center bg-black/30 p-1 rounded-xl border border-white/10 shadow-[inset_0_1px_3px_rgba(0,0,0,0.3)] shrink-0 self-start sm:self-auto backdrop-blur-sm">
+                    <div className="flex items-center bg-[#011F18] p-1 rounded-xl border border-white/10 shrink-0 self-start sm:self-auto">
                       {[
                         { id: 'morning', title: 'Утро', icon: <Sunrise className="w-3.5 h-3.5 shrink-0" /> },
                         { id: 'day', title: 'День', icon: <Sun className="w-3.5 h-3.5 shrink-0" /> },
@@ -2099,9 +2090,9 @@ export default function App() {
                             key={tab.id}
                             type="button"
                             onClick={() => setClimateTime(tab.id as 'morning' | 'day' | 'evening')}
-                            className={`flex items-center space-x-1.5 py-1.5 px-3 rounded-lg text-xs font-sans font-semibold transition-all duration-300 cursor-pointer ${
+                            className={`flex items-center space-x-1.5 py-1.5 px-3 rounded-lg text-xs font-sans font-semibold transition-colors duration-200 cursor-pointer ${
                               isActive
-                                ? 'bg-gradient-to-r from-[#d1b58f] via-[#c5a880] to-[#b4936a] text-[#022C22] shadow-[0_2px_8px_rgba(197,168,128,0.4)] scale-105'
+                                ? 'bg-[#c5a880] text-[#022C22]'
                                 : 'text-stone-200 hover:text-white hover:bg-white/[0.08]'
                             }`}
                           >
@@ -2120,7 +2111,7 @@ export default function App() {
                       <span className="text-stone-200 text-xs font-sans">Синхронизация с метеостанцией...</span>
                     </div>
                   ) : weatherError || !realWeather ? (
-                    <div className="py-6 text-center text-xs text-stone-200 space-y-1 bg-emerald-950/40 rounded-xl border border-emerald-900/60 p-3 shadow-inner">
+                    <div className="py-6 text-center text-xs text-stone-200 space-y-1 bg-[#011F18] rounded-xl border border-white/10 p-3">
                       <p className="font-serif font-semibold text-[#c5a880]">Метеостанция Гаспры в сети</p>
                       <p className="text-stone-300">Погода: +22°C, Черное море: +19°C</p>
                     </div>
@@ -2128,7 +2119,7 @@ export default function App() {
                     <div className="space-y-3">
                       
                       {/* Compact Weather & Doctor note Hero Row */}
-                      <div className="bg-gradient-to-r from-white/[0.07] via-white/[0.04] to-white/[0.06] p-3 rounded-2xl border border-[#c5a880]/25 shadow-[0_4px_16px_-4px_rgba(0,0,0,0.3)] relative overflow-hidden backdrop-blur-sm">
+                      <div className="bg-[#04392C] p-3.5 rounded-xl border border-[#c5a880]/25 relative overflow-hidden">
                         <AnimatePresence mode="wait">
                           <motion.div
                             key={climateTime}
@@ -2139,12 +2130,12 @@ export default function App() {
                             className="flex items-center justify-between gap-3"
                           >
                             <div className="flex items-center space-x-3">
-                              <div className="bg-gradient-to-br from-emerald-900/80 to-emerald-950/90 p-2 rounded-xl border border-[#c5a880]/30 shadow-[inset_0_1px_2px_rgba(255,255,255,0.15),0_4px_10px_rgba(0,0,0,0.25)] shrink-0">
-                                {getWeatherIcon(climateDetails[climateTime].weatherCode, "w-8 h-8 sm:w-9 sm:h-9")}
+                              <div className="bg-[#011F18] p-2.5 rounded-xl border border-[#c5a880]/30 shrink-0">
+                                {getWeatherIcon(climateDetails[climateTime].weatherCode, "w-8 h-8")}
                               </div>
                               <div>
                                 <div className="flex items-baseline space-x-2">
-                                  <span className="text-2xl sm:text-3xl font-sans font-extrabold text-white leading-none tracking-tight tabular-nums">
+                                  <span className="text-2xl sm:text-3xl font-sans font-bold text-white leading-none tracking-tight tabular-nums">
                                     {climateDetails[climateTime].temp}
                                   </span>
                                   <span className="text-xs sm:text-sm text-stone-200 font-sans font-medium">
@@ -2159,7 +2150,7 @@ export default function App() {
                             </div>
 
                             <div className="text-right max-w-[200px] hidden sm:block border-l border-[#c5a880]/20 pl-3">
-                              <span className="text-[10px] text-[#c5a880] uppercase tracking-wider font-sans font-bold block">
+                              <span className="text-xs text-[#c5a880] uppercase tracking-wider font-sans font-bold block">
                                 Рекомендация врача
                               </span>
                               <div className="text-xs font-sans text-stone-100 line-clamp-2 leading-snug mt-1">
@@ -2170,38 +2161,38 @@ export default function App() {
                         </AnimatePresence>
                       </div>
 
-                      {/* Extended Live Parameters (Sleek 3-Column Rounded Cards with Soft Glow) */}
-                      <div className="grid grid-cols-3 gap-2">
-                        <div className="bg-gradient-to-b from-white/[0.06] to-white/[0.02] hover:from-white/[0.1] hover:to-white/[0.04] p-2.5 rounded-xl border border-white/[0.08] hover:border-[#c5a880]/35 transition-all duration-300 text-center flex flex-col justify-center shadow-[0_4px_12px_rgba(0,0,0,0.15)] hover:shadow-[0_6px_16px_rgba(0,0,0,0.25)] group">
-                          <span className="text-[10px] uppercase tracking-wider font-sans text-stone-300 group-hover:text-white font-semibold block">
+                      {/* Extended Live Parameters */}
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                        <div className="bg-[#04392C]/80 p-2.5 rounded-xl border border-white/10 text-center flex sm:flex-col items-center justify-between sm:justify-center px-3.5 sm:px-2.5">
+                          <span className="text-xs uppercase tracking-wider font-sans text-stone-300 font-semibold block">
                             Ветер
                           </span>
-                          <div className="flex items-center justify-center space-x-1 mt-1">
-                            <Wind className="w-3.5 h-3.5 text-[#c5a880] shrink-0 group-hover:rotate-12 transition-transform duration-300" />
+                          <div className="flex items-center justify-center space-x-1 sm:mt-1">
+                            <Wind className="w-3.5 h-3.5 text-[#c5a880] shrink-0" />
                             <span className="text-xs sm:text-sm font-bold text-white font-mono tabular-nums">
                               {climateDetails[climateTime].windSpeed}
                             </span>
                           </div>
                         </div>
 
-                        <div className="bg-gradient-to-b from-white/[0.06] to-white/[0.02] hover:from-white/[0.1] hover:to-white/[0.04] p-2.5 rounded-xl border border-white/[0.08] hover:border-[#c5a880]/35 transition-all duration-300 text-center flex flex-col justify-center shadow-[0_4px_12px_rgba(0,0,0,0.15)] hover:shadow-[0_6px_16px_rgba(0,0,0,0.25)] group">
-                          <span className="text-[10px] uppercase tracking-wider font-sans text-stone-300 group-hover:text-white font-semibold block">
+                        <div className="bg-[#04392C]/80 p-2.5 rounded-xl border border-white/10 text-center flex sm:flex-col items-center justify-between sm:justify-center px-3.5 sm:px-2.5">
+                          <span className="text-xs uppercase tracking-wider font-sans text-stone-300 font-semibold block">
                             Влажность
                           </span>
-                          <div className="flex items-center justify-center space-x-1 mt-1">
-                            <Droplet className="w-3.5 h-3.5 text-[#c5a880] shrink-0 group-hover:scale-110 transition-transform duration-300" />
+                          <div className="flex items-center justify-center space-x-1 sm:mt-1">
+                            <Droplet className="w-3.5 h-3.5 text-[#c5a880] shrink-0" />
                             <span className="text-xs sm:text-sm font-bold text-white font-mono tabular-nums">
                               {climateDetails[climateTime].humidity}
                             </span>
                           </div>
                         </div>
 
-                        <div className="bg-gradient-to-b from-[#c5a880]/15 to-emerald-950/40 hover:from-[#c5a880]/25 hover:to-emerald-900/40 p-2.5 rounded-xl border border-[#c5a880]/30 hover:border-[#c5a880]/50 transition-all duration-300 text-center flex flex-col justify-center shadow-[0_4px_12px_rgba(0,0,0,0.15)] hover:shadow-[0_6px_16px_rgba(197,168,128,0.15)] group">
-                          <span className="text-[10px] uppercase tracking-wider font-sans text-emerald-300 font-semibold block">
+                        <div className="bg-[#04392C] p-2.5 rounded-xl border border-[#c5a880]/30 text-center flex sm:flex-col items-center justify-between sm:justify-center px-3.5 sm:px-2.5">
+                          <span className="text-xs uppercase tracking-wider font-sans text-emerald-300 font-semibold block">
                             Черное море
                           </span>
-                          <div className="flex items-center justify-center space-x-1 mt-1">
-                            <Waves className="w-3.5 h-3.5 text-[#c5a880] shrink-0 group-hover:translate-x-0.5 transition-transform duration-300" />
+                          <div className="flex items-center justify-center space-x-1 sm:mt-1">
+                            <Waves className="w-3.5 h-3.5 text-[#c5a880] shrink-0" />
                             <span className="text-xs sm:text-sm font-bold text-[#c5a880] font-mono tabular-nums">
                               {climateDetails[climateTime].seaTemp}
                             </span>
@@ -2209,12 +2200,12 @@ export default function App() {
                         </div>
                       </div>
 
-                      {/* Phyto-Barometer Indicators (Compact Rounded Bars) */}
-                      <div className="bg-gradient-to-b from-white/[0.04] to-black/20 p-3 rounded-xl border border-[#c5a880]/20 space-y-2.5 shadow-[inset_0_1px_2px_rgba(0,0,0,0.2)]">
+                      {/* Phyto-Barometer Indicators */}
+                      <div className="bg-[#011F18]/80 p-3.5 rounded-xl border border-[#c5a880]/20 space-y-2.5">
                         <div className="space-y-1">
                           <div className="flex justify-between items-center text-xs">
                             <span className="text-stone-200 font-medium truncate">Фитонциды хвои (кедр, можжевельник):</span>
-                            <span className="font-bold text-emerald-300 font-mono text-[10px] bg-emerald-950/90 px-2 py-0.5 rounded-md border border-emerald-700/60 shrink-0 ml-1.5 shadow-sm tabular-nums">
+                            <span className="font-bold text-emerald-300 font-mono text-xs bg-[#022C22] px-2 py-0.5 rounded-md border border-emerald-700/60 shrink-0 ml-1.5 tabular-nums">
                               {climateDetails[climateTime].phytoncides}
                             </span>
                           </div>
@@ -2223,7 +2214,7 @@ export default function App() {
                               initial={{ width: '50%' }}
                               animate={{ width: climateTime === 'day' ? '100%' : climateTime === 'morning' ? '85%' : '65%' }}
                               transition={{ duration: 0.5, ease: "easeOut" }}
-                              className="h-full bg-gradient-to-r from-emerald-500 via-emerald-400 to-[#c5a880] rounded-full shadow-[0_0_8px_rgba(16,185,129,0.3)]"
+                              className="h-full bg-gradient-to-r from-emerald-500 to-[#c5a880] rounded-full"
                             ></motion.div>
                           </div>
                         </div>
@@ -2231,7 +2222,7 @@ export default function App() {
                         <div className="space-y-1">
                           <div className="flex justify-between items-center text-xs">
                             <span className="text-stone-200 font-medium truncate">Морские аэроионы и соли:</span>
-                            <span className="font-bold text-[#c5a880] font-mono text-[10px] bg-emerald-950/90 px-2 py-0.5 rounded-md border border-[#c5a880]/40 shrink-0 ml-1.5 shadow-sm tabular-nums">
+                            <span className="font-bold text-[#c5a880] font-mono text-xs bg-[#022C22] px-2 py-0.5 rounded-md border border-[#c5a880]/40 shrink-0 ml-1.5 tabular-nums">
                               {climateDetails[climateTime].aerosols}
                             </span>
                           </div>
@@ -2240,36 +2231,36 @@ export default function App() {
                               initial={{ width: '40%' }}
                               animate={{ width: climateTime === 'morning' ? '95%' : climateTime === 'day' ? '70%' : '50%' }}
                               transition={{ duration: 0.5, ease: "easeOut" }}
-                              className="h-full bg-gradient-to-r from-[#c5a880] via-amber-300 to-emerald-400 rounded-full shadow-[0_0_8px_rgba(197,168,128,0.3)]"
+                              className="h-full bg-gradient-to-r from-[#c5a880] to-emerald-400 rounded-full"
                             ></motion.div>
                           </div>
                         </div>
                       </div>
 
-                      {/* 3 Days Forecast Grid (Compact Rounded Cards) */}
-                      <div className="border-t border-[#c5a880]/15 pt-2">
-                        <div className="flex items-center justify-between mb-1.5">
-                          <span className="text-[10px] uppercase tracking-wider font-sans text-stone-200 font-bold flex items-center gap-1.5">
+                      {/* 3 Days Forecast Grid */}
+                      <div className="border-t border-[#c5a880]/15 pt-2.5">
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="text-xs uppercase tracking-wider font-sans text-stone-200 font-bold flex items-center gap-1.5">
                             <Calendar className="w-3.5 h-3.5 text-[#c5a880]" />
                             Прогноз на 3 дня (Гаспра):
                           </span>
                         </div>
-                        <div className="grid grid-cols-3 gap-1.5">
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                           {realWeather.forecast.map((f, index) => (
                             <div 
                               key={index} 
-                              className="bg-gradient-to-b from-white/[0.05] to-white/[0.02] hover:from-white/[0.09] hover:to-white/[0.04] transition-all duration-300 p-2 rounded-xl border border-white/[0.07] hover:border-[#c5a880]/40 text-center flex items-center justify-between px-2.5 group shadow-[0_2px_8px_rgba(0,0,0,0.1)] hover:shadow-[0_4px_12px_rgba(0,0,0,0.2)]"
+                              className="bg-[#04392C]/70 p-2.5 rounded-xl border border-white/10 text-center flex items-center justify-between px-3"
                             >
-                              <div className="text-left">
-                                <span className="block text-[11px] font-bold text-stone-100 leading-none group-hover:text-white transition-colors">
+                              <div className="text-left min-w-0">
+                                <span className="block text-xs font-bold text-stone-100 leading-none">
                                   {formatForecastDate(f.date)}
                                 </span>
-                                <span className="block text-[10px] text-[#c5a880] font-medium truncate max-w-[65px] mt-0.5">
+                                <span className="block text-xs text-[#c5a880] font-medium truncate mt-0.5">
                                   {getWeatherName(f.weatherCode)}
                                 </span>
                               </div>
-                              <div className="flex items-center space-x-1.5">
-                                <div className="group-hover:scale-110 transition-transform duration-300">
+                              <div className="flex items-center space-x-1.5 shrink-0">
+                                <div>
                                   {getWeatherIcon(f.weatherCode, "w-4 h-4")}
                                 </div>
                                 <span className="text-xs font-bold text-white font-mono tabular-nums">
@@ -2292,14 +2283,11 @@ export default function App() {
           </div>
 
           {/* OFFICIAL DETAILED INFORMATION REGISTRY */}
-          <div className="mt-14 sm:mt-16 bg-gradient-to-b from-[#EDE6D6] via-[#F3EFE4] to-[#E8DFCD] rounded-3xl border border-[#022C22]/15 ring-1 ring-[#c5a880]/40 shadow-[0_24px_60px_-15px_rgba(2,44,34,0.18)] p-4 sm:p-6 md:p-8 relative overflow-hidden">
-            {/* Ambient luxury corner glow */}
-            <div className="absolute -top-16 -right-16 w-60 h-60 bg-[#c5a880]/15 rounded-full filter blur-3xl pointer-events-none"></div>
-            <div className="absolute -bottom-16 -left-16 w-60 h-60 bg-[#022C22]/10 rounded-full filter blur-3xl pointer-events-none"></div>
+          <div className="mt-14 sm:mt-16 bg-[#F2EFE9] rounded-2xl border border-[#022C22]/15 p-4 sm:p-6 md:p-8 relative overflow-hidden shadow-md">
             
             <div className="relative z-10">
               {/* Architectural Dark Emerald Header Banner */}
-              <div className="bg-gradient-to-r from-[#022C22] via-[#04392C] to-[#022C22] text-white p-5 sm:p-7 rounded-2xl border border-[#c5a880]/35 shadow-lg flex flex-col lg:flex-row lg:items-center justify-between mb-6 gap-5">
+              <div className="bg-[#022C22] text-white p-5 sm:p-7 rounded-2xl border border-[#c5a880]/35 shadow-sm flex flex-col lg:flex-row lg:items-center justify-between mb-6 gap-5">
                 <div className="max-w-3xl space-y-2">
                   <div className="flex flex-wrap items-center gap-2 text-xs text-[#c5a880] font-sans font-semibold">
                     <Shield className="w-4 h-4 shrink-0" />
@@ -2966,7 +2954,7 @@ export default function App() {
       </section>
 
       {/* DETAILED INTERACTIVE MEDICAL PROGRAMS */}
-      <section id="medical" className="py-20 bg-gradient-to-b from-[#033E31] via-[#022C22] to-[#01221A] text-white">
+      <section id="medical" className="py-16 md:py-20 bg-gradient-to-b from-[#033E31] via-[#022C22] to-[#01221A] text-white">
         <motion.div
           initial={{ opacity: 0, y: 45 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -3024,7 +3012,7 @@ export default function App() {
                         setCurrentPage('medical');
                         window.scrollTo({ top: 0, behavior: 'smooth' });
                       }}
-                      className="bg-[#02221A]/95 border border-emerald-900/70 rounded-2xl overflow-hidden hover:border-[#c5a880]/70 transition-all duration-300 hover:-translate-y-1.5 hover:shadow-2xl hover:shadow-[#c5a880]/15 cursor-pointer group flex flex-col justify-between h-full"
+                      className="bg-[#02221A]/95 border border-emerald-900/70 rounded-xl overflow-hidden hover:border-[#c5a880]/70 transition-all duration-300 hover:shadow-xl cursor-pointer group flex flex-col justify-between h-full"
                     >
                       <div>
                         {/* Image Preview Header */}
@@ -3095,7 +3083,7 @@ export default function App() {
                 setCurrentPage('medical');
                 window.scrollTo({ top: 0, behavior: 'smooth' });
               }}
-              className="bg-[#c5a880] text-[#022C22] hover:bg-white hover:text-[#022C22] border border-[#c5a880] px-8 py-3.5 text-xs font-bold uppercase tracking-widest rounded-lg transition-all duration-300 shadow-xl hover:scale-105 inline-flex items-center gap-2 cursor-pointer"
+              className="bg-[#c5a880] text-[#022C22] hover:bg-white hover:text-[#022C22] border border-[#c5a880] px-8 py-3.5 text-xs font-bold uppercase tracking-widest rounded-lg transition-colors duration-200 shadow-md inline-flex items-center gap-2 cursor-pointer"
             >
               <Stethoscope className="w-4 h-4" />
               <span>Ознакомиться со всеми направлениями</span>
@@ -3106,7 +3094,7 @@ export default function App() {
       </section>
 
       {/* EXQUISITE ROOMS GALLERY */}
-      <section id="rooms" className="py-24 bg-[#FAF9F6]">
+      <section id="rooms" className="py-16 md:py-20 bg-[#F2EFE9]">
         <motion.div
           initial={{ opacity: 0, y: 45 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -3128,8 +3116,8 @@ export default function App() {
                 </div>
               )}
               <div className="flex items-center space-x-2">
-                <span className="h-[1px] w-8 bg-[#c5a880]"></span>
-                <span className="text-[11px] tracking-widest font-mono uppercase text-[#c5a880] font-bold">Отражение крымского комфорта</span>
+                <span className="h-[1px] w-8 bg-[#7C5E38]"></span>
+                <span className="text-[11px] tracking-widest font-mono uppercase text-[#7C5E38] font-bold">Отражение крымского комфорта</span>
               </div>
               <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight mt-3 text-[#022C22]">
                 Уютные видовые номера
@@ -3140,7 +3128,7 @@ export default function App() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto justify-center">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-7xl mx-auto justify-center">
             {ROOMS.map((room, index) => (
               <motion.div 
                 key={room.id}
@@ -3148,7 +3136,7 @@ export default function App() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-50px" }}
                 transition={{ duration: 0.7, delay: index * 0.15, ease: [0.16, 1, 0.3, 1] }}
-                className="bg-white rounded-sm border border-stone-200/60 overflow-hidden hover:shadow-xl transition-all duration-300 flex flex-col group justify-between"
+                className="bg-white rounded-xl border border-stone-200/80 overflow-hidden hover:shadow-xl transition-all duration-300 flex flex-col group justify-between"
               >
                 {/* Image Section - Clickable */}
                 <div 
@@ -3200,13 +3188,13 @@ export default function App() {
 
                     {/* Short highlights */}
                     <div className="space-y-1.5 border-t border-b border-stone-100 py-3 mb-4 text-xs sm:text-sm text-stone-700 font-sans">
-                      <div className="flex justify-between">
-                        <span className="text-stone-600 font-medium">Вид из окон:</span>
-                        <span className="font-semibold text-[#022C22] truncate max-w-[150px]">{room.view}</span>
+                      <div className="flex justify-between gap-4">
+                        <span className="text-stone-600 font-medium shrink-0">Вид из окон:</span>
+                        <span className="font-semibold text-[#022C22] text-right">{room.view}</span>
                       </div>
-                      <div className="flex justify-between">
-                        <span className="text-stone-600 font-medium">Размещение:</span>
-                        <span className="font-semibold text-[#022C22] truncate max-w-[150px]">{room.capacity}</span>
+                      <div className="flex justify-between gap-4">
+                        <span className="text-stone-600 font-medium shrink-0">Размещение:</span>
+                        <span className="font-semibold text-[#022C22] text-right">{room.capacity}</span>
                       </div>
                     </div>
                   </div>
@@ -3228,12 +3216,12 @@ export default function App() {
           </div>
 
           {/* Quick Notice under Rooms */}
-          <div className="mt-8 bg-emerald-950/5 border border-[#c5a880]/30 p-5 rounded-sm flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="mt-8 bg-white border border-stone-200 p-5 rounded-xl flex flex-col sm:flex-row items-center justify-between gap-4 shadow-xs">
             <div className="flex items-center space-x-3 text-sm text-stone-700">
-              <ShieldAlert className="w-5 h-5 text-[#c5a880] shrink-0" />
+              <ShieldAlert className="w-5 h-5 text-[#7C5E38] shrink-0" />
               <span>Действуют специальные корпоративные тарифы для сотрудников ФТС России и членов их семей.</span>
             </div>
-            <a href="tel:88005503240" className="text-[#c5a880] font-bold text-xs uppercase tracking-widest hover:underline flex items-center shrink-0">
+            <a href="tel:88005503240" className="text-[#7C5E38] font-bold text-xs uppercase tracking-widest hover:underline flex items-center shrink-0">
               Уточнить льготы
               <ArrowRight className="w-4 h-4 ml-1.5" />
             </a>
@@ -3243,7 +3231,7 @@ export default function App() {
       </section>
 
       {/* FILTERABLE MEDIA PHOTO GALLERY */}
-      <section id="gallery" className="py-24 bg-[#FAF9F6] border-t border-stone-200/40">
+      <section id="gallery" className="py-16 md:py-20 bg-[#FAF9F6] border-t border-stone-200/40">
         <motion.div
           initial={{ opacity: 0, y: 45 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -3263,7 +3251,7 @@ export default function App() {
                 </button>
               </div>
             )}
-            <span className="text-[#c5a880] text-xs font-mono uppercase tracking-widest font-bold">фотогалерея санатория</span>
+            <span className="text-[#7C5E38] text-xs font-mono uppercase tracking-widest font-bold">фотогалерея санатория</span>
             <h2 className="font-serif text-3xl sm:text-4xl font-extrabold tracking-tight text-[#022C22] mt-3">
               Виды и инфраструктура санатория
             </h2>
@@ -3381,7 +3369,7 @@ export default function App() {
                         setIsGalleryExpanded(true);
                       }
                     }}
-                    className="group relative inline-flex items-center gap-3 px-8 py-4 bg-[#022C22] hover:bg-[#c5a880] text-white hover:text-[#022C22] rounded-xl font-sans font-bold text-xs sm:text-sm tracking-wider uppercase shadow-lg hover:shadow-2xl hover:shadow-[#c5a880]/20 transition-all duration-300 transform hover:-translate-y-0.5 cursor-pointer border border-[#c5a880]/40"
+                    className="group relative inline-flex items-center gap-3 px-8 py-4 bg-[#022C22] hover:bg-[#c5a880] text-white hover:text-[#022C22] rounded-xl font-sans font-bold text-xs sm:text-sm tracking-wider uppercase shadow-md transition-colors duration-200 cursor-pointer border border-[#c5a880]/40"
                   >
                     <div className="w-7 h-7 rounded-lg bg-white/10 group-hover:bg-[#022C22]/10 flex items-center justify-center transition-colors">
                       {isGalleryExpanded ? (
@@ -3418,7 +3406,7 @@ export default function App() {
       </section>
 
       {/* REAL REVIEWS & TRUST */}
-      <section id="testimonials" className="py-24 bg-gradient-to-b from-[#022C22] via-[#033E31] to-[#01221A] text-white">
+      <section id="testimonials" className="py-16 md:py-20 bg-gradient-to-b from-[#022C22] via-[#033E31] to-[#01221A] text-white">
         <motion.div
           initial={{ opacity: 0, y: 45 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -3487,7 +3475,7 @@ export default function App() {
             </button>
             <a 
               href="#booking"
-              className="inline-block bg-transparent hover:bg-white/5 text-[#c5a880] border border-[#c5a880]/30 hover:border-[#c5a880] px-6 py-3.5 rounded-sm font-bold text-xs uppercase tracking-widest transition-all"
+              className="inline-block bg-transparent hover:bg-white/5 text-[#c5a880] border border-[#c5a880]/30 hover:border-[#c5a880] px-6 py-3.5 rounded-lg font-bold text-xs uppercase tracking-widest transition-all"
             >
               Написать отзыв
             </a>
@@ -3497,7 +3485,7 @@ export default function App() {
       </section>
 
       {/* COMPREHENSIVE INTERACTIVE REVIEW FORM */}
-      <section id="booking" className="py-24 bg-[#FAF9F6]">
+      <section id="booking" className="py-16 md:py-20 bg-[#F2EFE9]">
         <motion.div
           initial={{ opacity: 0, y: 45 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -3505,7 +3493,7 @@ export default function App() {
           transition={{ duration: 0.85, ease: [0.16, 1, 0.3, 1] }}
           className="max-w-4xl mx-auto px-4 sm:px-6"
         >
-          <div className="bg-white rounded-sm border border-stone-200/80 shadow-2xl overflow-hidden">
+          <div className="bg-white rounded-2xl border border-stone-200 shadow-lg overflow-hidden">
             
             {/* Header / Intro banner for the callback form */}
             <div className="bg-[#022C22] text-white p-6 sm:p-8 border-b border-[#c5a880]/30 text-center relative">
@@ -3634,7 +3622,7 @@ export default function App() {
                         rows={5}
                         value={reviewForm.text}
                         onChange={handleReviewInputChange}
-                        className={`w-full px-4 py-3 rounded-sm border focus:outline-none focus:ring-1 text-sm ${
+                        className={`w-full px-4 py-3 rounded-lg border focus:outline-none focus:ring-1 text-sm ${
                           formErrors.text 
                             ? 'border-red-500 bg-red-50/20 focus:ring-red-500' 
                             : 'border-stone-300 focus:border-[#022C22] focus:ring-[#022C22]'
@@ -3647,7 +3635,7 @@ export default function App() {
                     </div>
 
                     {/* Personal data agreement note compliant with 152-FZ */}
-                    <div className="text-xs text-stone-500 flex items-start space-x-3 bg-stone-50 p-3 rounded-sm border border-stone-200">
+                    <div className="text-xs text-stone-500 flex items-start space-x-3 bg-stone-50 p-3.5 rounded-lg border border-stone-200">
                       <input
                         type="checkbox"
                         required
@@ -3671,7 +3659,7 @@ export default function App() {
                     {/* Submit Button */}
                     <button
                       type="submit"
-                      className="w-full bg-[#022C22] hover:bg-[#c5a880] text-white hover:text-[#022C22] py-4 rounded-sm font-bold text-sm uppercase tracking-widest transition-all duration-300 shadow-lg flex items-center justify-center space-x-2 cursor-pointer"
+                      className="w-full bg-[#022C22] hover:bg-[#c5a880] text-white hover:text-[#022C22] py-4 rounded-lg font-bold text-sm uppercase tracking-widest transition-all duration-300 shadow-md flex items-center justify-center space-x-2 cursor-pointer"
                     >
                       <Send className="w-4 h-4" />
                       <span>Отправить отзыв</span>
@@ -3733,7 +3721,7 @@ export default function App() {
                       </p>
                     </div>
 
-                    <div className="bg-stone-50 p-5 rounded-sm border border-stone-200 text-xs text-stone-600 space-y-2 max-w-md">
+                    <div className="bg-stone-50 p-5 rounded-xl border border-stone-200 text-xs text-stone-600 space-y-2 max-w-md">
                       <div className="flex items-center space-x-2 text-emerald-800 font-bold mb-1">
                         <Check className="w-4 h-4" />
                         <span>Общественный контроль ФТС России</span>
@@ -3753,7 +3741,7 @@ export default function App() {
                         });
                         setSubmitSuccess(false);
                       }}
-                      className="bg-[#022C22] hover:bg-[#c5a880] text-white hover:text-[#022C22] px-8 py-3 rounded-sm font-bold text-xs uppercase tracking-widest transition-all duration-300 cursor-pointer"
+                      className="bg-[#022C22] hover:bg-[#c5a880] text-white hover:text-[#022C22] px-8 py-3 rounded-lg font-bold text-xs uppercase tracking-widest transition-all duration-300 cursor-pointer"
                     >
                       Написать еще один отзыв
                     </button>
@@ -3769,7 +3757,7 @@ export default function App() {
       </section>
 
       {/* DETAILED FAQ SEGMENT */}
-      <section className="py-20 bg-white border-t border-b border-stone-200/60">
+      <section className="py-16 md:py-20 bg-white border-t border-b border-stone-200/60">
         <motion.div
           initial={{ opacity: 0, y: 45 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -3789,7 +3777,7 @@ export default function App() {
                 </button>
               </div>
             )}
-            <span className="text-[#c5a880] text-xs font-mono uppercase tracking-widest font-bold">информационный гид</span>
+            <span className="text-[#7C5E38] text-xs font-mono uppercase tracking-widest font-bold">информационный гид</span>
             <h2 className="font-serif text-2xl sm:text-3xl font-extrabold tracking-tight text-[#022C22] mt-2">
               Ответы на популярные вопросы
             </h2>
@@ -3818,7 +3806,7 @@ export default function App() {
       </section>
 
       {/* CONTACTS, DIRECTIONS & EMBEDDED DYNAMIC MAP INFO */}
-      <section id="contacts" className="py-24 bg-[#FAF9F6]">
+      <section id="contacts" className="py-16 md:py-20 bg-[#FAF9F6]">
         <motion.div
           initial={{ opacity: 0, y: 45 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -3833,8 +3821,8 @@ export default function App() {
             <div className="lg:col-span-5 space-y-8 flex flex-col justify-between">
               <div>
                 <div className="flex items-center space-x-2">
-                  <span className="h-[1px] w-8 bg-[#c5a880]"></span>
-                  <span className="text-xs tracking-wider font-sans uppercase text-[#c5a880] font-semibold">Контакты и адрес</span>
+                  <span className="h-[1px] w-8 bg-[#7C5E38]"></span>
+                  <span className="text-xs tracking-wider font-sans uppercase text-[#7C5E38] font-semibold">Контакты и адрес</span>
                 </div>
                 <h2 className="font-serif text-3xl sm:text-4xl font-extrabold tracking-tight text-[#022C22] mt-3">
                   Связаться с нами
@@ -3908,7 +3896,7 @@ export default function App() {
             </div>
 
             {/* Real Interactive Yandex Map */}
-            <div className="lg:col-span-7 min-h-[450px] bg-[#022C22] text-white rounded-sm border border-[#c5a880]/20 flex flex-col justify-between overflow-hidden relative shadow-2xl">
+            <div className="lg:col-span-7 min-h-[450px] bg-[#022C22] text-white rounded-2xl border border-[#c5a880]/20 flex flex-col justify-between overflow-hidden relative shadow-xl">
               
               <div className="w-full h-[280px] sm:h-[320px] lg:h-[350px] relative z-10 border-b border-[#c5a880]/20 bg-emerald-950/40">
                 <iframe 
@@ -3954,7 +3942,7 @@ export default function App() {
                         href={`https://yandex.ru/maps/?text=${encodeURIComponent("298660, Республика Крым, г. Ялта, пгт. Гаспра, Севастопольское шоссе, д. 52")}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="bg-[#c5a880] hover:bg-[#bca075] text-[#022C22] px-4 py-1.5 rounded-sm text-[11px] font-bold uppercase tracking-wider transition-colors flex items-center space-x-1.5 justify-center w-full"
+                        className="bg-[#c5a880] hover:bg-[#bca075] text-[#022C22] px-4 py-2 rounded-lg text-[11px] font-bold uppercase tracking-wider transition-colors flex items-center space-x-1.5 justify-center w-full"
                       >
                         <Compass className="w-3.5 h-3.5" />
                         <span>Открыть на Яндекс.Картах</span>
@@ -3984,7 +3972,7 @@ export default function App() {
             <div className="space-y-4">
               <div className="flex items-center space-x-2">
                 <span className="font-serif font-semibold text-lg text-white">Санаторий «Ясная Поляна»</span>
-                <span className="text-[#c5a880] text-lg font-serif italic">ФТС РФ</span>
+                <span className="text-[#c5a880] text-lg font-serif font-bold">ФТС РФ</span>
               </div>
               <p className="text-xs text-stone-300 leading-relaxed">
                 Высокоэффективное санаторно-курортное лечение в уникальном оазисе крымской природы под патронатом Федеральной Таможенной Службы Российской Федерации.
@@ -3996,7 +3984,7 @@ export default function App() {
 
             {/* Quick links columns */}
             <div>
-              <h4 className="font-serif text-sm font-semibold text-white tracking-wider uppercase mb-4 border-b border-white/10 pb-1 select-none">Лечебный профиль</h4>
+              <h4 className="font-sans text-xs font-bold text-[#c5a880] tracking-wider uppercase mb-4 border-b border-white/10 pb-2 select-none">Лечебный профиль</h4>
               <ul className="space-y-2 text-xs text-stone-300 font-sans">
                 <li>Органы дыхания</li>
                 <li>Сердечно-сосудистая система</li>
@@ -4008,7 +3996,7 @@ export default function App() {
 
             {/* Quick links columns */}
             <div>
-              <h4 className="font-serif text-sm font-semibold text-white tracking-wider uppercase mb-4 border-b border-white/10 pb-1 select-none font-bold text-[#c5a880]">Размещение</h4>
+              <h4 className="font-sans text-xs font-bold text-[#c5a880] tracking-wider uppercase mb-4 border-b border-white/10 pb-2 select-none">Размещение</h4>
               <ul className="space-y-2 text-xs text-stone-300 font-sans">
                 <li><a href="#rooms" className="hover:text-[#c5a880] transition-colors">Стандарт Улучшенный</a></li>
                 <li><a href="#rooms" className="hover:text-[#c5a880] transition-colors">Полулюкс Комфорт</a></li>
@@ -4020,7 +4008,7 @@ export default function App() {
 
             {/* Contacts column */}
             <div>
-              <h4 className="font-serif text-sm font-semibold text-white tracking-wider uppercase mb-4 border-b border-white/10 pb-1 select-none text-stone-200">Бронирование</h4>
+              <h4 className="font-sans text-xs font-bold text-[#c5a880] tracking-wider uppercase mb-4 border-b border-white/10 pb-2 select-none">Бронирование</h4>
               <ul className="space-y-2 text-xs text-stone-300 font-sans">
                 <li>Телефон: <a href={`tel:${RESORT_INFO.phone}`} className="hover:underline font-mono tabular-nums">{RESORT_INFO.phone}</a></li>
                 {RESORT_INFO.fax && <li>Факс: <a href={`tel:${RESORT_INFO.fax}`} className="hover:underline font-mono tabular-nums">{RESORT_INFO.fax}</a></li>}
@@ -4093,7 +4081,7 @@ export default function App() {
               initial={{ opacity: 0, scale: 0.95, y: 30 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 30 }}
-              className="bg-white rounded-sm max-w-3xl w-full border border-stone-200 shadow-2xl overflow-hidden relative z-10 flex flex-col max-h-[92vh]"
+              className="bg-white rounded-2xl max-w-3xl w-full border border-stone-200 shadow-2xl overflow-hidden relative z-10 flex flex-col max-h-[92vh]"
             >
               
               {/* Header Visual */}
@@ -4226,25 +4214,25 @@ export default function App() {
               </div>
 
               {/* Bottom bar */}
-              <div className="p-4 bg-stone-50 border-t border-stone-100 flex items-center justify-between">
+              <div className="p-4 bg-stone-50 border-t border-stone-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div>
                   <span className="text-xs tracking-wider text-stone-600 uppercase font-sans font-semibold block">Цена за сутки</span>
                   {(!roomModal.price || roomModal.price <= 0) ? (
-                    <span className="text-sm font-bold text-[#c5a880] uppercase tracking-wide font-sans">Уточняйте у менеджера!</span>
+                    <span className="text-sm font-bold text-[#7C5E38] uppercase tracking-wide font-sans">Уточняйте у менеджера!</span>
                   ) : (
-                    <span className="text-lg font-bold text-[#022C22] font-sans">от <span className="text-xl font-serif font-bold text-[#c5a880] font-mono tabular-nums">{roomModal.price.toLocaleString('ru')} ₽</span></span>
+                    <span className="text-lg font-bold text-[#022C22] font-sans">от <span className="text-xl font-serif font-bold text-[#7C5E38] font-mono tabular-nums">{roomModal.price.toLocaleString('ru')} ₽</span></span>
                   )}
                 </div>
-                <div className="flex space-x-2">
+                <div className="flex space-x-2 w-full sm:w-auto">
                   <button
                     onClick={() => setRoomModal(null)}
-                    className="px-4 py-2 bg-stone-200 hover:bg-stone-300 text-stone-700 text-xs font-bold uppercase tracking-wider rounded-sm transition-colors"
+                    className="px-4 py-2.5 bg-stone-200 hover:bg-stone-300 text-stone-700 text-xs font-bold uppercase tracking-wider rounded-lg transition-colors flex-1 sm:flex-initial cursor-pointer"
                   >
                     Закрыть
                   </button>
                   <button
                     onClick={() => handleBookRoom(roomModal.name)}
-                    className="px-5 py-2 bg-[#022C22] hover:bg-[#c5a880] text-white hover:text-[#022C22] text-xs font-bold uppercase tracking-wider rounded-sm transition-all duration-300"
+                    className="px-5 py-2.5 bg-[#022C22] hover:bg-[#c5a880] text-white hover:text-[#022C22] text-xs font-bold uppercase tracking-wider rounded-lg transition-all duration-300 flex-1 sm:flex-initial cursor-pointer"
                   >
                     Выбрать этот номер
                   </button>
@@ -4294,7 +4282,7 @@ export default function App() {
               {/* Prev Button */}
               <button
                 onClick={() => setLightboxIndex((prev) => (prev !== null && prev > 0 ? prev - 1 : filteredGallery.length - 1))}
-                className="p-3 bg-zinc-900/80 border border-zinc-800 hover:border-zinc-650 hover:bg-[#022C22] text-[#c5a880] hover:text-white rounded-full transition-all focus:outline-none focus:ring-2 focus:ring-[#c5a880]/50 select-none cursor-pointer hidden md:flex"
+                className="p-3 bg-zinc-900/80 border border-zinc-800 hover:border-stone-600 hover:bg-[#022C22] text-[#c5a880] hover:text-white rounded-full transition-all focus:outline-none focus:ring-2 focus:ring-[#c5a880]/50 select-none cursor-pointer hidden md:flex"
                 title="Предыдущее фото (←)"
               >
                 <ChevronLeft className="w-6 h-6" />
@@ -4312,7 +4300,7 @@ export default function App() {
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0, scale: 0.95 }}
                     transition={{ type: 'spring', damping: 25, stiffness: 220 }}
-                    className="max-w-full max-h-full object-contain rounded border border-zinc-800 shadow-2xl select-none"
+                    className="max-w-full max-h-full object-contain rounded-lg border border-zinc-800 shadow-2xl select-none"
                     referrerPolicy="no-referrer"
                   />
                 </AnimatePresence>
@@ -4321,7 +4309,7 @@ export default function App() {
               {/* Next Button */}
               <button
                 onClick={() => setLightboxIndex((prev) => (prev !== null && prev < filteredGallery.length - 1 ? prev + 1 : 0))}
-                className="p-3 bg-zinc-900/80 border border-zinc-800 hover:border-zinc-650 hover:bg-[#022C22] text-[#c5a880] hover:text-white rounded-full transition-all focus:outline-none focus:ring-2 focus:ring-[#c5a880]/50 select-none cursor-pointer hidden md:flex"
+                className="p-3 bg-zinc-900/80 border border-zinc-800 hover:border-stone-600 hover:bg-[#022C22] text-[#c5a880] hover:text-white rounded-full transition-all focus:outline-none focus:ring-2 focus:ring-[#c5a880]/50 select-none cursor-pointer hidden md:flex"
                 title="Следующее фото (→)"
               >
                 <ChevronRight className="w-6 h-6" />

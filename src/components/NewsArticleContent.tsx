@@ -110,7 +110,7 @@ export default function NewsArticleContent({ content, className = '' }: NewsArti
   // Convert blockquotes:
   processedContent = processedContent.replace(
     /^> (.*$)/gim,
-    '<blockquote class="border-l-4 border-[#c5a880] pl-4 py-1 my-4 italic text-stone-700 font-serif text-base bg-amber-50/40 rounded-r-lg">$1</blockquote>'
+    '<blockquote class="border-l-4 border-[#c5a880] pl-4 py-1 my-4 text-stone-700 font-serif text-base bg-amber-50/40 rounded-r-lg">$1</blockquote>'
   );
 
   // Convert horizontal rules:
@@ -141,7 +141,7 @@ export default function NewsArticleContent({ content, className = '' }: NewsArti
             prose-h2:text-2xl sm:prose-h2:text-3xl
             prose-h3:text-xl sm:prose-h3:text-2xl
             prose-p:mb-4 prose-p:leading-relaxed prose-p:text-base sm:prose-p:text-[16px]
-            prose-blockquote:border-l-4 prose-blockquote:border-[#c5a880] prose-blockquote:pl-4 prose-blockquote:italic prose-blockquote:text-stone-700
+            prose-blockquote:border-l-4 prose-blockquote:border-[#c5a880] prose-blockquote:pl-4 prose-blockquote:not-italic prose-blockquote:text-stone-700
             prose-ul:list-disc prose-ul:pl-6 prose-ul:my-4 prose-li:my-1.5
             prose-ol:list-decimal prose-ol:pl-6 prose-ol:my-4
             prose-a:text-[#c5a880] prose-a:font-semibold hover:prose-a:underline

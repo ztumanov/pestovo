@@ -24,7 +24,7 @@ export default function TestimonialsPage({ onBackToHome }: { onBackToHome: () =>
     <div className="min-h-screen bg-[#FAF9F6] text-stone-800 font-sans selection:bg-[#c5a880]/30">
       
       {/* HEADER HERO */}
-      <div className="bg-[#022C22] text-white pt-28 pb-16 px-4 sm:px-6 relative overflow-hidden border-b border-[#c5a880]/30">
+      <div className="bg-[#022C22] text-white py-12 sm:py-16 px-4 sm:px-6 relative overflow-hidden border-b border-[#c5a880]/30">
         <div className="max-w-7xl mx-auto relative z-10">
           {/* Unified Breadcrumbs & Back Button */}
           <div className="flex flex-wrap items-center justify-between gap-4 mb-8 pb-4 border-b border-white/10">
@@ -180,7 +180,7 @@ export default function TestimonialsPage({ onBackToHome }: { onBackToHome: () =>
                       </span>
                     </div>
 
-                    <p className="text-stone-700 text-sm leading-relaxed italic mb-6">
+                    <p className="text-stone-700 text-sm leading-relaxed mb-6">
                       «{t.text}»
                     </p>
                   </div>

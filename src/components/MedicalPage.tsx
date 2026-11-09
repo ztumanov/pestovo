@@ -219,7 +219,7 @@ export default function MedicalPage({
     <div className="min-h-screen bg-[#FAF9F6] text-[#022C22] font-sans selection:bg-[#c5a880]/30">
       
       {/* HEADER HERO */}
-      <div className="bg-[#022C22] text-white py-14 sm:py-16 px-4 relative overflow-hidden border-b border-[#c5a880]/30">
+      <div className="bg-[#022C22] text-white py-12 sm:py-16 px-4 relative overflow-hidden border-b border-[#c5a880]/30">
         <div className="max-w-7xl mx-auto relative z-10">
           {/* Unified Breadcrumbs & Back Navigation */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8 pb-4 border-b border-white/10">
@@ -242,7 +242,7 @@ export default function MedicalPage({
 
             <button 
               onClick={onBackToHome}
-              className="group inline-flex items-center space-x-2 border border-[#c5a880]/40 hover:border-[#c5a880] bg-white/5 hover:bg-[#c5a880] px-4 py-2 rounded-sm text-xs font-bold uppercase tracking-widest transition-all text-[#c5a880] hover:text-[#022C22] cursor-pointer self-start sm:self-auto shrink-0 whitespace-nowrap"
+              className="group inline-flex items-center space-x-2 border border-[#c5a880]/40 hover:border-[#c5a880] bg-white/5 hover:bg-[#c5a880] px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-widest transition-all text-[#c5a880] hover:text-[#022C22] cursor-pointer self-start sm:self-auto shrink-0 whitespace-nowrap"
             >
               <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
               <span>На главную</span>
@@ -262,7 +262,7 @@ export default function MedicalPage({
           </p>
 
           {/* Architectural Key Metrics Strip */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-px bg-[#c5a880]/25 border border-[#c5a880]/30 mt-10">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-px bg-[#c5a880]/25 border border-[#c5a880]/30 rounded-xl overflow-hidden mt-10">
             <div className="p-4 sm:p-5 bg-[#011F18]">
               <span className="block font-mono tabular-nums text-2xl sm:text-3xl font-bold text-[#c5a880]">39</span>
               <span className="text-xs text-stone-300 mt-1 block">сотрудников медицинского отделения</span>
@@ -285,7 +285,7 @@ export default function MedicalPage({
             <div className="mt-6">
               <button 
                 onClick={() => { setActiveSettingsTab('medical'); setCurrentPage('admin'); }}
-                className="bg-amber-500 hover:bg-amber-600 text-stone-900 border border-amber-400 font-bold text-xs px-4 py-2 rounded-sm inline-flex items-center gap-2 transition-all cursor-pointer"
+                className="bg-amber-500 hover:bg-amber-600 text-stone-900 border border-amber-400 font-bold text-xs px-4 py-2 rounded-lg inline-flex items-center gap-2 transition-all cursor-pointer"
               >
                 Редактировать программы в Админке
               </button>
@@ -297,7 +297,7 @@ export default function MedicalPage({
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-16">
         
         {/* MEDICAL LEADERSHIP & SPECIALIST CONSULTATIONS */}
-        <section className="bg-white border border-stone-200">
+        <section className="bg-white border border-stone-200 rounded-xl overflow-hidden shadow-xs">
           <div className="grid grid-cols-1 lg:grid-cols-12">
             <div className="lg:col-span-7 p-6 sm:p-10 space-y-4">
               <div className="text-xs font-mono uppercase tracking-widest text-[#9b7b51] font-semibold">
@@ -343,10 +343,10 @@ export default function MedicalPage({
         </section>
 
         {/* 4-STEP GUEST ROUTE (ПОШАГОВЫЙ МАРШРУТ ГОСТЯ) */}
-        <section className="bg-white border border-stone-200 p-6 sm:p-10 space-y-8">
+        <section className="bg-white border border-stone-200 rounded-xl p-6 sm:p-10 space-y-8 shadow-xs">
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-stone-200 pb-5">
             <div>
-              <span className="text-xs font-mono uppercase tracking-widest text-[#9b7b51] font-bold block mb-1">
+              <span className="text-xs font-mono uppercase tracking-widest text-[#7C5E38] font-bold block mb-1">
                 Порядок назначения процедур · Форма 072/у и 076/у
               </span>
               <h3 className="font-serif text-2xl sm:text-3xl font-bold text-[#022C22]">
@@ -358,20 +358,20 @@ export default function MedicalPage({
                 setCurrentPage('documents');
                 window.scrollTo({ top: 0, behavior: 'smooth' });
               }}
-              className="text-xs font-bold uppercase tracking-wider text-[#022C22] hover:text-[#c5a880] inline-flex items-center gap-1.5 cursor-pointer shrink-0 whitespace-nowrap"
+              className="text-xs font-bold uppercase tracking-wider text-[#022C22] hover:text-[#7C5E38] inline-flex items-center gap-1.5 cursor-pointer shrink-0 whitespace-nowrap"
             >
               <span>Перечень документов для заезда</span>
-              <ChevronRight className="w-4 h-4 text-[#c5a880]" />
+              <ChevronRight className="w-4 h-4 text-[#7C5E38]" />
             </button>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {guestSteps.map((step) => (
-              <div key={step.num} className="border border-stone-200 bg-[#FAF9F6] p-5 flex flex-col justify-between">
+              <div key={step.num} className="border border-stone-200 rounded-xl bg-[#FAF9F6] p-5 flex flex-col justify-between">
                 <div>
                   <div className="flex items-center justify-between border-b border-stone-200 pb-3 mb-3">
-                    <span className="font-mono tabular-nums text-2xl font-bold text-[#c5a880]">{step.num}</span>
-                    <span className="text-[11px] font-mono uppercase tracking-wider text-stone-400">Этап</span>
+                    <span className="font-mono tabular-nums text-2xl font-bold text-[#7C5E38]">{step.num}</span>
+                    <span className="text-[11px] font-mono uppercase tracking-wider text-stone-500">Этап</span>
                   </div>
                   <h4 className="font-serif text-base font-bold text-[#022C22] mb-2">
                     {step.title}
@@ -398,7 +398,7 @@ export default function MedicalPage({
             </div>
 
             {/* Interactive Profile Filter Bar */}
-            <div className="flex flex-wrap items-center gap-1 sm:gap-1.5 bg-stone-200/60 p-1 border border-stone-200">
+            <div className="flex flex-wrap items-center gap-1 sm:gap-1.5 bg-stone-200/60 p-1 rounded-lg border border-stone-200">
               {profileCategories.map((cat) => {
                 const isSelected = profileFilter === cat.id;
                 return (
@@ -413,7 +413,7 @@ export default function MedicalPage({
                         setActiveTab(medicalPrograms[0].id);
                       }
                     }}
-                    className={`px-2.5 py-1.5 lg:px-3.5 lg:py-2 text-[11px] lg:text-xs font-semibold transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
+                    className={`px-2.5 py-1.5 lg:px-3.5 lg:py-2 text-[11px] lg:text-xs font-semibold rounded-md transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
                       isSelected
                         ? 'bg-[#022C22] text-[#c5a880]'
                         : 'text-stone-700 hover:text-[#022C22] hover:bg-white/60'
@@ -432,7 +432,7 @@ export default function MedicalPage({
             <div className="lg:col-span-4 space-y-5">
               
               {/* Search Bar */}
-              <div className="bg-white p-4 border border-stone-200">
+              <div className="bg-white p-4 border border-stone-200 rounded-xl shadow-xs">
                 <label className="block text-xs font-bold uppercase tracking-wider text-stone-500 mb-2">
                   Поиск по процедурам и показаниям
                 </label>
@@ -453,7 +453,7 @@ export default function MedicalPage({
                         setActiveTab(matches[0].id);
                       }
                     }}
-                    className="w-full text-sm bg-[#FAF9F6] border border-stone-200 pl-10 pr-4 py-2.5 focus:outline-none focus:border-[#022C22] transition-colors"
+                    className="w-full text-sm bg-[#FAF9F6] border border-stone-200 rounded-lg pl-10 pr-4 py-2.5 focus:outline-none focus:border-[#022C22] transition-colors"
                   />
                 </div>
               </div>
@@ -467,9 +467,9 @@ export default function MedicalPage({
                       <button
                         key={prog.id}
                         onClick={() => setActiveTab(prog.id)}
-                        className={`w-full text-left p-4 border transition-all duration-200 flex items-start justify-between group cursor-pointer ${
+                        className={`w-full text-left p-4 border rounded-xl transition-all duration-200 flex items-start justify-between group cursor-pointer ${
                           isSelected 
-                            ? 'bg-[#022C22] border-[#022C22] text-white' 
+                            ? 'bg-[#022C22] border-[#022C22] text-white shadow-sm' 
                             : 'bg-white border-stone-200 hover:border-[#c5a880] text-[#022C22]'
                         }`}
                       >
@@ -490,16 +490,16 @@ export default function MedicalPage({
                     );
                   })
                 ) : (
-                  <div className="p-8 text-center bg-white border border-stone-200 text-stone-500 text-sm font-serif">
+                  <div className="p-8 text-center bg-white border border-stone-200 rounded-xl text-stone-500 text-sm font-serif">
                     Программы по запросу не найдены
                   </div>
                 )}
               </div>
 
               {/* SANATORNO-KURORTNAYA KARTA INFO CARD */}
-              <div className="bg-white border border-stone-200 p-5 space-y-4">
+              <div className="bg-white border border-stone-200 rounded-xl p-5 space-y-4 shadow-xs">
                 <div className="flex items-start space-x-3">
-                  <Award className="w-5 h-5 text-[#c5a880] shrink-0 mt-0.5" />
+                  <Award className="w-5 h-5 text-[#7C5E38] shrink-0 mt-0.5" />
                   <div>
                     <h5 className="font-serif text-sm font-bold text-[#022C22]">Санаторно-курортная карта</h5>
                     <p className="text-xs text-stone-600 leading-relaxed mt-1">
@@ -508,7 +508,7 @@ export default function MedicalPage({
                   </div>
                 </div>
                 <div className="flex items-start space-x-3 border-t border-stone-200 pt-3">
-                  <ShieldAlert className="w-5 h-5 text-[#c5a880] shrink-0 mt-0.5" />
+                  <ShieldAlert className="w-5 h-5 text-[#7C5E38] shrink-0 mt-0.5" />
                   <div>
                     <h5 className="font-serif text-sm font-bold text-[#022C22]">Индивидуальные назначения</h5>
                     <p className="text-xs text-stone-600 leading-relaxed mt-1">
@@ -530,7 +530,7 @@ export default function MedicalPage({
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -10 }}
                     transition={{ duration: 0.2 }}
-                    className="bg-white border border-stone-200 overflow-hidden"
+                    className="bg-white border border-stone-200 rounded-xl overflow-hidden shadow-xs"
                   >
                     
                     {/* Hero Image inside program card */}
@@ -572,7 +572,7 @@ export default function MedicalPage({
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-6 border-t border-stone-200">
                         
                         {/* Indications */}
-                        <div className="bg-[#FAF9F6] p-6 border border-stone-200">
+                        <div className="bg-[#FAF9F6] p-6 border border-stone-200 rounded-xl">
                           <h4 className="text-[#022C22] font-sans text-xs uppercase tracking-wider font-bold mb-4 pb-2 border-b border-stone-200 flex items-center">
                             <Check className="w-4 h-4 text-emerald-800 mr-2 shrink-0" />
                             Показания к назначению
@@ -580,7 +580,7 @@ export default function MedicalPage({
                           <ul className="space-y-3">
                             {activeProgramObj.indications?.map((ind, i) => (
                               <li key={i} className="text-xs sm:text-sm text-stone-700 flex items-start leading-relaxed font-sans">
-                                <span className="font-mono tabular-nums text-[11px] font-bold text-[#9b7b51] mr-2.5 mt-0.5 shrink-0">0{i + 1}.</span>
+                                <span className="font-mono tabular-nums text-[11px] font-bold text-[#7C5E38] mr-2.5 mt-0.5 shrink-0">0{i + 1}.</span>
                                 <span>{ind}</span>
                               </li>
                             )) || <li className="text-xs text-stone-500 font-sans">Определяются лечащим врачом</li>}
@@ -588,9 +588,9 @@ export default function MedicalPage({
                         </div>
 
                         {/* Procedures */}
-                        <div className="bg-[#FAF9F6] p-6 border border-stone-200">
+                        <div className="bg-[#FAF9F6] p-6 border border-stone-200 rounded-xl">
                           <h4 className="text-[#022C22] font-sans text-xs uppercase tracking-wider font-bold mb-4 pb-2 border-b border-stone-200 flex items-center">
-                            <Check className="w-4 h-4 text-[#9b7b51] mr-2 shrink-0" />
+                            <Check className="w-4 h-4 text-[#7C5E38] mr-2 shrink-0" />
                             Применяемые методики и процедуры
                           </h4>
                           <ul className="space-y-3">
@@ -606,7 +606,7 @@ export default function MedicalPage({
                       </div>
 
                       {/* Booking Prompt */}
-                      <div className="bg-[#022C22] text-[#FAF9F6] p-6 border border-[#c5a880]/30 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+                      <div className="bg-[#022C22] text-[#FAF9F6] p-6 rounded-xl border border-[#c5a880]/30 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
                         <div className="space-y-1">
                           <span className="text-[#c5a880] font-bold text-xs uppercase tracking-wider font-mono block">Стандарты санаторно-курортной помощи</span>
                           <p className="text-xs sm:text-sm text-stone-300 max-w-xl leading-relaxed">
@@ -625,7 +625,7 @@ export default function MedicalPage({
                               }
                             }, 150);
                           }}
-                          className="bg-[#c5a880] hover:bg-[#b09268] text-[#022C22] px-6 py-3 text-xs font-bold uppercase tracking-wider rounded-sm transition-colors inline-flex items-center gap-2 shrink-0 cursor-pointer whitespace-nowrap"
+                          className="bg-[#c5a880] hover:bg-[#b09268] text-[#022C22] px-6 py-3 text-xs font-bold uppercase tracking-wider rounded-lg transition-colors inline-flex items-center gap-2 shrink-0 cursor-pointer whitespace-nowrap"
                         >
                           <Phone className="w-3.5 h-3.5" />
                           <span>Связаться с санаторием</span>
@@ -643,10 +643,10 @@ export default function MedicalPage({
         </section>
 
         {/* STRUCTURE OF MEDICAL DEPARTMENT & CABINETS + DIET NUTRITION */}
-        <section className="bg-white border border-stone-200 p-6 sm:p-10 space-y-8">
+        <section className="bg-white border border-stone-200 rounded-xl p-6 sm:p-10 space-y-8 shadow-xs">
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-stone-200 pb-5">
             <div>
-              <span className="text-xs font-mono uppercase tracking-widest text-[#9b7b51] font-bold block mb-1">
+              <span className="text-xs font-mono uppercase tracking-widest text-[#7C5E38] font-bold block mb-1">
                 Структура медицинского отделения · 9 профильных подразделений
               </span>
               <h3 className="font-serif text-2xl sm:text-3xl font-bold text-[#022C22]">
@@ -662,11 +662,11 @@ export default function MedicalPage({
             {medicalCabinets.map((cab) => (
               <div
                 key={cab.num}
-                className="bg-[#FAF9F6] border border-stone-200 p-6 flex flex-col justify-between hover:border-[#c5a880] transition-colors"
+                className="bg-[#FAF9F6] border border-stone-200 rounded-xl p-6 flex flex-col justify-between hover:border-[#c5a880] transition-colors"
               >
                 <div className="space-y-3">
                   <div className="flex items-baseline justify-between gap-2 border-b border-stone-200 pb-2.5">
-                    <span className="font-mono tabular-nums text-lg font-bold text-[#c5a880]">
+                    <span className="font-mono tabular-nums text-lg font-bold text-[#7C5E38]">
                       {cab.num}
                     </span>
                     <span className="text-[11px] font-mono uppercase tracking-wider text-stone-500 text-right">
@@ -685,7 +685,7 @@ export default function MedicalPage({
           </div>
 
           {/* Dietetic Nutrition Highlight */}
-          <div className="bg-[#022C22] text-white p-6 sm:p-8 border border-[#c5a880]/30 grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+          <div className="bg-[#022C22] text-white p-6 sm:p-8 rounded-xl border border-[#c5a880]/30 grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
             <div className="lg:col-span-8 space-y-2">
               <div className="flex items-center gap-2 text-[#c5a880] text-xs font-mono uppercase tracking-widest font-bold">
                 <Utensils className="w-4 h-4" />
@@ -698,7 +698,7 @@ export default function MedicalPage({
                 Диетическое питание отдыхающих осуществляется по заказной системе на основании 22-дневного меню с учётом рекомендаций специалистов Совета по питанию. Столовая санатория оснащена новым технологическим оборудованием. Согласно диете, назначенной лечащим врачом, отдыхающих весь срок лечения курирует медицинская сестра диетическая.
               </p>
             </div>
-            <div className="lg:col-span-4 grid grid-cols-2 divide-x divide-white/15 border border-white/15 bg-white/5 text-center">
+            <div className="lg:col-span-4 grid grid-cols-2 divide-x divide-white/15 border border-white/15 rounded-lg bg-white/5 text-center">
               <div className="p-4">
                 <span className="block font-mono tabular-nums text-2xl font-bold text-[#c5a880]">22 дня</span>
                 <span className="text-xs text-stone-300 block mt-1">заказное меню по диетам</span>
@@ -712,9 +712,9 @@ export default function MedicalPage({
         </section>
 
         {/* DIAGNOSTIC BASE SECTION */}
-        <section className="bg-white border border-stone-200 p-6 sm:p-10 space-y-8">
+        <section className="bg-white border border-stone-200 rounded-xl p-6 sm:p-10 space-y-8 shadow-xs">
           <div className="border-b border-stone-200 pb-5">
-            <span className="text-xs font-mono uppercase tracking-widest text-[#9b7b51] font-bold block mb-1">
+            <span className="text-xs font-mono uppercase tracking-widest text-[#7C5E38] font-bold block mb-1">
               Клиническая и инструментальная диагностика
             </span>
             <h3 className="font-serif text-2xl sm:text-3xl font-bold text-[#022C22]">
@@ -723,8 +723,8 @@ export default function MedicalPage({
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="bg-[#FAF9F6] border border-stone-200 p-6 space-y-3">
-              <div className="text-xs font-mono uppercase tracking-wider text-[#9b7b51] font-bold border-b border-stone-200 pb-2">
+            <div className="bg-[#FAF9F6] border border-stone-200 rounded-xl p-6 space-y-3">
+              <div className="text-xs font-mono uppercase tracking-wider text-[#7C5E38] font-bold border-b border-stone-200 pb-2">
                 01 · Лабораторная диагностика
               </div>
               <h4 className="font-serif text-lg font-bold text-[#022C22]">
@@ -735,7 +735,7 @@ export default function MedicalPage({
               </p>
             </div>
 
-            <div className="bg-[#FAF9F6] border border-[#c5a880] p-6 space-y-3">
+            <div className="bg-[#FAF9F6] border border-[#c5a880] rounded-xl p-6 space-y-3">
               <div className="text-xs font-mono uppercase tracking-wider text-[#022C22] font-bold border-b border-[#c5a880]/40 pb-2">
                 02 · Оснащение 2026 г. · Аппарат «РуСкан»
               </div>
@@ -747,8 +747,8 @@ export default function MedicalPage({
               </p>
             </div>
 
-            <div className="bg-[#FAF9F6] border border-stone-200 p-6 space-y-3">
-              <div className="text-xs font-mono uppercase tracking-wider text-[#9b7b51] font-bold border-b border-stone-200 pb-2">
+            <div className="bg-[#FAF9F6] border border-stone-200 rounded-xl p-6 space-y-3">
+              <div className="text-xs font-mono uppercase tracking-wider text-[#7C5E38] font-bold border-b border-stone-200 pb-2">
                 03 · Кардио-респираторный контроль
               </div>
               <h4 className="font-serif text-lg font-bold text-[#022C22]">
@@ -762,7 +762,7 @@ export default function MedicalPage({
         </section>
 
         {/* FULL LICENSE NOMENCLATURE SECTION (24 TYPES OF WORKS/SERVICES) */}
-        <section className="bg-white border border-stone-200 overflow-hidden">
+        <section className="bg-white border border-stone-200 rounded-xl overflow-hidden shadow-xs">
           <div className="bg-[#022C22] text-white p-6 sm:p-8 border-b border-[#c5a880]/30 flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
               <div className="text-[#c5a880] text-xs font-mono uppercase tracking-widest font-bold mb-1">
@@ -772,14 +772,14 @@ export default function MedicalPage({
                 Номенклатура лицензированных медицинских работ и услуг (24 вида)
               </h3>
             </div>
-            <div className="text-stone-300 font-mono tabular-nums text-xs border border-[#c5a880]/40 px-4 py-2 bg-white/5 shrink-0">
+            <div className="text-stone-300 font-mono tabular-nums text-xs border border-[#c5a880]/40 rounded-lg px-4 py-2 bg-white/5 shrink-0">
               Лицензия № <strong className="text-white">Л041-00110-91/00554225</strong>
             </div>
           </div>
 
           <div className="p-6 sm:p-10 space-y-8">
             {/* License Requisites Header Strip */}
-            <div className="bg-[#FAF9F6] border border-stone-200 p-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 text-xs">
+            <div className="bg-[#FAF9F6] border border-stone-200 rounded-xl p-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 text-xs">
               <div>
                 <span className="text-stone-500 block">Лицензиат:</span>
                 <strong className="text-[#022C22] font-bold block mt-1">ФГКУ «Санаторий «Ясная Поляна» ФТС России»</strong>
@@ -801,10 +801,10 @@ export default function MedicalPage({
             {/* 5 Official Categories with 24 Codes */}
             <div className="space-y-6">
               {licenseCategories.map((cat) => (
-                <div key={cat.code} className="border border-stone-200 p-5 sm:p-6 bg-[#FAF9F6]/50">
+                <div key={cat.code} className="border border-stone-200 rounded-xl p-5 sm:p-6 bg-[#FAF9F6]/50">
                   <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-2 pb-3 mb-4 border-b border-stone-200">
                     <div className="flex items-baseline gap-3">
-                      <span className="font-mono tabular-nums text-xs font-bold text-[#9b7b51]">
+                      <span className="font-mono tabular-nums text-xs font-bold text-[#7C5E38]">
                         Код {cat.code}
                       </span>
                       <h4 className="font-serif text-base font-bold text-[#022C22]">
@@ -819,9 +819,9 @@ export default function MedicalPage({
                     {cat.items.map((item) => (
                       <div
                         key={item.code}
-                        className="bg-white border border-stone-200 px-3.5 py-2.5 flex items-baseline gap-2.5 text-xs"
+                        className="bg-white border border-stone-200 rounded-lg px-3.5 py-2.5 flex items-baseline gap-2.5 text-xs"
                       >
-                        <span className="font-mono tabular-nums text-[11px] font-bold text-[#9b7b51] shrink-0">
+                        <span className="font-mono tabular-nums text-[11px] font-bold text-[#7C5E38] shrink-0">
                           {item.code}
                         </span>
                         <span className="text-[#022C22] font-medium leading-snug">

@@ -230,7 +230,7 @@ export default function DocumentsPage({ onBackToHome }: { onBackToHome: () => vo
     <div className="flex-1 bg-[#FAF9F6] text-[#1c2a22] font-sans">
       
       {/* Dynamic Visual Banner */}
-      <div className="bg-[#022C22] text-white py-14 px-4 relative overflow-hidden border-b border-[#c5a880]/30 shadow-inner">
+      <div className="bg-[#022C22] text-white py-12 sm:py-16 px-4 relative overflow-hidden border-b border-[#c5a880]/30 shadow-inner">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10">
           <div className="space-y-2">
             <div className="flex items-center space-x-2 text-[#c5a880] text-xs font-sans uppercase tracking-wider font-semibold">
@@ -271,13 +271,13 @@ export default function DocumentsPage({ onBackToHome }: { onBackToHome: () => vo
       </AnimatePresence>
 
       {/* Main documents container - all documents on one page */}
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-6">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-6">
         
         {/* Admin status box */}
         {isAdminMode && (
-          <div className="bg-amber-50 border border-amber-250 p-4 sm:p-5 rounded-xl shadow-xs flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+          <div className="bg-amber-50 border border-amber-200 p-4 sm:p-5 rounded-xl shadow-xs flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
             <div className="flex items-start sm:items-center space-x-3 text-amber-900">
-              <Shield className="w-6 h-6 text-amber-750 shrink-0 mt-0.5 sm:mt-0" />
+              <Shield className="w-6 h-6 text-amber-700 shrink-0 mt-0.5 sm:mt-0" />
               <div>
                 <span className="font-mono uppercase tracking-wider font-bold text-xs block">
                   Панель управления PDF документами (Администратор)
@@ -339,7 +339,7 @@ export default function DocumentsPage({ onBackToHome }: { onBackToHome: () => vo
               placeholder="Быстрый поиск по названию документа, номеру приказа, коду или ключевым словам..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-stone-50 border border-stone-200 pl-12 pr-4 py-3.5 rounded-xl text-sm sm:text-base focus:outline-none focus:border-[#022C22] font-sans placeholder:text-stone-400 text-stone-850 transition-colors"
+              className="w-full bg-stone-50 border border-stone-200 pl-12 pr-4 py-3.5 rounded-xl text-sm sm:text-base focus:outline-none focus:border-[#022C22] font-sans placeholder:text-stone-400 text-stone-800 transition-colors"
             />
           </div>
           <div className="shrink-0 text-xs sm:text-sm font-sans font-bold text-stone-700 bg-stone-100 px-5 py-3 rounded-xl border border-stone-200 flex items-center gap-2.5">
@@ -383,7 +383,7 @@ export default function DocumentsPage({ onBackToHome }: { onBackToHome: () => vo
             <div className="bg-[#022C22] text-white rounded-2xl border border-[#c5a880]/30 shadow-lg overflow-hidden transition-all duration-300">
               <div 
                 onClick={() => setIsPassportOpen(!isPassportOpen)}
-                className="p-5 sm:p-6 flex justify-between items-center cursor-pointer select-none bg-gradient-to-r from-[#022C22] to-[#011F18] border-b border-[#c5a880]/20"
+                className="p-5 sm:p-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 cursor-pointer select-none bg-gradient-to-r from-[#022C22] to-[#011F18] border-b border-[#c5a880]/20"
               >
                 <div className="flex items-center space-x-3.5">
                   <div className="bg-white/10 text-[#c5a880] p-2.5 rounded-xl shrink-0">
@@ -392,7 +392,7 @@ export default function DocumentsPage({ onBackToHome }: { onBackToHome: () => vo
                   <div>
                     <div className="flex items-center space-x-2.5 flex-wrap">
                       <span className="text-xs uppercase tracking-wider text-[#c5a880] font-sans font-semibold bg-[#c5a880]/15 px-2.5 py-0.5 rounded-md">ГАС карточка ФТС России</span>
-                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
                       <span className="text-xs font-mono font-bold text-emerald-300">АКТУАЛИЗИРОВАНО В 2026 ГОДУ</span>
                     </div>
                     <h2 className="font-serif text-base sm:text-lg md:text-xl font-bold tracking-tight text-white mt-1">
@@ -400,7 +400,7 @@ export default function DocumentsPage({ onBackToHome }: { onBackToHome: () => vo
                     </h2>
                   </div>
                 </div>
-                <button className="text-[#c5a885] hover:text-white px-3 py-1.5 rounded-lg hover:bg-white/10 transition-all font-sans text-xs font-bold uppercase tracking-wider shrink-0 cursor-pointer">
+                <button className="text-[#c5a880] hover:text-white px-3 py-1.5 rounded-lg hover:bg-white/10 transition-all font-sans text-xs font-bold uppercase tracking-wider shrink-0 cursor-pointer self-end sm:self-auto">
                   {isPassportOpen ? 'Свернуть [-]' : 'Развернуть [+]'}
                 </button>
               </div>
