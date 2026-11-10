@@ -1287,7 +1287,7 @@ export default function App() {
 
       {/* TOP NOTIFICATION / ACCESSIBILITY PRE-HEADER BAR */}
       {!isAccessMode ? (
-        <div className="bg-[#021f18] text-stone-200 text-xs py-2 border-b border-emerald-950 px-4">
+        <div className="bg-[#011F18] text-stone-200 text-xs py-2 border-b border-[#c5a880]/20 px-4">
           <div className="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-2">
             <div className="flex items-center space-x-2">
               <span className="w-1.5 h-1.5 rounded-full bg-[#c5a880]"></span>
@@ -1304,7 +1304,7 @@ export default function App() {
                   window.speechSynthesis.speak(welcome);
                 }
               }}
-              className="flex items-center space-x-1.5 text-stone-200 hover:text-white transition-colors bg-emerald-950 hover:bg-emerald-900 border border-[#c5a880]/30 rounded-md px-3 py-1 text-xs select-none cursor-pointer font-sans"
+              className="flex items-center space-x-1.5 text-stone-200 hover:text-white transition-colors bg-[#022C22] hover:bg-[#04392C] border border-[#c5a880]/30 rounded-lg px-3 py-1 text-xs select-none cursor-pointer font-sans"
             >
               <Eye className="w-3.5 h-3.5 text-[#c5a880]" />
               <span className="font-semibold">Версия для слабовидящих</span>
@@ -1510,7 +1510,7 @@ export default function App() {
                       animate={{ opacity: 1, y: 0, scale: 1 }}
                       exit={{ opacity: 0, y: 5, scale: 0.95 }}
                       transition={{ duration: 0.15 }}
-                      className="absolute left-0 mt-1 w-56 bg-[#022C22] border border-[#c5a880]/30 rounded shadow-xl py-2 z-50 text-left font-sans text-stone-100"
+                      className="absolute left-0 mt-1 w-56 bg-[#022C22] border border-[#c5a880]/30 rounded-xl shadow-xl py-2 z-50 text-left font-sans text-stone-100 overflow-hidden"
                     >
                       <a
                         href="#about"
@@ -1780,19 +1780,19 @@ export default function App() {
           ) : (
             <>
           {/* HERO / WELCOME ATRIUM */}
-          <header id="hero" className="relative min-h-[90vh] flex items-center justify-center overflow-hidden bg-gradient-to-b from-[#033E31] to-[#01221A]">
+          <header id="hero" className="relative min-h-[88vh] flex items-center justify-center overflow-hidden bg-[#011F18] border-b border-[#c5a880]/25">
         
         {/* Dynamic Background (Switchable Video/Image loops) */}
-        <motion.div className="absolute inset-0 z-0 bg-[#033E31]" style={{ y: yBg }}>
+        <motion.div className="absolute inset-0 z-0 bg-[#011F18]" style={{ y: yBg }}>
           <AnimatePresence mode="wait" initial={false}>
             {slides[activeSlideIndex] && (
               <motion.div 
                 key={`slide-${activeSlideIndex}-${slides[activeSlideIndex]?.url}`}
-                className="absolute inset-0 w-full h-full overflow-hidden brightness-[1.20] saturate-[1.05]"
+                className="absolute inset-0 w-full h-full overflow-hidden contrast-[1.02]"
                 initial={{ opacity: 0 }}
-                animate={{ opacity: 0.90 }}
+                animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                transition={{ duration: 1.0 }}
+                transition={{ duration: 0.8 }}
               >
                 {slides[activeSlideIndex]?.type === 'video' ? (
                   <video
@@ -1803,7 +1803,7 @@ export default function App() {
                     loop
                     preload="auto"
                     poster={slides.find(s => s.type === 'photo')?.url || (IMAGES?.hero && !IMAGES.hero.includes('pestovo_palace') ? IMAGES.hero : undefined)}
-                    className="w-full h-full object-cover object-center scale-105"
+                    className="w-full h-full object-cover object-center"
                     onEnded={() => {
                       if (slides.length > 1) {
                         setActiveSlideIndex(prev => (prev + 1) % slides.length);
@@ -1817,7 +1817,7 @@ export default function App() {
                   <img
                     src={slides[activeSlideIndex]?.url}
                     alt="Санаторий Ясная Поляна ФТС России"
-                    className="w-full h-full object-cover object-center scale-105"
+                    className="w-full h-full object-cover object-center"
                     referrerPolicy="no-referrer"
                     fetchPriority="high"
                   />
@@ -1826,27 +1826,26 @@ export default function App() {
             )}
           </AnimatePresence>
 
-          {/* Institutional emerald contrast overlay */}
-          <div className="absolute inset-0 bg-gradient-to-t from-[#022C22]/75 via-[#011F19]/45 to-[#022C22]/55 z-1"></div>
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-black/25 via-transparent to-black/20 z-1"></div>
-          <div className="absolute inset-x-0 bottom-0 h-36 bg-gradient-to-t from-[#FAF9F6] to-transparent z-2"></div>
+          {/* Balanced institutional emerald overlay: preserves photo clarity while ensuring strict text contrast */}
+          <div className="absolute inset-0 bg-gradient-to-b from-[#011F18]/65 via-[#022C22]/45 to-[#011F18]/85 z-1"></div>
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-[#011F18]/30 via-transparent to-[#011F18]/45 z-1"></div>
         </motion.div>
 
         {/* Hero Content */}
         <motion.div 
-          className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 text-center text-white flex flex-col items-center"
+          className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-14 sm:py-20 text-center text-white flex flex-col items-center w-full"
           style={{ y: yHeroText, opacity: opacityHeroText }}
         >
           
           {isAdminMode && (
             <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
+              initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               className="mb-4"
             >
               <button 
                 onClick={() => { setActiveSettingsTab('hero'); setCurrentPage('admin'); }}
-                className="bg-amber-500 hover:bg-amber-600 font-bold text-stone-900 border border-amber-300 text-xs px-4 py-2 rounded-lg cursor-pointer shadow-lg flex items-center gap-1.5 transition-colors"
+                className="bg-amber-500 hover:bg-amber-600 font-bold text-stone-900 border border-amber-300 text-xs px-4 py-2 rounded-lg cursor-pointer shadow-md flex items-center gap-1.5 transition-colors"
               >
                 <Edit className="w-4 h-4" /> Редактировать первый экран
               </button>
@@ -1854,64 +1853,64 @@ export default function App() {
           )}
 
           <motion.div
-            initial={{ opacity: 0, y: 30 }}
+            initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            className="inline-flex items-center space-x-2 bg-[#022C22]/90 backdrop-blur-md border border-[#c5a880]/40 px-4 py-2 rounded-lg mb-6"
+            transition={{ duration: 0.5 }}
+            className="inline-flex items-center space-x-2.5 bg-[#022C22]/90 backdrop-blur-md border border-[#c5a880]/45 px-4 py-2 rounded-lg mb-6 shadow-sm"
           >
-            <TreePine className="w-4 h-4 text-[#c5a880]" />
+            <TreePine className="w-4 h-4 text-[#c5a880] shrink-0" />
             <span className="text-xs font-sans font-semibold uppercase tracking-wider text-[#FAF9F6]">{HERO_DATA.badge}</span>
           </motion.div>
 
           <motion.h1 
-            initial={{ opacity: 0, y: 30 }}
+            initial={{ opacity: 0, y: 18 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.15 }}
-            className="font-serif leading-none max-w-5xl text-center"
+            transition={{ duration: 0.55, delay: 0.1 }}
+            className="font-serif leading-none max-w-4xl text-center"
           >
             {(() => {
               const text = HERO_DATA.titleFirstPart || 'САНАТОРИЙ «ЯСНАЯ ПОЛЯНА»';
               if (text.toUpperCase().includes('САНАТОРИЙ') && (text.toUpperCase().includes('ЯСНАЯ ПОЛЯНА') || text.toUpperCase().includes('«ЯСНАЯ ПОЛЯНА»'))) {
                 return (
                   <>
-                    <span className="block text-stone-200 font-sans font-bold text-base sm:text-xl md:text-2xl tracking-[0.18em] uppercase opacity-95 mb-2 sm:mb-3 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
+                    <span className="block text-stone-200 font-mono font-bold text-sm sm:text-base md:text-lg tracking-[0.2em] uppercase mb-2.5 sm:mb-3 drop-shadow-xs">
                       САНАТОРИЙ
                     </span>
-                    <span className="block text-white font-serif font-bold tracking-tight text-3xl sm:text-5xl md:text-6xl lg:text-7xl drop-shadow-[0_4px_16px_rgba(0,0,0,0.95)] leading-tight">
+                    <span className="block text-white font-serif font-bold tracking-tight text-3xl sm:text-5xl md:text-6xl lg:text-[64px] drop-shadow-sm leading-[1.08]">
                       «ЯСНАЯ ПОЛЯНА»
                     </span>
                   </>
                 );
               }
               return (
-                <span className="block text-white font-serif font-bold tracking-tight text-3xl sm:text-5xl md:text-6xl lg:text-7xl drop-shadow-[0_4px_16px_rgba(0,0,0,0.95)]">
+                <span className="block text-white font-serif font-bold tracking-tight text-3xl sm:text-5xl md:text-6xl lg:text-[64px] drop-shadow-sm leading-[1.08]">
                   {text}
                 </span>
               );
             })()}
-            <span className="text-[#c5a880] font-semibold font-serif text-lg sm:text-2xl md:text-3xl block mt-4 sm:mt-5 tracking-wide drop-shadow-[0_2px_6px_rgba(0,0,0,0.85)]">
+            <span className="text-[#c5a880] font-semibold font-serif text-base sm:text-xl md:text-2xl block mt-3.5 sm:mt-4 tracking-wide drop-shadow-xs">
               {HERO_DATA.titleSecondPart}
             </span>
           </motion.h1>
 
           <motion.p
-            initial={{ opacity: 0, y: 30 }}
+            initial={{ opacity: 0, y: 18 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.3 }}
-            className="mt-6 text-sm sm:text-lg md:text-xl text-stone-100 font-sans max-w-3xl leading-relaxed drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)] font-normal"
+            transition={{ duration: 0.55, delay: 0.2 }}
+            className="mt-5 sm:mt-6 text-sm sm:text-base md:text-lg text-stone-100 font-sans max-w-2xl leading-relaxed drop-shadow-xs font-normal"
           >
             {HERO_DATA.subtitle}
           </motion.p>
 
           <motion.div
-            initial={{ opacity: 0, y: 30 }}
+            initial={{ opacity: 0, y: 18 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.45 }}
-            className="mt-10 flex flex-col sm:flex-row items-center gap-4"
+            transition={{ duration: 0.55, delay: 0.3 }}
+            className="mt-8 sm:mt-9 flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto"
           >
             <a
               href="#about"
-              className="w-full sm:w-auto bg-[#c5a880] hover:bg-[#bca075] text-[#022C22] px-8 py-4 rounded-lg font-bold text-xs sm:text-sm uppercase tracking-wider text-center transition-colors duration-200 shadow-lg font-sans"
+              className="w-full sm:w-auto bg-[#c5a880] hover:bg-[#bca075] text-[#022C22] px-8 py-3.5 sm:py-4 rounded-lg font-bold text-xs sm:text-sm uppercase tracking-wider text-center transition-colors duration-200 shadow-md font-sans"
             >
               Узнать о санатории
             </a>
@@ -1920,37 +1919,44 @@ export default function App() {
           {/* Quick Verified Highlights / Official Institutional Facts */}
           {HERO_DATA.showStats !== false && HERO_DATA.stats && HERO_DATA.stats.length > 0 && (
             <motion.div 
-              initial={{ opacity: 0, y: 25 }}
+              initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.55 }}
-              className="mt-14 sm:mt-16 w-full max-w-5xl"
+              transition={{ duration: 0.6, delay: 0.4 }}
+              className="mt-12 sm:mt-14 w-full max-w-6xl"
             >
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5 sm:gap-4 bg-[#011F18]/90 backdrop-blur-xl p-4 sm:p-5 rounded-2xl border border-[#c5a880]/30 shadow-2xl">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-3.5 bg-[#011F18]/95 backdrop-blur-md p-3.5 sm:p-4 rounded-2xl border border-[#c5a880]/30 shadow-xl">
                 {HERO_DATA.stats.map((stat, idx) => (
                   <div 
                     key={idx} 
-                    className="relative flex flex-col items-center justify-center p-4 rounded-xl bg-white/[0.04] border border-white/[0.1] hover:border-[#c5a880]/50 hover:bg-white/[0.07] transition-colors duration-200 group text-center"
+                    className="relative flex flex-col justify-between p-4 rounded-xl bg-[#022C22]/85 border border-[#c5a880]/20 hover:border-[#c5a880]/45 transition-colors duration-200 text-left h-full"
                   >
-                    <div className="w-8 h-8 rounded-lg bg-[#c5a880]/15 border border-[#c5a880]/30 flex items-center justify-center mb-2.5 text-[#c5a880] group-hover:bg-[#c5a880] group-hover:text-[#022C22] transition-colors duration-200 shadow-sm shrink-0">
-                      {idx === 0 ? (
-                        <Shield className="w-4 h-4" />
-                      ) : idx === 1 ? (
-                        <Award className="w-4 h-4" />
-                      ) : idx === 2 ? (
-                        <MapPin className="w-4 h-4" />
-                      ) : (
-                        <Stethoscope className="w-4 h-4" />
-                      )}
+                    <div>
+                      <div className="flex items-center justify-between gap-2 mb-3 pb-2.5 border-b border-white/10">
+                        <div className="w-8 h-8 rounded-lg bg-[#c5a880]/15 border border-[#c5a880]/30 flex items-center justify-center text-[#c5a880] shrink-0">
+                          {idx === 0 ? (
+                            <Shield className="w-4 h-4" />
+                          ) : idx === 1 ? (
+                            <Award className="w-4 h-4" />
+                          ) : idx === 2 ? (
+                            <MapPin className="w-4 h-4" />
+                          ) : (
+                            <Stethoscope className="w-4 h-4" />
+                          )}
+                        </div>
+                        <span className="font-mono text-[11px] font-bold text-[#c5a880]/80 tabular-nums">
+                          0{idx + 1}
+                        </span>
+                      </div>
+                      
+                      <span className="block font-sans text-sm sm:text-[15px] font-bold text-white tracking-tight leading-snug">
+                        {stat.value}
+                      </span>
+                      <span className="block text-[#c5a880] text-[11px] font-mono font-bold uppercase tracking-wider mt-1.5 leading-tight">
+                        {stat.label}
+                      </span>
                     </div>
-                    
-                    <span className="block font-sans text-sm sm:text-base font-bold text-white tracking-tight group-hover:text-[#c5a880] transition-colors leading-snug">
-                      {stat.value}
-                    </span>
-                    <span className="block text-[#c5a880] text-xs font-sans font-semibold uppercase tracking-wider mt-1.5 leading-tight">
-                      {stat.label}
-                    </span>
                     {stat.description && (
-                      <span className="block text-stone-200 text-xs font-sans mt-1 leading-snug">
+                      <span className="block text-stone-300 text-xs font-sans mt-2 pt-2 border-t border-white/[0.06] leading-snug">
                         {stat.description}
                       </span>
                     )}
@@ -2011,12 +2017,12 @@ export default function App() {
       </header>
 
       {/* ABOUT & MICROCLIMATE INTERACTIVE EXPERIENCE */}
-      <section id="about" className="py-16 md:py-20 bg-[#FAF9F6]">
+      <section id="about" className="py-16 md:py-24 bg-[#FAF9F6] border-b border-stone-200/70">
         <motion.div
-          initial={{ opacity: 0, y: 35 }}
+          initial={{ opacity: 0, y: 24 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-100px" }}
-          transition={{ duration: 0.75, ease: [0.16, 1, 0.3, 1] }}
+          transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
           className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"
         >
           
@@ -2037,7 +2043,7 @@ export default function App() {
 
               <div className="flex items-center space-x-2">
                 <span className="h-[1px] w-8 bg-[#7C5E38]"></span>
-                <span className="text-xs tracking-wider font-sans uppercase text-[#7C5E38] font-bold">Оазис Здоровья в Гаспре</span>
+                <span className="text-xs tracking-widest font-mono uppercase text-[#7C5E38] font-bold">Оазис Здоровья в Гаспре</span>
               </div>
               <h2 className="font-serif text-3xl sm:text-4xl font-bold text-[#022C22] tracking-tight leading-tight">
                 Южнобережный климат <br/>
@@ -2053,7 +2059,7 @@ export default function App() {
             <div className="lg:col-span-5">
               
               {/* Фито-Барометр & Метео-Станция */}
-              <div className="bg-[#022C22] text-white p-5 sm:p-6 rounded-2xl border border-[#c5a880]/30 shadow-xl relative overflow-hidden">
+              <div className="bg-[#022C22] text-white p-5 sm:p-6 rounded-2xl border border-[#c5a880]/30 shadow-lg relative overflow-hidden">
                 
                 <div className="relative z-10 space-y-4">
                   
@@ -2321,7 +2327,7 @@ export default function App() {
 
               {/* Intuitive Modern Segmented Tab Switcher */}
               <div className="mb-6">
-                <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 p-2 bg-[#022C22]/[0.08] rounded-2xl border border-[#022C22]/15 shadow-inner">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 p-2 bg-[#022C22]/[0.08] rounded-2xl border border-[#022C22]/15 shadow-inner">
                   {[
                     { 
                       id: 'general', 
@@ -2368,7 +2374,7 @@ export default function App() {
                         }}
                         className={`group relative p-3.5 sm:p-4 rounded-xl text-left transition-all duration-200 cursor-pointer flex items-center space-x-3 select-none ${
                           isActive 
-                            ? 'bg-[#022C22] text-white shadow-[0_8px_20px_-4px_rgba(2,44,34,0.4)] ring-1 ring-[#c5a880]/60' 
+                            ? 'bg-[#022C22] text-white shadow-md ring-1 ring-[#c5a880]/60' 
                             : 'bg-white/90 hover:bg-white text-[#022C22] border border-[#022C22]/10 hover:border-[#c5a880] shadow-xs'
                         }`}
                       >
@@ -2380,13 +2386,13 @@ export default function App() {
                           <IconComp className="w-4 h-4" />
                         </div>
                         <div className="min-w-0 flex-1">
-                          <span className={`block text-xs sm:text-sm font-sans font-bold tracking-normal truncate leading-tight ${
+                          <span className={`block text-xs sm:text-sm font-sans font-bold tracking-normal leading-snug ${
                             isActive ? 'text-white' : 'text-[#022C22]'
                           }`}>
                             <span className={`font-mono mr-1 ${isActive ? 'text-[#c5a880]' : 'text-stone-400'}`}>{t.num}</span>
                             {t.label}
                           </span>
-                          <span className={`block text-xs font-sans mt-0.5 truncate ${
+                          <span className={`block text-xs font-sans mt-0.5 leading-snug ${
                             isActive ? 'text-[#c5a880]' : 'text-stone-600 group-hover:text-stone-800'
                           }`}>
                             {t.sub}
@@ -2399,7 +2405,7 @@ export default function App() {
               </div>
 
               {/* Tab Content Box with High-Contrast Architectural Frame & Action Toolbar */}
-              <div className="bg-gradient-to-b from-[#022C22] via-[#033327] to-[#022C22] rounded-2xl p-1 sm:p-1.5 shadow-[0_18px_45px_-12px_rgba(2,44,34,0.28)] border border-[#022C22]">
+              <div className="bg-gradient-to-b from-[#022C22] via-[#033327] to-[#022C22] rounded-2xl p-1 sm:p-1.5 shadow-md border border-[#022C22]">
                 {/* Top Interactive Context Strip inside the Frame */}
                 <div className="px-4 sm:px-6 py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs text-stone-200 border-b border-white/10">
                   <div className="flex items-center gap-2 font-sans">
@@ -2441,7 +2447,7 @@ export default function App() {
                 </div>
 
                 {/* Inner Warm Sandstone Surface Holding Crisp White Content Cards */}
-                <div className="bg-[#F6F2E9] rounded-xl p-4 sm:p-6 md:p-7">
+                <div className="bg-[#FAF9F6] rounded-xl p-4 sm:p-6 md:p-7">
                   <AnimatePresence mode="wait">
                     {aboutTab === 'general' && (
                       <motion.div
@@ -2455,7 +2461,7 @@ export default function App() {
                         {/* Left: Organization Credentials */}
                         <div className="lg:col-span-7 flex flex-col justify-between gap-4">
                           <div className="bg-white p-5 sm:p-6 rounded-xl border border-[#022C22]/15 shadow-sm text-left">
-                            <span className="block text-xs font-sans text-[#9b7b51] font-bold">
+                            <span className="block text-xs font-sans text-[#7C5E38] font-bold">
                               Полное официальное наименование
                             </span>
                             <h4 className="font-serif text-base sm:text-lg md:text-xl text-[#022C22] font-bold mt-2 leading-snug">
@@ -2511,7 +2517,7 @@ export default function App() {
                           </div>
 
                           <div className="bg-white p-5 sm:p-6 rounded-xl border border-[#022C22]/15 shadow-sm flex-1 flex flex-col justify-between text-left">
-                            <span className="block text-xs font-sans text-[#9b7b51] font-bold border-b border-stone-200 pb-2.5 mb-3">
+                            <span className="block text-xs font-sans text-[#7C5E38] font-bold border-b border-stone-200 pb-2.5 mb-3">
                               Ведомственная принадлежность и статус
                             </span>
                             <div className="divide-y divide-stone-200/80 text-xs sm:text-[13px]">
@@ -2575,7 +2581,7 @@ export default function App() {
                           <div className="lg:col-span-6 space-y-5">
                             <div className="bg-white p-5 rounded-xl border border-[#022C22]/15 shadow-sm space-y-4">
                               <h5 className="font-serif text-base font-bold text-[#022C22] pb-2.5 flex items-center space-x-2 border-b border-stone-200">
-                                <Stethoscope className="w-4 h-4 text-[#9b7b51]" />
+                                <Stethoscope className="w-4 h-4 text-[#7C5E38]" />
                                 <span>Лицензированные медицинские направления (24 вида работ):</span>
                               </h5>
                               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
@@ -2593,7 +2599,7 @@ export default function App() {
                                   { name: 'Организация здравоохранения и эпидемиология', desc: 'Коды 1000.2.3, 1000.4.36, 1040.24' },
                                   { name: 'Экспертиза качества медпомощи', desc: 'Код 1070.8 · Медицинские экспертизы' }
                                 ].map((item, id) => (
-                                  <div key={id} className="bg-[#F6F2E9]/80 hover:bg-[#EDE6D6] border border-stone-200/90 p-3 rounded-lg transition-colors">
+                                  <div key={id} className="bg-[#F2EFE9]/70 hover:bg-[#F2EFE9] border border-stone-200/90 p-3 rounded-lg transition-colors">
                                     <span className="font-serif font-bold text-xs sm:text-[13px] text-[#022C22] block">
                                       {item.name}
                                     </span>
@@ -2606,11 +2612,11 @@ export default function App() {
                             {/* Diagnostics */}
                             <div className="bg-white p-5 rounded-xl border border-[#022C22]/15 shadow-sm space-y-3.5">
                               <h5 className="font-serif text-base font-bold text-[#022C22] pb-2 flex items-center space-x-2 border-b border-stone-200">
-                                <Activity className="w-4 h-4 text-[#9b7b51]" />
+                                <Activity className="w-4 h-4 text-[#7C5E38]" />
                                 <span>Диагностическая и лабораторная база:</span>
                               </h5>
                               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                                <div className="bg-[#F6F2E9] p-3.5 rounded-lg border border-stone-200/90">
+                                <div className="bg-[#F2EFE9]/70 p-3.5 rounded-lg border border-stone-200/90">
                                   <h6 className="font-sans text-xs font-bold text-[#022C22]">Лаборатория</h6>
                                   <p className="text-stone-700 mt-1 text-xs leading-relaxed font-sans">
                                     Клинические, биохимические, иммуноферментные (ИФА) анализы крови, специфические ферменты.
@@ -2622,7 +2628,7 @@ export default function App() {
                                     УЗИ щитовидной железы, печени, желчного пузыря, почек, простаты, сосудов головы, шеи и ног.
                                   </p>
                                 </div>
-                                <div className="bg-[#F6F2E9] p-3.5 rounded-lg border border-stone-200/90">
+                                <div className="bg-[#F2EFE9]/70 p-3.5 rounded-lg border border-stone-200/90">
                                   <h6 className="font-sans text-xs font-bold text-[#022C22]">Функциональная база</h6>
                                   <p className="text-stone-700 mt-1 text-xs leading-relaxed font-sans">
                                     Электрокардиография (ЭКГ) и диагностика функции внешнего дыхания (ФВД / спирография).
@@ -2636,13 +2642,13 @@ export default function App() {
                           <div className="lg:col-span-6 bg-white p-5 sm:p-6 rounded-xl border border-[#022C22]/15 shadow-sm flex flex-col justify-between space-y-4">
                             <div className="space-y-4">
                               <h5 className="font-serif text-lg font-bold text-[#022C22] flex items-center space-x-2 border-b border-stone-200 pb-3">
-                                <Shield className="w-5 h-5 text-[#9b7b51]" />
+                                <Shield className="w-5 h-5 text-[#7C5E38]" />
                                 <span>Основные лечебные профили и консультации врачей</span>
                               </h5>
                               
                               <div className="space-y-3.5 text-xs text-stone-700 font-sans">
-                                <div className="bg-[#F6F2E9]/80 p-4 rounded-xl border border-stone-200/90 space-y-1.5">
-                                  <span className="text-xs font-bold text-[#9b7b51] font-sans block">
+                                <div className="bg-[#F2EFE9]/70 p-4 rounded-xl border border-stone-200/90 space-y-1.5">
+                                  <span className="text-xs font-bold text-[#7C5E38] font-sans block">
                                     01. Пульмонологический и ЛОР-профиль
                                   </span>
                                   <strong className="block font-bold text-sm text-[#022C22]">
@@ -2653,8 +2659,8 @@ export default function App() {
                                   </p>
                                 </div>
 
-                                <div className="bg-[#F6F2E9]/80 p-4 rounded-xl border border-stone-200/90 space-y-1.5">
-                                  <span className="text-xs font-bold text-[#9b7b51] font-sans block">
+                                <div className="bg-[#F2EFE9]/70 p-4 rounded-xl border border-stone-200/90 space-y-1.5">
+                                  <span className="text-xs font-bold text-[#7C5E38] font-sans block">
                                     02. Опорно-двигательный профиль
                                   </span>
                                   <strong className="block font-bold text-sm text-[#022C22]">
@@ -2665,8 +2671,8 @@ export default function App() {
                                   </p>
                                 </div>
 
-                                <div className="bg-[#F6F2E9]/80 p-4 rounded-xl border border-stone-200/90 space-y-1.5">
-                                  <span className="text-xs font-bold text-[#9b7b51] font-sans block">
+                                <div className="bg-[#F2EFE9]/70 p-4 rounded-xl border border-stone-200/90 space-y-1.5">
+                                  <span className="text-xs font-bold text-[#7C5E38] font-sans block">
                                     03. Кардиологический и психосоматический профиль
                                   </span>
                                   <strong className="block font-bold text-sm text-[#022C22]">
@@ -2763,7 +2769,7 @@ export default function App() {
                             ].map((cat, groupIdx) => (
                               <div key={groupIdx} className="bg-white border border-[#022C22]/15 p-4 sm:p-5 rounded-xl space-y-3.5 shadow-sm">
                                 <div className="flex items-center space-x-2 border-b border-stone-200 pb-2.5">
-                                  <span className="font-mono text-xs font-bold text-[#9b7b51]">{cat.num}</span>
+                                  <span className="font-mono text-xs font-bold text-[#7C5E38]">{cat.num}</span>
                                   <h5 className="font-serif text-xs sm:text-sm font-bold text-[#022C22]">{cat.category}</h5>
                                 </div>
                                 <div className="space-y-3">
@@ -2788,7 +2794,7 @@ export default function App() {
                         <div className="lg:col-span-4 bg-white p-5 sm:p-6 rounded-xl border border-[#022C22]/15 shadow-sm space-y-4">
                           <div>
                             <h4 className="font-serif text-base sm:text-lg font-bold text-[#022C22] border-b border-stone-200 pb-2.5 flex items-center space-x-2">
-                              <Building2 className="w-4 h-4 text-[#9b7b51]" />
+                              <Building2 className="w-4 h-4 text-[#7C5E38]" />
                               <span>Структура медицинского отделения</span>
                             </h4>
                             <p className="text-xs text-stone-600 mt-2 leading-relaxed">
@@ -2811,7 +2817,7 @@ export default function App() {
                               'Кабинет УЗ-диагностики (аппарат «РуСкан»)',
                               'Кабинет функциональной диагностики (ЭКГ, ФВД) и лаборатория'
                             ].map((cab, idx) => (
-                              <div key={idx} className="flex items-center space-x-2.5 bg-[#F6F2E9]/80 p-2.5 border border-stone-200/90 rounded-lg">
+                              <div key={idx} className="flex items-center space-x-2.5 bg-[#F2EFE9]/70 p-2.5 border border-stone-200/90 rounded-lg">
                                 <Check className="w-4 h-4 text-[#022C22] flex-shrink-0" />
                                 <span className="font-sans text-[#022C22] font-semibold text-xs">{cab}</span>
                               </div>
@@ -2834,7 +2840,7 @@ export default function App() {
                         <div className="space-y-4 bg-white p-5 sm:p-6 rounded-xl border border-[#022C22]/15 flex flex-col justify-between shadow-sm">
                           <div className="space-y-4">
                             <h4 className="font-serif text-base sm:text-lg font-bold text-[#022C22] border-b border-stone-200 pb-2.5 flex items-center space-x-2">
-                              <UserCheck className="w-4 h-4 text-[#9b7b51]" />
+                              <UserCheck className="w-4 h-4 text-[#7C5E38]" />
                               <span>Руководство учреждения</span>
                             </h4>
                             <div className="bg-[#022C22] text-white p-4 rounded-xl border border-[#c5a880]/40">
@@ -2845,8 +2851,8 @@ export default function App() {
                                 {siteData?.resortInfo?.directorName || RESORT_INFO.directorName || 'Шапортов Станислав Владимирович'}
                               </strong>
                             </div>
-                            <div className="bg-[#F6F2E9] p-3.5 rounded-xl border border-stone-200/90">
-                              <span className="block text-[#9b7b51] font-sans text-xs font-bold">
+                            <div className="bg-[#F2EFE9]/70 p-3.5 rounded-xl border border-stone-200/90">
+                              <span className="block text-[#7C5E38] font-sans text-xs font-bold">
                                 Заведующий медицинским отделением (с января 2025 г.)
                               </span>
                               <strong className="block text-sm text-[#022C22] font-serif font-bold mt-0.5">
@@ -2860,14 +2866,14 @@ export default function App() {
 
                           <div className="pt-3 border-t border-stone-200 space-y-2">
                             <span className="block text-stone-600 font-sans text-xs font-semibold">Приемная и официальная связь</span>
-                            <div className="space-y-2 bg-[#F6F2E9]/80 p-3.5 rounded-xl border border-stone-200/90 text-xs sm:text-[13px]">
+                            <div className="space-y-2 bg-[#F2EFE9]/70 p-3.5 rounded-xl border border-stone-200/90 text-xs sm:text-[13px]">
                               <p className="flex justify-between items-center">
                                 <span className="text-stone-600 font-medium">Телефон / Факс:</span>
-                                <a href="tel:+73654239376" className="font-mono tabular-nums font-bold text-[#022C22] hover:text-[#9b7b51] transition-colors">+7 (3654) 23-93-76</a>
+                                <a href="tel:+73654239376" className="font-mono tabular-nums font-bold text-[#022C22] hover:text-[#7C5E38] transition-colors">+7 (3654) 23-93-76</a>
                               </p>
                               <p className="flex justify-between items-center">
                                 <span className="text-stone-600 font-medium">Email:</span>
-                                <a href={`mailto:${RESORT_INFO.email || 'sanatoriy@ya-polyana.ru'}`} className="font-mono text-[#022C22] font-semibold hover:text-[#9b7b51] hover:underline">{RESORT_INFO.email || 'sanatoriy@ya-polyana.ru'}</a>
+                                <a href={`mailto:${RESORT_INFO.email || 'sanatoriy@ya-polyana.ru'}`} className="font-mono text-[#022C22] font-semibold hover:text-[#7C5E38] hover:underline">{RESORT_INFO.email || 'sanatoriy@ya-polyana.ru'}</a>
                               </p>
                             </div>
                           </div>
@@ -2877,7 +2883,7 @@ export default function App() {
                         <div className="space-y-4 bg-white p-5 sm:p-6 rounded-xl border border-[#022C22]/15 flex flex-col justify-between shadow-sm">
                           <div>
                             <h4 className="font-serif text-base sm:text-lg font-bold text-[#022C22] border-b border-stone-200 pb-2.5 flex items-center space-x-2">
-                              <FileText className="w-4 h-4 text-[#9b7b51]" />
+                              <FileText className="w-4 h-4 text-[#7C5E38]" />
                               <span>Государственная регистрация</span>
                             </h4>
                             <div className="space-y-3 text-xs sm:text-[13px] mt-3.5">
@@ -2897,15 +2903,15 @@ export default function App() {
                           </div>
 
                           <div className="border-t border-stone-200 pt-3 grid grid-cols-2 gap-2.5 text-xs">
-                            <div className="bg-[#F6F2E9]/80 p-3 rounded-xl border border-stone-200/90">
+                            <div className="bg-[#F2EFE9]/70 p-3 rounded-xl border border-stone-200/90">
                               <span className="block text-stone-500 font-sans text-xs font-semibold">Серия бланка</span>
-                              <span className="font-mono tabular-nums font-extrabold text-[#022C22] text-sm mt-0.5 block">77</span>
+                              <span className="font-mono tabular-nums font-bold text-[#022C22] text-sm mt-0.5 block">77</span>
                             </div>
-                            <div className="bg-[#F6F2E9]/80 p-3 rounded-xl border border-stone-200/90">
+                            <div className="bg-[#F2EFE9]/70 p-3 rounded-xl border border-stone-200/90">
                               <span className="block text-stone-500 font-sans text-xs font-semibold">№ Свидетельства</span>
-                              <span className="font-mono tabular-nums font-extrabold text-[#022C22] text-xs sm:text-sm mt-0.5 block">015463944</span>
+                              <span className="font-mono tabular-nums font-bold text-[#022C22] text-xs sm:text-sm mt-0.5 block">015463944</span>
                             </div>
-                            <div className="bg-[#F6F2E9]/80 p-3 rounded-xl border border-stone-200/90 col-span-2">
+                            <div className="bg-[#F2EFE9]/70 p-3 rounded-xl border border-stone-200/90 col-span-2">
                               <span className="block text-stone-500 font-sans text-xs font-semibold">Дата государственной регистрации</span>
                               <span className="font-mono tabular-nums font-bold text-[#022C22] mt-0.5 block">29 октября 2013 г.</span>
                             </div>
@@ -2916,7 +2922,7 @@ export default function App() {
                         <div className="space-y-4 bg-white p-5 sm:p-6 rounded-xl border border-[#022C22]/15 flex flex-col justify-between shadow-sm md:col-span-2 lg:col-span-1">
                           <div className="space-y-3">
                             <h4 className="font-serif text-base sm:text-lg font-bold text-[#022C22] border-b border-stone-200 pb-2.5 flex items-center space-x-2">
-                              <Shield className="w-4 h-4 text-[#9b7b51]" />
+                              <Shield className="w-4 h-4 text-[#7C5E38]" />
                               <span>Учредительные сведения</span>
                             </h4>
                             <div className="space-y-2.5 text-xs sm:text-[13px] mt-3 leading-relaxed font-sans">
@@ -2932,11 +2938,11 @@ export default function App() {
                           </div>
 
                           <div className="border-t border-stone-200 pt-3 grid grid-cols-2 gap-2.5 text-xs">
-                            <div className="bg-[#F6F2E9]/80 p-3 rounded-xl border border-stone-200/90">
+                            <div className="bg-[#F2EFE9]/70 p-3 rounded-xl border border-stone-200/90">
                               <span className="block text-stone-500 font-sans text-xs font-semibold">Дата создания</span>
                               <p className="font-bold text-[#022C22] mt-0.5 font-mono tabular-nums">29.10.2013</p>
                             </div>
-                            <div className="bg-[#F6F2E9]/80 p-3 rounded-xl border border-stone-200/90">
+                            <div className="bg-[#F2EFE9]/70 p-3 rounded-xl border border-stone-200/90">
                               <span className="block text-stone-500 font-sans text-xs font-semibold">ОГРН</span>
                               <strong className="font-mono tabular-nums text-[#022C22] text-xs sm:text-sm mt-0.5 block">5137746004787</strong>
                             </div>
@@ -2954,12 +2960,12 @@ export default function App() {
       </section>
 
       {/* DETAILED INTERACTIVE MEDICAL PROGRAMS */}
-      <section id="medical" className="py-16 md:py-20 bg-gradient-to-b from-[#033E31] via-[#022C22] to-[#01221A] text-white">
+      <section id="medical" className="py-16 md:py-24 bg-[#022C22] text-white border-b border-[#c5a880]/20">
         <motion.div
-          initial={{ opacity: 0, y: 45 }}
+          initial={{ opacity: 0, y: 24 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-100px" }}
-          transition={{ duration: 0.85, ease: [0.16, 1, 0.3, 1] }}
+          transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
           className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"
         >
           
@@ -2968,17 +2974,17 @@ export default function App() {
               <div className="mb-4">
                 <button 
                   onClick={() => { setActiveSettingsTab('medical'); setCurrentPage('admin'); }}
-                  className="bg-amber-500 hover:bg-amber-600 text-stone-900 border border-amber-300 font-bold text-xs px-3.5 py-1.5 rounded-lg inline-flex items-center gap-1.5 transition-all shadow hover:scale-105"
+                  className="bg-amber-500 hover:bg-amber-600 text-stone-900 border border-amber-300 font-bold text-xs px-3.5 py-1.5 rounded-lg inline-flex items-center gap-1.5 transition-colors shadow"
                 >
                   <Edit className="w-3.5 h-3.5" /> Управление программами лечения
                 </button>
               </div>
             )}
             <span className="text-[#c5a880] text-xs font-mono uppercase tracking-widest font-bold">Медицинское отделение санатория • Лицензия № Л041-00110-91/00554225</span>
-            <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight mt-3">
+            <h2 className="font-serif text-3xl sm:text-4xl font-bold tracking-tight mt-3">
               Лечение и диагностика
             </h2>
-            <div className="h-1 w-20 bg-[#c5a880] mx-auto mt-6"></div>
+            <div className="h-1 w-16 bg-[#c5a880] mx-auto mt-5"></div>
             <p className="text-stone-300 text-sm sm:text-base leading-relaxed mt-4">
               В медицинском отделении работают 39 специалистов (100% аккредитованный средний и высший медперсонал, 5 опытных врачей) под руководством к.м.н., Заслуженного врача Республики Крым И.Ф. Душкина. Функционируют кабинеты грязелечения Сакскими грязями, бальнеологии, аппаратной физиотерапии, УЗ-диагностики «РуСкан», клинико-биохимическая лаборатория и зал ЛФК.
             </p>
@@ -3004,34 +3010,34 @@ export default function App() {
                   return (
                     <motion.div 
                       key={prog.id || index}
-                      initial={{ opacity: 0, y: 35 }}
+                      initial={{ opacity: 0, y: 20 }}
                       whileInView={{ opacity: 1, y: 0 }}
                       viewport={{ once: true, margin: "-50px" }}
-                      transition={{ duration: 0.65, delay: index * 0.1, ease: [0.16, 1, 0.3, 1] }}
+                      transition={{ duration: 0.5, delay: index * 0.08, ease: [0.16, 1, 0.3, 1] }}
                       onClick={() => {
                         setCurrentPage('medical');
                         window.scrollTo({ top: 0, behavior: 'smooth' });
                       }}
-                      className="bg-[#02221A]/95 border border-emerald-900/70 rounded-xl overflow-hidden hover:border-[#c5a880]/70 transition-all duration-300 hover:shadow-xl cursor-pointer group flex flex-col justify-between h-full"
+                      className="bg-[#011F18] border border-[#c5a880]/20 rounded-xl overflow-hidden hover:border-[#c5a880]/55 transition-colors duration-200 shadow-md cursor-pointer group flex flex-col justify-between h-full"
                     >
                       <div>
                         {/* Image Preview Header */}
-                        <div className="relative h-44 w-full overflow-hidden bg-[#011B14]">
+                        <div className="relative h-44 w-full overflow-hidden bg-[#011F18]">
                           <img
                             src={progImg}
                             alt={prog.title}
-                            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-[1.02]"
                             referrerPolicy="no-referrer"
                           />
-                          <div className="absolute inset-0 bg-gradient-to-t from-[#02221A] via-black/35 to-transparent"></div>
+                          <div className="absolute inset-0 bg-gradient-to-t from-[#011F18] via-black/30 to-transparent"></div>
                           
                           {/* Floating Icon */}
-                          <div className="absolute bottom-3 left-4 w-10 h-10 rounded-xl bg-[#022C22]/95 text-[#c5a880] border border-[#c5a880]/40 flex items-center justify-center shadow-lg group-hover:bg-[#c5a880] group-hover:text-[#022C22] transition-colors duration-300">
+                          <div className="absolute bottom-3 left-4 w-10 h-10 rounded-xl bg-[#022C22]/95 text-[#c5a880] border border-[#c5a880]/40 flex items-center justify-center shadow-md group-hover:bg-[#c5a880] group-hover:text-[#022C22] transition-colors duration-200">
                             {getMedicalIcon(prog.icon)}
                           </div>
 
                           {/* Floating Duration Badge */}
-                          <div className="absolute top-3 right-3 bg-[#022C22]/90 backdrop-blur-md border border-[#c5a880]/40 text-[#c5a880] font-mono text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-lg flex items-center gap-1 shadow-md">
+                          <div className="absolute top-3 right-3 bg-[#022C22]/90 backdrop-blur-md border border-[#c5a880]/40 text-[#c5a880] font-mono text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-lg flex items-center gap-1 shadow-sm">
                             <Clock className="w-3 h-3 text-[#c5a880]" />
                             <span>{durationText}</span>
                           </div>
@@ -3039,15 +3045,15 @@ export default function App() {
 
                         {/* Content Details */}
                         <div className="p-6">
-                          <h3 className="font-serif font-bold text-lg text-white mb-2 leading-tight group-hover:text-[#c5a880] transition-colors">
+                          <h3 className="font-serif font-bold text-lg text-white mb-2 leading-snug group-hover:text-[#c5a880] transition-colors">
                             {prog.title}
                           </h3>
-                          <p className="text-stone-300 text-xs leading-relaxed line-clamp-3 mb-4">
+                          <p className="text-stone-300 text-xs sm:text-sm leading-relaxed line-clamp-3 mb-4">
                             {prog.shortDesc}
                           </p>
 
                           {/* Procedures / Indications Pill Preview */}
-                          <div className="pt-3 border-t border-emerald-900/50 flex items-center justify-between text-[11px] text-stone-400 font-mono">
+                          <div className="pt-3 border-t border-white/10 flex items-center justify-between text-[11px] text-stone-400 font-mono">
                             <span>Назначение процедур:</span>
                             <span className="text-[#c5a880] font-bold">По показаниям врача</span>
                           </div>
@@ -3068,11 +3074,11 @@ export default function App() {
           })()}
 
           {/* Statutory Medical Disclaimer */}
-          <div className="mt-10 p-5 rounded-xl bg-black/30 border border-emerald-900/60 text-center max-w-4xl mx-auto">
-            <p className="font-semibold text-amber-200/90 uppercase tracking-widest text-[11px] mb-1 font-mono">
+          <div className="mt-10 p-5 rounded-xl bg-[#011F18]/90 border border-[#c5a880]/20 text-center max-w-4xl mx-auto">
+            <p className="font-semibold text-[#c5a880] uppercase tracking-widest text-[11px] mb-1 font-mono">
               Имеются противопоказания. Необходима консультация специалиста
             </p>
-            <p className="text-xs text-stone-300/80 leading-relaxed font-sans">
+            <p className="text-xs text-stone-300 leading-relaxed font-sans">
               Информация о медицинских и оздоровительных программах носит ознакомительный характер и не является публичной офертой. Перечень, объем и график диагностических и лечебно-оздоровительных процедур определяются лечащим врачом индивидуально в соответствии с санаторно-курортной картой и стандартами санаторно-курортной помощи.
             </p>
           </div>
@@ -3083,7 +3089,7 @@ export default function App() {
                 setCurrentPage('medical');
                 window.scrollTo({ top: 0, behavior: 'smooth' });
               }}
-              className="bg-[#c5a880] text-[#022C22] hover:bg-white hover:text-[#022C22] border border-[#c5a880] px-8 py-3.5 text-xs font-bold uppercase tracking-widest rounded-lg transition-colors duration-200 shadow-md inline-flex items-center gap-2 cursor-pointer"
+              className="bg-[#c5a880] text-[#022C22] hover:bg-[#FAF9F6] hover:text-[#022C22] border border-[#c5a880] px-8 py-3.5 text-xs font-bold uppercase tracking-widest rounded-lg transition-colors duration-200 shadow-md inline-flex items-center gap-2 cursor-pointer"
             >
               <Stethoscope className="w-4 h-4" />
               <span>Ознакомиться со всеми направлениями</span>
@@ -3094,22 +3100,22 @@ export default function App() {
       </section>
 
       {/* EXQUISITE ROOMS GALLERY */}
-      <section id="rooms" className="py-16 md:py-20 bg-[#F2EFE9]">
+      <section id="rooms" className="py-16 md:py-24 bg-[#F2EFE9] border-b border-stone-200/80">
         <motion.div
-          initial={{ opacity: 0, y: 45 }}
+          initial={{ opacity: 0, y: 24 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-100px" }}
-          transition={{ duration: 0.85, ease: [0.16, 1, 0.3, 1] }}
+          transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
           className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"
         >
           
-          <div className="flex flex-col md:flex-row md:items-end justify-between mb-16">
+          <div className="flex flex-col md:flex-row md:items-end justify-between mb-12">
             <div>
               {isAdminMode && (
                 <div className="mb-4">
                   <button 
                     onClick={() => { setActiveSettingsTab('rooms'); setCurrentPage('admin'); }}
-                    className="bg-amber-500 hover:bg-amber-600 text-stone-900 border border-amber-300 font-bold text-xs px-3.5 py-1.5 rounded-lg flex items-center gap-1.5 transition-all shadow hover:scale-105"
+                    className="bg-amber-500 hover:bg-amber-600 text-stone-900 border border-amber-300 font-bold text-xs px-3.5 py-1.5 rounded-lg flex items-center gap-1.5 transition-colors shadow"
                   >
                     <Edit className="w-3.5 h-3.5" /> Управление номерами
                   </button>
@@ -3117,9 +3123,9 @@ export default function App() {
               )}
               <div className="flex items-center space-x-2">
                 <span className="h-[1px] w-8 bg-[#7C5E38]"></span>
-                <span className="text-[11px] tracking-widest font-mono uppercase text-[#7C5E38] font-bold">Отражение крымского комфорта</span>
+                <span className="text-xs tracking-widest font-mono uppercase text-[#7C5E38] font-bold">Отражение крымского комфорта</span>
               </div>
-              <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight mt-3 text-[#022C22]">
+              <h2 className="font-serif text-3xl sm:text-4xl font-bold tracking-tight mt-3 text-[#022C22]">
                 Уютные видовые номера
               </h2>
             </div>
@@ -3132,11 +3138,11 @@ export default function App() {
             {ROOMS.map((room, index) => (
               <motion.div 
                 key={room.id}
-                initial={{ opacity: 0, y: 40 }}
+                initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-50px" }}
-                transition={{ duration: 0.7, delay: index * 0.15, ease: [0.16, 1, 0.3, 1] }}
-                className="bg-white rounded-xl border border-stone-200/80 overflow-hidden hover:shadow-xl transition-all duration-300 flex flex-col group justify-between"
+                transition={{ duration: 0.5, delay: index * 0.1, ease: [0.16, 1, 0.3, 1] }}
+                className="bg-white rounded-xl border border-stone-200/90 hover:border-[#c5a880] overflow-hidden shadow-xs hover:shadow-md transition-all duration-200 flex flex-col group justify-between"
               >
                 {/* Image Section - Clickable */}
                 <div 
@@ -3155,29 +3161,29 @@ export default function App() {
                   <img
                     src={room.image || undefined}
                     alt={room.name}
-                    className="w-full h-full object-cover object-center transition-transform duration-500 group-hover:scale-105"
+                    className="w-full h-full object-cover object-center transition-transform duration-300 group-hover:scale-[1.02]"
                     referrerPolicy="no-referrer"
                   />
-                  <div className="absolute top-3 left-3 bg-[#022C22] border border-[#c5a880]/30 text-white font-mono text-xs uppercase font-bold tracking-wider px-2.5 py-1 rounded-md shadow-sm tabular-nums">
+                  <div className="absolute top-3 left-3 bg-[#022C22] border border-[#c5a880]/30 text-white font-mono text-xs uppercase font-bold tracking-wider px-2.5 py-1 rounded-lg shadow-sm tabular-nums">
                     {room.area} м²
                   </div>
                   {/* Visual hint on photo */}
-                  <div className="absolute top-3 right-3 bg-black/60 backdrop-blur-xs text-white text-xs font-medium px-2.5 py-1 rounded-md opacity-90 group-hover:opacity-100 transition-all flex items-center gap-1.5 shadow-sm border border-white/10 font-sans">
+                  <div className="absolute top-3 right-3 bg-[#011F18]/80 backdrop-blur-xs text-white text-xs font-medium px-2.5 py-1 rounded-lg opacity-90 group-hover:opacity-100 transition-opacity flex items-center gap-1.5 shadow-sm border border-white/15 font-sans">
                     <Eye className="w-3.5 h-3.5 text-[#c5a880]" />
                     <span className="hidden sm:inline text-xs uppercase tracking-wider font-semibold">Фото и детали</span>
                   </div>
-                  <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-black/60 to-transparent pointer-events-none"></div>
+                  <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-black/65 to-transparent pointer-events-none"></div>
                   <div className="absolute bottom-3 left-3 text-white pointer-events-none">
                     <span className="block text-xs font-sans tracking-wider text-stone-200 uppercase leading-none font-semibold">{room.category}</span>
                   </div>
                 </div>
 
                 {/* Content Section */}
-                <div className="p-5 flex-1 flex flex-col justify-between">
+                <div className="p-6 flex-1 flex flex-col justify-between">
                   <div>
                     <h3 
                       onClick={() => handleOpenRoomDetails(room)}
-                      className="font-serif text-xl sm:text-2xl font-bold text-[#022C22] mb-2 leading-snug hover:text-[#c5a880] cursor-pointer transition-colors"
+                      className="font-serif text-xl sm:text-2xl font-bold text-[#022C22] mb-2 leading-snug hover:text-[#7C5E38] cursor-pointer transition-colors"
                       title={`Посмотреть описание номера «${room.name}»`}
                     >
                       {room.name}
@@ -3203,7 +3209,7 @@ export default function App() {
                     <div className="flex justify-center pt-2">
                       <button
                         onClick={() => handleOpenRoomDetails(room)}
-                        className="w-full bg-[#022C22] hover:bg-[#c5a880] text-white hover:text-[#022C22] text-xs font-bold py-3 rounded-lg uppercase tracking-wider text-center transition-all duration-300 cursor-pointer shadow-sm font-sans"
+                        className="w-full bg-[#022C22] hover:bg-[#c5a880] text-white hover:text-[#022C22] text-xs font-bold py-3 rounded-lg uppercase tracking-wider text-center transition-colors duration-200 cursor-pointer shadow-xs font-sans"
                       >
                         Описание и фото
                       </button>
@@ -3231,12 +3237,12 @@ export default function App() {
       </section>
 
       {/* FILTERABLE MEDIA PHOTO GALLERY */}
-      <section id="gallery" className="py-16 md:py-20 bg-[#FAF9F6] border-t border-stone-200/40">
+      <section id="gallery" className="py-16 md:py-24 bg-[#FAF9F6] border-b border-stone-200/70">
         <motion.div
-          initial={{ opacity: 0, y: 45 }}
+          initial={{ opacity: 0, y: 24 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-100px" }}
-          transition={{ duration: 0.85, ease: [0.16, 1, 0.3, 1] }}
+          transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
           className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"
         >
           
@@ -3245,17 +3251,18 @@ export default function App() {
               <div className="mb-4">
                 <button 
                   onClick={() => { setActiveSettingsTab('media'); setCurrentPage('admin'); }}
-                  className="bg-amber-500 hover:bg-amber-600 text-stone-900 border border-amber-300 font-bold text-xs px-3.5 py-1.5 rounded-lg inline-flex items-center gap-1.5 transition-all shadow hover:scale-105"
+                  className="bg-amber-500 hover:bg-amber-600 text-stone-900 border border-amber-300 font-bold text-xs px-3.5 py-1.5 rounded-lg inline-flex items-center gap-1.5 transition-colors shadow"
                 >
                   <Edit className="w-3.5 h-3.5" /> Настроить медиа-архив и фоны
                 </button>
               </div>
             )}
             <span className="text-[#7C5E38] text-xs font-mono uppercase tracking-widest font-bold">фотогалерея санатория</span>
-            <h2 className="font-serif text-3xl sm:text-4xl font-extrabold tracking-tight text-[#022C22] mt-3">
+            <h2 className="font-serif text-3xl sm:text-4xl font-bold tracking-tight text-[#022C22] mt-3">
               Виды и инфраструктура санатория
             </h2>
-            <p className="text-stone-600 text-xs sm:text-sm mt-3">
+            <div className="h-1 w-16 bg-[#c5a880] mx-auto mt-5"></div>
+            <p className="text-stone-600 text-sm sm:text-base mt-4 leading-relaxed">
               Окунитесь в атмосферу целительного отдыха. Снято на территории санатория, в нашем парке и медицинских кабинетах.
             </p>
           </div>
@@ -3275,14 +3282,14 @@ export default function App() {
                 <button
                   key={tab.id}
                   onClick={() => setGalleryTab(tab.id as any)}
-                  className={`px-4 py-2 text-xs font-bold uppercase tracking-wider rounded-lg transition-all flex items-center gap-2 cursor-pointer ${
+                  className={`px-4 py-2 text-xs font-bold uppercase tracking-wider rounded-lg transition-colors flex items-center gap-2 cursor-pointer ${
                     isActive
-                      ? 'bg-[#022C22] text-[#c5a880] shadow-md'
+                      ? 'bg-[#022C22] text-[#c5a880] shadow-xs'
                       : 'text-stone-600 hover:text-[#022C22] hover:bg-stone-200/60 bg-stone-100'
                   }`}
                 >
                   <span>{tab.label}</span>
-                  <span className={`text-[10px] font-mono px-1.5 py-0.5 rounded-md ${
+                  <span className={`text-[10px] font-mono px-1.5 py-0.5 rounded-md tabular-nums ${
                     isActive ? 'bg-[#c5a880]/20 text-[#c5a880]' : 'bg-stone-200 text-stone-600'
                   }`}>
                     {tab.count}
@@ -3294,7 +3301,7 @@ export default function App() {
 
           {/* Empty state if no photos in active category */}
           {filteredGallery.length === 0 ? (
-            <div className="text-center py-16 bg-white border border-stone-200 rounded-2xl p-8 max-w-md mx-auto shadow-sm">
+            <div className="text-center py-16 bg-white border border-stone-200 rounded-2xl p-8 max-w-md mx-auto shadow-xs">
               <Images className="w-12 h-12 text-stone-300 mx-auto mb-3" />
               <h4 className="font-serif font-bold text-stone-800 text-lg">В этой категории пока нет фото</h4>
               <p className="text-stone-500 text-xs mt-1">Выберите другую вкладку или добавьте фотографии через панель управления.</p>
@@ -3313,33 +3320,33 @@ export default function App() {
                       <motion.div
                         layout
                         key={item.id || item.src || originalIndex}
-                        initial={{ opacity: 0, scale: 0.92 }}
+                        initial={{ opacity: 0, scale: 0.96 }}
                         animate={{ opacity: 1, scale: 1 }}
-                        exit={{ opacity: 0, scale: 0.92 }}
-                        transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+                        exit={{ opacity: 0, scale: 0.96 }}
+                        transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
                         onClick={() => setLightboxIndex(originalIndex >= 0 ? originalIndex : 0)}
-                        className="relative group h-64 overflow-hidden rounded-xl border border-stone-200/80 shadow-sm hover:shadow-xl transition-all duration-500 cursor-zoom-in bg-stone-100"
+                        className="relative group h-64 overflow-hidden rounded-xl border border-stone-200/90 hover:border-[#c5a880] shadow-xs hover:shadow-md transition-all duration-200 cursor-zoom-in bg-stone-100"
                       >
                         <img
                           src={item.src || undefined}
                           alt={item.title}
                           loading="lazy"
-                          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-108"
+                          className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-[1.02]"
                           referrerPolicy="no-referrer"
                         />
                         
                         {/* Magnifier badge in corner */}
-                        <div className="absolute top-3.5 right-3.5 bg-black/60 hover:bg-black/90 text-white rounded-xl p-2.5 opacity-0 group-hover:opacity-100 transition-all duration-300 backdrop-blur-md z-10 border border-white/20 scale-90 group-hover:scale-100">
+                        <div className="absolute top-3.5 right-3.5 bg-[#011F18]/80 text-white rounded-xl p-2.5 opacity-0 group-hover:opacity-100 transition-opacity duration-200 backdrop-blur-md z-10 border border-white/20">
                           <ZoomIn className="w-4 h-4 text-[#c5a880]" />
                         </div>
 
                         {/* Hover Overlay */}
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-5">
+                        <div className="absolute inset-0 bg-gradient-to-t from-[#011F18]/90 via-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex flex-col justify-end p-5">
                           <span className="text-[10px] tracking-wider text-[#c5a880] uppercase font-mono font-bold">
                             {siteData.galleryCategories?.find(c => c.id === item.category)?.name || item.category}
                           </span>
-                          <h4 className="text-white font-serif text-lg font-medium leading-snug mt-1">{item.title}</h4>
-                          <p className="text-stone-300 text-[11px] mt-1 opacity-80 flex items-center gap-1">
+                          <h4 className="text-white font-serif text-lg font-bold leading-snug mt-1">{item.title}</h4>
+                          <p className="text-stone-300 text-[11px] mt-1 flex items-center gap-1">
                             <ZoomIn className="w-3 h-3 text-[#c5a880]" /> Нажмите для просмотра в полный экран
                           </p>
                         </div>
@@ -3352,7 +3359,7 @@ export default function App() {
               {/* Expand / Collapse Button when more than 3 rows (9 photos) exist */}
               {hasHiddenGalleryPhotos && (
                 <motion.div 
-                  initial={{ opacity: 0, y: 15 }}
+                  initial={{ opacity: 0, y: 12 }}
                   animate={{ opacity: 1, y: 0 }}
                   className="flex flex-col items-center justify-center mt-12 pt-4 border-t border-stone-200/60"
                 >
@@ -3369,7 +3376,7 @@ export default function App() {
                         setIsGalleryExpanded(true);
                       }
                     }}
-                    className="group relative inline-flex items-center gap-3 px-8 py-4 bg-[#022C22] hover:bg-[#c5a880] text-white hover:text-[#022C22] rounded-xl font-sans font-bold text-xs sm:text-sm tracking-wider uppercase shadow-md transition-colors duration-200 cursor-pointer border border-[#c5a880]/40"
+                    className="group relative inline-flex items-center gap-3 px-8 py-4 bg-[#022C22] hover:bg-[#c5a880] text-white hover:text-[#022C22] rounded-xl font-sans font-bold text-xs sm:text-sm tracking-wider uppercase shadow-sm transition-colors duration-200 cursor-pointer border border-[#c5a880]/40"
                   >
                     <div className="w-7 h-7 rounded-lg bg-white/10 group-hover:bg-[#022C22]/10 flex items-center justify-center transition-colors">
                       {isGalleryExpanded ? (
@@ -3406,46 +3413,47 @@ export default function App() {
       </section>
 
       {/* REAL REVIEWS & TRUST */}
-      <section id="testimonials" className="py-16 md:py-20 bg-gradient-to-b from-[#022C22] via-[#033E31] to-[#01221A] text-white">
+      <section id="testimonials" className="py-16 md:py-24 bg-[#022C22] text-white border-b border-[#c5a880]/20">
         <motion.div
-          initial={{ opacity: 0, y: 45 }}
+          initial={{ opacity: 0, y: 24 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-100px" }}
-          transition={{ duration: 0.85, ease: [0.16, 1, 0.3, 1] }}
+          transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
           className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"
         >
           
-          <div className="text-center max-w-3xl mx-auto mb-16">
+          <div className="text-center max-w-3xl mx-auto mb-12">
             {isAdminMode && (
               <div className="mb-4">
                 <button 
                   onClick={() => { setActiveSettingsTab('testimonials'); setCurrentPage('admin'); }}
-                  className="bg-amber-500 hover:bg-amber-600 text-stone-900 border border-amber-300 font-bold text-xs px-3.5 py-1.5 rounded-lg inline-flex items-center gap-1.5 transition-all shadow hover:scale-105"
+                  className="bg-amber-500 hover:bg-amber-600 text-stone-900 border border-amber-300 font-bold text-xs px-3.5 py-1.5 rounded-lg inline-flex items-center gap-1.5 transition-colors shadow"
                 >
                   <Edit className="w-3.5 h-3.5" /> Управление отзывами
                 </button>
               </div>
             )}
-            <span className="text-[#c5a880] text-xs font-sans uppercase tracking-wider font-semibold">обратная связь от наших гостей</span>
-            <h2 className="font-serif text-3xl sm:text-4xl font-extrabold tracking-tight mt-3">
+            <span className="text-[#c5a880] text-xs font-mono uppercase tracking-widest font-bold">обратная связь от наших гостей</span>
+            <h2 className="font-serif text-3xl sm:text-4xl font-bold tracking-tight mt-3">
               Отзывы отдыхающих
             </h2>
-            <div className="h-1 w-20 bg-[#c5a880] mx-auto mt-5"></div>
+            <div className="h-1 w-16 bg-[#c5a880] mx-auto mt-5"></div>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
             {siteData.testimonials.filter(t => t.isApproved !== false).slice(0, 3).map((t) => (
               <div 
                 key={t.id} 
-                className="bg-emerald-950 border border-[#c5a880]/20 p-6 sm:p-8 rounded-xl relative flex flex-col justify-between shadow-xl font-sans"
+                className="bg-[#011F18] border border-[#c5a880]/25 hover:border-[#c5a880]/50 transition-colors duration-200 p-6 sm:p-8 rounded-xl relative flex flex-col justify-between shadow-md font-sans"
               >
                 <div>
-                  {/* Visual stars and absolute quote symbol */}
-                  <span className="absolute top-6 right-8 font-serif text-6xl text-emerald-900 leading-none select-none">“</span>
-                  <div className="flex items-center space-x-1 mb-4">
-                    {[...Array(t.rating)].map((_, i) => (
-                      <Star key={i} className="w-4 h-4 fill-amber-400 text-amber-400" />
-                    ))}
+                  <div className="flex items-center justify-between mb-4 pb-3 border-b border-white/10">
+                    <div className="flex items-center space-x-1">
+                      {[...Array(t.rating)].map((_, i) => (
+                        <Star key={i} className="w-4 h-4 fill-[#c5a880] text-[#c5a880]" />
+                      ))}
+                    </div>
+                    <span className="font-mono text-xs text-[#c5a880]/80 tabular-nums">{t.date}</span>
                   </div>
                   <p className="text-stone-200 text-xs sm:text-sm leading-relaxed mb-6 font-sans">
                     «{t.text}»
@@ -3454,9 +3462,8 @@ export default function App() {
 
                 <div className="border-t border-white/10 pt-4 mt-auto">
                   <h4 className="font-serif font-bold text-base text-white">{t.text.length > 200 ? `${t.author}` : t.author}</h4>
-                  <div className="flex justify-between items-center text-xs text-stone-300 font-sans tracking-wide mt-1.5">
+                  <div className="flex justify-between items-center text-xs text-stone-300 font-sans tracking-wide mt-1">
                     <span>{t.role}</span>
-                    <span className="font-mono tabular-nums">{t.date}</span>
                   </div>
                 </div>
               </div>
@@ -3469,13 +3476,13 @@ export default function App() {
                 setCurrentPage('testimonials');
                 window.scrollTo({ top: 0, behavior: 'smooth' });
               }}
-              className="bg-[#c5a880] hover:bg-[#FAF9F6] text-[#022C22] font-bold text-xs px-6 py-3.5 rounded-lg uppercase tracking-wider transition-all shadow-sm cursor-pointer active:scale-95 font-sans"
+              className="bg-[#c5a880] hover:bg-[#FAF9F6] text-[#022C22] font-bold text-xs px-7 py-3.5 rounded-lg uppercase tracking-wider transition-colors duration-200 shadow-sm cursor-pointer font-sans"
             >
               Посмотреть все отзывы
             </button>
             <a 
               href="#booking"
-              className="inline-block bg-transparent hover:bg-white/5 text-[#c5a880] border border-[#c5a880]/30 hover:border-[#c5a880] px-6 py-3.5 rounded-lg font-bold text-xs uppercase tracking-widest transition-all"
+              className="inline-block bg-transparent hover:bg-white/[0.06] text-[#c5a880] border border-[#c5a880]/40 hover:border-[#c5a880] px-7 py-3.5 rounded-lg font-bold text-xs uppercase tracking-widest transition-colors duration-200"
             >
               Написать отзыв
             </a>
@@ -3485,23 +3492,20 @@ export default function App() {
       </section>
 
       {/* COMPREHENSIVE INTERACTIVE REVIEW FORM */}
-      <section id="booking" className="py-16 md:py-20 bg-[#F2EFE9]">
+      <section id="booking" className="py-16 md:py-24 bg-[#F2EFE9] border-b border-stone-200/80">
         <motion.div
-          initial={{ opacity: 0, y: 45 }}
+          initial={{ opacity: 0, y: 24 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-100px" }}
-          transition={{ duration: 0.85, ease: [0.16, 1, 0.3, 1] }}
+          transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
           className="max-w-4xl mx-auto px-4 sm:px-6"
         >
-          <div className="bg-white rounded-2xl border border-stone-200 shadow-lg overflow-hidden">
+          <div className="bg-white rounded-2xl border border-stone-200/90 shadow-md overflow-hidden">
             
             {/* Header / Intro banner for the callback form */}
             <div className="bg-[#022C22] text-white p-6 sm:p-8 border-b border-[#c5a880]/30 text-center relative">
-              <div className="absolute inset-0 opacity-10">
-                <div className="w-full h-full bg-[radial-gradient(#c5a880_1px,transparent_1px)] [background-size:16px_16px]"></div>
-              </div>
-              <span className="relative z-10 text-[#c5a880] text-xs font-sans uppercase tracking-wider font-semibold">обратная связь отдыхающих</span>
-              <h2 className="relative z-10 font-serif text-2xl sm:text-3xl font-extrabold tracking-tight mt-2">
+              <span className="relative z-10 text-[#c5a880] text-xs font-mono uppercase tracking-widest font-bold">обратная связь отдыхающих</span>
+              <h2 className="relative z-10 font-serif text-2xl sm:text-3xl font-bold tracking-tight mt-2">
                 Поделитесь своими впечатлениями
               </h2>
               <p className="relative z-10 text-stone-200 text-xs sm:text-sm mt-3 leading-relaxed max-w-2xl mx-auto font-sans">
@@ -3535,14 +3539,14 @@ export default function App() {
                               key={star}
                               type="button"
                               onClick={() => setReviewForm(prev => ({ ...prev, rating: star }))}
-                              className="text-amber-400 hover:scale-115 transition-transform duration-100 focus:outline-none cursor-pointer p-0.5"
+                              className="text-[#c5a880] hover:scale-105 transition-transform duration-150 focus:outline-none cursor-pointer p-0.5"
                               title={`Оценка ${star}`}
                             >
                               <Star 
-                                className={`w-8 h-8 transition-all ${
+                                className={`w-7 h-7 transition-colors ${
                                   star <= reviewForm.rating 
-                                    ? 'fill-amber-400 text-amber-400 filter drop-shadow-[0_1px_2px_rgba(245,158,11,0.2)]' 
-                                    : 'text-stone-300 hover:text-amber-200'
+                                    ? 'fill-[#c5a880] text-[#c5a880]' 
+                                    : 'text-stone-300 hover:text-[#c5a880]/60'
                                 }`} 
                               />
                             </button>
@@ -3757,12 +3761,12 @@ export default function App() {
       </section>
 
       {/* DETAILED FAQ SEGMENT */}
-      <section className="py-16 md:py-20 bg-white border-t border-b border-stone-200/60">
+      <section className="py-16 md:py-24 bg-[#FAF9F6] border-b border-stone-200/70">
         <motion.div
-          initial={{ opacity: 0, y: 45 }}
+          initial={{ opacity: 0, y: 24 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-100px" }}
-          transition={{ duration: 0.85, ease: [0.16, 1, 0.3, 1] }}
+          transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
           className="max-w-4xl mx-auto px-4 sm:px-6"
         >
           
@@ -3771,31 +3775,32 @@ export default function App() {
               <div className="mb-4">
                 <button 
                   onClick={() => { setActiveSettingsTab('faq'); setCurrentPage('admin'); }}
-                  className="bg-amber-500 hover:bg-amber-600 text-stone-900 border border-amber-300 font-bold text-xs px-3.5 py-1.5 rounded-lg inline-flex items-center gap-1.5 transition-all shadow hover:scale-105"
+                  className="bg-amber-500 hover:bg-amber-600 text-stone-900 border border-amber-300 font-bold text-xs px-3.5 py-1.5 rounded-lg inline-flex items-center gap-1.5 transition-colors shadow"
                 >
                   <Edit className="w-3.5 h-3.5" /> Редактировать FAQ вопросы
                 </button>
               </div>
             )}
             <span className="text-[#7C5E38] text-xs font-mono uppercase tracking-widest font-bold">информационный гид</span>
-            <h2 className="font-serif text-2xl sm:text-3xl font-extrabold tracking-tight text-[#022C22] mt-2">
+            <h2 className="font-serif text-3xl sm:text-4xl font-bold tracking-tight text-[#022C22] mt-3">
               Ответы на популярные вопросы
             </h2>
+            <div className="h-1 w-16 bg-[#c5a880] mx-auto mt-5"></div>
           </div>
 
-          <div className="space-y-4">
+          <div className="space-y-3.5">
             {FAQS.map((faq) => (
               <details 
                 key={faq.id} 
-                className="group border border-stone-200/80 rounded-xl bg-[#FAF9F6] p-4 [&_summary::-webkit-details-marker]:hidden cursor-pointer hover:border-stone-300 font-sans"
+                className="group border border-stone-200/90 rounded-xl bg-white p-5 [&_summary::-webkit-details-marker]:hidden cursor-pointer hover:border-[#c5a880] transition-colors duration-200 shadow-2xs font-sans"
               >
-                <summary className="flex items-center justify-between font-sans font-semibold text-[#022C22] text-sm sm:text-base selection:bg-transparent">
+                <summary className="flex items-center justify-between gap-4 font-sans font-semibold text-[#022C22] text-sm sm:text-base selection:bg-transparent">
                   <span>{faq.question}</span>
-                  <span className="transition duration-300 group-open:-rotate-180 text-[#c5a880]">
+                  <span className="transition duration-200 group-open:-rotate-180 text-[#7C5E38] shrink-0">
                     <ChevronLeft className="w-5 h-5 -rotate-90" />
                   </span>
                 </summary>
-                <div className="mt-4 pt-3 border-t border-stone-200/60 text-xs sm:text-sm text-stone-700 leading-relaxed font-sans">
+                <div className="mt-4 pt-3.5 border-t border-stone-200/70 text-xs sm:text-sm text-stone-700 leading-relaxed font-sans">
                   {faq.answer}
                 </div>
               </details>
@@ -3806,25 +3811,25 @@ export default function App() {
       </section>
 
       {/* CONTACTS, DIRECTIONS & EMBEDDED DYNAMIC MAP INFO */}
-      <section id="contacts" className="py-16 md:py-20 bg-[#FAF9F6]">
+      <section id="contacts" className="py-16 md:py-24 bg-[#F2EFE9]">
         <motion.div
-          initial={{ opacity: 0, y: 45 }}
+          initial={{ opacity: 0, y: 24 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-100px" }}
-          transition={{ duration: 0.85, ease: [0.16, 1, 0.3, 1] }}
+          transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
           className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"
         >
           
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-stretch">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-stretch">
             
             {/* Direct Contact Details */}
             <div className="lg:col-span-5 space-y-8 flex flex-col justify-between">
               <div>
                 <div className="flex items-center space-x-2">
                   <span className="h-[1px] w-8 bg-[#7C5E38]"></span>
-                  <span className="text-xs tracking-wider font-sans uppercase text-[#7C5E38] font-semibold">Контакты и адрес</span>
+                  <span className="text-xs tracking-widest font-mono uppercase text-[#7C5E38] font-bold">Контакты и адрес</span>
                 </div>
-                <h2 className="font-serif text-3xl sm:text-4xl font-extrabold tracking-tight text-[#022C22] mt-3">
+                <h2 className="font-serif text-3xl sm:text-4xl font-bold tracking-tight text-[#022C22] mt-3">
                   Связаться с нами
                 </h2>
                 <p className="text-stone-700 text-xs sm:text-sm mt-3 leading-relaxed font-sans">
@@ -3832,11 +3837,11 @@ export default function App() {
                 </p>
               </div>
 
-              <div className="space-y-6">
+              <div className="space-y-5">
                 
                 {/* MapPin / Address */}
                 <div className="flex items-start space-x-3.5">
-                  <div className="bg-[#022C22] text-[#c5a880] p-2.5 rounded-lg mt-1 shrink-0">
+                  <div className="bg-[#022C22] text-[#c5a880] p-2.5 rounded-xl border border-[#c5a880]/30 mt-0.5 shrink-0">
                     <MapPin className="w-5 h-5" />
                   </div>
                   <div>
@@ -3849,34 +3854,34 @@ export default function App() {
 
                 {/* Phone detail */}
                 <div className="flex items-start space-x-3.5">
-                  <div className="bg-[#022C22] text-[#c5a880] p-2.5 rounded-lg mt-1 shrink-0">
+                  <div className="bg-[#022C22] text-[#c5a880] p-2.5 rounded-xl border border-[#c5a880]/30 mt-0.5 shrink-0">
                     <Phone className="w-5 h-5" />
                   </div>
                   <div>
                     <span className="text-xs uppercase tracking-wider text-stone-600 font-sans font-semibold">Телефоны отдела бронирования:</span>
                     <p className="text-sm font-semibold text-[#022C22] mt-0.5 flex flex-col sm:flex-row sm:space-x-4 font-mono tabular-nums">
-                      <a href={`tel:${RESORT_INFO.phone}`} className="hover:text-[#c5a880]">Тел: {RESORT_INFO.phone}</a>
-                      {RESORT_INFO.fax && <a href={`tel:${RESORT_INFO.fax}`} className="hover:text-[#c5a880]">Факс: {RESORT_INFO.fax}</a>}
+                      <a href={`tel:${RESORT_INFO.phone}`} className="hover:text-[#7C5E38] transition-colors">Тел: {RESORT_INFO.phone}</a>
+                      {RESORT_INFO.fax && <a href={`tel:${RESORT_INFO.fax}`} className="hover:text-[#7C5E38] transition-colors">Факс: {RESORT_INFO.fax}</a>}
                     </p>
                   </div>
                 </div>
 
                 {/* Email detail */}
                 <div className="flex items-start space-x-3.5">
-                  <div className="bg-[#022C22] text-[#c5a880] p-2.5 rounded-lg mt-1 shrink-0">
+                  <div className="bg-[#022C22] text-[#c5a880] p-2.5 rounded-xl border border-[#c5a880]/30 mt-0.5 shrink-0">
                     <Mail className="w-5 h-5" />
                   </div>
                   <div>
                     <span className="text-xs uppercase tracking-wider text-stone-600 font-sans font-semibold">Электронная почта:</span>
                     <p className="text-sm font-semibold text-[#022C22] mt-0.5 font-mono">
-                      <a href={`mailto:${RESORT_INFO.email}`} className="hover:text-[#c5a880] underline">{RESORT_INFO.email}</a>
+                      <a href={`mailto:${RESORT_INFO.email}`} className="hover:text-[#7C5E38] transition-colors underline">{RESORT_INFO.email}</a>
                     </p>
                   </div>
                 </div>
 
                 {/* Working hours */}
                 <div className="flex items-start space-x-3.5">
-                  <div className="bg-[#022C22] text-[#c5a880] p-2.5 rounded-lg mt-1 shrink-0">
+                  <div className="bg-[#022C22] text-[#c5a880] p-2.5 rounded-xl border border-[#c5a880]/30 mt-0.5 shrink-0">
                     <Clock className="w-5 h-5" />
                   </div>
                   <div>
@@ -3889,16 +3894,16 @@ export default function App() {
 
               </div>
 
-              <div className="bg-stone-100 p-4 rounded-xl border-l-4 border-[#022C22] text-xs text-stone-700 font-sans leading-relaxed">
-                <strong className="text-stone-900">Важное уведомление:</strong> На территории санатория действует пропускной режим. При посещении лечебного корпуса или заселении обязательно предъявление удостоверения личности (паспорта/служебного).
+              <div className="bg-white p-4 rounded-xl border border-stone-200/90 border-l-4 border-l-[#022C22] text-xs text-stone-700 font-sans leading-relaxed shadow-2xs">
+                <strong className="text-[#022C22]">Важное уведомление:</strong> На территории санатория действует пропускной режим. При посещении лечебного корпуса или заселении обязательно предъявление удостоверения личности (паспорта/служебного).
               </div>
 
             </div>
 
             {/* Real Interactive Yandex Map */}
-            <div className="lg:col-span-7 min-h-[450px] bg-[#022C22] text-white rounded-2xl border border-[#c5a880]/20 flex flex-col justify-between overflow-hidden relative shadow-xl">
+            <div className="lg:col-span-7 min-h-[450px] bg-[#022C22] text-white rounded-2xl border border-[#c5a880]/30 flex flex-col justify-between overflow-hidden relative shadow-lg">
               
-              <div className="w-full h-[280px] sm:h-[320px] lg:h-[350px] relative z-10 border-b border-[#c5a880]/20 bg-emerald-950/40">
+              <div className="w-full h-[280px] sm:h-[320px] lg:h-[350px] relative z-10 border-b border-[#c5a880]/20 bg-[#011F18]">
                 <iframe 
                   src={`https://yandex.ru/map-widget/v1/?text=${encodeURIComponent("298660, Республика Крым, г. Ялта, пгт. Гаспра, Севастопольское шоссе, д. 52")}&z=16`}
                   width="100%" 
@@ -3910,11 +3915,11 @@ export default function App() {
                 ></iframe>
               </div>
 
-              <div className="p-6 space-y-4 bg-gradient-to-b from-[#022C22] to-[#011B15] relative z-10">
+              <div className="p-6 space-y-4 bg-[#011F18] relative z-10">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                   <div>
-                    <span className="text-[10px] tracking-widest font-mono text-emerald-400 uppercase font-bold">Гео-модуль «Ясная Поляна»</span>
-                    <h3 className="font-serif text-lg font-semibold tracking-wide mt-0.5">Размещение на Черноморском побережье</h3>
+                    <span className="text-[10px] tracking-widest font-mono text-[#c5a880] uppercase font-bold">Гео-модуль «Ясная Поляна»</span>
+                    <h3 className="font-serif text-lg font-bold tracking-tight mt-0.5 text-white">Размещение на Черноморском побережье</h3>
                     <p className="text-stone-300 text-xs mt-1.5 leading-relaxed">
                       Крым, г. Ялта, пгт. Гаспра, Севастопольское шоссе, д. 52. Расположен посреди реликтовой парковой зоны Харакс.
                     </p>
@@ -3926,7 +3931,7 @@ export default function App() {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 border-t border-white/5 pt-3.5 text-xs text-stone-300">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 border-t border-white/10 pt-3.5 text-xs text-stone-300">
                   <div>
                     <strong className="text-xs font-bold text-[#c5a880] uppercase tracking-wide block mb-1">Рядом с нами:</strong>
                     • Дворец «Харакс» — 600 м <br/>
@@ -4184,7 +4189,7 @@ export default function App() {
                     <strong className="block text-sm text-[#022C22] mt-1 pr-1 font-sans">{roomModal.capacity.split('(')[0]}</strong>
                   </div>
                   <div className="text-center md:border-r border-stone-200 last:border-0 p-1">
-                    <span className="block text-xs font-sans tracking-wider text-[#9b7b51] font-bold uppercase">Кровати</span>
+                    <span className="block text-xs font-sans tracking-wider text-[#7C5E38] font-bold uppercase">Кровати</span>
                     <strong className="block text-xs text-[#022C22] mt-1 truncate pr-1 font-sans" title={roomModal.beds}>{roomModal.beds.split(',')[0]}</strong>
                   </div>
                   <div className="text-center last:border-0 p-1">
@@ -4268,7 +4273,7 @@ export default function App() {
               {/* Close Button */}
               <button
                 onClick={() => setLightboxIndex(null)}
-                className="flex items-center space-x-1.5 p-2 bg-zinc-900 border border-zinc-800 hover:border-zinc-700 hover:bg-zinc-800 text-white rounded transition-all cursor-pointer"
+                className="flex items-center space-x-1.5 p-2 bg-zinc-900 border border-zinc-800 hover:border-zinc-700 hover:bg-zinc-800 text-white rounded-lg transition-all cursor-pointer"
                 title="Закрыть (Esc)"
               >
                 <span className="hidden sm:inline text-[10px] tracking-wider uppercase font-mono text-zinc-400">Esc</span>
@@ -4323,18 +4328,18 @@ export default function App() {
                 {/* Mobile version simple buttons when screen is small or touch */}
                 <button
                   onClick={() => setLightboxIndex((prev) => (prev !== null && prev > 0 ? prev - 1 : filteredGallery.length - 1))}
-                  className="p-2 bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-[#c5a880] rounded transition-all md:hidden cursor-pointer"
+                  className="p-2 bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-[#c5a880] rounded-lg transition-all md:hidden cursor-pointer"
                 >
                   <ChevronLeft className="w-4 h-4" />
                 </button>
 
-                <div className="px-3 py-1 bg-zinc-900/60 border border-zinc-800 rounded font-mono text-[11px] sm:text-xs tracking-wider text-[#c5a880] select-none">
+                <div className="px-3 py-1 bg-zinc-900/60 border border-zinc-800 rounded-lg font-mono text-[11px] sm:text-xs tracking-wider text-[#c5a880] select-none">
                   {lightboxIndex + 1} / {filteredGallery.length}
                 </div>
 
                 <button
                   onClick={() => setLightboxIndex((prev) => (prev !== null && prev < filteredGallery.length - 1 ? prev + 1 : 0))}
-                  className="p-2 bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-[#c5a880] rounded transition-all md:hidden cursor-pointer"
+                  className="p-2 bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-[#c5a880] rounded-lg transition-all md:hidden cursor-pointer"
                 >
                   <ChevronRight className="w-4 h-4" />
                 </button>

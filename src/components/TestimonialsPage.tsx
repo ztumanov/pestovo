@@ -248,13 +248,6 @@ export default function TestimonialsPage({ onBackToHome }: { onBackToHome: () =>
 
       </div>
 
-      {/* FOOTER BAR */}
-      <footer className="bg-stone-100 border-t border-stone-200 py-6 text-center">
-        <p className="text-[11px] text-stone-500 font-mono tabular-nums tracking-wider uppercase">
-          ФГКУ «Санаторий «Ясная Поляна» ФТС России» • ПГТ Гаспра • 2026
-        </p>
-      </footer>
-
     </div>
   );
 }

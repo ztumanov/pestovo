@@ -219,10 +219,10 @@ export default function MedicalPage({
     <div className="min-h-screen bg-[#FAF9F6] text-[#022C22] font-sans selection:bg-[#c5a880]/30">
       
       {/* HEADER HERO */}
-      <div className="bg-[#022C22] text-white py-12 sm:py-16 px-4 relative overflow-hidden border-b border-[#c5a880]/30">
+      <div className="bg-[#022C22] text-white py-12 sm:py-16 px-4 sm:px-6 lg:px-8 relative overflow-hidden border-b border-[#c5a880]/30">
         <div className="max-w-7xl mx-auto relative z-10">
           {/* Unified Breadcrumbs & Back Navigation */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8 pb-4 border-b border-white/10">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8 pb-5 border-b border-white/10">
             <nav aria-label="Навигационная цепочка" className="flex items-center flex-wrap gap-2 text-xs text-stone-300 font-sans">
               <button
                 onClick={onBackToHome}
@@ -242,50 +242,94 @@ export default function MedicalPage({
 
             <button 
               onClick={onBackToHome}
-              className="group inline-flex items-center space-x-2 border border-[#c5a880]/40 hover:border-[#c5a880] bg-white/5 hover:bg-[#c5a880] px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-widest transition-all text-[#c5a880] hover:text-[#022C22] cursor-pointer self-start sm:self-auto shrink-0 whitespace-nowrap"
+              className="group inline-flex items-center space-x-2 border border-[#c5a880]/40 hover:border-[#c5a880] bg-[#011F18] hover:bg-[#c5a880] px-4 py-2.5 rounded-lg text-xs font-bold uppercase tracking-widest transition-colors duration-200 text-[#c5a880] hover:text-[#022C22] cursor-pointer self-start sm:self-auto shrink-0 whitespace-nowrap"
             >
-              <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
+              <ArrowLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
               <span>На главную</span>
             </button>
           </div>
 
-          <div className="flex items-center space-x-2 mb-3 text-xs font-mono uppercase tracking-widest text-[#c5a880]">
-            <span>ФГКУ «Санаторий «Ясная Поляна» ФТС России»</span>
-            <span aria-hidden="true">·</span>
-            <span className="tabular-nums">Лицензия № Л041-00110-91/00554225</span>
-          </div>
-          <h1 className="font-serif text-3xl sm:text-5xl font-bold tracking-tight max-w-4xl">
-            Медицинское отделение: Лечение и Диагностика
-          </h1>
-          <p className="text-stone-200 text-sm sm:text-base mt-4 leading-relaxed max-w-3xl">
-            В медицинском отделении санатория работают 39 сотрудников, включая 5 врачей с большим опытом в санаторно-курортной сфере. 100% среднего и высшего медицинского персонала аккредитованы. Оказывается полный комплекс бальнеологического, грязевого, физиотерапевтического и реабилитационного лечения по стандартам Минздрава РФ.
-          </p>
+          {/* Structured Header Composition */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-end">
+            <div className="lg:col-span-8 space-y-4">
+              <div className="inline-flex items-center flex-wrap gap-2 bg-[#011F18] border border-[#c5a880]/35 px-3.5 py-1.5 rounded-lg text-xs font-mono uppercase tracking-wider text-[#c5a880]">
+                <span>ФГКУ «Санаторий «Ясная Поляна» ФТС России»</span>
+                <span aria-hidden="true">·</span>
+                <span className="tabular-nums font-bold">Лицензия № Л041-00110-91/00554225</span>
+              </div>
+              <h1 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight leading-[1.12] text-white">
+                Медицинское отделение: Лечение и Диагностика
+              </h1>
+              <p className="text-stone-200 text-sm sm:text-base leading-relaxed max-w-3xl">
+                В медицинском отделении санатория работают 39 сотрудников, включая 5 врачей с большим опытом в санаторно-курортной сфере. 100% среднего и высшего медицинского персонала аккредитованы. Оказывается полный комплекс бальнеологического, грязевого, физиотерапевтического и реабилитационного лечения по стандартам Минздрава РФ.
+              </p>
+            </div>
 
-          {/* Architectural Key Metrics Strip */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-px bg-[#c5a880]/25 border border-[#c5a880]/30 rounded-xl overflow-hidden mt-10">
-            <div className="p-4 sm:p-5 bg-[#011F18]">
-              <span className="block font-mono tabular-nums text-2xl sm:text-3xl font-bold text-[#c5a880]">39</span>
-              <span className="text-xs text-stone-300 mt-1 block">сотрудников медицинского отделения</span>
+            {/* Official License Verification Card in Header */}
+            <div className="lg:col-span-4">
+              <div className="bg-[#011F18] border border-[#c5a880]/30 rounded-xl p-5 space-y-3 shadow-md">
+                <div className="flex items-center justify-between border-b border-white/10 pb-2.5">
+                  <span className="text-[11px] font-mono uppercase tracking-widest text-[#c5a880] font-bold">
+                    Государственная лицензия
+                  </span>
+                  <Award className="w-4 h-4 text-[#c5a880] shrink-0" />
+                </div>
+                <div>
+                  <span className="block font-mono tabular-nums text-sm sm:text-base font-bold text-white">
+                    № Л041-00110-91/00554225
+                  </span>
+                  <span className="block text-xs text-stone-300 mt-1 font-mono tabular-nums">
+                    Дата выдачи: 22.06.2022 · Бессрочно
+                  </span>
+                </div>
+                <div className="pt-2 border-t border-white/10 flex items-center justify-between text-xs text-stone-300 font-mono tabular-nums">
+                  <span>ИНН: 7713778678</span>
+                  <span className="text-[#c5a880] font-bold">Росздравнадзор</span>
+                </div>
+              </div>
             </div>
-            <div className="p-4 sm:p-5 bg-[#011F18]">
-              <span className="block font-mono tabular-nums text-2xl sm:text-3xl font-bold text-[#c5a880]">100%</span>
-              <span className="text-xs text-stone-300 mt-1 block">аккредитация среднего и высшего медперсонала</span>
-            </div>
-            <div className="p-4 sm:p-5 bg-[#011F18]">
-              <span className="block font-mono tabular-nums text-2xl sm:text-3xl font-bold text-[#c5a880]">5 врачей</span>
-              <span className="text-xs text-stone-300 mt-1 block">с большим опытом в санаторно-курортной сфере</span>
-            </div>
-            <div className="p-4 sm:p-5 bg-[#011F18]">
-              <span className="block font-mono tabular-nums text-2xl sm:text-3xl font-bold text-[#c5a880]">24 вида</span>
-              <span className="text-xs text-stone-300 mt-1 block">лицензированных медицинских работ и услуг</span>
-            </div>
+          </div>
+
+          {/* Architectural Key Metrics Strip — Unified Card Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5 mt-10">
+            {[
+              { code: '01', val: '39', label: 'сотрудников медицинского отделения', icon: Users },
+              { code: '02', val: '100%', label: 'аккредитация среднего и высшего медперсонала', icon: UserCheck },
+              { code: '03', val: '5 врачей', label: 'с большим опытом в санаторно-курортной сфере', icon: Stethoscope },
+              { code: '04', val: '24 вида', label: 'лицензированных медицинских работ и услуг', icon: FileText }
+            ].map((item) => {
+              const MetricIcon = item.icon;
+              return (
+                <div
+                  key={item.code}
+                  className="p-4 sm:p-5 bg-[#011F18] border border-[#c5a880]/25 rounded-xl flex flex-col justify-between"
+                >
+                  <div className="flex items-center justify-between border-b border-white/10 pb-2.5 mb-3">
+                    <div className="w-8 h-8 rounded-lg bg-[#c5a880]/15 border border-[#c5a880]/30 flex items-center justify-center text-[#c5a880] shrink-0">
+                      <MetricIcon className="w-4 h-4" />
+                    </div>
+                    <span className="font-mono text-[11px] font-bold text-[#c5a880]/80 tabular-nums">
+                      {item.code}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="block font-mono tabular-nums text-2xl sm:text-3xl font-bold text-[#c5a880] leading-none">
+                      {item.val}
+                    </span>
+                    <span className="text-xs text-stone-300 mt-2 block leading-snug">
+                      {item.label}
+                    </span>
+                  </div>
+                </div>
+              );
+            })}
           </div>
 
           {isAdminMode && (
             <div className="mt-6">
               <button 
                 onClick={() => { setActiveSettingsTab('medical'); setCurrentPage('admin'); }}
-                className="bg-amber-500 hover:bg-amber-600 text-stone-900 border border-amber-400 font-bold text-xs px-4 py-2 rounded-lg inline-flex items-center gap-2 transition-all cursor-pointer"
+                className="bg-amber-500 hover:bg-amber-600 text-stone-900 border border-amber-400 font-bold text-xs px-4 py-2 rounded-lg inline-flex items-center gap-2 transition-colors cursor-pointer"
               >
                 Редактировать программы в Админке
               </button>
@@ -294,35 +338,78 @@ export default function MedicalPage({
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-16">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 space-y-14 sm:space-y-16">
         
         {/* MEDICAL LEADERSHIP & SPECIALIST CONSULTATIONS */}
-        <section className="bg-white border border-stone-200 rounded-xl overflow-hidden shadow-xs">
+        <section className="bg-white border border-stone-200/90 rounded-2xl overflow-hidden shadow-xs">
           <div className="grid grid-cols-1 lg:grid-cols-12">
-            <div className="lg:col-span-7 p-6 sm:p-10 space-y-4">
-              <div className="text-xs font-mono uppercase tracking-widest text-[#9b7b51] font-semibold">
-                Руководство медицинской службой · с января 2025 года
+            {/* Left Column: Medical Service Leadership */}
+            <div className="lg:col-span-7 p-6 sm:p-8 lg:p-10 flex flex-col justify-between space-y-6">
+              <div className="space-y-4">
+                <div className="flex items-center space-x-2">
+                  <span className="h-[1px] w-8 bg-[#7C5E38]"></span>
+                  <span className="text-xs font-mono uppercase tracking-widest text-[#7C5E38] font-bold">
+                    Руководство медицинской службой · с января 2025 года
+                  </span>
+                </div>
+                <div className="flex items-start justify-between gap-4">
+                  <div>
+                    <h2 className="font-serif text-2xl sm:text-3xl font-bold text-[#022C22] tracking-tight">
+                      Душкин Игорь Фёдорович
+                    </h2>
+                    <span className="text-xs font-mono uppercase tracking-wider text-stone-500 font-semibold block mt-1">
+                      Заведующий медицинским отделением санатория
+                    </span>
+                  </div>
+                  <div className="w-11 h-11 rounded-xl bg-[#022C22] text-[#c5a880] border border-[#c5a880]/40 flex items-center justify-center shrink-0 hidden sm:flex">
+                    <UserCheck className="w-5 h-5" />
+                  </div>
+                </div>
+
+                {/* Structured Qualifications Block */}
+                <div className="bg-[#FAF9F6] border border-stone-200/90 rounded-xl p-4 sm:p-5 space-y-2.5">
+                  <span className="block text-[11px] font-mono uppercase tracking-wider text-[#7C5E38] font-bold border-b border-stone-200 pb-2">
+                    Квалификация, учёная степень и государственные звания
+                  </span>
+                  <div className="flex flex-wrap gap-2 pt-0.5">
+                    {[
+                      'Врач высшей категории',
+                      'Кандидат медицинских наук',
+                      'Заслуженный врач Республики Крым',
+                      'Доцент по специальности «Восстановительная медицина»',
+                      'Ветеран боевых действий СВО'
+                    ].map((qual, qIdx) => (
+                      <span
+                        key={qIdx}
+                        className="inline-flex items-center gap-1.5 bg-white border border-stone-200/90 px-3 py-1.5 rounded-lg text-xs font-semibold text-[#022C22]"
+                      >
+                        <span className="w-1.5 h-1.5 rounded-full bg-[#7C5E38] shrink-0" />
+                        <span>{qual}</span>
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
+                <p className="text-sm sm:text-base text-stone-700 leading-relaxed">
+                  Под руководством И.Ф. Душкина организована комплексная система восстановительного лечения, бальнеогрязелечения Сакскими сульфидными грязями, аппаратной физиотерапии и функционально-ультразвуковой диагностики в строгом соответствии с клиническими рекомендациями Минздрава РФ.
+                </p>
               </div>
-              <h2 className="font-serif text-2xl sm:text-3xl font-bold text-[#022C22]">
-                Душкин Игорь Фёдорович
-              </h2>
-              <p className="text-xs sm:text-sm text-[#022C22] font-medium leading-relaxed border-y border-stone-200 py-3">
-                Врач высшей категории · Кандидат медицинских наук · Заслуженный врач Республики Крым · Доцент по специальности «Восстановительная медицина» · Ветеран боевых действий СВО
-              </p>
-              <p className="text-sm sm:text-base text-stone-700 leading-relaxed max-w-2xl">
-                Под руководством И.Ф. Душкина организована комплексная система восстановительного лечения, бальнеогрязелечения Сакскими сульфидными грязями, аппаратной физиотерапии и функционально-ультразвуковой диагностики в строгом соответствии с клиническими рекомендациями Минздрава РФ.
-              </p>
             </div>
 
-            <div className="lg:col-span-5 bg-[#022C22] text-white p-6 sm:p-10 flex flex-col justify-between border-t lg:border-t-0 lg:border-l border-[#c5a880]/30">
-              <div className="space-y-4">
-                <div className="text-[#c5a880] text-xs font-mono uppercase tracking-widest font-bold">
-                  Консультации врачей-специалистов
+            {/* Right Column: Specialist Consultations Grid */}
+            <div className="lg:col-span-5 bg-[#022C22] text-white p-6 sm:p-8 lg:p-10 flex flex-col justify-between border-t lg:border-t-0 lg:border-l border-[#c5a880]/30">
+              <div className="space-y-5">
+                <div className="border-b border-white/10 pb-3.5">
+                  <div className="text-[#c5a880] text-xs font-mono uppercase tracking-widest font-bold flex items-center gap-2">
+                    <Stethoscope className="w-4 h-4 shrink-0" />
+                    <span>Консультации врачей-специалистов</span>
+                  </div>
+                  <p className="text-xs sm:text-sm text-stone-300 leading-relaxed mt-2">
+                    Согласно стандартам оказания санаторно-курортной помощи, отдыхающие проходят прием лечащего врача-терапевта и получают консультации профильных специалистов:
+                  </p>
                 </div>
-                <p className="text-xs sm:text-sm text-stone-300 leading-relaxed">
-                  Согласно стандартам оказания санаторно-курортной помощи, отдыхающие проходят прием лечащего врача-терапевта и получают консультации профильных специалистов:
-                </p>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-px bg-white/10 border border-white/10">
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                   {[
                     { role: 'Врач-терапевт', note: 'Ведение курса лечения' },
                     { role: 'Врач-физиотерапевт', note: 'Подбор аппаратных методик' },
@@ -331,9 +418,24 @@ export default function MedicalPage({
                     { role: 'Врач УЗ-диагностики', note: 'Аппарат экспертного класса «РуСкан»' },
                     { role: 'Медсестра диетическая', note: 'Курация диеты весь срок лечения' }
                   ].map((spec, idx) => (
-                    <div key={idx} className="bg-[#022C22] p-3">
-                      <span className="font-bold text-xs text-white block">{spec.role}</span>
-                      <span className="text-[11px] text-[#c5a880] block mt-0.5">{spec.note}</span>
+                    <div
+                      key={idx}
+                      className="bg-[#011F18] border border-[#c5a880]/25 rounded-xl p-3.5 flex flex-col justify-between h-full"
+                    >
+                      <div className="flex items-center justify-between gap-2 mb-1.5">
+                        <span className="font-mono text-[10px] font-bold text-[#c5a880]/80 tabular-nums">
+                          0{idx + 1}
+                        </span>
+                        <span className="w-1.5 h-1.5 rounded-full bg-[#c5a880]/60" />
+                      </div>
+                      <div>
+                        <span className="font-bold text-xs sm:text-[13px] text-white block leading-snug">
+                          {spec.role}
+                        </span>
+                        <span className="text-[11px] text-[#c5a880] block mt-1 leading-snug">
+                          {spec.note}
+                        </span>
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -343,13 +445,16 @@ export default function MedicalPage({
         </section>
 
         {/* 4-STEP GUEST ROUTE (ПОШАГОВЫЙ МАРШРУТ ГОСТЯ) */}
-        <section className="bg-white border border-stone-200 rounded-xl p-6 sm:p-10 space-y-8 shadow-xs">
+        <section className="bg-white border border-stone-200/90 rounded-2xl p-6 sm:p-8 lg:p-10 space-y-7 shadow-xs">
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-stone-200 pb-5">
             <div>
-              <span className="text-xs font-mono uppercase tracking-widest text-[#7C5E38] font-bold block mb-1">
-                Порядок назначения процедур · Форма 072/у и 076/у
-              </span>
-              <h3 className="font-serif text-2xl sm:text-3xl font-bold text-[#022C22]">
+              <div className="flex items-center space-x-2 mb-1">
+                <span className="h-[1px] w-8 bg-[#7C5E38]"></span>
+                <span className="text-xs font-mono uppercase tracking-widest text-[#7C5E38] font-bold">
+                  Порядок назначения процедур · Форма 072/у и 076/у
+                </span>
+              </div>
+              <h3 className="font-serif text-2xl sm:text-3xl font-bold text-[#022C22] tracking-tight mt-1">
                 Маршрут гостя: как организовано лечение в санатории
               </h3>
             </div>
@@ -358,22 +463,29 @@ export default function MedicalPage({
                 setCurrentPage('documents');
                 window.scrollTo({ top: 0, behavior: 'smooth' });
               }}
-              className="text-xs font-bold uppercase tracking-wider text-[#022C22] hover:text-[#7C5E38] inline-flex items-center gap-1.5 cursor-pointer shrink-0 whitespace-nowrap"
+              className="text-xs font-bold uppercase tracking-wider text-[#022C22] hover:text-[#7C5E38] bg-[#F2EFE9] hover:bg-[#c5a880]/20 border border-stone-200/90 px-4 py-2.5 rounded-lg inline-flex items-center gap-1.5 transition-colors cursor-pointer shrink-0 self-start md:self-auto whitespace-nowrap"
             >
               <span>Перечень документов для заезда</span>
               <ChevronRight className="w-4 h-4 text-[#7C5E38]" />
             </button>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
             {guestSteps.map((step) => (
-              <div key={step.num} className="border border-stone-200 rounded-xl bg-[#FAF9F6] p-5 flex flex-col justify-between">
+              <div
+                key={step.num}
+                className="border border-stone-200/90 hover:border-[#c5a880] transition-colors rounded-xl bg-[#FAF9F6] p-5 flex flex-col justify-between h-full"
+              >
                 <div>
-                  <div className="flex items-center justify-between border-b border-stone-200 pb-3 mb-3">
-                    <span className="font-mono tabular-nums text-2xl font-bold text-[#7C5E38]">{step.num}</span>
-                    <span className="text-[11px] font-mono uppercase tracking-wider text-stone-500">Этап</span>
+                  <div className="flex items-center justify-between border-b border-stone-200 pb-3 mb-3.5">
+                    <span className="bg-[#022C22] text-[#c5a880] font-mono tabular-nums text-xs font-bold px-2.5 py-1 rounded-md">
+                      Этап {step.num}
+                    </span>
+                    <span className="text-[11px] font-mono uppercase tracking-wider text-[#7C5E38] font-semibold">
+                      Регламент
+                    </span>
                   </div>
-                  <h4 className="font-serif text-base font-bold text-[#022C22] mb-2">
+                  <h4 className="font-serif text-base font-bold text-[#022C22] mb-2 leading-snug">
                     {step.title}
                   </h4>
                   <p className="text-xs sm:text-sm text-stone-600 leading-relaxed">
@@ -389,16 +501,19 @@ export default function MedicalPage({
         <section className="space-y-6">
           <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-4 border-b border-stone-200 pb-5">
             <div>
-              <span className="text-xs font-mono uppercase tracking-widest text-[#9b7b51] font-bold block mb-1">
-                Профильные медицинские программы
-              </span>
-              <h3 className="font-serif text-2xl sm:text-3xl font-bold text-[#022C22]">
+              <div className="flex items-center space-x-2 mb-1">
+                <span className="h-[1px] w-8 bg-[#7C5E38]"></span>
+                <span className="text-xs font-mono uppercase tracking-widest text-[#7C5E38] font-bold">
+                  Профильные медицинские программы
+                </span>
+              </div>
+              <h3 className="font-serif text-2xl sm:text-3xl font-bold text-[#022C22] tracking-tight mt-1">
                 Клинические направления оздоровления
               </h3>
             </div>
 
             {/* Interactive Profile Filter Bar */}
-            <div className="flex flex-wrap items-center gap-1 sm:gap-1.5 bg-stone-200/60 p-1 rounded-lg border border-stone-200">
+            <div className="flex flex-wrap items-center gap-1.5 bg-[#F2EFE9] p-1.5 rounded-xl border border-stone-200/90">
               {profileCategories.map((cat) => {
                 const isSelected = profileFilter === cat.id;
                 return (
@@ -413,10 +528,10 @@ export default function MedicalPage({
                         setActiveTab(medicalPrograms[0].id);
                       }
                     }}
-                    className={`px-2.5 py-1.5 lg:px-3.5 lg:py-2 text-[11px] lg:text-xs font-semibold rounded-md transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
+                    className={`px-3 py-1.5 lg:px-3.5 lg:py-2 text-xs font-semibold rounded-lg transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
                       isSelected
-                        ? 'bg-[#022C22] text-[#c5a880]'
-                        : 'text-stone-700 hover:text-[#022C22] hover:bg-white/60'
+                        ? 'bg-[#022C22] text-[#c5a880] shadow-2xs'
+                        : 'text-stone-700 hover:text-[#022C22] hover:bg-white/80'
                     }`}
                   >
                     {cat.label}
@@ -432,8 +547,8 @@ export default function MedicalPage({
             <div className="lg:col-span-4 space-y-5">
               
               {/* Search Bar */}
-              <div className="bg-white p-4 border border-stone-200 rounded-xl shadow-xs">
-                <label className="block text-xs font-bold uppercase tracking-wider text-stone-500 mb-2">
+              <div className="bg-white p-4 sm:p-5 border border-stone-200/90 rounded-xl shadow-xs">
+                <label className="block text-xs font-mono font-bold uppercase tracking-wider text-[#7C5E38] mb-2">
                   Поиск по процедурам и показаниям
                 </label>
                 <div className="relative">
@@ -467,21 +582,23 @@ export default function MedicalPage({
                       <button
                         key={prog.id}
                         onClick={() => setActiveTab(prog.id)}
-                        className={`w-full text-left p-4 border rounded-xl transition-all duration-200 flex items-start justify-between group cursor-pointer ${
+                        className={`w-full text-left p-4 sm:p-4.5 border rounded-xl transition-colors duration-200 flex items-start justify-between group cursor-pointer ${
                           isSelected 
                             ? 'bg-[#022C22] border-[#022C22] text-white shadow-sm' 
-                            : 'bg-white border-stone-200 hover:border-[#c5a880] text-[#022C22]'
+                            : 'bg-white border-stone-200/90 hover:border-[#c5a880] text-[#022C22]'
                         }`}
                       >
-                        <div className="flex items-start space-x-3.5">
-                          <span className={`font-mono tabular-nums text-xs font-bold mt-0.5 ${isSelected ? 'text-[#c5a880]' : 'text-stone-400'}`}>
+                        <div className="flex items-start space-x-3.5 min-w-0">
+                          <span className={`font-mono tabular-nums text-xs font-bold px-2 py-1 rounded-md shrink-0 mt-0.5 ${
+                            isSelected ? 'bg-[#011F18] text-[#c5a880] border border-[#c5a880]/30' : 'bg-[#F2EFE9] text-[#7C5E38]'
+                          }`}>
                             0{index + 1}
                           </span>
-                          <div>
+                          <div className="min-w-0">
                             <h4 className={`font-serif font-bold text-sm sm:text-base leading-snug ${isSelected ? 'text-white' : 'text-[#022C22]'}`}>
                               {prog.title}
                             </h4>
-                            <p className={`text-xs mt-1.5 line-clamp-2 leading-relaxed ${isSelected ? 'text-stone-300' : 'text-stone-500'}`}>
+                            <p className={`text-xs mt-1.5 line-clamp-2 leading-relaxed ${isSelected ? 'text-stone-300' : 'text-stone-600'}`}>
                               {prog.shortDesc}
                             </p>
                           </div>
@@ -497,21 +614,25 @@ export default function MedicalPage({
               </div>
 
               {/* SANATORNO-KURORTNAYA KARTA INFO CARD */}
-              <div className="bg-white border border-stone-200 rounded-xl p-5 space-y-4 shadow-xs">
+              <div className="bg-[#F2EFE9] border border-stone-200/90 rounded-xl p-5 space-y-4">
                 <div className="flex items-start space-x-3">
-                  <Award className="w-5 h-5 text-[#7C5E38] shrink-0 mt-0.5" />
+                  <div className="w-8 h-8 rounded-lg bg-[#022C22] text-[#c5a880] flex items-center justify-center shrink-0 mt-0.5">
+                    <Award className="w-4 h-4" />
+                  </div>
                   <div>
                     <h5 className="font-serif text-sm font-bold text-[#022C22]">Санаторно-курортная карта</h5>
-                    <p className="text-xs text-stone-600 leading-relaxed mt-1">
+                    <p className="text-xs text-stone-700 leading-relaxed mt-1">
                       Для назначения полного комплекса бальнео-, грязе- и физиопроцедур требуется санаторно-курортная карта (форма 072/у для взрослых, 076/у для детей).
                     </p>
                   </div>
                 </div>
-                <div className="flex items-start space-x-3 border-t border-stone-200 pt-3">
-                  <ShieldAlert className="w-5 h-5 text-[#7C5E38] shrink-0 mt-0.5" />
+                <div className="flex items-start space-x-3 border-t border-stone-300/70 pt-3.5">
+                  <div className="w-8 h-8 rounded-lg bg-[#022C22] text-[#c5a880] flex items-center justify-center shrink-0 mt-0.5">
+                    <ShieldAlert className="w-4 h-4" />
+                  </div>
                   <div>
                     <h5 className="font-serif text-sm font-bold text-[#022C22]">Индивидуальные назначения</h5>
-                    <p className="text-xs text-stone-600 leading-relaxed mt-1">
+                    <p className="text-xs text-stone-700 leading-relaxed mt-1">
                       Перечень процедур, лечебный режим терренкура и диетический стол определяются лечащим врачом и врачом-физиотерапевтом с учетом основного и сопутствующих заболеваний.
                     </p>
                   </div>
@@ -530,21 +651,21 @@ export default function MedicalPage({
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -10 }}
                     transition={{ duration: 0.2 }}
-                    className="bg-white border border-stone-200 rounded-xl overflow-hidden shadow-xs"
+                    className="bg-white border border-stone-200/90 rounded-2xl overflow-hidden shadow-xs"
                   >
                     
                     {/* Hero Image inside program card */}
-                    <div className="relative h-64 sm:h-80 w-full overflow-hidden bg-[#022C22]">
+                    <div className="relative h-64 sm:h-76 w-full overflow-hidden bg-[#011F18]">
                       <img
                         src={activeProgramObj.image || images.medical || '/images/pestovo_medical_1779777676990.png'}
                         alt={activeProgramObj.title}
                         className="w-full h-full object-cover"
                         referrerPolicy="no-referrer"
                       />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/35 to-transparent"></div>
+                      <div className="absolute inset-0 bg-gradient-to-t from-[#011F18]/90 via-[#022C22]/40 to-transparent"></div>
                       <div className="absolute bottom-6 left-6 right-6 text-white flex flex-col sm:flex-row sm:items-end justify-between gap-4">
                         <div>
-                          <div className="flex items-center space-x-2 text-[#c5a880] text-xs font-mono uppercase tracking-widest font-bold mb-2">
+                          <div className="inline-flex items-center flex-wrap gap-2 bg-[#011F18]/90 border border-[#c5a880]/40 px-3 py-1 rounded-lg text-[#c5a880] text-xs font-mono uppercase tracking-wider font-bold mb-2.5">
                             {getMedicalIcon(activeProgramObj.icon)}
                             <span>Профильное направление лечения</span>
                             <span aria-hidden="true">·</span>
@@ -558,57 +679,86 @@ export default function MedicalPage({
                     </div>
 
                     {/* Program Description */}
-                    <div className="p-6 sm:p-10 space-y-8">
-                      <div>
-                        <h4 className="font-serif text-xl font-bold text-[#022C22] mb-3">
+                    <div className="p-6 sm:p-8 lg:p-10 space-y-8">
+                      <div className="bg-[#FAF9F6] border border-stone-200/90 rounded-xl p-5 sm:p-6">
+                        <span className="block text-[11px] font-mono uppercase tracking-widest text-[#7C5E38] font-bold mb-1.5">
+                          Клиническая характеристика
+                        </span>
+                        <h4 className="font-serif text-lg sm:text-xl font-bold text-[#022C22] mb-2.5">
                           Клиническое описание программы
                         </h4>
-                        <p className="text-stone-700 text-sm sm:text-base leading-relaxed max-w-3xl">
+                        <p className="text-stone-700 text-sm sm:text-base leading-relaxed">
                           {activeProgramObj.fullDesc}
                         </p>
                       </div>
 
                       {/* Indications & Procedures list */}
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-6 border-t border-stone-200">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         
                         {/* Indications */}
-                        <div className="bg-[#FAF9F6] p-6 border border-stone-200 rounded-xl">
-                          <h4 className="text-[#022C22] font-sans text-xs uppercase tracking-wider font-bold mb-4 pb-2 border-b border-stone-200 flex items-center">
-                            <Check className="w-4 h-4 text-emerald-800 mr-2 shrink-0" />
-                            Показания к назначению
-                          </h4>
-                          <ul className="space-y-3">
-                            {activeProgramObj.indications?.map((ind, i) => (
-                              <li key={i} className="text-xs sm:text-sm text-stone-700 flex items-start leading-relaxed font-sans">
-                                <span className="font-mono tabular-nums text-[11px] font-bold text-[#7C5E38] mr-2.5 mt-0.5 shrink-0">0{i + 1}.</span>
-                                <span>{ind}</span>
-                              </li>
-                            )) || <li className="text-xs text-stone-500 font-sans">Определяются лечащим врачом</li>}
-                          </ul>
+                        <div className="bg-[#FAF9F6] p-5 sm:p-6 border border-stone-200/90 rounded-xl flex flex-col justify-between">
+                          <div>
+                            <div className="flex items-center justify-between pb-3 mb-4 border-b border-stone-200">
+                              <h4 className="text-[#022C22] font-sans text-xs uppercase tracking-wider font-bold flex items-center">
+                                <Check className="w-4 h-4 text-[#022C22] mr-2 shrink-0" />
+                                Показания к назначению
+                              </h4>
+                              <span className="font-mono text-[11px] text-[#7C5E38] font-bold tabular-nums">
+                                {activeProgramObj.indications?.length || 0} поз.
+                              </span>
+                            </div>
+                            <ul className="space-y-2">
+                              {activeProgramObj.indications?.map((ind, i) => (
+                                <li
+                                  key={i}
+                                  className="bg-white border border-stone-200/80 rounded-lg px-3.5 py-2.5 text-xs sm:text-sm text-stone-700 flex items-start leading-snug font-sans"
+                                >
+                                  <span className="font-mono tabular-nums text-[11px] font-bold text-[#7C5E38] mr-2.5 mt-0.5 shrink-0">
+                                    {String(i + 1).padStart(2, '0')}.
+                                  </span>
+                                  <span>{ind}</span>
+                                </li>
+                              )) || <li className="text-xs text-stone-500 font-sans">Определяются лечащим врачом</li>}
+                            </ul>
+                          </div>
                         </div>
 
                         {/* Procedures */}
-                        <div className="bg-[#FAF9F6] p-6 border border-stone-200 rounded-xl">
-                          <h4 className="text-[#022C22] font-sans text-xs uppercase tracking-wider font-bold mb-4 pb-2 border-b border-stone-200 flex items-center">
-                            <Check className="w-4 h-4 text-[#7C5E38] mr-2 shrink-0" />
-                            Применяемые методики и процедуры
-                          </h4>
-                          <ul className="space-y-3">
-                            {activeProgramObj.procedures?.map((proc, i) => (
-                              <li key={i} className="text-xs sm:text-sm text-stone-700 flex items-start leading-relaxed font-sans">
-                                <span className="font-mono tabular-nums text-[11px] font-bold text-[#022C22] mr-2.5 mt-0.5 shrink-0">0{i + 1}.</span>
-                                <span>{proc}</span>
-                              </li>
-                            )) || <li className="text-xs text-stone-500 font-sans">Назначаются индивидуально</li>}
-                          </ul>
+                        <div className="bg-[#FAF9F6] p-5 sm:p-6 border border-stone-200/90 rounded-xl flex flex-col justify-between">
+                          <div>
+                            <div className="flex items-center justify-between pb-3 mb-4 border-b border-stone-200">
+                              <h4 className="text-[#022C22] font-sans text-xs uppercase tracking-wider font-bold flex items-center">
+                                <Stethoscope className="w-4 h-4 text-[#7C5E38] mr-2 shrink-0" />
+                                Применяемые методики и процедуры
+                              </h4>
+                              <span className="font-mono text-[11px] text-[#7C5E38] font-bold tabular-nums">
+                                {activeProgramObj.procedures?.length || 0} мет.
+                              </span>
+                            </div>
+                            <ul className="space-y-2">
+                              {activeProgramObj.procedures?.map((proc, i) => (
+                                <li
+                                  key={i}
+                                  className="bg-white border border-stone-200/80 rounded-lg px-3.5 py-2.5 text-xs sm:text-sm text-stone-700 flex items-start leading-snug font-sans"
+                                >
+                                  <span className="font-mono tabular-nums text-[11px] font-bold text-[#022C22] mr-2.5 mt-0.5 shrink-0">
+                                    {String(i + 1).padStart(2, '0')}.
+                                  </span>
+                                  <span>{proc}</span>
+                                </li>
+                              )) || <li className="text-xs text-stone-500 font-sans">Назначаются индивидуально</li>}
+                            </ul>
+                          </div>
                         </div>
 
                       </div>
 
                       {/* Booking Prompt */}
-                      <div className="bg-[#022C22] text-[#FAF9F6] p-6 rounded-xl border border-[#c5a880]/30 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+                      <div className="bg-[#022C22] text-[#FAF9F6] p-5 sm:p-6 rounded-xl border border-[#c5a880]/30 flex flex-col md:flex-row items-start md:items-center justify-between gap-5">
                         <div className="space-y-1">
-                          <span className="text-[#c5a880] font-bold text-xs uppercase tracking-wider font-mono block">Стандарты санаторно-курортной помощи</span>
+                          <span className="text-[#c5a880] font-bold text-xs uppercase tracking-wider font-mono block">
+                            Стандарты санаторно-курортной помощи
+                          </span>
                           <p className="text-xs sm:text-sm text-stone-300 max-w-xl leading-relaxed">
                             Программа лечения составляется персонально после осмотра лечащим врачом и консультации профильных специалистов (физиотерапевта, педиатра, врача функциональной диагностики).
                           </p>
@@ -625,7 +775,7 @@ export default function MedicalPage({
                               }
                             }, 150);
                           }}
-                          className="bg-[#c5a880] hover:bg-[#b09268] text-[#022C22] px-6 py-3 text-xs font-bold uppercase tracking-wider rounded-lg transition-colors inline-flex items-center gap-2 shrink-0 cursor-pointer whitespace-nowrap"
+                          className="bg-[#c5a880] hover:bg-[#bca075] text-[#022C22] px-6 py-3 text-xs font-bold uppercase tracking-wider rounded-lg transition-colors inline-flex items-center gap-2 shrink-0 cursor-pointer whitespace-nowrap"
                         >
                           <Phone className="w-3.5 h-3.5" />
                           <span>Связаться с санаторием</span>
@@ -643,37 +793,40 @@ export default function MedicalPage({
         </section>
 
         {/* STRUCTURE OF MEDICAL DEPARTMENT & CABINETS + DIET NUTRITION */}
-        <section className="bg-white border border-stone-200 rounded-xl p-6 sm:p-10 space-y-8 shadow-xs">
+        <section className="bg-white border border-stone-200/90 rounded-2xl p-6 sm:p-8 lg:p-10 space-y-8 shadow-xs">
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-stone-200 pb-5">
             <div>
-              <span className="text-xs font-mono uppercase tracking-widest text-[#7C5E38] font-bold block mb-1">
-                Структура медицинского отделения · 9 профильных подразделений
-              </span>
-              <h3 className="font-serif text-2xl sm:text-3xl font-bold text-[#022C22]">
+              <div className="flex items-center space-x-2 mb-1">
+                <span className="h-[1px] w-8 bg-[#7C5E38]"></span>
+                <span className="text-xs font-mono uppercase tracking-widest text-[#7C5E38] font-bold">
+                  Структура медицинского отделения · 9 профильных подразделений
+                </span>
+              </div>
+              <h3 className="font-serif text-2xl sm:text-3xl font-bold text-[#022C22] tracking-tight mt-1">
                 Лечебные кабинеты, оборудование и бальнеогрязелечение
               </h3>
             </div>
-            <p className="text-xs sm:text-sm text-stone-600 font-sans max-w-md">
+            <p className="text-xs sm:text-sm text-stone-600 font-sans max-w-md leading-relaxed">
               Ванны чередуются с лечебными душами, аппаратной физиотерапией, грязевыми аппликациями Сакского озера и занятиями ЛФК.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
             {medicalCabinets.map((cab) => (
               <div
                 key={cab.num}
-                className="bg-[#FAF9F6] border border-stone-200 rounded-xl p-6 flex flex-col justify-between hover:border-[#c5a880] transition-colors"
+                className="bg-[#FAF9F6] border border-stone-200/90 rounded-xl p-5 sm:p-6 flex flex-col justify-between hover:border-[#c5a880] transition-colors h-full"
               >
                 <div className="space-y-3">
-                  <div className="flex items-baseline justify-between gap-2 border-b border-stone-200 pb-2.5">
-                    <span className="font-mono tabular-nums text-lg font-bold text-[#7C5E38]">
+                  <div className="flex items-center justify-between gap-3 border-b border-stone-200 pb-3">
+                    <span className="w-8 h-8 rounded-lg bg-[#022C22] text-[#c5a880] font-mono tabular-nums text-xs font-bold flex items-center justify-center shrink-0">
                       {cab.num}
                     </span>
-                    <span className="text-[11px] font-mono uppercase tracking-wider text-stone-500 text-right">
+                    <span className="text-[11px] font-mono uppercase tracking-wider text-[#7C5E38] font-bold text-right leading-tight">
                       {cab.subtitle}
                     </span>
                   </div>
-                  <h4 className="font-serif text-lg font-bold text-[#022C22]">
+                  <h4 className="font-serif text-base sm:text-lg font-bold text-[#022C22] leading-snug">
                     {cab.title}
                   </h4>
                   <p className="text-xs sm:text-sm text-stone-600 leading-relaxed">
@@ -686,145 +839,174 @@ export default function MedicalPage({
 
           {/* Dietetic Nutrition Highlight */}
           <div className="bg-[#022C22] text-white p-6 sm:p-8 rounded-xl border border-[#c5a880]/30 grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
-            <div className="lg:col-span-8 space-y-2">
+            <div className="lg:col-span-8 space-y-2.5">
               <div className="flex items-center gap-2 text-[#c5a880] text-xs font-mono uppercase tracking-widest font-bold">
-                <Utensils className="w-4 h-4" />
+                <Utensils className="w-4 h-4 shrink-0" />
                 <span>Лечебное диетическое питание · 22-дневное заказное меню</span>
               </div>
-              <h4 className="font-serif text-xl sm:text-2xl font-bold">
+              <h4 className="font-serif text-xl sm:text-2xl font-bold tracking-tight">
                 Организация диетического питания под контролем Совета по питанию
               </h4>
               <p className="text-xs sm:text-sm text-stone-300 leading-relaxed max-w-2xl">
                 Диетическое питание отдыхающих осуществляется по заказной системе на основании 22-дневного меню с учётом рекомендаций специалистов Совета по питанию. Столовая санатория оснащена новым технологическим оборудованием. Согласно диете, назначенной лечащим врачом, отдыхающих весь срок лечения курирует медицинская сестра диетическая.
               </p>
             </div>
-            <div className="lg:col-span-4 grid grid-cols-2 divide-x divide-white/15 border border-white/15 rounded-lg bg-white/5 text-center">
-              <div className="p-4">
+            <div className="lg:col-span-4 grid grid-cols-2 gap-3 text-center">
+              <div className="p-4 bg-[#011F18] border border-[#c5a880]/25 rounded-xl">
                 <span className="block font-mono tabular-nums text-2xl font-bold text-[#c5a880]">22 дня</span>
-                <span className="text-xs text-stone-300 block mt-1">заказное меню по диетам</span>
+                <span className="text-xs text-stone-300 block mt-1.5">заказное меню по диетам</span>
               </div>
-              <div className="p-4">
+              <div className="p-4 bg-[#011F18] border border-[#c5a880]/25 rounded-xl">
                 <span className="block font-mono tabular-nums text-2xl font-bold text-[#c5a880]">100%</span>
-                <span className="text-xs text-stone-300 block mt-1">курация диетсестрой</span>
+                <span className="text-xs text-stone-300 block mt-1.5">курация диетсестрой</span>
               </div>
             </div>
           </div>
         </section>
 
         {/* DIAGNOSTIC BASE SECTION */}
-        <section className="bg-white border border-stone-200 rounded-xl p-6 sm:p-10 space-y-8 shadow-xs">
+        <section className="bg-white border border-stone-200/90 rounded-2xl p-6 sm:p-8 lg:p-10 space-y-8 shadow-xs">
           <div className="border-b border-stone-200 pb-5">
-            <span className="text-xs font-mono uppercase tracking-widest text-[#7C5E38] font-bold block mb-1">
-              Клиническая и инструментальная диагностика
-            </span>
-            <h3 className="font-serif text-2xl sm:text-3xl font-bold text-[#022C22]">
+            <div className="flex items-center space-x-2 mb-1">
+              <span className="h-[1px] w-8 bg-[#7C5E38]"></span>
+              <span className="text-xs font-mono uppercase tracking-widest text-[#7C5E38] font-bold">
+                Клиническая и инструментальная диагностика
+              </span>
+            </div>
+            <h3 className="font-serif text-2xl sm:text-3xl font-bold text-[#022C22] tracking-tight mt-1">
               Диагностическая база санатория
             </h3>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="bg-[#FAF9F6] border border-stone-200 rounded-xl p-6 space-y-3">
-              <div className="text-xs font-mono uppercase tracking-wider text-[#7C5E38] font-bold border-b border-stone-200 pb-2">
-                01 · Лабораторная диагностика
+            <div className="bg-[#FAF9F6] border border-stone-200/90 rounded-xl p-6 flex flex-col justify-between space-y-4">
+              <div className="space-y-3">
+                <div className="flex items-center justify-between border-b border-stone-200 pb-3">
+                  <span className="text-xs font-mono uppercase tracking-wider text-[#7C5E38] font-bold">
+                    01 · Лабораторная диагностика
+                  </span>
+                  <Microscope className="w-4 h-4 text-[#7C5E38] shrink-0" />
+                </div>
+                <h4 className="font-serif text-lg font-bold text-[#022C22] leading-snug">
+                  Клинико-биохимическая и ИФА лаборатория
+                </h4>
+                <p className="text-xs sm:text-sm text-stone-600 leading-relaxed">
+                  Лаборатория санатория выполняет широкий спектр клинических, биохимических и иммуноферментных анализов крови, в том числе определяет содержание специфических ферментов для точной оценки функционального состояния органов и контроля эффективности терапии.
+                </p>
               </div>
-              <h4 className="font-serif text-lg font-bold text-[#022C22]">
-                Клинико-биохимическая и ИФА лаборатория
-              </h4>
-              <p className="text-xs sm:text-sm text-stone-600 leading-relaxed">
-                Лаборатория санатория выполняет широкий спектр клинических, биохимических и иммуноферментных анализов крови, в том числе определяет содержание специфических ферментов для точной оценки функционального состояния органов и контроля эффективности терапии.
-              </p>
             </div>
 
-            <div className="bg-[#FAF9F6] border border-[#c5a880] rounded-xl p-6 space-y-3">
-              <div className="text-xs font-mono uppercase tracking-wider text-[#022C22] font-bold border-b border-[#c5a880]/40 pb-2">
-                02 · Оснащение 2026 г. · Аппарат «РуСкан»
+            <div className="bg-[#FAF9F6] border-2 border-[#c5a880] rounded-xl p-6 flex flex-col justify-between space-y-4">
+              <div className="space-y-3">
+                <div className="flex items-center justify-between border-b border-[#c5a880]/40 pb-3">
+                  <span className="text-xs font-mono uppercase tracking-wider text-[#022C22] font-bold">
+                    02 · Оснащение 2026 г. · Аппарат «РуСкан»
+                  </span>
+                  <span className="bg-[#022C22] text-[#c5a880] font-mono text-[10px] font-bold px-2 py-0.5 rounded uppercase">
+                    2026
+                  </span>
+                </div>
+                <h4 className="font-serif text-lg font-bold text-[#022C22] leading-snug">
+                  Кабинет ультразвуковой диагностики
+                </h4>
+                <p className="text-xs sm:text-sm text-stone-600 leading-relaxed">
+                  С 2026 года работает кабинет УЗИ, оснащённый отечественным аппаратом экспертного класса «РуСкан». Проводятся исследования щитовидной железы, печени, желчного пузыря и желчевыводящих путей, почек, мочевого пузыря и мочевыводящих путей, простаты, эндокринной системы, сосудов головы, шеи и нижних конечностей.
+                </p>
               </div>
-              <h4 className="font-serif text-lg font-bold text-[#022C22]">
-                Кабинет ультразвуковой диагностики
-              </h4>
-              <p className="text-xs sm:text-sm text-stone-600 leading-relaxed">
-                С 2026 года работает кабинет УЗИ, оснащённый отечественным аппаратом экспертного класса «РуСкан». Проводятся исследования щитовидной железы, печени, желчного пузыря и желчевыводящих путей, почек, мочевого пузыря и мочевыводящих путей, простаты, эндокринной системы, сосудов головы, шеи и нижних конечностей.
-              </p>
             </div>
 
-            <div className="bg-[#FAF9F6] border border-stone-200 rounded-xl p-6 space-y-3">
-              <div className="text-xs font-mono uppercase tracking-wider text-[#7C5E38] font-bold border-b border-stone-200 pb-2">
-                03 · Кардио-респираторный контроль
+            <div className="bg-[#FAF9F6] border border-stone-200/90 rounded-xl p-6 flex flex-col justify-between space-y-4">
+              <div className="space-y-3">
+                <div className="flex items-center justify-between border-b border-stone-200 pb-3">
+                  <span className="text-xs font-mono uppercase tracking-wider text-[#7C5E38] font-bold">
+                    03 · Кардио-респираторный контроль
+                  </span>
+                  <Activity className="w-4 h-4 text-[#7C5E38] shrink-0" />
+                </div>
+                <h4 className="font-serif text-lg font-bold text-[#022C22] leading-snug">
+                  Кабинет функциональной диагностики
+                </h4>
+                <p className="text-xs sm:text-sm text-stone-600 leading-relaxed">
+                  В кабинете функциональной диагностики проводятся электрокардиографические исследования (ЭКГ) и диагностика функции внешнего дыхания (ФВД / спирография) для объективного подбора нагрузок, терренкура и физиопроцедур.
+                </p>
               </div>
-              <h4 className="font-serif text-lg font-bold text-[#022C22]">
-                Кабинет функциональной диагностики
-              </h4>
-              <p className="text-xs sm:text-sm text-stone-600 leading-relaxed">
-                В кабинете функциональной диагностики проводятся электрокардиографические исследования (ЭКГ) и диагностика функции внешнего дыхания (ФВД / спирография) для объективного подбора нагрузок, терренкура и физиопроцедур.
-              </p>
             </div>
           </div>
         </section>
 
         {/* FULL LICENSE NOMENCLATURE SECTION (24 TYPES OF WORKS/SERVICES) */}
-        <section className="bg-white border border-stone-200 rounded-xl overflow-hidden shadow-xs">
+        <section className="bg-white border border-stone-200/90 rounded-2xl overflow-hidden shadow-xs">
           <div className="bg-[#022C22] text-white p-6 sm:p-8 border-b border-[#c5a880]/30 flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
-              <div className="text-[#c5a880] text-xs font-mono uppercase tracking-widest font-bold mb-1">
-                Государственный реестр лицензий Росздравнадзора
+              <div className="text-[#c5a880] text-xs font-mono uppercase tracking-widest font-bold mb-1.5 flex items-center gap-2">
+                <Award className="w-4 h-4 shrink-0" />
+                <span>Государственный реестр лицензий Росздравнадзора</span>
               </div>
-              <h3 className="font-serif text-xl sm:text-2xl font-bold tracking-tight">
+              <h3 className="font-serif text-xl sm:text-2xl lg:text-3xl font-bold tracking-tight">
                 Номенклатура лицензированных медицинских работ и услуг (24 вида)
               </h3>
             </div>
-            <div className="text-stone-300 font-mono tabular-nums text-xs border border-[#c5a880]/40 rounded-lg px-4 py-2 bg-white/5 shrink-0">
-              Лицензия № <strong className="text-white">Л041-00110-91/00554225</strong>
+            <div className="text-stone-200 font-mono tabular-nums text-xs border border-[#c5a880]/40 rounded-xl px-4 py-3 bg-[#011F18] shrink-0 self-start md:self-auto">
+              Лицензия № <strong className="text-[#c5a880] font-bold">Л041-00110-91/00554225</strong>
             </div>
           </div>
 
-          <div className="p-6 sm:p-10 space-y-8">
-            {/* License Requisites Header Strip */}
-            <div className="bg-[#FAF9F6] border border-stone-200 rounded-xl p-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 text-xs">
-              <div>
-                <span className="text-stone-500 block">Лицензиат:</span>
-                <strong className="text-[#022C22] font-bold block mt-1">ФГКУ «Санаторий «Ясная Поляна» ФТС России»</strong>
+          <div className="p-6 sm:p-8 lg:p-10 space-y-8">
+            {/* License Requisites Header Strip — Structured Cells */}
+            <div className="bg-[#F2EFE9] border border-stone-300/80 rounded-xl p-4 sm:p-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5 text-xs">
+              <div className="bg-white border border-stone-200/90 rounded-lg p-3.5 flex flex-col justify-between">
+                <span className="text-[11px] font-mono uppercase tracking-wider text-[#7C5E38] font-bold block">Лицензиат:</span>
+                <strong className="text-[#022C22] font-bold block mt-1.5 text-xs sm:text-[13px] leading-snug">
+                  ФГКУ «Санаторий «Ясная Поляна» ФТС России»
+                </strong>
               </div>
-              <div>
-                <span className="text-stone-500 block">ИНН / Рег. номер лицензии:</span>
-                <strong className="font-mono tabular-nums text-[#022C22] font-bold block mt-1">7713778678 / Л041-00110-91/00554225</strong>
+              <div className="bg-white border border-stone-200/90 rounded-lg p-3.5 flex flex-col justify-between">
+                <span className="text-[11px] font-mono uppercase tracking-wider text-[#7C5E38] font-bold block">ИНН / Рег. номер лицензии:</span>
+                <strong className="font-mono tabular-nums text-[#022C22] font-bold block mt-1.5 text-xs sm:text-[13px] leading-snug">
+                  7713778678 / Л041-00110-91/00554225
+                </strong>
               </div>
-              <div>
-                <span className="text-stone-500 block">Дата предоставления:</span>
-                <strong className="font-mono tabular-nums text-[#022C22] font-bold block mt-1">22.06.2022 (Бессрочно)</strong>
+              <div className="bg-white border border-stone-200/90 rounded-lg p-3.5 flex flex-col justify-between">
+                <span className="text-[11px] font-mono uppercase tracking-wider text-[#7C5E38] font-bold block">Дата предоставления:</span>
+                <strong className="font-mono tabular-nums text-[#022C22] font-bold block mt-1.5 text-xs sm:text-[13px] leading-snug">
+                  22.06.2022 (Бессрочно)
+                </strong>
               </div>
-              <div>
-                <span className="text-stone-500 block">Адрес места осуществления деятельности:</span>
-                <strong className="text-[#022C22] font-bold block mt-1">298660, Республика Крым, г. Ялта, пгт. Гаспра, ш. Севастопольское, д. 52</strong>
+              <div className="bg-white border border-stone-200/90 rounded-lg p-3.5 flex flex-col justify-between">
+                <span className="text-[11px] font-mono uppercase tracking-wider text-[#7C5E38] font-bold block">Адрес места осуществления деятельности:</span>
+                <strong className="text-[#022C22] font-bold block mt-1.5 text-xs sm:text-[13px] leading-snug">
+                  298660, Республика Крым, г. Ялта, пгт. Гаспра, ш. Севастопольское, д. 52
+                </strong>
               </div>
             </div>
 
-            {/* 5 Official Categories with 24 Codes */}
-            <div className="space-y-6">
+            {/* 5 Official Categories with 24 Codes — Structured Registry Tables */}
+            <div className="space-y-5">
               {licenseCategories.map((cat) => (
-                <div key={cat.code} className="border border-stone-200 rounded-xl p-5 sm:p-6 bg-[#FAF9F6]/50">
-                  <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-2 pb-3 mb-4 border-b border-stone-200">
-                    <div className="flex items-baseline gap-3">
-                      <span className="font-mono tabular-nums text-xs font-bold text-[#7C5E38]">
+                <div key={cat.code} className="border border-stone-200/90 rounded-xl overflow-hidden bg-white shadow-2xs">
+                  <div className="bg-[#FAF9F6] px-5 py-4 border-b border-stone-200 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+                    <div className="flex items-start sm:items-center gap-3">
+                      <span className="bg-[#022C22] text-[#c5a880] font-mono tabular-nums text-xs font-bold px-2.5 py-1 rounded-md shrink-0">
                         Код {cat.code}
                       </span>
-                      <h4 className="font-serif text-base font-bold text-[#022C22]">
+                      <h4 className="font-serif text-sm sm:text-base font-bold text-[#022C22] leading-snug">
                         {cat.title}
                       </h4>
                     </div>
-                    <span className="text-xs font-mono tabular-nums text-stone-500 shrink-0">
+                    <span className="text-xs font-mono tabular-nums font-semibold text-[#022C22] bg-[#F2EFE9] border border-stone-200/90 px-3 py-1 rounded-md shrink-0 self-start sm:self-auto">
                       Видов работ: {cat.items.length}
                     </span>
                   </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                  <div className="p-4 sm:p-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5 bg-white">
                     {cat.items.map((item) => (
                       <div
                         key={item.code}
-                        className="bg-white border border-stone-200 rounded-lg px-3.5 py-2.5 flex items-baseline gap-2.5 text-xs"
+                        className="bg-[#FAF9F6] hover:bg-[#F2EFE9]/70 transition-colors border border-stone-200/90 rounded-lg px-3.5 py-2.5 flex items-baseline gap-2.5 text-xs"
                       >
-                        <span className="font-mono tabular-nums text-[11px] font-bold text-[#7C5E38] shrink-0">
+                        <span className="font-mono tabular-nums text-[11px] font-bold text-[#7C5E38] bg-[#c5a880]/15 border border-[#c5a880]/30 px-2 py-0.5 rounded shrink-0">
                           {item.code}
                         </span>
-                        <span className="text-[#022C22] font-medium leading-snug">
+                        <span className="text-[#022C22] font-semibold leading-snug">
                           {item.name}
                         </span>
                       </div>

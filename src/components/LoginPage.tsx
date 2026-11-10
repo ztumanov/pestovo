@@ -109,7 +109,7 @@ export default function LoginPage({ onBackToHome }: { onBackToHome: () => void }
                 <div className="w-14 h-14 bg-[#c5a880]/20 border border-[#c5a880]/30 rounded-2xl flex items-center justify-center text-[#c5a880] shadow-lg mb-4">
                   <ShieldAlert className="w-7 h-7" />
                 </div>
-                <h1 className="font-serif font-extrabold text-xl md:text-2xl tracking-wide uppercase text-white">
+                <h1 className="font-serif font-bold text-xl md:text-2xl tracking-wide uppercase text-white">
                   Авторизация сотрудника
                 </h1>
                 <p className="text-xs text-stone-300 mt-2 max-w-xs mx-auto leading-relaxed">
@@ -230,13 +230,6 @@ export default function LoginPage({ onBackToHome }: { onBackToHome: () => void }
           </motion.div>
         </div>
       </main>
-
-      {/* Footer Info */}
-      <footer className="relative z-10 w-full text-center py-6 border-t border-stone-200 bg-stone-100/50">
-        <p className="text-[10px] text-stone-500 font-mono tracking-wider">
-          © {new Date().getFullYear()} ФГКУ «Санаторий «Ясная Поляна» ФТС России. ВСЕ ПРАВА ЗАЩИЩЕНЫ.
-        </p>
-      </footer>
     </div>
   );
 }

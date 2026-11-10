@@ -312,7 +312,7 @@ export default function PrivacyPolicyModal({ isOpen, onClose }: PrivacyPolicyMod
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Поиск по статьям политики..."
-              className="w-full pl-8 pr-3 py-1 bg-white border border-stone-300 rounded-md text-xs text-stone-800 placeholder:text-stone-400 focus:outline-none focus:border-[#022C22] transition-colors"
+              className="w-full pl-8 pr-3 py-1 bg-white border border-stone-300 rounded-lg text-xs text-stone-800 placeholder:text-stone-400 focus:outline-none focus:border-[#022C22] transition-colors"
             />
             {searchQuery && (
               <button 
@@ -369,7 +369,7 @@ export default function PrivacyPolicyModal({ isOpen, onClose }: PrivacyPolicyMod
 
           {/* Document Reader Sheet */}
           <div ref={contentRef} className="flex-1 overflow-y-auto p-4 sm:p-6 md:p-8 space-y-6">
-            <div className="max-w-3xl mx-auto bg-white p-6 sm:p-10 md:p-12 rounded-xl border border-stone-200 shadow-sm relative text-stone-850 font-sans">
+            <div className="max-w-3xl mx-auto bg-white p-6 sm:p-10 md:p-12 rounded-xl border border-stone-200 shadow-sm relative text-stone-800 font-sans">
               
               {/* Document Official Heading */}
               <div className="text-center border-b border-stone-200 pb-6 mb-8">
@@ -469,7 +469,7 @@ export default function PrivacyPolicyModal({ isOpen, onClose }: PrivacyPolicyMod
           <span>По вопросам обработки ПДн: <a href={`mailto:${RESORT_INFO.email}`} className="text-[#022C22] font-bold hover:underline">{RESORT_INFO.email}</a></span>
           <button 
             onClick={onClose}
-            className="bg-[#022C22] hover:bg-[#c5a880] text-white hover:text-[#022C22] text-xs font-bold px-4 py-1.5 rounded-md transition-colors cursor-pointer font-sans"
+            className="bg-[#022C22] hover:bg-[#c5a880] text-white hover:text-[#022C22] text-xs font-bold px-4 py-1.5 rounded-lg transition-colors cursor-pointer font-sans"
           >
             Закрыть окно
           </button>

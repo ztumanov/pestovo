@@ -139,12 +139,12 @@ export default function NewsPage({ onBackToHome }: { onBackToHome: () => void })
                   </div>
 
                   <div className="p-6 sm:p-7 pb-4">
-                    <div className="flex items-center justify-between gap-2 pb-3 mb-3 border-b border-stone-100 text-[11px] font-mono uppercase tracking-widest text-[#9b7b51]">
+                    <div className="flex items-center justify-between gap-2 pb-3 mb-3 border-b border-stone-100 text-[11px] font-mono uppercase tracking-widest text-[#7C5E38]">
                       <span>{item.categoryLabel || 'События санатория'}</span>
                       <span className="tabular-nums text-stone-400">№ {String(index + 1).padStart(2, '0')}</span>
                     </div>
 
-                    <h3 className="font-serif font-bold leading-snug text-xl text-[#022C22] mb-3 group-hover:text-[#9b7b51] transition-colors line-clamp-2">
+                    <h3 className="font-serif font-bold leading-snug text-xl text-[#022C22] mb-3 group-hover:text-[#7C5E38] transition-colors line-clamp-2">
                       {item.title}
                     </h3>
                     <p className="text-stone-600 text-sm leading-relaxed line-clamp-3">
@@ -154,7 +154,7 @@ export default function NewsPage({ onBackToHome }: { onBackToHome: () => void })
                 </div>
 
                 <div className="px-6 sm:px-7 pb-6 pt-4 mt-auto border-t border-stone-100 flex items-center justify-between">
-                  <span className="text-[#022C22] group-hover:text-[#9b7b51] font-bold text-xs uppercase tracking-widest transition-colors">
+                  <span className="text-[#022C22] group-hover:text-[#7C5E38] font-bold text-xs uppercase tracking-widest transition-colors">
                     Читать материал
                   </span>
                   <ArrowRight className="w-4 h-4 text-[#c5a880] group-hover:translate-x-1 transition-transform" />

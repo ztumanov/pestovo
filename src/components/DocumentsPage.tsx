@@ -237,7 +237,7 @@ export default function DocumentsPage({ onBackToHome }: { onBackToHome: () => vo
               <span className="w-2 h-2 rounded-full bg-[#c5a880]" />
               <span>ФГКУ «Санаторий «Ясная Поляна» ФТС России»</span>
             </div>
-            <h1 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight">
+            <h1 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight">
               Официальный реестр документации
             </h1>
             <p className="text-stone-200 text-sm max-w-2xl leading-relaxed">
@@ -262,7 +262,7 @@ export default function DocumentsPage({ onBackToHome }: { onBackToHome: () => vo
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className="fixed top-24 left-1/2 -translate-x-1/2 z-[100] bg-emerald-950 border border-[#c5a880]/50 text-stone-100 text-xs sm:text-sm px-6 py-4 rounded-md shadow-2xl flex items-center space-x-3 font-semibold max-w-lg text-center"
+            className="fixed top-24 left-1/2 -translate-x-1/2 z-[100] bg-emerald-950 border border-[#c5a880]/50 text-stone-100 text-xs sm:text-sm px-6 py-4 rounded-xl shadow-2xl flex items-center space-x-3 font-semibold max-w-lg text-center"
           >
             <CheckCircle2 className="w-5 h-5 text-[#c5a880] flex-shrink-0" />
             <span>{feedbackMsg}</span>
@@ -415,14 +415,14 @@ export default function DocumentsPage({ onBackToHome }: { onBackToHome: () => vo
                     className="overflow-hidden bg-[#FAF9F6] text-[#1c2a22]"
                   >
                     {/* Tab bars inside Passport */}
-                    <div className="flex border-b border-stone-200 bg-stone-100 select-none">
+                    <div className="flex flex-col sm:flex-row border-b border-stone-200 bg-stone-100 select-none">
                       <button
                         type="button"
                         onClick={() => setActivePassportTab('general')}
-                        className={`flex-1 py-3.5 px-3 text-xs sm:text-sm font-sans font-bold cursor-pointer border-b-2 transition-all ${
+                        className={`flex-1 py-3.5 px-4 sm:px-3 text-left sm:text-center text-xs sm:text-sm font-sans font-bold cursor-pointer border-l-4 sm:border-l-0 border-b border-stone-200/80 sm:border-b-2 transition-all ${
                           activePassportTab === 'general'
-                            ? 'border-[#022C22] text-[#022C22] bg-[#FAF9F6]'
-                            : 'border-transparent text-stone-600 hover:text-[#022C22] hover:bg-stone-200/60'
+                            ? 'border-l-[#022C22] sm:border-b-[#022C22] text-[#022C22] bg-[#FAF9F6]'
+                            : 'border-l-transparent sm:border-b-transparent text-stone-600 hover:text-[#022C22] hover:bg-stone-200/60'
                         }`}
                       >
                         Общие данные и Руководство
@@ -430,10 +430,10 @@ export default function DocumentsPage({ onBackToHome }: { onBackToHome: () => vo
                       <button
                         type="button"
                         onClick={() => setActivePassportTab('medical')}
-                        className={`flex-1 py-3.5 px-3 text-xs sm:text-sm font-sans font-bold cursor-pointer border-b-2 transition-all ${
+                        className={`flex-1 py-3.5 px-4 sm:px-3 text-left sm:text-center text-xs sm:text-sm font-sans font-bold cursor-pointer border-l-4 sm:border-l-0 border-b border-stone-200/80 sm:border-b-2 transition-all ${
                           activePassportTab === 'medical'
-                            ? 'border-[#022C22] text-[#022C22] bg-[#FAF9F6]'
-                            : 'border-transparent text-stone-600 hover:text-[#022C22] hover:bg-stone-200/60'
+                            ? 'border-l-[#022C22] sm:border-b-[#022C22] text-[#022C22] bg-[#FAF9F6]'
+                            : 'border-l-transparent sm:border-b-transparent text-stone-600 hover:text-[#022C22] hover:bg-stone-200/60'
                         }`}
                       >
                         Специализация и Лицензия
@@ -441,10 +441,10 @@ export default function DocumentsPage({ onBackToHome }: { onBackToHome: () => vo
                       <button
                         type="button"
                         onClick={() => setActivePassportTab('structure')}
-                        className={`flex-1 py-3.5 px-3 text-xs sm:text-sm font-sans font-bold cursor-pointer border-b-2 transition-all ${
+                        className={`flex-1 py-3.5 px-4 sm:px-3 text-left sm:text-center text-xs sm:text-sm font-sans font-bold cursor-pointer border-l-4 sm:border-l-0 border-b-0 sm:border-b-2 transition-all ${
                           activePassportTab === 'structure'
-                            ? 'border-[#022C22] text-[#022C22] bg-[#FAF9F6]'
-                            : 'border-transparent text-stone-600 hover:text-[#022C22] hover:bg-stone-200/60'
+                            ? 'border-l-[#022C22] sm:border-b-[#022C22] text-[#022C22] bg-[#FAF9F6]'
+                            : 'border-l-transparent sm:border-b-transparent text-stone-600 hover:text-[#022C22] hover:bg-stone-200/60'
                         }`}
                       >
                         Структура и Профиль
@@ -456,7 +456,7 @@ export default function DocumentsPage({ onBackToHome }: { onBackToHome: () => vo
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                           {/* Left Column: Organization registration */}
                           <div className="space-y-4">
-                            <h3 className="text-xs font-sans font-bold uppercase tracking-wider text-[#9b7b51] border-b border-stone-200 pb-2">Общие реквизиты</h3>
+                            <h3 className="text-xs font-sans font-bold uppercase tracking-wider text-[#7C5E38] border-b border-stone-200 pb-2">Общие реквизиты</h3>
                             <div className="space-y-3 text-sm">
                               <div>
                                 <span className="text-stone-500 block text-xs font-semibold uppercase tracking-wider">Наименование полное:</span>
@@ -499,10 +499,10 @@ export default function DocumentsPage({ onBackToHome }: { onBackToHome: () => vo
 
                           {/* Right Column: Key managers & Registry dates */}
                           <div className="space-y-4">
-                            <h3 className="text-xs font-sans font-bold uppercase tracking-wider text-[#9b7b51] border-b border-stone-200 pb-2">Ответственные лица и Гос. регистрация</h3>
+                            <h3 className="text-xs font-sans font-bold uppercase tracking-wider text-[#7C5E38] border-b border-stone-200 pb-2">Ответственные лица и Гос. регистрация</h3>
                             <div className="space-y-4 text-sm">
                               <div className="bg-white p-4 rounded-xl border border-stone-200 space-y-2.5 shadow-xs">
-                                <span className="text-[#9b7b51] block text-xs font-bold uppercase tracking-wider">Руководитель:</span>
+                                <span className="text-[#7C5E38] block text-xs font-bold uppercase tracking-wider">Руководитель:</span>
                                 <div>
                                   <p className="font-bold text-[#022C22] text-base sm:text-lg font-sans">{siteData?.resortInfo?.directorName || 'Шапортов Станислав Владимирович'}</p>
                                   <p className="text-xs text-stone-600 font-medium mt-0.5">{siteData?.resortInfo?.directorRole || 'Начальник санатория'}</p>
@@ -551,7 +551,7 @@ export default function DocumentsPage({ onBackToHome }: { onBackToHome: () => vo
 
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-2">
                             <div className="space-y-4">
-                              <h5 className="text-xs font-sans font-bold uppercase tracking-wider text-[#9b7b51] border-b border-stone-200 pb-2">Номенклатура лицензированных работ и услуг (24 вида)</h5>
+                              <h5 className="text-xs font-sans font-bold uppercase tracking-wider text-[#7C5E38] border-b border-stone-200 pb-2">Номенклатура лицензированных работ и услуг (24 вида)</h5>
                               <div className="p-3 bg-white rounded-xl border border-stone-200 max-h-[260px] overflow-y-auto space-y-2 text-xs text-stone-800 scrollbar-thin">
                                 <p className="font-bold text-[#022C22]">1000.1. Первичная доврачебная помощь (амбулаторно):</p>
                                 <p className="pl-2 text-stone-700">1000.1.5 лабораторная диагностика; 1000.1.6 лечебная физкультура; 1000.1.7 лечебное дело; 1000.1.12 медицинский массаж; 1000.1.23 физиотерапия; 1000.1.24 функциональная диагностика.</p>
@@ -565,7 +565,7 @@ export default function DocumentsPage({ onBackToHome }: { onBackToHome: () => vo
                                 <p className="pl-2 text-stone-700">1070.8 экспертиза качества медицинской помощи.</p>
                               </div>
                               
-                              <h5 className="text-xs font-sans font-bold uppercase tracking-wider text-[#9b7b51] border-b border-stone-200 pb-2 pt-2">Диагностическая база</h5>
+                              <h5 className="text-xs font-sans font-bold uppercase tracking-wider text-[#7C5E38] border-b border-stone-200 pb-2 pt-2">Диагностическая база</h5>
                               <p className="text-xs sm:text-sm text-stone-800 font-sans leading-relaxed">
                                 <strong className="text-[#022C22]">Ультразвуковая диагностика (с 2026 г.):</strong> отечественный аппарат экспертного класса «РуСкан» (УЗИ щитовидной железы, печени, желчного пузыря и протоков, почек, мочевого пузыря, простаты, эндокринной системы, сосудов головы, шеи и нижних конечностей).
                               </p>
@@ -575,7 +575,7 @@ export default function DocumentsPage({ onBackToHome }: { onBackToHome: () => vo
                             </div>
 
                             <div className="space-y-4">
-                              <h5 className="text-xs font-sans font-bold uppercase tracking-wider text-[#9b7b51] border-b border-stone-200 pb-2">Методы лечения и бальнеогрязелечения</h5>
+                              <h5 className="text-xs font-sans font-bold uppercase tracking-wider text-[#7C5E38] border-b border-stone-200 pb-2">Методы лечения и бальнеогрязелечения</h5>
                               <div className="p-3 bg-white rounded-xl border border-stone-200 max-h-[380px] overflow-y-auto space-y-2.5 text-sm text-stone-800 scrollbar-thin">
                                 <p className="leading-relaxed">• <strong>Грязелечение:</strong> аппликации сульфидных иловых грязей Сакского озера при болезнях костно-мышечной системы и внутренних органов;</p>
                                 <p className="leading-relaxed">• <strong>Бальнеологические ванны:</strong> хвойные, хвойно-жемчужные, йодобромные, лавандовые, ванны с раствором бишофита, с экстрактом пиявки, с крымскими эфирными маслами и морским коллагеном;</p>
@@ -596,7 +596,7 @@ export default function DocumentsPage({ onBackToHome }: { onBackToHome: () => vo
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                           {/* Left column: medical profiles & staff */}
                           <div className="space-y-4">
-                            <h5 className="text-xs font-sans font-bold uppercase tracking-wider text-[#9b7b51] border-b border-stone-200 pb-2">Руководство медициной и профили лечения</h5>
+                            <h5 className="text-xs font-sans font-bold uppercase tracking-wider text-[#7C5E38] border-b border-stone-200 pb-2">Руководство медициной и профили лечения</h5>
                             <div className="space-y-3 text-sm text-stone-800">
                               <div className="bg-white p-3.5 rounded-xl border border-[#c5a880]/50">
                                 <strong className="text-[#022C22] block text-sm font-bold">Кадровый состав (39 сотрудников, 100% аккредитация):</strong>
@@ -625,7 +625,7 @@ export default function DocumentsPage({ onBackToHome }: { onBackToHome: () => vo
                           {/* Right column: internal medical structure */}
                           <div className="space-y-4">
                             <div className="space-y-2">
-                              <h5 className="text-xs font-sans font-bold uppercase tracking-wider text-[#9b7b51] border-b border-stone-200 pb-2">Кабинеты медицинского отделения</h5>
+                              <h5 className="text-xs font-sans font-bold uppercase tracking-wider text-[#7C5E38] border-b border-stone-200 pb-2">Кабинеты медицинского отделения</h5>
                               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs pt-1 text-stone-800">
                                 <span className="bg-white p-2.5 rounded-xl font-semibold border border-stone-200 shadow-2xs">Кабинет грязелечения (Сакские грязи)</span>
                                 <span className="bg-white p-2.5 rounded-xl font-semibold border border-stone-200 shadow-2xs">Бальнеологический кабинет (ванны и души)</span>
@@ -674,7 +674,7 @@ export default function DocumentsPage({ onBackToHome }: { onBackToHome: () => vo
                         <div className="space-y-4 flex-1 min-w-0">
                           {/* Badges row */}
                           <div className="flex flex-wrap items-center gap-2.5">
-                            <span className="text-xs font-sans font-bold uppercase tracking-wider text-[#9b7b51] bg-[#c5a880]/15 border border-[#c5a880]/30 px-3 py-1 rounded-lg">
+                            <span className="text-xs font-sans font-bold uppercase tracking-wider text-[#7C5E38] bg-[#c5a880]/15 border border-[#c5a880]/30 px-3 py-1 rounded-lg">
                               {doc.categoryLabel}
                             </span>
                             {doc.code && (
@@ -703,7 +703,7 @@ export default function DocumentsPage({ onBackToHome }: { onBackToHome: () => vo
                             <div className="min-w-0 flex-1">
                               <h3 
                                 onClick={() => setViewingDoc(doc)}
-                                className="font-sans text-xl sm:text-2xl font-bold text-[#022C22] tracking-tight group-hover:text-[#9b7b51] transition-colors leading-snug cursor-pointer select-none"
+                                className="font-sans text-xl sm:text-2xl font-bold text-[#022C22] tracking-tight group-hover:text-[#7C5E38] transition-colors leading-snug cursor-pointer select-none"
                                 title={`Открыть «${doc.title}»`}
                               >
                                 {formatDocTitle(doc.title)}
